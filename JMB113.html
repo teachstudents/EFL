@@ -86,12 +86,14 @@
 <body>
   <div class="quiz-container">
     <h2>Joel Mitchell's B1 Practice 13</h2>
+
     <!-- Start Screen -->
     <div id="start-screen">
       <label for="username">Enter your name:</label>
       <input type="text" id="username" required>
       <button id="start-btn">Start Quiz</button>
     </div>
+
     <!-- Quiz Screen -->
     <div id="quiz-screen">
       <div id="timer">Time Left: 10:00</div>
@@ -100,6 +102,7 @@
       <div id="feedback"></div>
       <button id="next-btn" style="display: none;">Next Question</button>
     </div>
+
     <!-- Result Screen -->
     <div id="result-screen">
       <h3>Quiz Report</h3>
@@ -109,216 +112,188 @@
   </div>
 
   <script>
-    // Array of 25 science-themed multiple-choice gap-fill questions.
+    // Array of 25 science-themed, gap-fill MCQ questions (using vocabulary appropriate for A1, A2, B1).
     const questions = [
       {
-        question: "The ____ is the control center of the cell that stores DNA.",
-        options: ["nucleus", "cell wall", "cytoplasm", "vacuole"],
-        correct: 0,
-        explanation: "Nucleus means the center of the cell.",
-        detailedExplanation: "The nucleus contains the cell's genetic material and regulates its activities."
-      },
-      {
-        question: "Plants produce food through ____, a process that converts sunlight into energy.",
+        question: "Plants make food from sunlight by a process called ____.",
         options: ["photosynthesis", "respiration", "digestion", "evaporation"],
         correct: 0,
-        explanation: "Photosynthesis is how plants make food.",
-        detailedExplanation: "During photosynthesis, plants use sunlight, water, and carbon dioxide to produce sugar and oxygen."
+        explanation: "Photosynthesis means converting sunlight into energy.",
+        detailedExplanation: "During photosynthesis, plants combine sunlight, water, and carbon dioxide to produce glucose and oxygen, which fuel their growth."
       },
       {
-        question: "The ____ of a plant absorbs water and minerals from the soil.",
+        question: "The basic unit of life is the ____, which contains genetic material.",
+        options: ["cell", "atom", "organ", "molecule"],
+        correct: 0,
+        explanation: "Cell means the smallest living part of an organism.",
+        detailedExplanation: "Cells are the building blocks of all living things and perform vital functions for growth and repair."
+      },
+      {
+        question: "The underground part of a plant that absorbs water is called the ____. ",
         options: ["root", "leaf", "stem", "flower"],
         correct: 0,
-        explanation: "Root means the underground part of a plant.",
-        detailedExplanation: "Roots gather water and nutrients, which are vital for a plant's growth and survival."
+        explanation: "Root means the part of the plant that grows downward.",
+        detailedExplanation: "Roots penetrate the soil to gather water and nutrients, ensuring plant survival."
       },
       {
-        question: "The largest planet in our solar system is ____.",
-        options: ["Jupiter", "Mars", "Venus", "Saturn"],
+        question: "Water changes from liquid to gas through the process of ____. ",
+        options: ["evaporation", "condensation", "freezing", "boiling"],
         correct: 0,
-        explanation: "Jupiter is the largest planet.",
-        detailedExplanation: "Jupiter is a gas giant known for its massive size and the famous Great Red Spot."
+        explanation: "Evaporation means turning into vapor.",
+        detailedExplanation: "When water is heated, its molecules gain energy and change into vapor, forming a key step in the water cycle."
       },
       {
-        question: "When water is heated, it turns into vapor through the process of ____. ",
-        options: ["evaporation", "condensation", "freezing", "melting"],
+        question: "When water cools, it turns into a solid known as ____. ",
+        options: ["ice", "steam", "vapor", "mist"],
         correct: 0,
-        explanation: "Evaporation means liquid to gas.",
-        detailedExplanation: "When water is warmed, its molecules move faster and change from liquid to gas, a key step in the water cycle."
+        explanation: "Ice means frozen water.",
+        detailedExplanation: "Freezing occurs when water loses energy and its molecules arrange into a solid structure, forming ice."
       },
       {
-        question: "A ____ is a tool that magnifies tiny objects such as cells.",
-        options: ["microscope", "telescope", "barometer", "caliper"],
+        question: "The force that pulls objects toward the Earth is called ____. ",
+        options: ["gravity", "friction", "magnetism", "inertia"],
         correct: 0,
-        explanation: "Microscope is used to see small objects.",
-        detailedExplanation: "Microscopes are essential in biology and medicine because they allow scientists to observe cells, bacteria, and other minute structures."
+        explanation: "Gravity pulls objects toward the ground.",
+        detailedExplanation: "Gravity is a natural force that attracts objects, keeping us and everything else securely on Earth."
       },
       {
-        question: "The ____ is the star at the center of our solar system that provides heat and light.",
-        options: ["sun", "moon", "comet", "planet"],
+        question: "Jupiter is the ____ planet in our solar system.",
+        options: ["largest", "smallest", "coldest", "brightest"],
         correct: 0,
-        explanation: "Sun means the star that gives us light.",
-        detailedExplanation: "The sun supports life on Earth by supplying essential energy through nuclear fusion processes."
+        explanation: "Largest means the biggest in size.",
+        detailedExplanation: "Jupiter is known as the largest planet due to its massive size and volume among the planets in our solar system."
       },
       {
-        question: "Joel studies ____ to understand the interactions between organisms and their environment.",
-        options: ["ecology", "algebra", "history", "literature"],
+        question: "During photosynthesis, plants release ____ as a by-product.",
+        options: ["oxygen", "carbon dioxide", "nitrogen", "hydrogen"],
         correct: 0,
-        explanation: "Ecology is the study of organisms and their environment.",
-        detailedExplanation: "Ecology involves examining relationships within ecosystems and understanding how living things depend on one another and their surroundings."
+        explanation: "Oxygen is released during photosynthesis.",
+        detailedExplanation: "As plants convert sunlight into energy, they release oxygen, which is essential for most life forms on Earth."
       },
       {
-        question: "____ is the natural force that pulls objects toward the Earth.",
-        options: ["Gravity", "Friction", "Magnetism", "Inertia"],
-        correct: 0,
-        explanation: "Gravity pulls things toward Earth.",
-        detailedExplanation: "Gravity gives objects weight and is responsible for keeping us grounded and maintaining planetary orbits."
-      },
-      {
-        question: "When water vapor cools, it turns back into liquid in a process called ____. ",
-        options: ["condensation", "evaporation", "sublimation", "precipitation"],
-        correct: 0,
-        explanation: "Condensation is when gas turns into liquid.",
-        detailedExplanation: "Condensation forms dew on grass and droplets on cold surfaces as water vapor loses heat and becomes liquid."
-      },
-      {
-        question: "The ____ of the Earth is made up of solid rock and is the outermost layer.",
-        options: ["crust", "mantle", "core", "atmosphere"],
-        correct: 0,
-        explanation: "Crust means the outer layer of the Earth.",
-        detailedExplanation: "The Earth's crust is the thin, rocky surface on which we live and where most geological activity occurs."
-      },
-      {
-        question: "During photosynthesis, plants convert light energy into ____ energy.",
-        options: ["chemical", "thermal", "electrical", "mechanical"],
-        correct: 0,
-        explanation: "Chemical energy is stored in food molecules.",
-        detailedExplanation: "Through photosynthesis, plants produce sugar, which contains chemical energy that fuels their growth and metabolism."
-      },
-      {
-        question: "____ is the process by which a cell divides to form two identical daughter cells.",
-        options: ["Mitosis", "Meiosis", "Fission", "Fusion"],
-        correct: 0,
-        explanation: "Mitosis means cell division for growth and repair.",
-        detailedExplanation: "Mitosis is essential for a cell’s reproduction, allowing organisms to grow and repair damaged tissues."
-      },
-      {
-        question: "An ____ is a pure substance made up of only one type of atom.",
-        options: ["element", "compound", "mixture", "solution"],
-        correct: 0,
-        explanation: "Element means a basic substance that cannot be broken down chemically.",
-        detailedExplanation: "Elements, such as oxygen or iron, are the simplest forms of matter and combine in various ways to form compounds."
-      },
-      {
-        question: "The process by which liquid water becomes solid is known as ____. ",
-        options: ["freezing", "melting", "boiling", "evaporation"],
-        correct: 0,
-        explanation: "Freezing means turning from liquid to solid.",
-        detailedExplanation: "When water freezes, its temperature drops and its molecules settle into a fixed structure, forming ice."
-      },
-      {
-        question: "A ____ is a massive collection of stars, dust, and gas held together by gravity.",
-        options: ["galaxy", "nebula", "asteroid", "comet"],
-        correct: 0,
-        explanation: "Galaxy means a huge group of stars and other celestial objects.",
-        detailedExplanation: "Our Milky Way is an example of a galaxy, containing billions of stars and forming a significant part of the universe."
-      },
-      {
-        question: "Newton's first law, also called the law of ____, explains that an object at rest stays at rest.",
-        options: ["inertia", "gravity", "momentum", "force"],
-        correct: 0,
-        explanation: "Inertia means resistance to changes in motion.",
-        detailedExplanation: "This law states that an object will continue in its state of rest or uniform motion unless acted upon by an external force."
-      },
-      {
-        question: "In a ____ circuit, components are connected one after the other in a single path.",
-        options: ["series", "parallel", "complex", "simple"],
-        correct: 0,
-        explanation: "Series means connected in a single chain.",
-        detailedExplanation: "A series circuit is one where the electrical current flows through each component sequentially, meaning if one component fails, the entire circuit is interrupted."
-      },
-      {
-        question: "A ____ is an instrument used to measure temperature.",
-        options: ["thermometer", "barometer", "hygrometer", "anemometer"],
-        correct: 0,
-        explanation: "Thermometer means a device that measures temperature.",
-        detailedExplanation: "Thermometers are used in weather forecasting, medicine, and many other fields to monitor temperature changes."
-      },
-      {
-        question: "In the eye, the ____ is the opening that adjusts its size to control the amount of light entering.",
-        options: ["pupil", "iris", "retina", "lens"],
-        correct: 0,
-        explanation: "Pupil means the dark opening in the center of the eye.",
-        detailedExplanation: "The pupil enlarges or constricts based on light conditions, regulating the light that reaches the retina for proper vision."
-      },
-      {
-        question: "The ____ layer of the atmosphere absorbs most of the Sun's ultraviolet radiation.",
-        options: ["ozone", "carbon", "nitrogen", "sulfur"],
-        correct: 0,
-        explanation: "Ozone means a form of oxygen that absorbs UV light.",
-        detailedExplanation: "The ozone layer acts as a shield for Earth, protecting living organisms from the harmful effects of ultraviolet radiation."
-      },
-      {
-        question: "Scientists study ____ to learn about the structure and composition of the Earth.",
-        options: ["geology", "psychology", "economics", "astronomy"],
-        correct: 0,
-        explanation: "Geology is the study of Earth's physical structure.",
-        detailedExplanation: "Geology examines rocks, minerals, and landforms; it helps us understand the history and processes shaping our planet."
-      },
-      {
-        question: "When water freezes, it changes its ____ from a liquid to a solid.",
-        options: ["state", "speed", "shape", "mass"],
-        correct: 0,
-        explanation: "State means the form in which matter exists.",
-        detailedExplanation: "Water can exist as a solid, liquid, or gas. In freezing, water changes its state from liquid to ice."
-      },
-      {
-        question: "The ____ is the natural satellite that orbits the Earth.",
+        question: "The natural satellite that orbits the Earth is known as the ____. ",
         options: ["moon", "sun", "comet", "asteroid"],
         correct: 0,
-        explanation: "Moon means Earth's only natural satellite.",
-        detailedExplanation: "The moon influences our tides and has phases that we can observe as it orbits the Earth."
+        explanation: "Moon means Earth's natural satellite.",
+        detailedExplanation: "The moon orbits the Earth and influences its tides; it is the most visible object in our night sky."
       },
       {
-        question: "A ____ speeds up a chemical reaction without being consumed by it.",
-        options: ["catalyst", "solvent", "reagent", "compound"],
+        question: "A ____ magnifies very small objects, making them visible to the human eye.",
+        options: ["microscope", "telescope", "periscope", "binoculars"],
         correct: 0,
-        explanation: "Catalyst means a substance that accelerates a reaction.",
-        detailedExplanation: "Catalysts help reactions occur faster without undergoing any permanent change themselves."
+        explanation: "Microscope means an instrument that enlarges tiny objects.",
+        detailedExplanation: "Microscopes are used in science, especially biology, to study cells, bacteria, and other small entities that cannot be seen clearly by the naked eye."
       },
       {
-        question: "During photosynthesis, plants use sunlight to make ____ that fuels their growth.",
-        options: ["sugar", "salt", "water", "air"],
+        question: "The process by which water vapor changes back into liquid is called ____. ",
+        options: ["condensation", "evaporation", "sublimation", "precipitation"],
         correct: 0,
-        explanation: "Sugar is the food substance produced by plants.",
-        detailedExplanation: "Photosynthesis converts sunlight, carbon dioxide, and water into sugar (glucose) and oxygen, providing energy for the plant."
+        explanation: "Condensation means gas turning into liquid.",
+        detailedExplanation: "When water vapor cools, it condenses into liquid droplets, forming clouds or dew."
       },
       {
-        question: "The ____ describes the branch of science that deals with matter, energy, and their interactions.",
-        options: ["physics", "biology", "chemistry", "geography"],
+        question: "The outermost layer of the Earth is called the ____. ",
+        options: ["crust", "mantle", "core", "atmosphere"],
         correct: 0,
-        explanation: "Physics is the study of matter and energy.",
-        detailedExplanation: "Physics investigates the fundamental forces of nature, the properties of matter, and energy changes, forming the basis of many scientific applications."
+        explanation: "Crust means the Earth's outer surface.",
+        detailedExplanation: "The crust is the thin, solid layer on the outside of the Earth where we live, and it is key to most geological activities."
       },
       {
-        question: "In our solar system, the ____ is the primary source of energy for the planets.",
-        options: ["sun", "planet", "asteroid", "moon"],
+        question: "In a ____ circuit, components are arranged in a single row so that the same current passes through each.",
+        options: ["series", "parallel", "complex", "integrated"],
         correct: 0,
-        explanation: "Sun means the star at the center of the solar system.",
-        detailedExplanation: "The sun generates energy through nuclear fusion, providing light and heat necessary for life on Earth."
+        explanation: "Series means arranged one after the other.",
+        detailedExplanation: "In a series circuit, the components are connected end-to-end; a break in one component causes the entire circuit to stop working."
       },
       {
-        question: "The ____ is a protective layer of gases surrounding the Earth that makes life possible.",
-        options: ["atmosphere", "ocean", "crust", "mantle"],
+        question: "To measure temperature, scientists use a ____. ",
+        options: ["thermometer", "barometer", "anemometer", "hygrometer"],
         correct: 0,
-        explanation: "Atmosphere means the layer of gases around the Earth.",
-        detailedExplanation: "The atmosphere provides oxygen, regulates temperature, and shields us from harmful solar radiation."
+        explanation: "Thermometer measures temperature.",
+        detailedExplanation: "Thermometers are instruments that use liquids or sensors to display the temperature in various settings, from weather forecasting to medical applications."
+      },
+      {
+        question: "The study of living organisms and life processes is known as ____. ",
+        options: ["biology", "chemistry", "physics", "geology"],
+        correct: 0,
+        explanation: "Biology is the science of life.",
+        detailedExplanation: "Biology covers everything from cells and genetics to ecosystems and evolution, helping us understand the living world."
+      },
+      {
+        question: "The ____ consists of the solid, central part of the Earth made mostly of metals.",
+        options: ["core", "crust", "mantle", "atmosphere"],
+        correct: 0,
+        explanation: "Core means the Earth’s innermost layer.",
+        detailedExplanation: "The Earth's core is divided into an inner solid part and an outer liquid part, and its movement helps generate our planet's magnetic field."
+      },
+      {
+        question: "The ____ cycle describes the continuous movement of water on, under, and above the Earth.",
+        options: ["water", "carbon", "oxygen", "nitrogen"],
+        correct: 0,
+        explanation: "Water cycle means the movement of water in its various forms.",
+        detailedExplanation: "The water cycle includes processes such as evaporation, condensation, precipitation, and runoff, which recycle water constantly in nature."
+      },
+      {
+        question: "A substance that speeds up a chemical reaction without being consumed is called a ____. ",
+        options: ["catalyst", "reagent", "solvent", "compound"],
+        correct: 0,
+        explanation: "Catalyst means something that accelerates a reaction.",
+        detailedExplanation: "A catalyst allows a chemical reaction to occur faster by lowering the activation energy, yet it remains unchanged after the process."
+      },
+      {
+        question: "The measure of how heavy an object is, independent of gravity, is called its ____. ",
+        options: ["mass", "weight", "volume", "density"],
+        correct: 0,
+        explanation: "Mass means the amount of matter in an object.",
+        detailedExplanation: "Mass is a fundamental property of matter that does not change, whereas weight is affected by the strength of gravity."
+      },
+      {
+        question: "Earth’s ____ is a layer of gases that surrounds and protects the planet.",
+        options: ["atmosphere", "ocean", "mantle", "crust"],
+        correct: 0,
+        explanation: "Atmosphere means the envelope of gases around Earth.",
+        detailedExplanation: "The atmosphere provides oxygen, helps regulate the planet’s temperature, and shields us from harmful solar radiation."
+      },
+      {
+        question: "The process by which plants lose water vapor through small pores in their leaves is called ____. ",
+        options: ["transpiration", "evaporation", "condensation", "precipitation"],
+        correct: 0,
+        explanation: "Transpiration is the loss of water from plants.",
+        detailedExplanation: "During transpiration, water evaporates from the tiny openings called stomata on the leaves, helping regulate temperature and nutrient uptake."
+      },
+      {
+        question: "The branch of science that studies matter, its properties, and how it changes is ____. ",
+        options: ["chemistry", "physics", "biology", "geology"],
+        correct: 0,
+        explanation: "Chemistry is the study of substances and their reactions.",
+        detailedExplanation: "Chemistry involves analyzing elements, compounds, and mixtures, and it explains processes like reactions and energy changes."
+      },
+      {
+        question: "A ____ is a man-made object that orbits a planet, often used for communication.",
+        options: ["satellite", "asteroid", "comet", "meteor"],
+        correct: 0,
+        explanation: "Satellite means an object that orbits Earth.",
+        detailedExplanation: "Satellites are launched into space to monitor weather, support global communications, and provide GPS services."
+      },
+      {
+        question: "Light that passes through a prism is split into a spectrum of ____ colors.",
+        options: ["different", "single", "dim", "equal"],
+        correct: 0,
+        explanation: "Different means not the same.",
+        detailedExplanation: "A prism disperses light into various colors (red, orange, yellow, green, blue, indigo, violet) due to refraction, forming a rainbow spectrum."
+      },
+      {
+        question: "The ____ of a wave indicates the number of cycles it completes per second.",
+        options: ["frequency", "amplitude", "wavelength", "speed"],
+        correct: 0,
+        explanation: "Frequency means the rate of vibration.",
+        detailedExplanation: "Frequency is measured in Hertz (Hz) and determines the pitch of a sound or the color of light in electromagnetic waves."
       }
     ];
     
     let currentQuestionIndex = 0;
     let score = 100;
-    const penalty = 100 / questions.length; // Percentage deducted for each wrong answer
+    const penalty = 100 / questions.length; // Deduct a percentage for each wrong answer
     let timerValue = 10 * 60; // 10 minutes in seconds
     let timerInterval;
     const incorrectAnswers = [];
@@ -375,7 +350,7 @@
       
       const currentQ = questions[currentQuestionIndex];
       
-      // Display the question text.
+      // Display the gap-fill question text.
       const questionEl = document.createElement("div");
       questionEl.className = "question";
       questionEl.innerText = `Q${currentQuestionIndex + 1}: ${currentQ.question}`;
