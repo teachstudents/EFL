@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Joel Mitchell's B1 Practice 13</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f5f5f5;
+    }
+    .quiz-container {
+      max-width: 750px;
+      margin: auto;
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h2, h3 {
+      text-align: center;
+    }
+    #start-screen, #quiz-screen, #result-screen {
+      margin-bottom: 20px;
+    }
+    #quiz-screen, #result-screen {
+      display: none;
+    }
+    #timer {
+      font-size: 1.2em;
+      text-align: right;
+      margin-bottom: 10px;
+    }
+    #score-display {
+      font-size: 1.1em;
+      margin-bottom: 20px;
+      text-align: right;
+    }
+    .question {
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    .option {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .option:hover {
+      background-color: #eee;
+    }
+    .option.correct {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+      color: #155724;
+    }
+    .option.incorrect {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+      color: #721c24;
+    }
+    .disabled {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    #feedback {
+      margin-top: 10px;
+      font-style: italic;
+    }
+    button {
+      padding: 10px;
+      font-size: 1em;
+      width: 100%;
+      margin-top: 5px;
+      cursor: pointer;
+    }
+    .error-item {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h2>Joel Mitchell's B1 Practice 13</h2>
+    <!-- Start Screen -->
+    <div id="start-screen">
+      <label for="username">Enter your name:</label>
+      <input type="text" id="username" required>
+      <button id="start-btn">Start Quiz</button>
+    </div>
+    <!-- Quiz Screen -->
+    <div id="quiz-screen">
+      <div id="timer">Time Left: 10:00</div>
+      <div id="score-display">Score: 100%</div>
+      <div id="question-container"></div>
+      <div id="feedback"></div>
+      <button id="next-btn" style="display: none;">Next Question</button>
+    </div>
+    <!-- Result Screen -->
+    <div id="result-screen">
+      <h3>Quiz Report</h3>
+      <div id="final-score"></div>
+      <div id="error-report"></div>
+    </div>
+  </div>
+
+  <script>
+    // Array of 25 science-themed multiple-choice gap-fill questions.
+    const questions = [
+      {
+        question: "The ____ is the control center of the cell that stores DNA.",
+        options: ["nucleus", "cell wall", "cytoplasm", "vacuole"],
+        correct: 0,
+        explanation: "Nucleus means the center of the cell.",
+        detailedExplanation: "The nucleus contains the cell's genetic material and regulates its activities."
+      },
+      {
+        question: "Plants produce food through ____, a process that converts sunlight into energy.",
+        options: ["photosynthesis", "respiration", "digestion", "evaporation"],
+        correct: 0,
+        explanation: "Photosynthesis is how plants make food.",
+        detailedExplanation: "During photosynthesis, plants use sunlight, water, and carbon dioxide to produce sugar and oxygen."
+      },
+      {
+        question: "The ____ of a plant absorbs water and minerals from the soil.",
+        options: ["root", "leaf", "stem", "flower"],
+        correct: 0,
+        explanation: "Root means the underground part of a plant.",
+        detailedExplanation: "Roots gather water and nutrients, which are vital for a plant's growth and survival."
+      },
+      {
+        question: "The largest planet in our solar system is ____.",
+        options: ["Jupiter", "Mars", "Venus", "Saturn"],
+        correct: 0,
+        explanation: "Jupiter is the largest planet.",
+        detailedExplanation: "Jupiter is a gas giant known for its massive size and the famous Great Red Spot."
+      },
+      {
+        question: "When water is heated, it turns into vapor through the process of ____. ",
+        options: ["evaporation", "condensation", "freezing", "melting"],
+        correct: 0,
+        explanation: "Evaporation means liquid to gas.",
+        detailedExplanation: "When water is warmed, its molecules move faster and change from liquid to gas, a key step in the water cycle."
+      },
+      {
+        question: "A ____ is a tool that magnifies tiny objects such as cells.",
+        options: ["microscope", "telescope", "barometer", "caliper"],
+        correct: 0,
+        explanation: "Microscope is used to see small objects.",
+        detailedExplanation: "Microscopes are essential in biology and medicine because they allow scientists to observe cells, bacteria, and other minute structures."
+      },
+      {
+        question: "The ____ is the star at the center of our solar system that provides heat and light.",
+        options: ["sun", "moon", "comet", "planet"],
+        correct: 0,
+        explanation: "Sun means the star that gives us light.",
+        detailedExplanation: "The sun supports life on Earth by supplying essential energy through nuclear fusion processes."
+      },
+      {
+        question: "Joel studies ____ to understand the interactions between organisms and their environment.",
+        options: ["ecology", "algebra", "history", "literature"],
+        correct: 0,
+        explanation: "Ecology is the study of organisms and their environment.",
+        detailedExplanation: "Ecology involves examining relationships within ecosystems and understanding how living things depend on one another and their surroundings."
+      },
+      {
+        question: "____ is the natural force that pulls objects toward the Earth.",
+        options: ["Gravity", "Friction", "Magnetism", "Inertia"],
+        correct: 0,
+        explanation: "Gravity pulls things toward Earth.",
+        detailedExplanation: "Gravity gives objects weight and is responsible for keeping us grounded and maintaining planetary orbits."
+      },
+      {
+        question: "When water vapor cools, it turns back into liquid in a process called ____. ",
+        options: ["condensation", "evaporation", "sublimation", "precipitation"],
+        correct: 0,
+        explanation: "Condensation is when gas turns into liquid.",
+        detailedExplanation: "Condensation forms dew on grass and droplets on cold surfaces as water vapor loses heat and becomes liquid."
+      },
+      {
+        question: "The ____ of the Earth is made up of solid rock and is the outermost layer.",
+        options: ["crust", "mantle", "core", "atmosphere"],
+        correct: 0,
+        explanation: "Crust means the outer layer of the Earth.",
+        detailedExplanation: "The Earth's crust is the thin, rocky surface on which we live and where most geological activity occurs."
+      },
+      {
+        question: "During photosynthesis, plants convert light energy into ____ energy.",
+        options: ["chemical", "thermal", "electrical", "mechanical"],
+        correct: 0,
+        explanation: "Chemical energy is stored in food molecules.",
+        detailedExplanation: "Through photosynthesis, plants produce sugar, which contains chemical energy that fuels their growth and metabolism."
+      },
+      {
+        question: "____ is the process by which a cell divides to form two identical daughter cells.",
+        options: ["Mitosis", "Meiosis", "Fission", "Fusion"],
+        correct: 0,
+        explanation: "Mitosis means cell division for growth and repair.",
+        detailedExplanation: "Mitosis is essential for a cell’s reproduction, allowing organisms to grow and repair damaged tissues."
+      },
+      {
+        question: "An ____ is a pure substance made up of only one type of atom.",
+        options: ["element", "compound", "mixture", "solution"],
+        correct: 0,
+        explanation: "Element means a basic substance that cannot be broken down chemically.",
+        detailedExplanation: "Elements, such as oxygen or iron, are the simplest forms of matter and combine in various ways to form compounds."
+      },
+      {
+        question: "The process by which liquid water becomes solid is known as ____. ",
+        options: ["freezing", "melting", "boiling", "evaporation"],
+        correct: 0,
+        explanation: "Freezing means turning from liquid to solid.",
+        detailedExplanation: "When water freezes, its temperature drops and its molecules settle into a fixed structure, forming ice."
+      },
+      {
+        question: "A ____ is a massive collection of stars, dust, and gas held together by gravity.",
+        options: ["galaxy", "nebula", "asteroid", "comet"],
+        correct: 0,
+        explanation: "Galaxy means a huge group of stars and other celestial objects.",
+        detailedExplanation: "Our Milky Way is an example of a galaxy, containing billions of stars and forming a significant part of the universe."
+      },
+      {
+        question: "Newton's first law, also called the law of ____, explains that an object at rest stays at rest.",
+        options: ["inertia", "gravity", "momentum", "force"],
+        correct: 0,
+        explanation: "Inertia means resistance to changes in motion.",
+        detailedExplanation: "This law states that an object will continue in its state of rest or uniform motion unless acted upon by an external force."
+      },
+      {
+        question: "In a ____ circuit, components are connected one after the other in a single path.",
+        options: ["series", "parallel", "complex", "simple"],
+        correct: 0,
+        explanation: "Series means connected in a single chain.",
+        detailedExplanation: "A series circuit is one where the electrical current flows through each component sequentially, meaning if one component fails, the entire circuit is interrupted."
+      },
+      {
+        question: "A ____ is an instrument used to measure temperature.",
+        options: ["thermometer", "barometer", "hygrometer", "anemometer"],
+        correct: 0,
+        explanation: "Thermometer means a device that measures temperature.",
+        detailedExplanation: "Thermometers are used in weather forecasting, medicine, and many other fields to monitor temperature changes."
+      },
+      {
+        question: "In the eye, the ____ is the opening that adjusts its size to control the amount of light entering.",
+        options: ["pupil", "iris", "retina", "lens"],
+        correct: 0,
+        explanation: "Pupil means the dark opening in the center of the eye.",
+        detailedExplanation: "The pupil enlarges or constricts based on light conditions, regulating the light that reaches the retina for proper vision."
+      },
+      {
+        question: "The ____ layer of the atmosphere absorbs most of the Sun's ultraviolet radiation.",
+        options: ["ozone", "carbon", "nitrogen", "sulfur"],
+        correct: 0,
+        explanation: "Ozone means a form of oxygen that absorbs UV light.",
+        detailedExplanation: "The ozone layer acts as a shield for Earth, protecting living organisms from the harmful effects of ultraviolet radiation."
+      },
+      {
+        question: "Scientists study ____ to learn about the structure and composition of the Earth.",
+        options: ["geology", "psychology", "economics", "astronomy"],
+        correct: 0,
+        explanation: "Geology is the study of Earth's physical structure.",
+        detailedExplanation: "Geology examines rocks, minerals, and landforms; it helps us understand the history and processes shaping our planet."
+      },
+      {
+        question: "When water freezes, it changes its ____ from a liquid to a solid.",
+        options: ["state", "speed", "shape", "mass"],
+        correct: 0,
+        explanation: "State means the form in which matter exists.",
+        detailedExplanation: "Water can exist as a solid, liquid, or gas. In freezing, water changes its state from liquid to ice."
+      },
+      {
+        question: "The ____ is the natural satellite that orbits the Earth.",
+        options: ["moon", "sun", "comet", "asteroid"],
+        correct: 0,
+        explanation: "Moon means Earth's only natural satellite.",
+        detailedExplanation: "The moon influences our tides and has phases that we can observe as it orbits the Earth."
+      },
+      {
+        question: "A ____ speeds up a chemical reaction without being consumed by it.",
+        options: ["catalyst", "solvent", "reagent", "compound"],
+        correct: 0,
+        explanation: "Catalyst means a substance that accelerates a reaction.",
+        detailedExplanation: "Catalysts help reactions occur faster without undergoing any permanent change themselves."
+      },
+      {
+        question: "During photosynthesis, plants use sunlight to make ____ that fuels their growth.",
+        options: ["sugar", "salt", "water", "air"],
+        correct: 0,
+        explanation: "Sugar is the food substance produced by plants.",
+        detailedExplanation: "Photosynthesis converts sunlight, carbon dioxide, and water into sugar (glucose) and oxygen, providing energy for the plant."
+      },
+      {
+        question: "The ____ describes the branch of science that deals with matter, energy, and their interactions.",
+        options: ["physics", "biology", "chemistry", "geography"],
+        correct: 0,
+        explanation: "Physics is the study of matter and energy.",
+        detailedExplanation: "Physics investigates the fundamental forces of nature, the properties of matter, and energy changes, forming the basis of many scientific applications."
+      },
+      {
+        question: "In our solar system, the ____ is the primary source of energy for the planets.",
+        options: ["sun", "planet", "asteroid", "moon"],
+        correct: 0,
+        explanation: "Sun means the star at the center of the solar system.",
+        detailedExplanation: "The sun generates energy through nuclear fusion, providing light and heat necessary for life on Earth."
+      },
+      {
+        question: "The ____ is a protective layer of gases surrounding the Earth that makes life possible.",
+        options: ["atmosphere", "ocean", "crust", "mantle"],
+        correct: 0,
+        explanation: "Atmosphere means the layer of gases around the Earth.",
+        detailedExplanation: "The atmosphere provides oxygen, regulates temperature, and shields us from harmful solar radiation."
+      }
+    ];
+    
+    let currentQuestionIndex = 0;
+    let score = 100;
+    const penalty = 100 / questions.length; // Percentage deducted for each wrong answer
+    let timerValue = 10 * 60; // 10 minutes in seconds
+    let timerInterval;
+    const incorrectAnswers = [];
+    let username = "";
+    
+    // DOM element references.
+    const startScreen = document.getElementById("start-screen");
+    const quizScreen = document.getElementById("quiz-screen");
+    const resultScreen = document.getElementById("result-screen");
+    const startBtn = document.getElementById("start-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const questionContainer = document.getElementById("question-container");
+    const feedbackDiv = document.getElementById("feedback");
+    const scoreDisplay = document.getElementById("score-display");
+    const timerDisplay = document.getElementById("timer");
+    const finalScoreDiv = document.getElementById("final-score");
+    const errorReportDiv = document.getElementById("error-report");
+    
+    startBtn.addEventListener("click", startQuiz);
+    nextBtn.addEventListener("click", nextQuestion);
+    
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+    
+    function startQuiz() {
+      username = document.getElementById("username").value.trim() || "Student";
+      startScreen.style.display = "none";
+      quizScreen.style.display = "block";
+      timerInterval = setInterval(updateTimer, 1000);
+      displayQuestion();
+    }
+    
+    function updateTimer() {
+      let minutes = Math.floor(timerValue / 60);
+      let seconds = timerValue % 60;
+      timerDisplay.innerText = `Time Left: ${minutes < 10 ? "0" + minutes : minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+      if (timerValue <= 0) {
+        clearInterval(timerInterval);
+        finishQuiz();
+      } else {
+        timerValue--;
+      }
+    }
+    
+    function displayQuestion() {
+      feedbackDiv.innerHTML = "";
+      nextBtn.style.display = "none";
+      questionContainer.innerHTML = "";
+      
+      const currentQ = questions[currentQuestionIndex];
+      
+      // Display the question text.
+      const questionEl = document.createElement("div");
+      questionEl.className = "question";
+      questionEl.innerText = `Q${currentQuestionIndex + 1}: ${currentQ.question}`;
+      questionContainer.appendChild(questionEl);
+      
+      // Create multiple-choice options.
+      let optionsArray = currentQ.options.map((text, idx) => ({ text, origIndex: idx }));
+      optionsArray = shuffleArray(optionsArray);
+      
+      optionsArray.forEach(optionObj => {
+        const optionEl = document.createElement("div");
+        optionEl.className = "option";
+        optionEl.innerText = optionObj.text;
+        optionEl.addEventListener("click", () => selectOption(optionEl, optionObj.origIndex));
+        questionContainer.appendChild(optionEl);
+      });
+    }
+    
+    function selectOption(selectedEl, selectedIndex) {
+      const currentQ = questions[currentQuestionIndex];
+      const optionEls = document.querySelectorAll(".option");
+      optionEls.forEach(el => el.classList.add("disabled"));
+      
+      if (selectedIndex === currentQ.correct) {
+        selectedEl.classList.add("correct");
+        feedbackDiv.innerHTML = "<strong>Correct!</strong>";
+      } else {
+        selectedEl.classList.add("incorrect");
+        feedbackDiv.innerHTML = "<strong>Incorrect.</strong> " + currentQ.explanation + "<br><br>" + currentQ.detailedExplanation;
+        score -= penalty;
+        incorrectAnswers.push({
+          question: currentQ.question,
+          yourAnswer: selectedEl.innerText,
+          correctAnswer: currentQ.options[currentQ.correct],
+          explanation: currentQ.explanation,
+          detailedExplanation: currentQ.detailedExplanation
+        });
+        optionEls.forEach(el => {
+          if (el.innerText === currentQ.options[currentQ.correct]) {
+            el.classList.add("correct");
+          }
+        });
+      }
+      
+      score = Math.max(score, 0);
+      scoreDisplay.innerText = `Score: ${Math.round(score)}%`;
+      nextBtn.style.display = "block";
+    }
+    
+    function nextQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        displayQuestion();
+        feedbackDiv.innerHTML = "";
+        nextBtn.style.display = "none";
+      } else {
+        finishQuiz();
+      }
+    }
+    
+    function finishQuiz() {
+      clearInterval(timerInterval);
+      quizScreen.style.display = "none";
+      resultScreen.style.display = "block";
+      finalScoreDiv.innerText = `${username}, your final score is ${Math.round(score)}%`;
+      
+      if (incorrectAnswers.length > 0) {
+        let errorHtml = "<h4>Review your incorrect answers:</h4>";
+        incorrectAnswers.forEach(item => {
+          errorHtml += `<div class="error-item">
+                          <strong>Question:</strong> ${item.question}<br>
+                          <strong>Your answer:</strong> ${item.yourAnswer}<br>
+                          <strong>Correct answer:</strong> ${item.correctAnswer}<br>
+                          <strong>Short note:</strong> ${item.explanation}<br>
+                          <strong>More details:</strong> ${item.detailedExplanation}
+                        </div>`;
+        });
+        errorReportDiv.innerHTML = errorHtml;
+      } else {
+        errorReportDiv.innerHTML = "<h4>Great job! You answered all questions correctly.</h4>";
+      }
+    }
+  </script>
+</body>
+</html>
