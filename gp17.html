@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Joel Mitchell's Verb Practice 17</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    /* Basic Styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f5f5f5;
+    }
+    /* Start Screen Styling */
+    #startScreen {
+      max-width: 700px;
+      margin: auto;
+      text-align: center;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    /* Main Quiz Container */
+    #container {
+      max-width: 700px;
+      margin: auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: none;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    /* Display Elements */
+    #overallTimer, #levelDisplay, #timer, #scoreDisplay {
+      text-align: center;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .feedback {
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
+    .correct {
+      color: #5cb85c;
+    }
+    .incorrect {
+      color: #d9534f;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      font-size: 1em;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #0275d8;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #aaa;
+    }
+    @media(max-width: 768px) {
+      input[type="text"] {
+        width: 100%;
+      }
+      button {
+        width: 100%;
+      }
+    }
+    #reward {
+      text-align: center;
+      padding: 10px;
+      margin-top: 10px;
+      display: none;
+    }
+    #reward img {
+      max-width: 150px;
+      width: 100%;
+      height: auto;
+    }
+    #summary {
+      display: none;
+      padding: 20px;
+      background: #e9ecef;
+      margin-top: 20px;
+      border-radius: 4px;
+    }
+    #summary p {
+      font-size: 1.2em;
+      text-align: center;
+    }
+    #printButton {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- Start Screen -->
+  <div id="startScreen">
+    <h1>Joel Mitchell's Verb Practice 17</h1>
+    <p>Please enter your name and press "Start Quiz" to begin.</p>
+    <input type="text" id="playerName" placeholder="Enter your name" />
+    <br/>
+    <button id="startBtn">Start Quiz</button>
+  </div>
+  
+  <!-- Main Quiz Container -->
+  <div id="container">
+    <div id="overallTimer">Overall Time Left: 10:00</div>
+    <p id="levelDisplay">Level: </p>
+    <div id="timer">Time left: </div>
+    <div class="question" id="questionDisplay"></div>
+    <input type="text" id="answerInput" placeholder="Type your answer here..." />
+    <button id="submitBtn">Submit Answer</button>
+    <div class="feedback" id="feedbackDisplay"></div>
+    <div id="scoreDisplay">Score: 0% (0/0)</div>
+    <div id="reward"></div>
+    
+    <!-- Summary Section -->
+    <div id="summary">
+      <h2>Quiz Summary</h2>
+      <p id="summaryText"></p>
+      <button id="printButton">Print Summary</button>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // GLOBAL VARIABLES
+      var totalCorrect = 0;
+      var totalAttempted = 0;
+      var currentLevel = 1;
+      var currentQuestionIndex = 0;
+      var startTime = 0;
+      var timerInterval = null;
+      var overallInterval = null;
+      var answered = false;
+      var overallTime = 600; // 10 minutes in seconds
+      var playerName = "";
+      var currentQuestions = [];
+
+      // LEVEL 1 – Simple Past (10 Questions; New Verbs, including irregulars)
+      var level1Questions = [
+        { template: "Last night, I ___ a rare book at the antique store. (find)", answer: "found", explanation: "The irregular past of 'find' is 'found'." },
+        { template: "Yesterday, she ___ a captivating novel. (write)", answer: "wrote", explanation: "The simple past of 'write' is 'wrote'." },
+        { template: "He ___ to the concert despite the rain. (go)", answer: "went", explanation: "The simple past of 'go' is 'went'." },
+        { template: "I ___ my umbrella on a windy day. (lose)", answer: "lost", explanation: "The irregular past of 'lose' is 'lost'." },
+        { template: "They ___ with great enthusiasm at the match. (cheer)", answer: "cheered", explanation: "Regular verb: 'cheer' → 'cheered'." },
+        { template: "She ___ a beautiful sculpture at the exhibition. (see)", answer: "saw", explanation: "The simple past of 'see' is 'saw' (pronounced 'red')." },
+        { template: "I ___ an amazing idea during the meeting. (have)", answer: "had", explanation: "The simple past of 'have' is 'had'." },
+        { template: "He ___ the difficult challenge with perseverance. (overcome)", answer: "overcame", explanation: "The irregular past of 'overcome' is 'overcame'." },
+        { template: "They ___ a historic building on their trip. (visit)", answer: "visited", explanation: "Regular verb: 'visit' → 'visited'." },
+        { template: "She ___ a wonderful gift for her friend. (give)", answer: "gave", explanation: "The irregular past of 'give' is 'gave'." }
+      ];
+
+      // LEVEL 2 – Past Continuous (10 Questions; New Verbs)
+      var level2Questions = [
+        { template: "At 8 PM yesterday, I ___ a mystery novel on my e-reader. (read)", answer: "was reading", explanation: "For 'I', use 'was reading' in past continuous." },
+        { template: "While she ___ in the park, a cool breeze swept by. (stroll)", answer: "was strolling", explanation: "For 'she', use 'was strolling'." },
+        { template: "They ___ cheerfully during the parade. (march)", answer: "were marching", explanation: "For 'they', use 'were marching' in past continuous." },
+        { template: "He ___ an email when I walked by. (write)", answer: "was writing", explanation: "For 'he', use 'was writing'." },
+        { template: "We ___ dinner when the lights suddenly went off. (have)", answer: "were having", explanation: "For 'we', use 'were having'." },
+        { template: "The children ___ excitedly during recess. (laugh)", answer: "were laughing", explanation: "For 'they', the correct form is 'were laughing'." },
+        { template: "I ___ my favorite podcast all the way home. (listen)", answer: "was listening", explanation: "For 'I', the correct form is 'was listening'." },
+        { template: "She ___ with a friend on the phone when I arrived. (chat)", answer: "was chatting", explanation: "For 'she', use 'was chatting'." },
+        { template: "They ___ about their plans while walking in the mall. (discuss)", answer: "were discussing", explanation: "For 'they', use 'were discussing'." },
+        { template: "He ___ his guitar softly during the quiet evening. (play)", answer: "was playing", explanation: "For 'he', the correct form is 'was playing'." }
+      ];
+
+      // LEVEL 3 – Present Perfect (10 Questions; New Verbs)
+      var level3Questions = [
+        { template: "I ___ an astonishing documentary this month. (watch)", answer: "have watched", explanation: "For 'I', use 'have watched' in present perfect." },
+        { template: "She ___ a remarkable innovation this year. (introduce)", answer: "has introduced", explanation: "For 'she', the present perfect is 'has introduced'." },
+        { template: "They ___ in this town for three challenging years. (live)", answer: "have lived", explanation: "For 'they', use 'have lived' in present perfect." },
+        { template: "He ___ an unexpected twist in the story. (experience)", answer: "has experienced", explanation: "For 'he', use 'has experienced'." },
+        { template: "I ___ many useful strategies for my career. (discover)", answer: "have discovered", explanation: "For 'I', the present perfect is 'have discovered'." },
+        { template: "She ___ her skills significantly over the past year. (improve)", answer: "has improved", explanation: "For 'she', use 'has improved'." },
+        { template: "They ___ multiple breakthroughs in technology. (achieve)", answer: "have achieved", explanation: "For 'they', use 'have achieved'." },
+        { template: "He ___ remarkable insights from the workshop. (gain)", answer: "has gained", explanation: "For 'he', the present perfect is 'has gained'." },
+        { template: "I ___ the solution to the problem after much thought. (find)", answer: "have found", explanation: "For 'I', use 'have found' in present perfect." },
+        { template: "She ___ her findings at several conferences. (present)", answer: "has presented", explanation: "For 'she', use 'has presented' in the present perfect." }
+      ];
+
+      // LEVEL 4 – Mixed Tenses (10 Questions; New Verbs, including irregulars)
+      var level4Questions = [
+        { template: "By the time the seminar started, I ___ all my research notes. (organize)", answer: "had organized", explanation: "Past perfect indicates completion before the event." },
+        { template: "Tomorrow, he ___ his breakthrough idea to the panel. (present)", answer: "will present", explanation: "Simple future: 'will present' = will + base verb." },
+        { template: "Right now, I ___ a concise report for my manager. (compose)", answer: "am composing", explanation: "Present continuous shows the action happening now." },
+        { template: "By next week, they ___ the final edits to the manuscript. (complete)", answer: "will have completed", explanation: "Future perfect indicates the action will be finished by next week." },
+        { template: "Yesterday, while I ___ through the park, I bumped into an old friend. (wander)", answer: "was wandering", explanation: "Past continuous 'was wandering' shows a continuous action interrupted." },
+        { template: "At this moment, we ___ a strategy meeting online. (attend)", answer: "are attending", explanation: "For plural 'we', the correct form is 'are attending' in present continuous." },
+        { template: "By 5 PM, she ___ all her pending assignments. (finish)", answer: "will have finished", explanation: "Future perfect expresses completion by a specific time." },
+        { template: "Last night, I ___ a captivating film at the cinema. (watch)", answer: "watched", explanation: "Simple past: 'watched' is used for a completed action." },
+        { template: "At 10 AM today, they ___ a creative meeting. (confer)", answer: "were conferring", explanation: "Past continuous: 'were conferring' is correct for plural subjects." },
+        { template: "Next month, I ___ my newest research paper. (publish)", answer: "will publish", explanation: "Simple future uses 'will' + base form: 'will publish'." }
+      ];
+
+      // Build the Question Bank Object
+      var questionBank = {
+        1: level1Questions,
+        2: level2Questions,
+        3: level3Questions,
+        4: level4Questions
+      };
+
+      // Time limits per level (in seconds)
+      var timeLimits = { 1: 20, 2: 30, 3: 40, 4: 50 };
+
+      // Helper Function: Fisher–Yates Shuffle
+      function shuffle(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var temp = array[i];
+          array[i] = array[j];
+          array[j] = temp;
+        }
+        return array;
+      }
+
+      // Reward Functions
+      function getRewardImageSource() {
+        if (currentLevel === 1) return "reward1.gif";
+        if (currentLevel === 2) return "reward2.gif";
+        if (currentLevel === 3) return "reward3.gif";
+        if (currentLevel === 4) return "reward4.gif";
+        return "reward1.gif";
+      }
+
+      function getRewardAudioSource() {
+        if (currentLevel === 1) return "game1.mp3";
+        if (currentLevel === 2) return "game2.mp3";
+        if (currentLevel === 3) return "game3.mp3";
+        if (currentLevel === 4) return "game4.mp3";
+        return "game1.mp3";
+      }
+
+      // Per-Question Timer Functions
+      function startTimer(limit) {
+        var timeLeft = limit;
+        document.getElementById("timer").innerText = "Time left: " + timeLeft + " s";
+        timerInterval = setInterval(function () {
+          timeLeft--;
+          document.getElementById("timer").innerText = "Time left: " + timeLeft + " s";
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            processTimeout();
+          }
+        }, 1000);
+      }
+
+      function processTimeout() {
+        if (!answered) {
+          answered = true;
+          document.getElementById("feedbackDisplay").className = "feedback incorrect";
+          var currentQ = currentQuestions[currentQuestionIndex];
+          document.getElementById("feedbackDisplay").innerText =
+            "Too slow! (limit: " + timeLimits[currentLevel] + " s)\nThe correct answer was: " + currentQ.answer +
+            "\nExplanation: " + currentQ.explanation;
+          totalAttempted++;
+          updateScore();
+          setTimeout(nextQuestion, 2000);
+        }
+      }
+
+      // Score Update Function
+      function updateScore() {
+        var scoreDisplay = document.getElementById("scoreDisplay");
+        var percentage = totalAttempted === 0 ? 0 : Math.round((totalCorrect / totalAttempted) * 100);
+        scoreDisplay.innerText = "Score: " + percentage + "% (" + totalCorrect + "/" + totalAttempted + ")";
+      }
+
+      // Load Current Level Questions
+      function loadCurrentLevel() {
+        if (questionBank[currentLevel]) {
+          currentQuestions = shuffle([...questionBank[currentLevel]]);
+          currentQuestionIndex = 0;
+          updateLevelDisplay();
+        }
+      }
+
+      // Update Level Display
+      function updateLevelDisplay() {
+        var levelLabels = {
+          1: "A1 (Simple Past)",
+          2: "A2 (Past Continuous)",
+          3: "B1 (Present Perfect)",
+          4: "B2 (Mixed Tenses)"
+        };
+        document.getElementById("levelDisplay").innerText = "Level: " + levelLabels[currentLevel];
+      }
+
+      // Next Question Function
+      function nextQuestion() {
+        clearInterval(timerInterval);
+        if (currentQuestionIndex < currentQuestions.length) {
+          answered = false;
+          var currentQ = currentQuestions[currentQuestionIndex];
+          document.getElementById("questionDisplay").innerText = currentQ.template;
+          document.getElementById("feedbackDisplay").innerText = "";
+          document.getElementById("answerInput").value = "";
+          startTime = Date.now();
+          startTimer(timeLimits[currentLevel]);
+        } else {
+          if (questionBank[currentLevel + 1]) {
+            currentLevel++;
+            loadCurrentLevel();
+            nextQuestion();
+          } else {
+            finishQuiz();
+          }
+        }
+      }
+
+      // Show Reward Function
+      function showReward() {
+        var rewardDiv = document.getElementById("reward");
+        rewardDiv.innerHTML = '<img src="' + getRewardImageSource() + '" alt="Great Job!"/>';
+        rewardDiv.style.display = 'block';
+        var rewardAudio = document.getElementById("rewardAudio");
+        rewardAudio.src = getRewardAudioSource();
+        rewardAudio.load();
+        rewardAudio.currentTime = 0;
+        rewardAudio.play();
+        setTimeout(function () {
+          rewardDiv.style.display = 'none';
+        }, 1500);
+      }
+
+      // Answer Submission Handler
+      document.getElementById("submitBtn").addEventListener("click", function () {
+        if (answered || currentQuestionIndex >= currentQuestions.length) return;
+        answered = true;
+        clearInterval(timerInterval);
+        var currentQ = currentQuestions[currentQuestionIndex];
+        var userAnswer = document.getElementById("answerInput").value.trim();
+        var elapsedTime = (Date.now() - startTime)
