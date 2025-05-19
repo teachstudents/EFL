@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vocabulary Spelling Test – Test Set 5 (30 Words)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover { background-color: #45a049; }
+    input[type="text"] {
+      padding: 10px;
+      width: 80%;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .feedback {
+      margin-top: 10px;
+      font-weight: bold;
+      min-height: 60px;
+    }
+    #overallTimer, #overallScore, #setIndicator, #timerDisplay {
+      font-size: 18px;
+      margin: 10px 0;
+      color: #333;
+    }
+    img.reward {
+      max-width: 300px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Welcome Screen -->
+  <div id="welcomeContainer" class="container">
+    <h2>Welcome to Joel Mitchell’s Listening & Spelling</h2>
+    <label for="username">Your Name: </label>
+    <input type="text" id="username" placeholder="Enter your name">
+    <br>
+    <button id="startBtn">Start Test</button>
+  </div>
+
+  <!-- Test Interface (hidden initially) -->
+  <div id="testInterface" class="container" style="display:none;">
+    <!-- Overall Timer, Overall Score, and Test Set Indicator -->
+    <p id="overallTimer">Overall Time Remaining: 10:00</p>
+    <p id="overallScore">Overall Score: 100%</p>
+    <!-- Since this file is only for one test set, we display "Test Set: 1/1" -->
+    <p id="setIndicator">Test Set: 1/1</p>
+
+    <!-- Current Word Section -->
+    <p id="progress">Word 1 of 30</p>
+    <p id="clue">Clue: </p>
+    <button id="playAudioBtn">Play Audio</button>
+    <p id="timerDisplay">Time remaining: <span id="wordTimer">20</span> seconds</p>
+    <input type="text" id="answerInput" placeholder="Type the word here">
+    <br>
+    <button id="checkBtn">Check Answer</button>
+    <button id="nextBtn" style="display:none;">Next Word</button>
+    <div id="feedback" class="feedback"></div>
+  </div>
+
+  <!-- Hidden audio element for playing vocabulary and reward audio -->
+  <audio id="audioPlayer"></audio>
+
+  <script>
+    /***** Data & Variables *****/
+    // Test Set 5: 30 words from the attached vocabulary list.
+    // The words in this set, along with simple clues, are:
+    const testSets = [
+      [
+        { word: "may",       clue: "A spring month following April",           audioFile: "voc/may.mp3" },
+        { word: "meat",      clue: "Edible animal flesh",                       audioFile: "voc/meat.mp3" },
+        { word: "mechanic",  clue: "A person who repairs machines",            audioFile: "voc/mechanic.mp3" },
+        { word: "microwave", clue: "An appliance that heats food quickly",      audioFile: "voc/microwave.mp3" },
+        { word: "milk",      clue: "A white liquid produced by cows",          audioFile: "voc/milk.mp3" },
+        { word: "milkshake", clue: "A blended drink made from milk and ice cream", audioFile: "voc/milkshake.mp3" },
+        { word: "monday",    clue: "The first day of the workweek",             audioFile: "voc/monday.mp3" },
+        { word: "monkey",    clue: "A playful primate",                          audioFile: "voc/monkey.mp3" },
+        { word: "moon",      clue: "Earth's natural satellite",                audioFile: "voc/moon.mp3" },
+        { word: "morning",   clue: "The early part of the day",                 audioFile: "voc/morning.mp3" },
+        { word: "mother",    clue: "A female parent",                           audioFile: "voc/mother.mp3" },
+        { word: "motorbike", clue: "A small, motorized two-wheeled vehicle",     audioFile: "voc/motorbike.mp3" },
+        { word: "mountain",  clue: "A large natural elevation of the Earth's surface", audioFile: "voc/mountain.mp3" },
+        { word: "mouth",     clue: "The opening used for eating and speaking",  audioFile: "voc/mouth.mp3" },
+        { word: "mushroom",  clue: "A type of fungus, sometimes edible",        audioFile: "voc/mushroom.mp3" },
+        { word: "night",     clue: "The period of darkness after sunset",       audioFile: "voc/night.mp3" },
+        { word: "noon",      clue: "Midday or 12 o'clock",                       audioFile: "voc/noon.mp3" },
+        { word: "nose",      clue: "The organ used for smelling",               audioFile: "voc/nose.mp3" },
+        { word: "notebook",  clue: "A book for writing notes",                  audioFile: "voc/notebook.mp3" },
+        { word: "november",  clue: "The penultimate month of the year",         audioFile: "voc/november.mp3" },
+        { word: "october",   clue: "The tenth month of the year",               audioFile: "voc/october.mp3" },
+        { word: "onion",     clue: "A pungent vegetable used for cooking",      audioFile: "voc/onion.mp3" },
+        { word: "orange",    clue: "A citrus fruit rich in vitamin C",          audioFile: "voc/orange.mp3" },
+        { word: "orbit",     clue: "The path of one body around another",        audioFile: "voc/orbit.mp3" },
+        { word: "pan",       clue: "A flat, shallow cooking vessel",            audioFile: "voc/pan.mp3" },
+        { word: "paper",     clue: "Material used for writing or printing",      audioFile: "voc/paper.mp3" },
+        { word: "park",      clue: "An area of public recreational space",      audioFile: "voc/park.mp3" },
+        { word: "pen",       clue: "A writing instrument that uses ink",        audioFile: "voc/pen.mp3" },
+        { word: "pencil",    clue: "A tool for writing or drawing with graphite", audioFile: "voc/pencil.mp3" },
+        { word: "pepper",    clue: "A spice that adds heat or flavor",           audioFile: "voc/pepper.mp3" }
+      ]
+    ];
+    
+    // Use only the one test set in this file.
+    const totalWords = testSets[0].length; // Should be 30
+    let mistakes = 0;
+    let overallScore = 100; // Initial 100%
+
+    // Overall timer: 10 minutes = 600 seconds.
+    let overallTime = 600;
+    let overallTimerInterval;
+
+    // For this file, there is one test set.
+    let currentTestIndex = 0;
+    let currentWordIndex = 0;
+
+    /***** DOM Element References *****/
+    const welcomeContainer = document.getElementById("welcomeContainer");
+    const testInterface = document.getElementById("testInterface");
+    const usernameInput = document.getElementById("username");
+    const startBtn = document.getElementById("startBtn");
+
+    const overallTimerEl = document.getElementById("overallTimer");
+    const overallScoreEl = document.getElementById("overallScore");
+    const setIndicatorEl = document.getElementById("setIndicator");
+
+    const progressEl = document.getElementById("progress");
+    const clueEl = document.getElementById("clue");
+    const playAudioBtn = document.getElementById("playAudioBtn");
+    const wordTimerEl = document.getElementById("wordTimer");
+    const answerInputEl = document.getElementById("answerInput");
+    const checkBtn = document.getElementById("checkBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const feedbackEl = document.getElementById("feedback");
+    const audioPlayer = document.getElementById("audioPlayer");
+
+    /***** Overall Timer Function *****/
+    function startOverallTimer() {
+      overallTimerInterval = setInterval(() => {
+        overallTime--;
+        const minutes = Math.floor(overallTime / 60);
+        const seconds = overallTime % 60;
+        overallTimerEl.textContent = `Overall Time Remaining: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        if (overallTime <= 0) {
+          clearInterval(overallTimerInterval);
+          endTest("Overall time is up!");
+        }
+      }, 1000);
+    }
+
+    /***** Per-Word Functions *****/
+    // Update display for the current word.
+    function updateWordDisplay() {
+      const currentItem = testSets[currentTestIndex][currentWordIndex];
+      progressEl.textContent = `Word ${currentWordIndex + 1} of ${totalWords}`;
+      clueEl.textContent = `Clue: ${currentItem.clue}`;
+      wordTimerEl.textContent = "20";
+      answerInputEl.value = "";
+      feedbackEl.innerHTML = "";
+      answerInputEl.disabled = false;
+      checkBtn.disabled = false;
+      playAudioBtn.disabled = false;
+      nextBtn.style.display = "none";
+    }
+    
+    // Start the 20‑second per‑word timer.
+    let wordTimerInterval;
+    function startWordTimer() {
+      clearInterval(wordTimerInterval);
+      let timeLeft = 20;
+      wordTimerEl.textContent = timeLeft;
+      wordTimerInterval = setInterval(() => {
+        timeLeft--;
+        wordTimerEl.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(wordTimerInterval);
+          checkAnswer(true); // Auto-check answer when time expires
+        }
+      }, 1000);
+    }
+    
+    // Play the audio for the current word.
+    function playAudio() {
+      const currentItem = testSets[currentTestIndex][currentWordIndex];
+      audioPlayer.src = currentItem.audioFile;
+      audioPlayer.play().catch(error => console.error("Error playing audio:", error));
+    }
+    
+    // Check the answer. If 'auto' is true (timer expired) and no answer provided, count as mistake.
+    function checkAnswer(auto = false) {
+      clearInterval(wordTimerInterval);
+      const currentItem = testSets[currentTestIndex][currentWordIndex];
+      const userAnswer = answerInputEl.value.trim().toLowerCase();
+      const correctAnswer = currentItem.word.toLowerCase();
+      
+      if (auto && userAnswer === "") {
+        feedbackEl.textContent = `Time's up! The correct answer was "${correctAnswer}".`;
+        feedbackEl.style.color = "red";
+        mistakes++;
+      } else if (userAnswer === correctAnswer) {
+        feedbackEl.innerHTML = `Correct!<br><img src="reward1.gif" alt="Reward" class="reward">`;
+        feedbackEl.style.color = "green";
+        // Play reward audio
+        new Audio("game1.mp3").play().catch(err => console.error("Error playing reward audio:", err));
+      } else {
+        feedbackEl.textContent = `Incorrect! The correct answer was "${correctAnswer}".`;
+        feedbackEl.style.color = "red";
+        mistakes++;
+      }
+      
+      // Recalculate overall score (each mistake subtracts an equal portion of 100%)
+      overallScore = Math.max(100 - (mistakes * (100 / totalWords)), 0).toFixed(2);
+      overallScoreEl.textContent = `Overall Score: ${overallScore}%`;
+      
+      answerInputEl.disabled = true;
+      checkBtn.disabled = true;
+      playAudioBtn.disabled = true;
+      nextBtn.style.display = "inline-block";
+    }
+    
+    // Move to the next word; if finished, end the test.
+    function nextWord() {
+      currentWordIndex++;
+      if (currentWordIndex < totalWords) {
+        updateWordDisplay();
+        startWordTimer();
+      } else {
+        endTest("You have completed this test set!");
+      }
+    }
+    
+    // End the test and display a final message with name and overall score.
+    function endTest(message) {
+      clearInterval(wordTimerInterval);
+      clearInterval(overallTimerInterval);
+      const userName = usernameInput.value.trim() || "Participant";
+      document.querySelector(".container").innerHTML = `
+        <h2>Test Completed!</h2>
+        <p>${message}</p>
+        <p>${userName}, your final score is ${overallScore}%.</p>
+        <button onclick="location.reload()">Restart Test</button>
+      `;
+    }
+    
+    /***** Event Listeners *****/
+    startBtn.addEventListener("click", () => {
+      if (usernameInput.value.trim() === "") {
+        alert("Please enter your name to start the test.");
+      } else {
+        welcomeContainer.style.display = "none";
+        testInterface.style.display = "block";
+        updateWordDisplay();
+        startWordTimer();
+        startOverallTimer();
+      }
+    });
+    
+    playAudioBtn.addEventListener("click", playAudio);
+    checkBtn.addEventListener("click", () => { checkAnswer(false); });
+    nextBtn.addEventListener("click", nextWord);
+    
+    answerInputEl.addEventListener("keyup", (event) => {
+      if (event.key === "Enter" && !checkBtn.disabled) {
+        checkAnswer(false);
+      }
+    });
+    
+  </script>
+  
+</body>
+</html>
