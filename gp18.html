@@ -2,22 +2,22 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Joel Mitchell's Verb Practice 16</title>
+  <title>Joel Mitchell's Verb Practice 18</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    /* Basic Styling */
+    /* Basic styling */
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
       background-color: #f5f5f5;
     }
-    /* Start Screen Styling */
+    /* Start Screen styling */
     #startScreen {
       max-width: 700px;
       margin: auto;
       text-align: center;
       padding: 20px;
-      background: #ffffff;
+      background: #fff;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
@@ -25,7 +25,7 @@
     #container {
       max-width: 700px;
       margin: auto;
-      background: #ffffff;
+      background: #fff;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -34,7 +34,7 @@
     h1, h2 {
       text-align: center;
     }
-    /* Display Elements */
+    /* Top-level displays */
     #overallTimer, #levelDisplay, #timer, #scoreDisplay {
       text-align: center;
       font-size: 1.2em;
@@ -75,8 +75,12 @@
       background-color: #aaa;
     }
     @media(max-width: 768px) {
-      input[type="text"] { width: 100%; }
-      button { width: 100%; }
+      input[type="text"] {
+        width: 100%;
+      }
+      button {
+        width: 100%;
+      }
     }
     #reward {
       text-align: center;
@@ -96,9 +100,9 @@
       margin-top: 20px;
       border-radius: 4px;
     }
-    #summary p { 
+    #summary p {
       font-size: 1.2em;
-      text-align: center; 
+      text-align: center;
     }
     #printButton {
       display: block;
@@ -116,8 +120,7 @@
 <body>
   <!-- Start Screen -->
   <div id="startScreen">
-    <h1>Joel Mitchell's Verb Practice 16</h1>
-    <p>Please enter your name and press "Start Quiz" to begin.</p>
+    <h1>Joel Mitchell's Verb Practice 18</h1>
     <input type="text" id="playerName" placeholder="Enter your name" />
     <br/>
     <button id="startBtn">Start Quiz</button>
@@ -125,6 +128,7 @@
   
   <!-- Main Quiz Container -->
   <div id="container">
+    <!-- Overall Timer -->
     <div id="overallTimer">Overall Time Left: 10:00</div>
     <p id="levelDisplay">Level: </p>
     <div id="timer">Time left: </div>
@@ -141,11 +145,17 @@
       <p id="summaryText"></p>
       <button id="printButton">Print Summary</button>
     </div>
+    
+    <!-- Hidden Audio Elements for Rewards and End-of-Quiz -->
+    <audio id="rewardAudio" preload="auto"></audio>
+    <audio id="endRewardAudio" src="game1.mp3" preload="auto"></audio>
   </div>
   
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // GLOBAL VARIABLES
+      // ---------------------------
+      // Global Variables and Settings
+      // ---------------------------
       var totalCorrect = 0;
       var totalAttempted = 0;
       var currentLevel = 1;
@@ -157,75 +167,135 @@
       var overallTime = 600; // 10 minutes in seconds
       var playerName = "";
       var currentQuestions = [];
-
-      // LEVEL 1 – Simple Past (10 Questions; New Verbs/Irregulars)
-      var level1Questions = [
-        { template: "Last night, I ___ a rare painting at the exhibit. (discover)", answer: "discovered", explanation: "Regular verbs add -ed: 'discover' → 'discovered'." },
-        { template: "Yesterday, she ___ a surprising secret. (reveal)", answer: "revealed", explanation: "Regular verb: 'reveal' → 'revealed'." },
-        { template: "He ___ his wallet at the market. (lose)", answer: "lost", explanation: "The irregular past of 'lose' is 'lost'." },
-        { template: "I ___ my old friend unexpectedly. (meet)", answer: "met", explanation: "The simple past of 'meet' is 'met'." },
-        { template: "They ___ the ancient castle during their trip. (visit)", answer: "visited", explanation: "Regular verb: 'visit' → 'visited'." },
-        { template: "She ___ an inspiring lecture last week. (deliver)", answer: "delivered", explanation: "Regular verb: 'deliver' → 'delivered'." },
-        { template: "I ___ a unique sculpture at the gallery. (find)", answer: "found", explanation: "The simple past of 'find' is 'found'." },
-        { template: "He ___ the winning goal in the final minute. (score)", answer: "scored", explanation: "Regular verb: 'score' → 'scored'." },
-        { template: "They ___ a classic film on Sunday. (watch)", answer: "watched", explanation: "Regular past: 'watch' becomes 'watched'." },
-        { template: "She ___ her performance to perfection. (perfect)", answer: "perfected", explanation: "Regular verb: 'perfect' → 'perfected'." }
-      ];
-
-      // LEVEL 2 – Past Continuous (10 Questions; New Verbs)
-      var level2Questions = [
-        { template: "At 8 PM yesterday, I ___ my favorite song. (listen)", answer: "was listening", explanation: "For 'I', use 'was listening' in past continuous." },
-        { template: "While she ___ down the street, she smiled at everyone. (walk)", answer: "was walking", explanation: "For 'she', the past continuous is 'was walking'." },
-        { template: "They ___ in the park when the rain began. (play)", answer: "were playing", explanation: "For 'they', use 'were playing'." },
-        { template: "He ___ a letter when the phone rang. (write)", answer: "was writing", explanation: "For 'he', use 'was writing'." },
-        { template: "We ___ dinner when our guests arrived. (have)", answer: "were having", explanation: "For 'we', use 'were having'." },
-        { template: "The children ___ loudly in the schoolyard. (laugh)", answer: "were laughing", explanation: "For 'they', use 'were laughing'." },
-        { template: "I ___ a book while commuting. (read)", answer: "was reading", explanation: "For 'I', 'was reading' is correct." },
-        { template: "She ___ an engaging conversation with a friend. (talk)", answer: "was talking", explanation: "For 'she', use 'was talking'." },
-        { template: "They ___ along the boardwalk at sunset. (stroll)", answer: "were strolling", explanation: "For plural subjects, use 'were strolling'." },
-        { template: "He ___ his new song on the guitar all evening. (play)", answer: "was playing", explanation: "For 'he', the past continuous is 'was playing'." }
-      ];
-
-      // LEVEL 3 – Present Perfect (10 Questions; New Verbs)
-      var level3Questions = [
-        { template: "I ___ a captivating novel this month. (finish)", answer: "have finished", explanation: "For 'I', use 'have finished' in present perfect." },
-        { template: "She ___ a prestigious award for her research. (win)", answer: "has won", explanation: "For 'she', the correct form is 'has won'." },
-        { template: "They ___ in this city for four years. (live)", answer: "have lived", explanation: "For 'they', use 'have lived'." },
-        { template: "He ___ his keys and can’t find them. (lose)", answer: "has lost", explanation: "For 'he', use 'has lost'." },
-        { template: "I ___ great progress in my studies. (make)", answer: "have made", explanation: "For 'I', use 'have made' in present perfect." },
-        { template: "She ___ the lecture slides thoroughly. (review)", answer: "has reviewed", explanation: "For 'she', the present perfect is 'has reviewed'." },
-        { template: "They ___ many innovative designs recently. (create)", answer: "have created", explanation: "For 'they', use 'have created'." },
-        { template: "He ___ valuable insights from the seminar. (gain)", answer: "has gained", explanation: "For 'he', use 'has gained'." },
-        { template: "I ___ a new perspective on the issue. (develop)", answer: "have developed", explanation: "For 'I', use 'have developed'." },
-        { template: "She ___ all her tasks successfully. (complete)", answer: "has completed", explanation: "For 'she', the correct form is 'has completed'." }
-      ];
-
-      // LEVEL 4 – Mixed Tenses (10 Questions; New Verbs including irregulars)
-      var level4Questions = [
-        { template: "By the time the workshop started, I ___ all my notes. (organize)", answer: "had organized", explanation: "Past perfect indicates the notes were completed before the workshop began." },
-        { template: "Tomorrow, he ___ his latest research findings. (present)", answer: "will present", explanation: "Simple future uses 'will' + base form: 'will present'." },
-        { template: "Right now, I ___ a draft of the report. (compose)", answer: "am composing", explanation: "Present continuous indicates an action in progress: 'am composing'." },
-        { template: "By next week, they ___ the complete software update. (release)", answer: "will have released", explanation: "Future perfect indicates the update will be complete by next week." },
-        { template: "Yesterday, while I ___ along the avenue, I bumped into an old friend. (stroll)", answer: "was strolling", explanation: "Past continuous shows an interrupted action: 'was strolling'." },
-        { template: "At this moment, we ___ an online strategy meeting. (attend)", answer: "are attending", explanation: "For 'we', present continuous is 'are attending'." },
-        { template: "By 5 PM today, she ___ all her pending tasks. (finish)", answer: "will have finished", explanation: "Future perfect expresses completion by a future deadline." },
-        { template: "Last night, I ___ an enthralling documentary. (watch)", answer: "watched", explanation: "Simple past: 'watched' is the completed form." },
-        { template: "At 10 AM, they ___ a collaborative session. (collaborate)", answer: "were collaborating", explanation: "Past continuous for plural subjects is 'were collaborating'." },
-        { template: "Next month, I ___ the final results in a report. (publish)", answer: "will publish", explanation: "Simple future uses 'will' + base form: 'will publish'." }
-      ];
-
-      // Build the Question Bank Object
+      
+      // ---------------------------
+      // Helper Function: Get CEFR Label & Update Level Display
+      // ---------------------------
+      function getCEFRLabel(level) {
+        switch (level) {
+          case 1: return "A1 (Simple Future)";
+          case 2: return "A2 (Future Continuous)";
+          case 3: return "B1 (Future Perfect)";
+          case 4: return "B2 (Mixed Future Tenses)";
+          default: return "";
+        }
+      }
+      function updateLevelDisplay() {
+        document.getElementById("levelDisplay").innerText = "Level: " + getCEFRLabel(currentLevel);
+      }
+      
+      // ---------------------------
+      // Overall Timer Functions
+      // ---------------------------
+      function updateOverallTimerDisplay() {
+        var minutes = Math.floor(overallTime / 60);
+        var seconds = overallTime % 60;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+        document.getElementById("overallTimer").innerText = "Overall Time Left: " + minutes + ":" + seconds;
+      }
+      function startOverallTimer() {
+        updateOverallTimerDisplay();
+        overallInterval = setInterval(function () {
+          overallTime--;
+          updateOverallTimerDisplay();
+          if (overallTime <= 0) {
+            clearInterval(overallInterval);
+            finishQuiz();
+          }
+        }, 1000);
+      }
+      
+      // ---------------------------
+      // Question Generation Functions
+      // ---------------------------
+      
+      // Level 1 (A1): Simple Future forms (use “will” + base verb)
+      function generateLevel1Questions() {
+        return [
+          { template: "Tomorrow, I ___ to the market. (go)", answer: "will go" },
+          { template: "Next week, she ___ a new book. (buy)", answer: "will buy" },
+          { template: "In the morning, he ___ a cup of coffee. (drink)", answer: "will drink" },
+          { template: "Tomorrow night, we ___ a movie. (watch)", answer: "will watch" },
+          { template: "Next year, they ___ a trip to Paris. (take)", answer: "will take" },
+          { template: "Soon, I ___ my friend at the park. (meet)", answer: "will meet" },
+          { template: "On Sunday, she ___ her homework. (do)", answer: "will do" },
+          { template: "Later, he ___ with his colleagues. (talk)", answer: "will talk" },
+          { template: "Tomorrow, we ___ for the test. (study)", answer: "will study" },
+          { template: "At noon, they ___ lunch together. (have)", answer: "will have" }
+        ];
+      }
+      
+      // Level 2 (A2): Future Continuous forms (use “will be” + present participle)
+      function generateLevel2Questions() {
+        return [
+          { template: "At 9 AM tomorrow, I ___ at the office. (work)", answer: "will be working" },
+          { template: "This time tomorrow, she ___ in the garden. (plant)", answer: "will be planting" },
+          { template: "At noon tomorrow, he ___ a meeting. (attend)", answer: "will be attending" },
+          { template: "Next evening, we ___ a new show on TV. (watch)", answer: "will be watching" },
+          { template: "At 8 PM, they ___ dinner. (eat)", answer: "will be eating" },
+          { template: "Tomorrow afternoon, I ___ with my family. (travel)", answer: "will be traveling" },
+          { template: "At this moment tomorrow, he ___ on his project. (work)", answer: "will be working" },
+          { template: "Next week, she ___ a presentation at the conference. (give)", answer: "will be giving" },
+          { template: "In a few minutes, we ___ outside. (play)", answer: "will be playing" },
+          { template: "At 10 AM, they ___ the new exhibit at the museum. (view)", answer: "will be viewing" }
+        ];
+      }
+      
+      // Level 3 (B1): Future Perfect forms (use “will have” + past participle)
+      function generateLevel3Questions() {
+        return [
+          { template: "By next month, I ___ the entire book. (read)", answer: "will have read" },
+          { template: "By the time you arrive, she ___ dinner. (prepare)", answer: "will have prepared" },
+          { template: "Before the semester ends, they ___ the project. (complete)", answer: "will have completed" },
+          { template: "By tomorrow night, he ___ the assignment. (finish)", answer: "will have finished" },
+          { template: "By next year, we ___ the new building. (construct)", answer: "will have constructed" },
+          { template: "By the time the show starts, I ___ my homework. (do)", answer: "will have done" },
+          { template: "Before the morning, she ___ the report. (write)", answer: "will have written" },
+          { template: "By tomorrow, they ___ their exam. (pass)", answer: "will have passed" },
+          { template: "By next weekend, he ___ the results. (analyze)", answer: "will have analyzed" },
+          { template: "By the end of the day, we ___ the meeting. (conclude)", answer: "will have concluded" }
+        ];
+      }
+      
+      // Level 4 (B2): Mixed Future Tenses
+      // This level is a mix of:
+      // • Simple Future (4 questions)
+      // • Future Continuous (4 questions)
+      // • Future Perfect (4 questions)
+      function generateLevel4Questions() {
+        return [
+          // Simple Future (4):
+          { template: "Next week, I ___ a conference. (attend)", answer: "will attend" },
+          { template: "Tomorrow, she ___ a gift for her friend. (choose)", answer: "will choose" },
+          { template: "Soon, they ___ a decision. (make)", answer: "will make" },
+          { template: "Next month, we ___ a new car. (buy)", answer: "will buy" },
+          // Future Continuous (4):
+          { template: "At 3 PM tomorrow, I ___ in a webinar. (join)", answer: "will be joining" },
+          { template: "This time next week, he ___ for his exams. (study)", answer: "will be studying" },
+          { template: "On Saturday evening, she ___ over the phone. (chat)", answer: "will be chatting" },
+          { template: "Later today, they ___ in the park. (exercise)", answer: "will be exercising" },
+          // Future Perfect (4):
+          { template: "By the end of the year, I ___ my training program. (complete)", answer: "will have completed" },
+          { template: "By next week, he ___ all the necessary tests. (finish)", answer: "will have finished" },
+          { template: "By tomorrow morning, she ___ on the proposal. (review)", answer: "will have reviewed" },
+          { template: "By then, they ___ the renovation. (finish)", answer: "will have finished" }
+        ];
+      }
+      
+      // ---------------------------
+      // Question Bank and Time Limits
+      // ---------------------------
       var questionBank = {
-        1: level1Questions,
-        2: level2Questions,
-        3: level3Questions,
-        4: level4Questions
+        1: generateLevel1Questions(),
+        2: generateLevel2Questions(),
+        3: generateLevel3Questions(),
+        4: generateLevel4Questions()
       };
-
-      // Time limits per level (in seconds)
       var timeLimits = { 1: 20, 2: 30, 3: 40, 4: 50 };
-
-      // Helper Function: Fisher–Yates Shuffle
+      
+      // ---------------------------
+      // Helper Function: Shuffle Array (Fisher–Yates)
+      // ---------------------------
       function shuffle(array) {
         for (var i = array.length - 1; i > 0; i--) {
           var j = Math.floor(Math.random() * (i + 1));
@@ -235,8 +305,10 @@
         }
         return array;
       }
-
+      
+      // ---------------------------
       // Reward Functions
+      // ---------------------------
       function getRewardImageSource() {
         if (currentLevel === 1) return "reward1.gif";
         if (currentLevel === 2) return "reward2.gif";
@@ -251,8 +323,10 @@
         if (currentLevel === 4) return "game4.mp3";
         return "game1.mp3";
       }
-
+      
+      // ---------------------------
       // Per-Question Timer Functions
+      // ---------------------------
       function startTimer(limit) {
         var timeLeft = limit;
         document.getElementById("timer").innerText = "Time left: " + timeLeft + " s";
@@ -271,22 +345,25 @@
           document.getElementById("feedbackDisplay").className = "feedback incorrect";
           var currentQ = currentQuestions[currentQuestionIndex];
           document.getElementById("feedbackDisplay").innerText =
-            "Too slow! (limit: " + timeLimits[currentLevel] + " s)\nThe correct answer was: " + currentQ.answer +
-            "\nExplanation: " + currentQ.explanation;
+            "Too slow! (limit: " + timeLimits[currentLevel] + " s)\nThe correct answer was: " + currentQ.answer;
           totalAttempted++;
           updateScore();
           setTimeout(nextQuestion, 2000);
         }
       }
-
+      
+      // ---------------------------
       // Score Update Function
+      // ---------------------------
       function updateScore() {
         var scoreDisplay = document.getElementById("scoreDisplay");
         var percentage = totalAttempted === 0 ? 0 : Math.round((totalCorrect / totalAttempted) * 100);
         scoreDisplay.innerText = "Score: " + percentage + "% (" + totalCorrect + "/" + totalAttempted + ")";
       }
-
+      
+      // ---------------------------
       // Load Current Level Questions
+      // ---------------------------
       function loadCurrentLevel() {
         if (questionBank[currentLevel]) {
           currentQuestions = shuffle([...questionBank[currentLevel]]);
@@ -294,19 +371,10 @@
           updateLevelDisplay();
         }
       }
-
-      // Update Level Display
-      function updateLevelDisplay() {
-        var levelLabels = {
-          1: "A1 (Simple Past)",
-          2: "A2 (Past Continuous)",
-          3: "B1 (Present Perfect)",
-          4: "B2 (Mixed Tenses)"
-        };
-        document.getElementById("levelDisplay").innerText = "Level: " + levelLabels[currentLevel];
-      }
-
+      
+      // ---------------------------
       // Next Question Function
+      // ---------------------------
       function nextQuestion() {
         clearInterval(timerInterval);
         if (currentQuestionIndex < currentQuestions.length) {
@@ -327,8 +395,10 @@
           }
         }
       }
-
+      
+      // ---------------------------
       // Show Reward Function
+      // ---------------------------
       function showReward() {
         var rewardDiv = document.getElementById("reward");
         rewardDiv.innerHTML = '<img src="' + getRewardImageSource() + '" alt="Great Job!"/>';
@@ -342,8 +412,10 @@
           rewardDiv.style.display = 'none';
         }, 1500);
       }
-
+      
+      // ---------------------------
       // Answer Submission Handler
+      // ---------------------------
       document.getElementById("submitBtn").addEventListener("click", function () {
         if (answered || currentQuestionIndex >= currentQuestions.length) return;
         answered = true;
@@ -354,8 +426,7 @@
         totalAttempted++;
         var feedbackMessage = "";
         if (elapsedTime > timeLimits[currentLevel]) {
-          feedbackMessage = "Too slow! (limit: " + timeLimits[currentLevel] + " s)\nThe correct answer was: " + currentQ.answer +
-            "\nExplanation: " + currentQ.explanation;
+          feedbackMessage = "Too slow! (limit: " + timeLimits[currentLevel] + " s)\nThe correct answer was: " + currentQ.answer;
           document.getElementById("feedbackDisplay").className = "feedback incorrect";
         } else if (userAnswer.toLowerCase() === currentQ.answer.toLowerCase()) {
           feedbackMessage = "Correct!";
@@ -363,8 +434,7 @@
           document.getElementById("feedbackDisplay").className = "feedback correct";
           showReward();
         } else {
-          feedbackMessage = "Not quite right. The correct answer was: " + currentQ.answer +
-            "\nExplanation: " + currentQ.explanation;
+          feedbackMessage = "Not quite right. The correct answer was: " + currentQ.answer;
           document.getElementById("feedbackDisplay").className = "feedback incorrect";
         }
         document.getElementById("feedbackDisplay").innerText = feedbackMessage;
@@ -372,8 +442,10 @@
         currentQuestionIndex++;
         setTimeout(nextQuestion, 2000);
       });
-
+      
+      // ---------------------------
       // Finish Quiz Function
+      // ---------------------------
       function finishQuiz() {
         clearInterval(timerInterval);
         clearInterval(overallInterval);
@@ -394,13 +466,17 @@
           totalCorrect + " out of " + totalAttempted + ")\nThank you for practicing.";
         summaryDiv.style.display = "block";
       }
-
+      
+      // ---------------------------
       // Print Summary Handler
+      // ---------------------------
       document.getElementById("printButton").addEventListener("click", function () {
         window.print();
       });
-
+      
+      // ---------------------------
       // Start Screen Logic
+      // ---------------------------
       document.getElementById("startBtn").addEventListener("click", function () {
         var nameInput = document.getElementById("playerName").value.trim();
         if (nameInput === "") {
@@ -415,19 +491,7 @@
         loadCurrentLevel();
         nextQuestion();
       });
-
-      // Overall Timer Initialization
-      overallInterval = setInterval(function () {
-        overallTime--;
-        var minutes = Math.floor(overallTime / 60);
-        var seconds = overallTime % 60;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-        document.getElementById("overallTimer").innerText = "Overall Time Left: " + minutes + ":" + seconds;
-        if (overallTime <= 0) {
-          clearInterval(overallInterval);
-          finishQuiz();
-        }
-      }, 1000);
+      
     });
   </script>
 </body>
