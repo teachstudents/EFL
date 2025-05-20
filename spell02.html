@@ -2,293 +2,210 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Vocabulary Spelling Test – Next Set (Set 4)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Joel Mitchell's Spelling Practice</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
-      margin: 20px;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
     }
     .container {
       max-width: 600px;
-      margin: auto;
-      background: white;
+      margin: 30px auto;
+      background: #fff;
       padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       text-align: center;
     }
-    h2 { margin-bottom: 10px; }
     button {
       padding: 10px 20px;
-      margin: 10px 5px;
-      border: none;
-      background-color: #4CAF50;
-      color: white;
-      border-radius: 5px;
+      margin: 10px;
+      font-size: 1em;
       cursor: pointer;
     }
-    button:hover { background-color: #45a049; }
     input[type="text"] {
-      padding: 10px;
+      padding: 8px;
+      font-size: 1em;
       width: 80%;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 16px;
+      margin: 10px;
     }
-    .feedback {
-      margin-top: 10px;
+    .hidden { display: none; }
+    #rewardImg {
+      margin-top: 15px;
+      width: 100px;
+      height: auto;
+    }
+    #timerDisplay {
+      font-size: 1.2em;
       font-weight: bold;
-      min-height: 60px;
-    }
-    #overallTimer, #overallScore, #setIndicator, #timerDisplay {
-      font-size: 18px;
-      margin: 10px 0;
-      color: #333;
-    }
-    img.reward {
-      max-width: 300px;
-      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-
-  <!-- Welcome Screen -->
-  <div id="welcomeContainer" class="container">
-    <h2>Welcome to Joel Mitchell’s Listening & Spelling</h2>
-    <label for="username">Your Name: </label>
-    <input type="text" id="username" placeholder="Enter your name">
-    <br>
-    <button id="startBtn">Start Test</button>
-  </div>
-  
-  <!-- Test Interface (hidden initially) -->
-  <div id="testInterface" class="container" style="display:none;">
-    <!-- Overall Timer, Overall Score, and Test Set Indicator -->
-    <p id="overallTimer">Overall Time Remaining: 10:00</p>
-    <p id="overallScore">Overall Score: 100%</p>
-    <!-- Since this file is only for the next set, we display "Test Set: 1 of 1" -->
-    <p id="setIndicator">Test Set: 1/1</p>
+  <div class="container">
+    <h1>Joel Mitchell's Spelling Practice</h1>
     
-    <!-- Current Word Section -->
-    <p id="progress">Word 1 of 30</p>
-    <p id="clue">Clue: </p>
-    <button id="playAudioBtn">Play Audio</button>
-    <p id="timerDisplay">Time remaining: <span id="wordTimer">20</span> seconds</p>
-    <input type="text" id="answerInput" placeholder="Type the word here">
-    <br>
-    <button id="checkBtn">Check Answer</button>
-    <button id="nextBtn" style="display:none;">Next Word</button>
-    <div id="feedback" class="feedback"></div>
+    <!-- Start Screen: Enter Name -->
+    <div id="startScreen">
+      <p>Please enter your name to start the quiz:</p>
+      <input type="text" id="userName" placeholder="Your Name" required>
+      <button id="startBtn">Start Quiz</button>
+    </div>
+    
+    <!-- Quiz Screen -->
+    <div id="quizScreen" class="hidden">
+      <p>Question <span id="questionNumber">1</span> of 25</p>
+      <p><em id="clue">Clue will appear here</em></p>
+      <button id="playAudio">Play Word</button>
+      <br>
+      <input type="text" id="userAnswer" placeholder="Type your answer here">
+      <br>
+      <button id="submitBtn">Submit</button>
+      <p id="timer">Time left: <span id="timeLeft">20</span> seconds</p>
+      <p id="feedback"></p>
+      <img id="rewardImg" src="reward1.gif" alt="Reward" class="hidden">
+    </div>
+    
+    <!-- Result Screen -->
+    <div id="resultScreen" class="hidden">
+      <h2>Quiz Completed</h2>
+      <p id="finalScore"></p>
+    </div>
   </div>
-  
-  <!-- Hidden audio element for playing both vocabulary and reward audio -->
-  <audio id="audioPlayer"></audio>
   
   <script>
-    /***** Data & Variables *****/
-    // Test Set 4: Next 30 words from the attached vocabulary list
-    const testSets = [
-      [
-        { word: "green",      clue: "A color between blue and yellow",               audioFile: "voc/green.mp3" },
-        { word: "hairdresser", clue: "A person who cuts clients' hair",               audioFile: "voc/hairdresser.mp3" },
-        { word: "hand",       clue: "The end part of your arm",                        audioFile: "voc/hand.mp3" },
-        { word: "head",       clue: "What you think with",                             audioFile: "voc/head.mp3" },
-        { word: "heart",      clue: "A vital organ; symbol of love",                   audioFile: "voc/heart.mp3" },
-        { word: "helicopter", clue: "A rotary-wing aircraft",                          audioFile: "voc/helicopter.mp3" },
-        { word: "horse",      clue: "A farm animal used for riding",                   audioFile: "voc/horse.mp3" },
-        { word: "hospital",   clue: "A place for medical treatment",                   audioFile: "voc/hospital.mp3" },
-        { word: "house",      clue: "A building in which people live",                 audioFile: "voc/house.mp3" },
-        { word: "husband",    clue: "A married man",                                   audioFile: "voc/husband.mp3" },
-        { word: "island",     clue: "A piece of land surrounded by water",             audioFile: "voc/island.mp3" },
-        { word: "jacket",     clue: "A piece of clothing worn over other clothes",     audioFile: "voc/jacket.mp3" },
-        { word: "january",    clue: "The first month of the year",                     audioFile: "voc/january.mp3" },
-        { word: "juice",      clue: "A drink made from fruits",                        audioFile: "voc/juice.mp3" },
-        { word: "july",       clue: "A hot summer month",                              audioFile: "voc/july.mp3" },
-        { word: "june",       clue: "The month between May and July",                  audioFile: "voc/june.mp3" },
-        { word: "kitchen",    clue: "A room where food is prepared",                   audioFile: "voc/kitchen.mp3" },
-        { word: "knife",      clue: "A tool used for cutting",                         audioFile: "voc/knife.mp3" },
-        { word: "lamb",       clue: "A young sheep",                                   audioFile: "voc/lamb.mp3" },
-        { word: "leaf",       clue: "A typically green, flat part of a plant",         audioFile: "voc/leaf.mp3" },
-        { word: "leg",        clue: "A limb used for walking",                         audioFile: "voc/leg.mp3" },
-        { word: "lemon",      clue: "A sour, yellow citrus fruit",                     audioFile: "voc/lemon.mp3" },
-        { word: "lemonade",   clue: "A sweet, refreshing citrus drink",               audioFile: "voc/lemonade.mp3" },
-        { word: "lettuce",    clue: "A green leafy vegetable",                         audioFile: "voc/lettuce.mp3" },
-        { word: "librarian",  clue: "A person who works in a library",                 audioFile: "voc/librarian.mp3" },
-        { word: "library",    clue: "A place that houses many books",                  audioFile: "voc/library.mp3" },
-        { word: "lion",       clue: "Known as the king of the jungle",               audioFile: "voc/lion.mp3" },
-        { word: "lips",       clue: "Parts of your mouth used for speaking",           audioFile: "voc/lips.mp3" },
-        { word: "lunch",      clue: "A midday meal",                                   audioFile: "voc/lunch.mp3" },
-        { word: "march",      clue: "A month in early spring",                         audioFile: "voc/march.mp3" }
-      ]
+    // Array of words along with display (for proper capitalization), clue, and audio file location.
+    const words = [
+      { word: "afternoon", display: "afternoon", clue: "Part of the day after noon", file: "voc/afternoon.mp3" },
+      { word: "airplane", display: "airplane", clue: "A flying vehicle", file: "voc/airplane.mp3" },
+      { word: "apple", display: "apple", clue: "A common fruit", file: "voc/apple.mp3" },
+      { word: "april", display: "April", clue: "Fourth month of the year", file: "voc/april.mp3" },
+      { word: "architect", display: "architect", clue: "A person who designs buildings", file: "voc/architect.mp3" },
+      { word: "arm", display: "arm", clue: "A limb", file: "voc/arm.mp3" },
+      { word: "artist", display: "artist", clue: "One who creates art", file: "voc/artist.mp3" },
+      { word: "asteroid", display: "asteroid", clue: "A small rocky body in space", file: "voc/asteroid.mp3" },
+      { word: "august", display: "August", clue: "Eighth month of the year", file: "voc/august.mp3" },
+      { word: "aunt", display: "aunt", clue: "A relative", file: "voc/aunt.mp3" },
+      { word: "autumn", display: "autumn", clue: "A season before winter", file: "voc/autumn.mp3" },
+      { word: "back", display: "back", clue: "Opposite of front", file: "voc/back.mp3" },
+      { word: "banana", display: "banana", clue: "A yellow fruit", file: "voc/banana.mp3" },
+      { word: "bank", display: "bank", clue: "A place to keep money", file: "voc/bank.mp3" },
+      { word: "bar", display: "bar", clue: "A place to drink", file: "voc/bar.mp3" },
+      { word: "bathroom", display: "bathroom", clue: "A room for bathing", file: "voc/bathroom.mp3" },
+      { word: "beach", display: "beach", clue: "A sandy shore", file: "voc/beach.mp3" },
+      { word: "bed", display: "bed", clue: "A place to sleep", file: "voc/bed.mp3" },
+      { word: "bedroom", display: "bedroom", clue: "A room with a bed", file: "voc/bedroom.mp3" },
+      { word: "beer", display: "beer", clue: "An alcoholic beverage", file: "voc/beer.mp3" },
+      { word: "belt", display: "belt", clue: "Clothing accessory", file: "voc/belt.mp3" },
+      { word: "bicycle", display: "bicycle", clue: "A two-wheeled vehicle", file: "voc/bicycle.mp3" },
+      { word: "bird", display: "bird", clue: "A flying animal", file: "voc/bird.mp3" },
+      { word: "black", display: "black", clue: "A color", file: "voc/black.mp3" },
+      { word: "blender", display: "blender", clue: "Kitchen appliance", file: "voc/blender.mp3" }
     ];
     
-    // Use the only set in this file.
-    const totalWords = testSets[0].length; // 30 words
-    let mistakes = 0;
-    let overallScore = 100; // start at 100%
+    // Variables to track state
+    let currentQuestion = 0;
+    let score = 100;
+    const timePerWord = 20;
+    let timer;
+    let timeLeft;
     
-    // Overall timer: 10 minutes = 600 seconds
-    let overallTime = 600;
-    let overallTimerInterval;
-    
-    // For this file, there is only one test set, so:
-    let currentTestIndex = 0;
-    let currentWordIndex = 0;
-    
-    /***** DOM Element References *****/
-    const welcomeContainer = document.getElementById("welcomeContainer");
-    const testInterface = document.getElementById("testInterface");
-    const usernameInput = document.getElementById("username");
+    // DOM Elements
+    const startScreen = document.getElementById("startScreen");
+    const quizScreen = document.getElementById("quizScreen");
+    const resultScreen = document.getElementById("resultScreen");
+    const userNameInput = document.getElementById("userName");
     const startBtn = document.getElementById("startBtn");
-    
-    const overallTimerEl = document.getElementById("overallTimer");
-    const overallScoreEl = document.getElementById("overallScore");
-    const setIndicatorEl = document.getElementById("setIndicator");
-    
-    const progressEl = document.getElementById("progress");
+    const questionNumber = document.getElementById("questionNumber");
     const clueEl = document.getElementById("clue");
-    const playAudioBtn = document.getElementById("playAudioBtn");
-    const wordTimerEl = document.getElementById("wordTimer");
-    const answerInputEl = document.getElementById("answerInput");
-    const checkBtn = document.getElementById("checkBtn");
-    const nextBtn = document.getElementById("nextBtn");
+    const playAudioBtn = document.getElementById("playAudio");
+    const userAnswerInput = document.getElementById("userAnswer");
+    const submitBtn = document.getElementById("submitBtn");
+    const timerDisplay = document.getElementById("timeLeft");
     const feedbackEl = document.getElementById("feedback");
-    const audioPlayer = document.getElementById("audioPlayer");
+    const rewardImg = document.getElementById("rewardImg");
+    const finalScoreEl = document.getElementById("finalScore");
     
-    /***** Overall Timer Function *****/
-    function startOverallTimer() {
-      overallTimerInterval = setInterval(() => {
-        overallTime--;
-        const minutes = Math.floor(overallTime / 60);
-        const seconds = overallTime % 60;
-        overallTimerEl.textContent = `Overall Time Remaining: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        if (overallTime <= 0) {
-          clearInterval(overallTimerInterval);
-          endTest("Overall time is up!");
-        }
-      }, 1000);
-    }
+    // Reward sound for correct answer
+    const rewardSound = new Audio("game1.mp3");
     
-    /***** Per-Word Functions *****/
-    // Update the display for the current word.
-    function updateWordDisplay() {
-      const currentItem = testSets[currentTestIndex][currentWordIndex];
-      progressEl.textContent = `Word ${currentWordIndex + 1} of ${totalWords}`;
-      clueEl.textContent = `Clue: ${currentItem.clue}`;
-      wordTimerEl.textContent = "20";
-      answerInputEl.value = "";
-      feedbackEl.innerHTML = "";
-      answerInputEl.disabled = false;
-      checkBtn.disabled = false;
-      playAudioBtn.disabled = false;
-      nextBtn.style.display = "none";
-    }
+    // Start quiz when user clicks the start button
+    startBtn.addEventListener("click", function() {
+      if (userNameInput.value.trim() === "") {
+        alert("Please enter your name to start the quiz.");
+        return;
+      }
+      startScreen.classList.add("hidden");
+      quizScreen.classList.remove("hidden");
+      loadQuestion();
+    });
     
-    // Start the per-word 20-second timer.
-    let wordTimerInterval;
-    function startWordTimer() {
-      clearInterval(wordTimerInterval);
-      let timeLeft = 20;
-      wordTimerEl.textContent = timeLeft;
-      wordTimerInterval = setInterval(() => {
+    // Load the current question
+    function loadQuestion() {
+      clearInterval(timer);
+      userAnswerInput.value = "";
+      feedbackEl.textContent = "";
+      rewardImg.classList.add("hidden");
+      timeLeft = timePerWord;
+      timerDisplay.textContent = timeLeft;
+      
+      const currentWord = words[currentQuestion];
+      // Update question number and clue text
+      questionNumber.textContent = currentQuestion + 1;
+      clueEl.textContent = currentWord.clue;
+      
+      // Set up the play button to play the audio file from the voc folder
+      playAudioBtn.onclick = function() {
+        const audio = new Audio(currentWord.file);
+        audio.play();
+      };
+      
+      // Start the 20-second countdown timer for this word
+      timer = setInterval(() => {
         timeLeft--;
-        wordTimerEl.textContent = timeLeft;
+        timerDisplay.textContent = timeLeft;
         if (timeLeft <= 0) {
-          clearInterval(wordTimerInterval);
-          checkAnswer(true); // auto-check if time expires
+          clearInterval(timer);
+          // Time is up—display message with correct answer
+          feedbackEl.textContent = "Time's up! The correct spelling was: " + currentWord.display;
+          score -= (100 / words.length); // deduct equal fraction per wrong
+          setTimeout(nextQuestion, 2000);
         }
       }, 1000);
     }
     
-    // Play the audio for the current word.
-    function playAudio() {
-      const currentItem = testSets[currentTestIndex][currentWordIndex];
-      audioPlayer.src = currentItem.audioFile;
-      audioPlayer.play().catch(error => console.error("Error playing audio:", error));
-    }
-    
-    // Check the answer; if auto is true (timer expired) and answer is empty, count it as a mistake.
-    function checkAnswer(auto = false) {
-      clearInterval(wordTimerInterval);
-      const currentItem = testSets[currentTestIndex][currentWordIndex];
-      const userAnswer = answerInputEl.value.trim().toLowerCase();
-      const correctAnswer = currentItem.word.toLowerCase();
+    // Check the submitted answer
+    submitBtn.addEventListener("click", function() {
+      clearInterval(timer);
+      const currentWord = words[currentQuestion];
+      const userAnswer = userAnswerInput.value.trim();
       
-      if (auto && userAnswer === "") {
-        feedbackEl.textContent = `Time's up! The correct answer was "${correctAnswer}".`;
-        feedbackEl.style.color = "red";
-        mistakes++;
-      } else if (userAnswer === correctAnswer) {
-        feedbackEl.innerHTML = `Correct!<br><img src="reward1.gif" alt="Reward" class="reward">`;
-        feedbackEl.style.color = "green";
-        // Play reward sound
-        new Audio("game1.mp3").play().catch(err => console.error("Error playing reward audio:", err));
+      // For months and days (or other words) the check is case-sensitive based on the display value.
+      if (userAnswer === currentWord.display) {
+        feedbackEl.textContent = "Correct!";
+        rewardImg.classList.remove("hidden");
+        rewardSound.play();
       } else {
-        feedbackEl.textContent = `Incorrect! The correct answer was "${correctAnswer}".`;
-        feedbackEl.style.color = "red";
-        mistakes++;
+        feedbackEl.textContent = "Incorrect! The correct spelling was: " + currentWord.display;
+        score -= (100 / words.length);
       }
-      
-      // Recalculate overall score (each mistake deducts 100/totalWords percent)
-      overallScore = Math.max(100 - (mistakes * (100 / totalWords)), 0).toFixed(2);
-      overallScoreEl.textContent = `Overall Score: ${overallScore}%`;
-      
-      answerInputEl.disabled = true;
-      checkBtn.disabled = true;
-      playAudioBtn.disabled = true;
-      nextBtn.style.display = "inline-block";
-    }
-    
-    // Move to the next word; end test if finished.
-    function nextWord() {
-      currentWordIndex++;
-      if (currentWordIndex < totalWords) {
-        updateWordDisplay();
-        startWordTimer();
-      } else {
-        endTest("You have completed this test set!");
-      }
-    }
-    
-    // End the test and show final message.
-    function endTest(message) {
-      clearInterval(wordTimerInterval);
-      clearInterval(overallTimerInterval);
-      const userName = usernameInput.value.trim() || "Participant";
-      document.querySelector(".container").innerHTML = `
-        <h2>Test Completed!</h2>
-        <p>${message}</p>
-        <p>${userName}, your final score is ${overallScore}%.</p>
-        <button onclick="location.reload()">Restart Test</button>
-      `;
-    }
-    
-    /***** Event Listeners *****/
-    startBtn.addEventListener("click", () => {
-      if (usernameInput.value.trim() === "") {
-        alert("Please enter your name to start the test.");
-      } else {
-        welcomeContainer.style.display = "none";
-        testInterface.style.display = "block";
-        updateWordDisplay();
-        startWordTimer();
-        startOverallTimer();
-      }
+      setTimeout(nextQuestion, 2000);
     });
     
-    playAudioBtn.addEventListener("click", playAudio);
-    checkBtn.addEventListener("click", () => { checkAnswer(false); });
-    nextBtn.addEventListener("click", nextWord);
-    answerInputEl.addEventListener("keyup", (event) => {
-      if (event.key === "Enter" && !checkBtn.disabled) {
-        checkAnswer(false);
+    // Move to the next question or finish the quiz
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < words.length) {
+        loadQuestion();
+      } else {
+        quizScreen.classList.add("hidden");
+        resultScreen.classList.remove("hidden");
+        finalScoreEl.textContent = "Your final score is: " + Math.max(Math.round(score), 0) + "%";
       }
-    });
-    
+    }
   </script>
-  
 </body>
 </html>
