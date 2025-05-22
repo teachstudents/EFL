@@ -138,18 +138,19 @@
   let timerInterval; // <--- Add this
   let currentShuffled = []; // <--- Add this
 
-  function startQuiz() {
-   142|     name = document.getElementById("name-input").value;
-143|     if (!name.trim()) { showAlert("Please enter your name!"); return; }
-    document.getElementById("name-input").style.display = "none";
-    document.getElementById("start-button").style.display = "none";
-    currentQuestion = 0;
-    score = 100;
-    timer = 600;
-    updateQuestion();
-    updateTimer();
-    updateScore();
-  }
+function startQuiz() {
+  console.log("startQuiz called");
+  name = document.getElementById("name-input").value;
+  if (!name.trim()) { showAlert("Please enter your name!"); return; }
+  document.getElementById("name-input").style.display = "none";
+  document.getElementById("start-button").style.display = "none";
+  currentQuestion = 0;
+  score = 100;
+  timer = 600;
+  updateQuestion();
+  updateTimer();
+  updateScore();
+}
 
   function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
