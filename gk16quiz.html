@@ -236,7 +236,50 @@
     document.getElementById("score-container").style.display = "none";
     document.querySelector(".progress-bar").style.display = "none"; // Corrected
     clearInterval(timerInterval); // Stop timer
-  }
-</script>
+  241|   }
+// Add spelling quiz function here
+242|   function startSpellingQuiz() {
+243|     let spellingScore = 0;
+244|     let spellingIndex = 0;
+245|     document.getElementById("question-container").innerHTML = '';
+246|     document.getElementById("timer-container").style.display = "none";
+247|     document.getElementById("score-container").style.display = "none";
+248|     document.querySelector(".progress-bar").style.display = "none";
+249|     
+250|     function showSpellingQuestion() {
+251|       if (spellingIndex >= questions.length) {
+252|         document.getElementById("question-container").innerHTML = `
+253|           <h2>Spelling Quiz Over!</h2>
+254|           <p>Score: ${spellingScore} out of ${questions.length}</p>
+255|           <button onclick="location.reload()">Restart Entire Quiz</button>
+256|         `;
+257|         return;
+258|       }
+259|       const chinese = questions[spellingIndex].translations[0];
+260|       document.getElementById("question-container").innerHTML = `
+261|         <h2>Type the English word for: <span style="color:#ff6347">${chinese}</span></h2>
+262|         <input id="spelling-input" type="text" style="font-size:20px;padding:8px;border-radius:5px;">
+263|         <button onclick="checkSpelling()">Submit</button>
+264|         <div id="spelling-feedback" style="margin-top:14px;height:30px;"></div>
+265|         <div>Progress: ${spellingIndex + 1} / ${questions.length}</div>
+266|       `;
+267|       document.getElementById("spelling-input").focus();
+268|     }
+269|     window.checkSpelling = function() {
+270|       const userInput = document.getElementById("spelling-input").value.trim().toLowerCase();
+271|       const correctEnglish = questions[spellingIndex].english.toLowerCase();
+272|       const feedback = document.getElementById("spelling-feedback");
+273|       if (userInput === correctEnglish) {
+274|         spellingScore++;
+275|         feedback.innerHTML = '<span style="color:green">✅ Correct!</span>';
+276|       } else {
+277|         feedback.innerHTML = `<span style="color:red">❌ Incorrect! The correct answer is: <b>${questions[spellingIndex].english}</b></span>`;
+278|       }
+279|       spellingIndex++;
+280|       setTimeout(showSpellingQuestion, 1200);
+281|     };
+282|     showSpellingQuestion();
+283|   }
+284| </script>
 </body>
 </html>
