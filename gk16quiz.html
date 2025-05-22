@@ -139,8 +139,8 @@
   let currentShuffled = []; // <--- Add this
 
   function startQuiz() {
-    name = document.getElementById("name-input").value;
-  if (!name.trim()) { showAlert("Please enter your name!"); return; }
+   142|     name = document.getElementById("name-input").value;
+143|     if (!name.trim()) { showAlert("Please enter your name!"); return; }
     document.getElementById("name-input").style.display = "none";
     document.getElementById("start-button").style.display = "none";
     currentQuestion = 0;
@@ -227,13 +227,13 @@
   }
 
   function endQuiz() {
-    document.getElementById("question-container").innerHTML = `
-  <h2>Quiz Over!</h2>
-  <p>Name: ${name}</p>
-  <p>Final Score: ${score} out of 100%</p>
-  <p>Time Used: ${600 - timer} seconds</p>
-  <button onclick="startSpellingQuiz()">Start Spelling Quiz (Part 2)</button>
-`;
+229|     document.getElementById("question-container").innerHTML = `
+230|       <h2>Quiz Over!</h2>
+231|       <p>Name: ${name}</p>
+232|       <p>Final Score: ${score} out of 100%</p>
+233|       <p>Time Used: ${600 - timer} seconds</p>
+234|       <button onclick="startSpellingQuiz()">Start Spelling Quiz (Part 2)</button>
+235|     `;
     document.getElementById("timer-container").style.display = "none";
     document.getElementById("score-container").style.display = "none";
     document.querySelector(".progress-bar").style.display = "none"; // Corrected
