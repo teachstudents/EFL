@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Optimized for phones and tablets -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joel Mitchell's GK List 16 Quiz</title>
+  <style>
+    /* Reset and Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      padding-top: 70px; /* Leave space for fixed header */
+    }
+    /* Fixed header for overall timer and score */
+    #header {
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #007700;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+      z-index: 1000;
+    }
+    #header span {
+      margin: 0 15px;
+      font-size: 18px;
+    }
+    /* Start Screen */
+    #startScreen {
+      text-align: center;
+      padding: 20px;
+    }
+    #startScreen input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 80%;
+      max-width: 300px;
+      margin-bottom: 10px;
+    }
+    #startScreen button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    /* Quiz Container */
+    #quizContainer {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 10px;
+    }
+    .page {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      background-color: #f7f7f7;
+    }
+    .passage {
+      margin-bottom: 20px;
+    }
+    .question {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+    .feedback {
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    .timer {
+      font-size: 16px;
+      font-weight: bold;
+      color: #007700;
+      margin-bottom: 15px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .reward-img {
+      width: 50px;
+      height: 50px;
+      vertical-align: middle;
+    }
+    .correct {
+      color: green;
+    }
+    .incorrect {
+      color: red;
+    }
+    /* Responsive Styles */
+    @media (max-width: 600px) {
+      body {
+        font-size: 16px;
+      }
+      #quizContainer {
+        padding: 5px;
+      }
+      .question, .page {
+        padding: 10px;
+        margin-bottom: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Fixed Header -->
+  <div id="header" class="hidden">
+    <span id="overallTimerDisplay">Time: 10:00</span>
+    <span id="scoreDisplay">Score: 100%</span>
+  </div>
+
+  <!-- Start Screen -->
+  <div id="startScreen">
+    <h1>Joel Mitchell's GK List 16 Quiz</h1>
+    <p>Please enter your name to begin:</p>
+    <input type="text" id="studentName" placeholder="Your Name">
+    <br>
+    <button id="startButton">Submit and Start</button>
+  </div>
+
+  <!-- Quiz Container -->
+  <div id="quizContainer" class="hidden">
+    <!-- Passage 1 (Page 1): Vocabulary words 1–14 -->
+    <div id="page1" class="page">
+      <div class="timer">Time left on this passage: <span id="timer1">200</span> seconds</div>
+      <h2>Passage 1</h2>
+      <div class="passage">
+        <p>
+          In the vibrant <strong>association</strong> of local creatives, members receive an <strong>allowance</strong> for materials. They decide to <strong>mark</strong> the start of the season with a <strong>friendly</strong> gathering. As everyone’s heart <strong>pulse</strong> quickens, a director begins to <strong>cast</strong> for an exciting play. Even the diligent <strong>clerk</strong> demonstrates how to <strong>skate</strong> gracefully. Attendees leave with a cherished <strong>souvenir</strong>, despite the <strong>freezing</strong> air outside. In a futuristic display, a clever <strong>robot</strong> appears ready to <strong>sail</strong> to new horizons—though a small <strong>quarral</strong> breaks out over a misplaced <strong>cupboard</strong>.
+        </p>
+      </div>
+      <!-- 5 Questions for Passage 1 -->
+      <div class="question" id="q1Div">
+        <p><strong>Q1:</strong> In Passage 1, what does <em>association</em> mean?</p>
+        <label><input type="radio" name="q1" value="a"> a) A group or organization</label><br>
+        <label><input type="radio" name="q1" value="b"> b) A spontaneous celebration</label><br>
+        <label><input type="radio" name="q1" value="c"> c) A legal contract</label><br>
+        <label><input type="radio" name="q1" value="d"> d) A cultural performance</label>
+        <div id="feedback-1" class="feedback"></div>
+      </div>
+      <div class="question" id="q2Div">
+        <p><strong>Q2:</strong> What does <em>allowance</em> refer to in Passage 1?</p>
+        <label><input type="radio" name="q2" value="a"> a) A sum provided for supporting materials</label><br>
+        <label><input type="radio" name="q2" value="b"> b) A penalty fee</label><br>
+        <label><input type="radio" name="q2" value="c"> c) A bonus gift</label><br>
+        <label><input type="radio" name="q2" value="d"> d) A written record</label>
+        <div id="feedback-2" class="feedback"></div>
+      </div>
+      <div class="question" id="q3Div">
+        <p><strong>Q3:</strong> In Passage 1, what does <em>mark</em> mean?</p>
+        <label><input type="radio" name="q3" value="a"> a) To commemorate or record an event</label><br>
+        <label><input type="radio" name="q3" value="b"> b) To erase or ignore</label><br>
+        <label><input type="radio" name="q3" value="c"> c) To design or decorate</label><br>
+        <label><input type="radio" name="q3" value="d"> d) To dispute or contest</label>
+        <div id="feedback-3" class="feedback"></div>
+      </div>
+      <div class="question" id="q4Div">
+        <p><strong>Q4:</strong> How is <em>skate</em> used in Passage 1?</p>
+        <label><input type="radio" name="q4" value="a"> a) To ride on inline or roller skates</label><br>
+        <label><input type="radio" name="q4" value="b"> b) To glide on ice only</label><br>
+        <label><input type="radio" name="q4" value="c"> c) To perform on a stage</label><br>
+        <label><input type="radio" name="q4" value="d"> d) To dance informally</label>
+        <div id="feedback-4" class="feedback"></div>
+      </div>
+      <div class="question" id="q5Div">
+        <p><strong>Q5:</strong> In Passage 1, what is a <em>souvenir</em>?</p>
+        <label><input type="radio" name="q5" value="a"> a) A keepsake or memento</label><br>
+        <label><input type="radio" name="q5" value="b"> b) A type of gift card</label><br>
+        <label><input type="radio" name="q5" value="c"> c) A money-saving coupon</label><br>
+        <label><input type="radio" name="q5" value="d"> d) A handwritten letter</label>
+        <div id="feedback-5" class="feedback"></div>
+      </div>
+    </div>
+  
+    <!-- Passage 2 (Page 2): Words 15–28 -->
+    <div id="page2" class="page hidden">
+      <div class="timer">Time left on this passage: <span id="timer2">200</span> seconds</div>
+      <h2>Passage 2</h2>
+      <div class="passage">
+        <p>
+          In a small classroom, one <strong>single</strong> student was encouraged to <strong>agree</strong> with peers as they discussed ways to promote <strong>peace</strong> though some remained <strong>unwilling</strong> to embrace change. The teacher wrote the entire <strong>alphabet</strong> on the board to introduce a legal <strong>case</strong> of practices that had become <strong>corrupt</strong>. He explained that any <strong>compromise</strong> in fundamental values could damage a core <strong>principle</strong> and urged everyone to be <strong>patient</strong> – <strong>while</strong> the entire <strong>nation</strong> struggles, the gentle <strong>atmosphere</strong> akin to a warm <strong>bath</strong> can soothe even the weariest soul.
+        </p>
+      </div>
+      <!-- 5 Questions for Passage 2 -->
+      <div class="question" id="q6Div">
+        <p><strong>Q6:</strong> In Passage 2, what does <em>single</em> mean?</p>
+        <label><input type="radio" name="q6" value="a" onchange="checkAnswer(6, 'a')"> a) One only</label><br>
+        <label><input type="radio" name="q6" value="b" onchange="checkAnswer(6, 'a')"> b) Multiple</label><br>
+        <label><input type="radio" name="q6" value="c" onchange="checkAnswer(6, 'a')"> c) A pair</label><br>
+        <label><input type="radio" name="q6" value="d" onchange="checkAnswer(6, 'a')"> d) None</label>
+        <div id="feedback-6" class="feedback"></div>
+      </div>
+      <div class="question" id="q7Div">
+        <p><strong>Q7:</strong> In Passage 2, what does <em>agree</em> mean?</p>
+        <label><input type="radio" name="q7" value="a" onchange="checkAnswer(7, 'a')"> a) To share the same opinion</label><br>
+        <label><input type="radio" name="q7" value="b" onchange="checkAnswer(7, 'a')"> b) To oppose strongly</label><br>
+        <label><input type="radio" name="q7" value="c" onchange="checkAnswer(7, 'a')"> c) To remain silent</label><br>
+        <label><input type="radio" name="q7" value="d" onchange="checkAnswer(7, 'a')"> d) To debate</label>
+        <div id="feedback-7" class="feedback"></div>
+      </div>
+      <div class="question" id="q8Div">
+        <p><strong>Q8:</strong> In Passage 2, what does <em>alphabet</em> refer to?</p>
+        <label><input type="radio" name="q8" value="a" onchange="checkAnswer(8, 'a')"> a) The set of letters in a language</label><br>
+        <label><input type="radio" name="q8" value="b" onchange="checkAnswer(8, 'a')"> b) A secret code</label><br>
+        <label><input type="radio" name="q8" value="c" onchange="checkAnswer(8, 'a')"> c) A numerical system</label><br>
+        <label><input type="radio" name="q8" value="d" onchange="checkAnswer(8, 'a')"> d) A type of art</label>
+        <div id="feedback-8" class="feedback"></div>
+      </div>
+      <div class="question" id="q9Div">
+        <p><strong>Q9:</strong> In Passage 2, what does <em>corrupt</em> mean?</p>
+        <label><input type="radio" name="q9" value="a" onchange="checkAnswer(9, 'a')"> a) Morally decayed or dishonest</label><br>
+        <label><input type="radio" name="q9" value="b" onchange="checkAnswer(9, 'a')"> b) Pure and ethical</label><br>
+        <label><input type="radio" name="q9" value="c" onchange="checkAnswer(9, 'a')"> c) Advanced technologically</label><br>
+        <label><input type="radio" name="q9" value="d" onchange="checkAnswer(9, 'a')"> d) Completely new</label>
+        <div id="feedback-9" class="feedback"></div>
+      </div>
+      <div class="question" id="q10Div">
+        <p><strong>Q10:</strong> In Passage 2, what does <em>compromise</em> mean?</p>
+        <label><input type="radio" name="q10" value="a" onchange="checkAnswer(10, 'a')"> a) To make concessions</label><br>
+        <label><input type="radio" name="q10" value="b" onchange="checkAnswer(10, 'a')"> b) To refuse dialogue</label><br>
+        <label><input type="radio" name="q10" value="c" onchange="checkAnswer(10, 'a')"> c) To divide evenly</label><br>
+        <label><input type="radio" name="q10" value="d" onchange="checkAnswer(10, 'a')"> d) To finalize an agreement</label>
+        <div id="feedback-10" class="feedback"></div>
+      </div>
+    </div>
+  
+    <!-- Passage 3 (Page 3): Words 29–42 -->
+    <div id="page3" class="page hidden">
+      <div class="timer">Time left on this passage: <span id="timer3">200</span> seconds</div>
+      <h2>Passage 3</h2>
+      <div class="passage">
+        <p>
+          In a state-of-the-art laboratory, a transparent <strong>tube</strong> demonstrated scientific principles while experts worked to <strong>favour</strong> innovative designs. Sleek <strong>furniture</strong> was arranged so that participants could sit comfortably on their <strong>lap</strong> during interactive sessions. Observers did not hesitate to <strong>condemn</strong> dangerous experiments or poorly designed <strong>trap</strong>s. A digital <strong>menu</strong> printed with proper <strong>punctuation</strong> proudly showcased breakthroughs in <strong>electricity</strong>, as if by <strong>magic</strong>. Attendees made a keen <strong>note</strong> of methods that were truly <strong>unique</strong> and <strong>specific</strong> to the lab's <strong>main</strong> research focus.
+        </p>
+      </div>
+      <!-- 5 Questions for Passage 3 -->
+      <div class="question" id="q11Div">
+        <p><strong>Q11:</strong> In Passage 3, what does <em>tube</em> mean?</p>
+        <label><input type="radio" name="q11" value="a" onchange="checkAnswer(11, 'a')"> a) A cylindrical container often used in science</label><br>
+        <label><input type="radio" name="q11" value="b" onchange="checkAnswer(11, 'a')"> b) A type of pipe for water</label><br>
+        <label><input type="radio" name="q11" value="c" onchange="checkAnswer(11, 'a')"> c) A flexible bundle of wires</label><br>
+        <label><input type="radio" name="q11" value="d" onchange="checkAnswer(11, 'a')"> d) A musical instrument</label>
+        <div id="feedback-11" class="feedback"></div>
+      </div>
+      <div class="question" id="q12Div">
+        <p><strong>Q12:</strong> What does <em>favour</em> mean in Passage 3?</p>
+        <label><input type="radio" name="q12" value="a" onchange="checkAnswer(12, 'a')"> a) To prefer or support</label><br>
+        <label><input type="radio" name="q12" value="b" onchange="checkAnswer(12, 'a')"> b) To oppose</label><br>
+        <label><input type="radio" name="q12" value="c" onchange="checkAnswer(12, 'a')"> c) To mix together</label><br>
+        <label><input type="radio" name="q12" value="d" onchange="checkAnswer(12, 'a')"> d) To disregard</label>
+        <div id="feedback-12" class="feedback"></div>
+      </div>
+      <div class="question" id="q13Div">
+        <p><strong>Q13:</strong> In Passage 3, what is a <em>menu</em>?</p>
+        <label><input type="radio" name="q13" value="a" onchange="checkAnswer(13, 'a')"> a) A printed list of options, often for food</label><br>
+        <label><input type="radio" name="q13" value="b" onchange="checkAnswer(13, 'a')"> b) A schedule of events</label><br>
+        <label><input type="radio" name="q13" value="c" onchange="checkAnswer(13, 'a')"> c) A style of music</label><br>
+        <label><input type="radio" name="q13" value="d" onchange="checkAnswer(13, 'a')"> d) A collection of images</label>
+        <div id="feedback-13" class="feedback"></div>
+      </div>
+      <div class="question" id="q14Div">
+        <p><strong>Q14:</strong> In Passage 3, what does <em>electricity</em> refer to?</p>
+        <label><input type="radio" name="q14" value="a" onchange="checkAnswer(14, 'a')"> a) The energy produced by power systems</label><br>
+        <label><input type="radio" name="q14" value="b" onchange="checkAnswer(14, 'a')"> b) A type of bulb</label><br>
+        <label><input type="radio" name="q14" value="c" onchange="checkAnswer(14, 'a')"> c) A digital clock</label><br>
+        <label><input type="radio" name="q14" value="d" onchange="checkAnswer(14, 'a')"> d) A chemical substance</label>
+        <div id="feedback-14" class="feedback"></div>
+      </div>
+      <div class="question" id="q15Div">
+        <p><strong>Q15:</strong> In Passage 3, what does <em>note</em> mean?</p>
+        <label><input type="radio" name="q15" value="a" onchange="checkAnswer(15, 'a')"> a) To observe or record information</label><br>
+        <label><input type="radio" name="q15" value="b" onchange="checkAnswer(15, 'a')"> b) To ignore</label><br>
+        <label><input type="radio" name="q15" value="c" onchange="checkAnswer(15, 'a')"> c) To discard</label><br>
+        <label><input type="radio" name="q15" value="d" onchange="checkAnswer(15, 'a')"> d) To alter</label>
+        <div id="feedback-15" class="feedback"></div>
+      </div>
+    </div>
+  
+    <!-- Passage 4 (Page 4): Words 43–54 -->
+    <div id="page4" class="page hidden">
+      <div class="timer">Time left on this passage: <span id="timer4">200</span> seconds</div>
+      <h2>Passage 4</h2>
+      <div class="passage">
+        <p>
+          At the grand finale, the performance’s <strong>consist</strong>ency impressed audiences, as dancers <strong>adore</strong> the art of movement. A sumptuous <strong>roast</strong> was prepared, though a sudden <strong>drop</strong> in temperature startled some. Poetic lines were <strong>spoken</strong> that recalled <strong>primitive</strong> rituals, while innovative stage designs <strong>cover</strong> every detail with an unexpected <strong>twist</strong> executed <strong>with</strong> precision. Miracles happen when a digital system creates a perfect <strong>clone</strong>, meeting every <strong>expectation</strong> and leaving audiences feeling united in a singular, emotional experience.
+        </p>
+      </div>
+      <!-- 5 Questions for Passage 4 -->
+      <div class="question" id="q16Div">
+        <p><strong>Q16:</strong> In Passage 4, what does <em>consist</em> mean?</p>
+        <label><input type="radio" name="q16" value="a" onchange="checkAnswer(16, 'a')"> a) To be made up of</label><br>
+        <label><input type="radio" name="q16" value="b" onchange="checkAnswer(16, 'a')"> b) To collapse</label><br>
+        <label><input type="radio" name="q16" value="c" onchange="checkAnswer(16, 'a')"> c) To ignore</label><br>
+        <label><input type="radio" name="q16" value="d" onchange="checkAnswer(16, 'a')"> d) To enrich</label>
+        <div id="feedback-16" class="feedback"></div>
+      </div>
+      <div class="question" id="q17Div">
+        <p><strong>Q17:</strong> In Passage 4, what does <em>roast</em> mean?</p>
+        <label><input type="radio" name="q17" value="a" onchange="checkAnswer(17, 'a')"> a) A method of cooking using dry heat</label><br>
+        <label><input type="radio" name="q17" value="b" onchange="checkAnswer(17, 'a')"> b) To verbally criticize harshly</label><br>
+        <label><input type="radio" name="q17" value="c" onchange="checkAnswer(17, 'a')"> c) To quickly run</label><br>
+        <label><input type="radio" name="q17" value="d" onchange="checkAnswer(17, 'a')"> d) To blend ingredients</label>
+        <div id="feedback-17" class="feedback"></div>
+      </div>
+      <div class="question" id="q18Div">
+        <p><strong>Q18:</strong> In Passage 4, what does <em>spoken</em> mean?</p>
+        <label><input type="radio" name="q18" value="a" onchange="checkAnswer(18, 'a')"> a) Communicated verbally</label><br>
+        <label><input type="radio" name="q18" value="b" onchange="checkAnswer(18, 'a')"> b) Written down</label><br>
+        <label><input type="radio" name="q18" value="c" onchange="checkAnswer(18, 'a')"> c) Hushed into silence</label><br>
+        <label><input type="radio" name="q18" value="d" onchange="checkAnswer(18, 'a')"> d) Loudly shouted</label>
+        <div id="feedback-18" class="feedback"></div>
+      </div>
+      <div class="question" id="q19Div">
+        <p><strong>Q19:</strong> In Passage 4, what does <em>twist</em> mean?</p>
+        <label><input type="radio" name="q19" value="a" onchange="checkAnswer(19, 'a')"> a) An unexpected turn or change</label><br>
+        <label><input type="radio" name="q19" value="b" onchange="checkAnswer(19, 'a')"> b) A gentle movement</label><br>
+        <label><input type="radio" name="q19" value="c" onchange="checkAnswer(19, 'a')"> c) A correction</label><br>
+        <label><input type="radio" name="q19" value="d" onchange="checkAnswer(19, 'a')"> d) A musical note</label>
+        <div id="feedback-19" class="feedback"></div>
+      </div>
+      <div class="question" id="q20Div">
+        <p><strong>Q20:</strong> In Passage 4, what does <em>clone</em> mean?</p>
+        <label><input type="radio" name="q20" value="a" onchange="checkAnswer(20, 'a')"> a) An exact copy or duplicate</label><br>
+        <label><input type="radio" name="q20" value="b" onchange="checkAnswer(20, 'a')"> b) A slightly altered sample</label><br>
+        <label><input type="radio" name="q20" value="c" onchange="checkAnswer(20, 'a')"> c) A combination of elements</label><br>
+        <label><input type="radio" name="q20" value="d" onchange="checkAnswer(20, 'a')"> d) A random assortment</label>
+        <div id="feedback-20" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Final Report -->
+  <div id="finalReport" class="hidden">
+    <h2>Quiz Report</h2>
+    <div id="report"></div>
+  </div>
+  
+  <!-- Audio Elements for reward feedback -->
+  <audio id="soundCorrect">
+    <source src="game1.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="soundWrong">
+    <source src="wrong.mp3" type="audio/mpeg">
+  </audio>
+  
+  <script>
+    // Global Variables
+    let currentPage = 1;
+    const totalPages = 4;
+    let score = 100; // Starting score out of 100%
+    const totalQuestions = 20; // 5 questions per passage x 4 passages
+    const answered = {};
+    let mistakes = [];
+    let pageTimerInterval;
+    let pageTimeLeft = 200; // seconds per page
+    let overallTimer;
+    let overallTimeLeft = 600; // 600 seconds (10 minutes total)
+    let studentName = "";
+  
+    // Arrays for random reward images and sounds
+    const rewardImages = ["reward1.gif", "reward2.gif", "reward3.gif", "reward4.gif"];
+    const rewardSounds = ["game1.mp3", "game2.mp3", "game3.mp3", "game4.mp3"];
+  
+    // Explanations for each question:
+    const explanations = {
+      // Passage 1 (Questions 1-5)
+      1: "'Welcome' means to greet someone warmly.",
+      2: "'Recipe' is a set of instructions for cooking.",
+      3: "'Dynasty' refers to a long period of ruling or tradition.",
+      4: "'Idiom' means a common expression with a figurative meaning.",
+      5: "'Receipt' is a written record of a transaction.",
+      // Passage 2 (Questions 6-10)
+      6: "'Single' means one only.",
+      7: "'Agree' means to share the same opinion.",
+      8: "'Alphabet' refers to the set of letters in a language.",
+      9: "'Corrupt' means morally decayed or dishonest.",
+      10: "'Compromise' means to make mutual concessions.",
+      // Passage 3 (Questions 11-15)
+      11: "'Tube' means a cylindrical container used in experiments.",
+      12: "'Favour' means to prefer or show support for.",
+      13: "'Menu' is a list of items available (often food choices).",
+      14: "'Electricity' is a form of energy produced by power systems.",
+      15: "'Note' means to observe or record information.",
+      // Passage 4 (Questions 16-20)
+      16: "'Main' means the most important part.",
+      17: "'Consist' means to be made up of.",
+      18: "'Adore' means to love or admire intensely.",
+      19: "'Roast' means to cook using dry heat.",
+      20: "'Clone' means an exact copy or duplicate."
+    };
+  
+    // Update header score display
+    function updateScoreDisplay() {
+      document.getElementById("scoreDisplay").innerText = "Score: " + score + "%";
+    }
+  
+    // Update header overall timer display
+    function updateOverallTimerDisplay() {
+      const minutes = Math.floor(overallTimeLeft / 60);
+      const seconds = overallTimeLeft % 60;
+      document.getElementById("overallTimerDisplay").innerText =
+        "Time: " + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+    }
+  
+    // Shuffle answer options within each question on the specified page using Fisher-Yates
+    function shuffleOptions(pageNum) {
+      const questions = document.querySelectorAll(`#page${pageNum} .question`);
+      questions.forEach(question => {
+        const container = question;
+        const labels = Array.from(container.querySelectorAll("label"));
+        for (let i = labels.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          // Swap nodes
+          const temp = labels[i].cloneNode(true);
+          labels[i].parentNode.replaceChild(labels[j].cloneNode(true), labels[i]);
+          labels[j].parentNode.replaceChild(temp, labels[j]);
+        }
+      });
+    }
+  
+    // Start quiz when user clicks "Submit and Start"
+    document.getElementById("startButton").addEventListener("click", startQuiz);
+    function startQuiz() {
+      studentName = document.getElementById("studentName").value.trim();
+      if (!studentName) {
+        alert("Please enter your name to start the quiz.");
+        return;
+      }
+      document.getElementById("startScreen").classList.add("hidden");
+      document.getElementById("quizContainer").classList.remove("hidden");
+      document.getElementById("header").classList.remove("hidden");
+      updateScoreDisplay();
+      updateOverallTimerDisplay();
+      startOverallTimer();
+      showPage(currentPage);
+    }
+  
+    // Overall Timer: 600 seconds
+    function startOverallTimer() {
+      overallTimer = setInterval(() => {
+        overallTimeLeft--;
+        updateOverallTimerDisplay();
+        if (overallTimeLeft <= 0) {
+          clearInterval(overallTimer);
+          finalizeQuiz();
+        }
+      }, 1000);
+    }
+  
+    // Show a specific page and start its timer (200 sec per page); also shuffle the options
+    function showPage(pageNum) {
+      for (let i = 1; i <= totalPages; i++) {
+        document.getElementById("page" + i).classList.add("hidden");
+      }
+      document.getElementById("page" + pageNum).classList.remove("hidden");
+      shuffleOptions(pageNum);
+      pageTimeLeft = 200;
+      updatePageTimer(pageNum);
+      if (pageTimerInterval) clearInterval(pageTimerInterval);
+      pageTimerInterval = setInterval(() => {
+        pageTimeLeft--;
+        updatePageTimer(pageNum);
+        if (pageTimeLeft <= 0) {
+          markUnansweredOnPage(pageNum);
+          nextPage();
+        }
+      }, 1000);
+    }
+  
+    function updatePageTimer(pageNum) {
+      const timerSpan = document.getElementById("timer" + pageNum);
+      if (timerSpan) timerSpan.textContent = pageTimeLeft;
+    }
+  
+    // Check answer with immediate feedback
+    function checkAnswer(qNum, correctValue) {
+      if (answered[qNum]) return;
+      const radios = document.getElementsByName("q" + qNum);
+      let selectedValue = "";
+      radios.forEach(radio => { if (radio.checked) selectedValue = radio.value; });
+      if (selectedValue === "") return;
+      answered[qNum] = true;
+      radios.forEach(radio => radio.disabled = true);
+      const feedbackDiv = document.getElementById("feedback-" + qNum);
+      if (selectedValue === correctValue) {
+        const randIndex = Math.floor(Math.random() * rewardImages.length);
+        const rewardImg = rewardImages[randIndex];
+        const rewardSound = rewardSounds[randIndex];
+        feedbackDiv.innerHTML = `<span class="correct">Correct!</span> ${explanations[qNum]}<br>
+                                 <audio src="${rewardSound}" autoplay></audio>
+                                 <br><img src="${rewardImg}" alt="Reward" class="reward-img">`;
+      } else {
+        score -= 2;
+        mistakes.push(qNum);
+        feedbackDiv.innerHTML = `<span class="incorrect">Incorrect!</span> The correct answer is: <strong>${correctValue}</strong>.<br>
+                                 ${explanations[qNum]}<br>
+                                 <audio src="wrong.mp3" autoplay></audio>`;
+      }
+      updateScoreDisplay();
+      if (allAnsweredOnPage(currentPage)) {
+        clearInterval(pageTimerInterval);
+        setTimeout(nextPage, 1000);
+      }
+    }
+  
+    // Get question numbers for the current page (5 questions per page)
+    function questionsOnPage(pageNum) {
+      const start = (pageNum - 1) * 5 + 1;
+      const end = pageNum * 5;
+      const qs = [];
+      for (let i = start; i <= end; i++) qs.push(i);
+      return qs;
+    }
+  
+    function allAnsweredOnPage(pageNum) {
+      const qs = questionsOnPage(pageNum);
+      for (const q of qs) {
+        if (!answered[q]) return false;
+      }
+      return true;
+    }
+  
+    function markUnansweredOnPage(pageNum) {
+      const qs = questionsOnPage(pageNum);
+      qs.forEach(q => {
+        if (!answered[q]) {
+          mistakes.push(q);
+          const feedbackDiv = document.getElementById("feedback-" + q);
+          if (feedbackDiv) {
+            feedbackDiv.innerHTML = `<span class="incorrect">No answer selected.</span> <audio src="wrong.mp3" autoplay></audio>`;
+          }
+          answered[q] = true;
+        }
+      });
+    }
+  
+    // Advance to next page or finalize quiz if at the end
+    function nextPage() {
+      clearInterval(pageTimerInterval);
+      if (currentPage < totalPages) {
+        currentPage++;
+        showPage(currentPage);
+      } else {
+        finalizeQuiz();
+      }
+    }
+  
+    // Finalize quiz: stop overall timer and display final report
+    function finalizeQuiz() {
+      clearInterval(overallTimer);
+      document.getElementById("quizContainer").classList.add("hidden");
+      document.getElementById("header").classList.add("hidden");
+      const reportDiv = document.getElementById("report");
+      reportDiv.innerHTML = `<p>Student: <strong>${studentName}</strong></p>
+                             <p>Your final score is: <strong>${score}%</strong></p>`;
+      if (mistakes.length > 0) {
+        reportDiv.innerHTML += `<p>You made mistakes on the following questions: ${mistakes.join(", ")}</p>`;
+      } else {
+        reportDiv.innerHTML += `<p>Excellent work! You answered all questions correctly!</p>`;
+      }
+      document.getElementById("finalReport").classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
