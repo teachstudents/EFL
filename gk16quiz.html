@@ -132,102 +132,114 @@
       { english: "skate", translations: ["滑板", "滑雪", "滑动"] }
     ];
 
-    let currentQuestion = 0;
-    let score = 100; // Start with 100% score
-    let timer = 600; // 10 minutes
-    let name = "";
+    <script>
+  let questions = [ /* ... your questions ... */ ];
+  let currentQuestion = 0;
+  let score = 100; // Start with 100% score
+  let timer = 600; // 10 minutes
+  let name = "";
+  let timerInterval; // <--- Add this
+  let currentShuffled = []; // <--- Add this
 
-    function startQuiz() {
-      name = document.getElementById("name-input").value;
-      document.getElementById("name-input").style.display = "none";
-      document.getElementById("start-button").style.display = "none";
-      updateQuestion();
-      updateTimer();
-      updateScore();
+  function startQuiz() {
+    name = document.getElementById("name-input").value;
+    document.getElementById("name-input").style.display = "none";
+    document.getElementById("start-button").style.display = "none";
+    currentQuestion = 0;
+    score = 100;
+    timer = 600;
+    updateQuestion();
+    updateTimer();
+    updateScore();
+  }
+
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
+  }
 
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-    }
+  function updateQuestion() {
+    const translations = [...questions[currentQuestion].translations];
+    shuffleArray(translations);
+    currentShuffled = translations; // Store for answer checking
 
-    function updateQuestion() {
-      const translations = [...questions[currentQuestion].translations];
-      shuffleArray(translations);
-      
-      document.getElementById("question-container").innerHTML = `
-        <h2>${questions[currentQuestion].english}</h2>
-        <div class="mcq">
-          ${translations.map((translation, index) => `
-            <button data-index="${index}" onclick="checkAnswer(${index})">${translation}</button>
-          `).join('')}
-        </div>
-      `;
-    }
+    document.getElementById("question-container").innerHTML = `
+      <h2>${questions[currentQuestion].english}</h2>
+      <div class="mcq">
+        ${translations.map((translation, index) => `
+          <button data-index="${index}" onclick="checkAnswer(${index})">${translation}</button>
+        `).join('')}
+      </div>
+    `;
+  }
 
-    function updateTimer() {
-      let interval = setInterval(() => {
-        timer--;
-        const progressPercentage = (timer / 600) * 100;
-        document.getElementById("progress").style.width = `${progressPercentage}%`;
-        document.getElementById("timer-container").innerHTML = `Time: ${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')} seconds`;
-        
-        if (timer === 0) {
-          endQuiz();
-          clearInterval(interval);
-        }
-      }, 1000);
-    }
+  function updateTimer() {
+    if (timerInterval) clearInterval(timerInterval); // Clear if running
+    timerInterval = setInterval(() => {
+      timer--;
+      const progressPercentage = (timer / 600) * 100;
+      document.getElementById("progress").style.width = `${progressPercentage}%`;
+      document.getElementById("timer-container").innerHTML = `Time: ${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')} seconds`;
 
-    function updateScore() {
-      document.getElementById("score-container").innerHTML = `Score: ${score} out of 100%`;
-    }
-
-    function checkAnswer(index) {
-      const correctIndex = questions[currentQuestion].translations.indexOf(questions[currentQuestion].translations[0]);
-      
-      if (index === correctIndex) {
-        score = Math.min(score + 10, 100); // Increase score for correct answer
-        document.getElementById("correct-sound").play();
-        showAlert("🎉 Correct! 🎉");
-      } else {
-        score -= 10; // Decrease score for incorrect answer
-        document.getElementById("incorrect-sound").play();
-        showAlert("❌ Incorrect! ❌");
-      }
-      
-      currentQuestion++;
-      if (currentQuestion >= questions.length) {
+      if (timer === 0) {
         endQuiz();
-      } else {
-        updateQuestion();
+        clearInterval(timerInterval);
       }
+    }, 1000);
+  }
+
+  function updateScore() {
+    document.getElementById("score-container").innerHTML = `Score: ${score} out of 100%`;
+  }
+
+  function checkAnswer(index) {
+    const selected = currentShuffled[index];
+    const correct = questions[currentQuestion].translations[0]; // The original correct answer
+
+    if (selected === correct) {
+      score = Math.min(score + 10, 100); // Clamp max
+      document.getElementById("correct-sound").play();
+      showAlert("🎉 Correct! 🎉");
+    } else {
+      score = Math.max(score - 10, 0); // Clamp min
+      document.getElementById("incorrect-sound").play();
+      showAlert("❌ Incorrect! ❌");
     }
 
-    function showAlert(message) {
-      const alertBox = document.createElement("div");
-      alertBox.innerText = message;
-      alertBox.className = "alert";
-      document.body.appendChild(alertBox);
-      
-      setTimeout(() => {
-        document.body.removeChild(alertBox);
-      }, 2000); // Alert will disappear after 2 seconds
+    currentQuestion++;
+    if (currentQuestion >= questions.length) {
+      endQuiz();
+    } else {
+      updateQuestion();
     }
+    updateScore();
+  }
 
-    function endQuiz() {
-      document.getElementById("question-container").innerHTML = `
-        <h2>Quiz Over!</h2>
-        <p>Name: ${name}</p>
-        <p>Final Score: ${score} out of 100%</p>
-        <p>Time Used: ${600 - timer} seconds</p>
-      `;
-      document.getElementById("timer-container").style.display = "none";
-      document.getElementById("score-container").style.display = "none";
-      document.getElementById("progress-bar").style.display = "none"; // Hide progress bar
-    }
-  </script>
+  function showAlert(message) {
+    const alertBox = document.createElement("div");
+    alertBox.innerText = message;
+    alertBox.className = "alert";
+    document.body.appendChild(alertBox);
+
+    setTimeout(() => {
+      document.body.removeChild(alertBox);
+    }, 2000);
+  }
+
+  function endQuiz() {
+    document.getElementById("question-container").innerHTML = `
+      <h2>Quiz Over!</h2>
+      <p>Name: ${name}</p>
+      <p>Final Score: ${score} out of 100%</p>
+      <p>Time Used: ${600 - timer} seconds</p>
+    `;
+    document.getElementById("timer-container").style.display = "none";
+    document.getElementById("score-container").style.display = "none";
+    document.querySelector(".progress-bar").style.display = "none"; // Corrected
+    clearInterval(timerInterval); // Stop timer
+  }
+</script>
 </body>
 </html>
