@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>English-Chinese Translation Quiz</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background-color: #f0f8ff;
+      color: #333;
+      text-align: center;
+    }
+    h1 {
+      color: #ff6347;
+    }
+    .question {
+      padding: 20px;
+      background-color: #fff;
+      border: 2px solid #ff6347;
+      border-radius: 10px;
+      margin: 20px auto;
+      max-width: 90%;
+    }
+    .mcq {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .mcq button {
+      padding: 15px 30px;
+      font-size: 20px;
+      cursor: pointer;
+      margin: 10px;
+      background-color: #ff6347;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      transition: background-color 0.3s;
+    }
+    .mcq button:hover {
+      background-color: #ff4500;
+    }
+    .timer, .score {
+      font-size: 24px;
+      margin: 10px;
+    }
+    .progress-bar {
+      width: 100%;
+      background-color: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    .progress {
+      height: 20px;
+      background-color: #4caf50;
+      width: 100%;
+      transition: width 1s;
+    }
+    .alert {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #f0ad4e;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      z-index: 1000;
+      animation: fadeIn 0.5s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <h1>English-Chinese Translation Quiz</h1>
+  <input type="text" id="name-input" placeholder="Enter your name" style="padding: 10px; font-size: 18px; border-radius: 5px; margin-bottom: 20px;">
+  <button id="start-button" onclick="startQuiz()">Start Quiz</button>
+  <div id="question-container" class="question"></div>
+  <div id="timer-container" class="timer"></div>
+  <div id="score-container" class="score"></div>
+  <div class="progress-bar">
+    <div id="progress" class="progress"></div>
+  </div>
+  <audio id="correct-sound" src="game1.mp3"></audio>
+  <audio id="incorrect-sound" src="wrong.mp3"></audio>
+
+  <script>
+    let questions = [
+      { english: "pulse", translations: ["脉动", "心跳", "血液"] },
+      { english: "clerk", translations: ["职员", "官僚", "文员"] },
+      { english: "souvenir", translations: ["纪念品", "回忆物", "遗物"] },
+      { english: "freezing", translations: ["冷冻", "发霉", "变质"] },
+      { english: "robot", translations: ["机器人", "自动化", "电子体"] },
+      { english: "single", translations: ["单独的", "独特的", "个人主义的"] },
+      { english: "agree", translations: ["同意", "一致", "共识"] },
+      { english: "unwilling", translations: ["不愿意", "反对", "拒绝"] },
+      { english: "alphabet", translations: ["字母", "词汇", "符号"] },
+      { english: "corrupt", translations: ["贿赂", "腐败", "邪恶"] },
+      { english: "principle", translations: ["原则", "道德", "准则"] },
+      { english: "patient", translations: ["患者", "病人", "病房"] },
+      { english: "while", translations: ["在...", "当...", "如..."] },
+      { english: "atmosphere", translations: ["气氛", "环境", "气象"] },
+      { english: "tube", translations: ["管道", "轴线", "电缆"] },
+      { english: "favour", translations: ["优惠", "折扣", "礼貌"] },
+      { english: "furniture", translations: ["家具", "家用品", "家饰"] },
+      { english: "condemn", translations: ["谴责", "斥责", "批评"] },
+      { english: "menu", translations: ["菜单", "列表", "选项"] },
+      { english: "electricity", translations: ["电力", "交流", "直流"] },
+      { english: "note", translations: ["注音", "记忆", "信条"] },
+      { english: "specific", translations: ["具体的", "明确的", "具体化"] },
+      { english: "main", translations: ["主要的", "最大的", "首要的"] },
+      { english: "consist", translations: ["包括", "包含", "构成"] },
+      { english: "roast", translations: ["烤锅", "烧肉", "批评"] },
+      { english: "drop", translations: ["掉落", "滴落", "放下"] },
+      { english: "spoken", translations: ["说出来的", "表达出的", "言语"] },
+      { english: "primitive", translations: ["原始的", "初级的", "简单的"] },
+      { english: "cover", translations: ["覆盖", "遮住", "盖子"] },
+      { english: "twist", translations: ["扭曲", "扭转", "变形"] },
+      { english: "with", translations: ["与...", "在...", "一起..."] },
+      { english: "clone", translations: ["克隆", "复制", "模拟"] },
+      { english: "expectation", translations: ["期望", "预期", "意图"] },
+      { english: "change", translations: ["改变", "转变", "变换"] },
+      { english: "design", translations: ["设计", "规划", "构造"] },
+      { english: "allowance", translations: ["许可", "准许", "同意"] },
+      { english: "association", translations: ["协会", "联合体", "团体"] },
+      { english: "cast", translations: ["投射", "排列", "演员"] },
+      { english: "skate", translations: ["滑板", "滑雪", "滑动"] }
+    ];
+
+    let currentQuestion = 0;
+    let score = 100; // Start with 100% score
+    let timer = 600; // 10 minutes
+    let name = "";
+
+    function startQuiz() {
+      name = document.getElementById("name-input").value;
+      document.getElementById("name-input").style.display = "none";
+      document.getElementById("start-button").style.display = "none";
+      updateQuestion();
+      updateTimer();
+      updateScore();
+    }
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function updateQuestion() {
+      const translations = [...questions[currentQuestion].translations];
+      shuffleArray(translations);
+      
+      document.getElementById("question-container").innerHTML = `
+        <h2>${questions[currentQuestion].english}</h2>
+        <div class="mcq">
+          ${translations.map((translation, index) => `
+            <button data-index="${index}" onclick="checkAnswer(${index})">${translation}</button>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function updateTimer() {
+      let interval = setInterval(() => {
+        timer--;
+        const progressPercentage = (timer / 600) * 100;
+        document.getElementById("progress").style.width = `${progressPercentage}%`;
+        document.getElementById("timer-container").innerHTML = `Time: ${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')} seconds`;
+        
+        if (timer === 0) {
+          endQuiz();
+          clearInterval(interval);
+        }
+      }, 1000);
+    }
+
+    function updateScore() {
+      document.getElementById("score-container").innerHTML = `Score: ${score} out of 100%`;
+    }
+
+    function checkAnswer(index) {
+      const correctIndex = questions[currentQuestion].translations.indexOf(questions[currentQuestion].translations[0]);
+      
+      if (index === correctIndex) {
+        score = Math.min(score + 10, 100); // Increase score for correct answer
+        document.getElementById("correct-sound").play();
+        showAlert("🎉 Correct! 🎉");
+      } else {
+        score -= 10; // Decrease score for incorrect answer
+        document.getElementById("incorrect-sound").play();
+        showAlert("❌ Incorrect! ❌");
+      }
+      
+      currentQuestion++;
+      if (currentQuestion >= questions.length) {
+        endQuiz();
+      } else {
+        updateQuestion();
+      }
+    }
+
+    function showAlert(message) {
+      const alertBox = document.createElement("div");
+      alertBox.innerText = message;
+      alertBox.className = "alert";
+      document.body.appendChild(alertBox);
+      
+      setTimeout(() => {
+        document.body.removeChild(alertBox);
+      }, 2000); // Alert will disappear after 2 seconds
+    }
+
+    function endQuiz() {
+      document.getElementById("question-container").innerHTML = `
+        <h2>Quiz Over!</h2>
+        <p>Name: ${name}</p>
+        <p>Final Score: ${score} out of 100%</p>
+        <p>Time Used: ${600 - timer} seconds</p>
+      `;
+      document.getElementById("timer-container").style.display = "none";
+      document.getElementById("score-container").style.display = "none";
+      document.getElementById("progress-bar").style.display = "none"; // Hide progress bar
+    }
+  </script>
+</body>
+</html>
