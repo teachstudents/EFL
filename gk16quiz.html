@@ -6,7 +6,7 @@
   <title>List 16</title>
   <style>
     body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       background-color: #f0f8ff;
       color: #333;
       text-align: center;
@@ -79,7 +79,7 @@
 <body>
   <h1>List 16</h1>
   <input type="text" id="name-input" placeholder="Enter your name" style="padding: 10px; font-size: 18px; border-radius: 5px; margin-bottom: 20px;">
-  <button id="start-button" onclick="startQuiz()">Start Quiz</button>
+  <button id="start-button">Start Quiz</button>
   <div id="question-container" class="question"></div>
   <div id="timer-container" class="timer"></div>
   <div id="score-container" class="score"></div>
@@ -90,7 +90,8 @@
   <audio id="incorrect-sound" src="wrong.mp3"></audio>
 
   <script>
-    let questions = [
+    // Quiz data
+    const questions = [
       { english: "pulse", translations: ["脉动", "心跳", "血液"] },
       { english: "clerk", translations: ["职员", "官僚", "文员"] },
       { english: "souvenir", translations: ["纪念品", "回忆物", "遗物"] },
@@ -131,158 +132,185 @@
       { english: "cast", translations: ["投射", "排列", "演员"] },
       { english: "skate", translations: ["滑板", "滑雪", "滑动"] }
     ];
-  let currentQuestion = 0;
-  let score = 100; // Start with 100% score
-  let timer = 600; // 10 minutes
-  let name = "";
-  let timerInterval; // <--- Add this
-  let currentShuffled = []; // <--- Add this
 
-function startQuiz() {
-  console.log("startQuiz called");
-  name = document.getElementById("name-input").value;
-  if (!name.trim()) { showAlert("Please enter your name!"); return; }
-  document.getElementById("name-input").style.display = "none";
-  document.getElementById("start-button").style.display = "none";
-  currentQuestion = 0;
-  score = 100;
-  timer = 600;
-  updateQuestion();
-  updateTimer();
-  updateScore();
-}
-window.startQuiz = startQuiz;
-  function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-  }
+    let currentQuestion = 0;
+    let score = 100;
+    let timer = 600;
+    let name = "";
+    let timerInterval = null;
+    let currentShuffled = [];
 
-  function updateQuestion() {
-    const translations = [...questions[currentQuestion].translations];
-    shuffleArray(translations);
-    currentShuffled = translations; // Store for answer checking
-
-    document.getElementById("question-container").innerHTML = `
-      <h2>${questions[currentQuestion].english}</h2>
-      <div class="mcq">
-        ${translations.map((translation, index) => `
-          <button data-index="${index}" onclick="checkAnswer(${index})">${translation}</button>
-        `).join('')}
-      </div>
-    `;
-  }
-
-  function updateTimer() {
-    if (timerInterval) clearInterval(timerInterval); // Clear if running
-    timerInterval = setInterval(() => {
-      timer--;
-      const progressPercentage = (timer / 600) * 100;
-      document.getElementById("progress").style.width = `${progressPercentage}%`;
-      document.getElementById("timer-container").innerHTML = `Time: ${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')} seconds`;
-
-      if (timer === 0) {
-        endQuiz();
-        clearInterval(timerInterval);
+    // Shuffle helper
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
       }
-    }, 1000);
-  }
-
-  function updateScore() {
-    document.getElementById("score-container").innerHTML = `Score: ${score} out of 100%`;
-  }
-
-  function checkAnswer(index) {
-    const selected = currentShuffled[index];
-    const correct = questions[currentQuestion].translations[0]; // The original correct answer
-
-    if (selected === correct) {
-      score = Math.min(score + 10, 100); // Clamp max
-      document.getElementById("correct-sound").play();
-      showAlert("🎉 Correct! 🎉");
-    } else {
-      score = Math.max(score - 10, 0); // Clamp min
-      document.getElementById("incorrect-sound").play();
-      showAlert("❌ Incorrect! ❌");
     }
 
-    currentQuestion++;
-    if (currentQuestion >= questions.length) {
-      endQuiz();
-    } else {
+    // Start Quiz logic
+    function startQuiz() {
+      name = document.getElementById("name-input").value.trim();
+      if (!name) {
+        showAlert("Please enter your name!");
+        return;
+      }
+      document.getElementById("name-input").style.display = "none";
+      document.getElementById("start-button").style.display = "none";
+      currentQuestion = 0;
+      score = 100;
+      timer = 600;
       updateQuestion();
+      updateTimer();
+      updateScore();
+      document.getElementById("timer-container").style.display = "";
+      document.getElementById("score-container").style.display = "";
+      document.querySelector(".progress-bar").style.display = "";
     }
-    updateScore();
-  }
 
-  function showAlert(message) {
-    const alertBox = document.createElement("div");
-    alertBox.innerText = message;
-    alertBox.className = "alert";
-    document.body.appendChild(alertBox);
+    // Attach startQuiz to the button *after* DOM is ready
+    document.getElementById("start-button").onclick = startQuiz;
+    // Also expose globally for any inline "onclick"
+    window.startQuiz = startQuiz;
 
-    setTimeout(() => {
-      document.body.removeChild(alertBox);
-    }, 2000);
-  }
+    // Question rendering
+    function updateQuestion() {
+      const translations = [...questions[currentQuestion].translations];
+      shuffleArray(translations);
+      currentShuffled = translations;
+      document.getElementById("question-container").innerHTML = `
+        <h2>${questions[currentQuestion].english}</h2>
+        <div class="mcq">
+          ${translations.map((translation, index) =>
+            `<button data-index="${index}" onclick="checkAnswer(${index})">${translation}</button>`
+          ).join('')}
+        </div>
+      `;
+    }
 
-  function endQuiz() {
-229|     document.getElementById("question-container").innerHTML = `
-230|       <h2>Quiz Over!</h2>
-231|       <p>Name: ${name}</p>
-232|       <p>Final Score: ${score} out of 100%</p>
-233|       <p>Time Used: ${600 - timer} seconds</p>
-234|       <button onclick="startSpellingQuiz()">Start Spelling Quiz (Part 2)</button>
-235|     `;
-    document.getElementById("timer-container").style.display = "none";
-    document.getElementById("score-container").style.display = "none";
-    document.querySelector(".progress-bar").style.display = "none"; // Corrected
-    clearInterval(timerInterval); // Stop timer
-  241|   }
-// Add spelling quiz function here
-242|   function startSpellingQuiz() {
-243|     let spellingScore = 0;
-244|     let spellingIndex = 0;
-245|     document.getElementById("question-container").innerHTML = '';
-246|     document.getElementById("timer-container").style.display = "none";
-247|     document.getElementById("score-container").style.display = "none";
-248|     document.querySelector(".progress-bar").style.display = "none";
-249|     
-250|     function showSpellingQuestion() {
-251|       if (spellingIndex >= questions.length) {
-252|         document.getElementById("question-container").innerHTML = `
-253|           <h2>Spelling Quiz Over!</h2>
-254|           <p>Score: ${spellingScore} out of ${questions.length}</p>
-255|           <button onclick="location.reload()">Restart Entire Quiz</button>
-256|         `;
-257|         return;
-258|       }
-259|       const chinese = questions[spellingIndex].translations[0];
-260|       document.getElementById("question-container").innerHTML = `
-261|         <h2>Type the English word for: <span style="color:#ff6347">${chinese}</span></h2>
-262|         <input id="spelling-input" type="text" style="font-size:20px;padding:8px;border-radius:5px;">
-263|         <button onclick="checkSpelling()">Submit</button>
-264|         <div id="spelling-feedback" style="margin-top:14px;height:30px;"></div>
-265|         <div>Progress: ${spellingIndex + 1} / ${questions.length}</div>
-266|       `;
-267|       document.getElementById("spelling-input").focus();
-268|     }
-269|     window.checkSpelling = function() {
-270|       const userInput = document.getElementById("spelling-input").value.trim().toLowerCase();
-271|       const correctEnglish = questions[spellingIndex].english.toLowerCase();
-272|       const feedback = document.getElementById("spelling-feedback");
-273|       if (userInput === correctEnglish) {
-274|         spellingScore++;
-275|         feedback.innerHTML = '<span style="color:green">✅ Correct!</span>';
-276|       } else {
-277|         feedback.innerHTML = `<span style="color:red">❌ Incorrect! The correct answer is: <b>${questions[spellingIndex].english}</b></span>`;
-278|       }
-279|       spellingIndex++;
-280|       setTimeout(showSpellingQuestion, 1200);
-281|     };
-282|     showSpellingQuestion();
-283|   }
-284| </script>
+    // Timer logic
+    function updateTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timer--;
+        const progressPercentage = (timer / 600) * 100;
+        document.getElementById("progress").style.width = `${progressPercentage}%`;
+        document.getElementById("timer-container").innerHTML = `Time: ${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')} seconds`;
+
+        if (timer <= 0) {
+          endQuiz();
+          clearInterval(timerInterval);
+        }
+      }, 1000);
+    }
+
+    // Score update
+    function updateScore() {
+      document.getElementById("score-container").innerHTML = `Score: ${score} out of 100%`;
+    }
+
+    // Multiple choice answer checking
+    function checkAnswer(index) {
+      const selected = currentShuffled[index];
+      const correct = questions[currentQuestion].translations[0];
+      if (selected === correct) {
+        score = Math.min(score + 10, 100);
+        document.getElementById("correct-sound").play();
+        showAlert("🎉 Correct! 🎉");
+      } else {
+        score = Math.max(score - 10, 0);
+        document.getElementById("incorrect-sound").play();
+        showAlert("❌ Incorrect! ❌");
+      }
+      currentQuestion++;
+      if (currentQuestion >= questions.length) {
+        endQuiz();
+      } else {
+        updateQuestion();
+      }
+      updateScore();
+    }
+    // Expose for inline onclick
+    window.checkAnswer = checkAnswer;
+
+    // Alert helper
+    function showAlert(message) {
+      const alertBox = document.createElement("div");
+      alertBox.innerText = message;
+      alertBox.className = "alert";
+      document.body.appendChild(alertBox);
+      setTimeout(() => {
+        if (alertBox.parentNode) {
+          alertBox.parentNode.removeChild(alertBox);
+        }
+      }, 2000);
+    }
+
+    // End of quiz
+    function endQuiz() {
+      document.getElementById("question-container").innerHTML = `
+        <h2>Quiz Over!</h2>
+        <p>Name: ${name}</p>
+        <p>Final Score: ${score} out of 100%</p>
+        <p>Time Used: ${600 - timer} seconds</p>
+        <button id="start-spelling-quiz">Start Spelling Quiz (Part 2)</button>
+      `;
+      document.getElementById("timer-container").style.display = "none";
+      document.getElementById("score-container").style.display = "none";
+      document.querySelector(".progress-bar").style.display = "none";
+      clearInterval(timerInterval);
+      document.getElementById("start-spelling-quiz").onclick = startSpellingQuiz;
+    }
+
+    // Spelling Quiz
+    function startSpellingQuiz() {
+      let spellingScore = 0;
+      let spellingIndex = 0;
+      document.getElementById("question-container").innerHTML = '';
+      document.getElementById("timer-container").style.display = "none";
+      document.getElementById("score-container").style.display = "none";
+      document.querySelector(".progress-bar").style.display = "none";
+
+      function showSpellingQuestion() {
+        if (spellingIndex >= questions.length) {
+          document.getElementById("question-container").innerHTML = `
+            <h2>Spelling Quiz Over!</h2>
+            <p>Score: ${spellingScore} out of ${questions.length}</p>
+            <button onclick="location.reload()">Restart Entire Quiz</button>
+          `;
+          return;
+        }
+        const chinese = questions[spellingIndex].translations[0];
+        document.getElementById("question-container").innerHTML = `
+          <h2>Type the English word for: <span style="color:#ff6347">${chinese}</span></h2>
+          <input id="spelling-input" type="text" style="font-size:20px;padding:8px;border-radius:5px;">
+          <button id="submit-spelling">Submit</button>
+          <div id="spelling-feedback" style="margin-top:14px;height:30px;"></div>
+          <div>Progress: ${spellingIndex + 1} / ${questions.length}</div>
+        `;
+        document.getElementById("spelling-input").focus();
+        document.getElementById("submit-spelling").onclick = checkSpelling;
+      }
+
+      function checkSpelling() {
+        const userInput = document.getElementById("spelling-input").value.trim().toLowerCase();
+        const correctEnglish = questions[spellingIndex].english.toLowerCase();
+        const feedback = document.getElementById("spelling-feedback");
+        if (userInput === correctEnglish) {
+          spellingScore++;
+          feedback.innerHTML = '<span style="color:green">✅ Correct!</span>';
+        } else {
+          feedback.innerHTML = `<span style="color:red">❌ Incorrect! The correct answer is: <b>${questions[spellingIndex].english}</b></span>`;
+        }
+        spellingIndex++;
+        setTimeout(showSpellingQuestion, 1200);
+      }
+
+      showSpellingQuestion();
+    }
+    // Expose for button
+    window.startSpellingQuiz = startSpellingQuiz;
+
+  </script>
 </body>
 </html>
