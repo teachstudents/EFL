@@ -91,28 +91,28 @@
 
   <script>
     // Quiz data
-const questions = [
-  { english: "somehow", translations: ["不知怎么地", "建议", "变成"] },
-  { english: "suggestion", translations: ["建议", "不知怎么地", "危险"] },
-  { english: "become", translations: ["变成", "幻想", "代替"] },
-  { english: "entire", translations: ["全部的", "虚荣的", "细绳"] },
-  { english: "superior", translations: ["更好的 / 优越的", "羞愧的", "危险"] },
-  { english: "superb", translations: ["极好的", "变成", "剑"] },
-  { english: "authority", translations: ["权威", "幻想", "抓住"] },
-  { english: "awesome", translations: ["令人敬畏的 / 极好的", "拖拉", "细绳"] },
-  { english: "vain", translations: ["虚荣的 / 徒劳的", "成熟的（水果）", "建议"] },
-  { english: "instead", translations: ["代替", "虚荣的", "抓住"] },
-  { english: "surround", translations: ["包围", "变成", "之后"] },
-  { english: "string", translations: ["细绳 / 一串", "剑", "幻想"] },
-  { english: "dust", translations: ["灰尘", "剑", "幻想"] },
-  { english: "afterward(s)", translations: ["之后", "建议", "权威"] },
-  { english: "sword", translations: ["剑", "抓住", "危险"] },
-  { english: "ashamed", translations: ["羞愧的", "变成", "幻想"] },
-  { english: "beg", translations: ["乞求", "全部的", "剑"] },
-  { english: "danger", translations: ["危险", "幻想", "乞求"] },
-  { english: "fantasy", translations: ["幻想", "灰尘", "乞求"] },
-  { english: "childhood", translations: ["童年", "剑", "虚荣的"] }
-];
+    const questions = [
+      { english: "somehow", translations: ["不知怎么地", "建议", "变成"] },
+      { english: "suggestion", translations: ["建议", "不知怎么地", "危险"] },
+      { english: "become", translations: ["变成", "幻想", "代替"] },
+      { english: "entire", translations: ["全部的", "虚荣的", "细绳"] },
+      { english: "superior", translations: ["更好的 / 优越的", "羞愧的", "危险"] },
+      { english: "superb", translations: ["极好的", "变成", "剑"] },
+      { english: "authority", translations: ["权威", "幻想", "抓住"] },
+      { english: "awesome", translations: ["令人敬畏的 / 极好的", "拖拉", "细绳"] },
+      { english: "vain", translations: ["虚荣的 / 徒劳的", "成熟的（水果）", "建议"] },
+      { english: "instead", translations: ["代替", "虚荣的", "抓住"] },
+      { english: "surround", translations: ["包围", "变成", "之后"] },
+      { english: "string", translations: ["细绳 / 一串", "剑", "幻想"] },
+      { english: "dust", translations: ["灰尘", "剑", "幻想"] },
+      { english: "afterward(s)", translations: ["之后", "建议", "权威"] },
+      { english: "sword", translations: ["剑", "抓住", "危险"] },
+      { english: "ashamed", translations: ["羞愧的", "变成", "幻想"] },
+      { english: "beg", translations: ["乞求", "全部的", "剑"] },
+      { english: "danger", translations: ["危险", "幻想", "乞求"] },
+      { english: "fantasy", translations: ["幻想", "灰尘", "乞求"] },
+      { english: "childhood", translations: ["童年", "剑", "虚荣的"] }
+    ];
 
     let currentQuestion = 0;
     let score = 100;
@@ -243,7 +243,7 @@ const questions = [
       document.getElementById("start-spelling-quiz").onclick = startSpellingQuiz;
     }
 
-    // Spelling Quiz
+    // Spelling/definition matching Quiz with 10 choices
     function startSpellingQuiz() {
       let spellingScore = 0;
       let spellingIndex = 0;
@@ -251,6 +251,24 @@ const questions = [
       document.getElementById("timer-container").style.display = "none";
       document.getElementById("score-container").style.display = "none";
       document.querySelector(".progress-bar").style.display = "none";
+
+      // Gather all unique possible definitions
+      let allDefs = [];
+      questions.forEach(q => {
+        q.translations.forEach(def => {
+          if (!allDefs.includes(def)) allDefs.push(def);
+        });
+      });
+
+      function getRandomItems(arr, n, avoid) {
+        const arrCopy = arr.filter(item => item !== avoid);
+        const res = [];
+        for (let i = 0; i < n && arrCopy.length > 0; i++) {
+          const idx = Math.floor(Math.random() * arrCopy.length);
+          res.push(arrCopy.splice(idx, 1)[0]);
+        }
+        return res;
+      }
 
       function showSpellingQuestion() {
         if (spellingIndex >= questions.length) {
@@ -261,30 +279,41 @@ const questions = [
           `;
           return;
         }
-        const chinese = questions[spellingIndex].translations[0];
+        const english = questions[spellingIndex].english;
+        const correctDef = questions[spellingIndex].translations[0];
+
+        // Get 9 random incorrect definitions (excluding the correct one)
+        const randomIncorrect = getRandomItems(allDefs, 9, correctDef);
+
+        // Combine and shuffle
+        const choices = [correctDef, ...randomIncorrect];
+        shuffleArray(choices);
+
         document.getElementById("question-container").innerHTML = `
-          <h2>Type the English word for: <span style="color:#ff6347">${chinese}</span></h2>
-          <input id="spelling-input" type="text" style="font-size:20px;padding:8px;border-radius:5px;">
-          <button id="submit-spelling">Submit</button>
+          <h2>Choose the correct definition for: <span style="color:#ff6347">${english}</span></h2>
+          <div class="mcq">
+            ${choices.map((choice, idx) =>
+              `<button data-index="${idx}" class="def-choice">${choice}</button>`
+            ).join('')}
+          </div>
           <div id="spelling-feedback" style="margin-top:14px;height:30px;"></div>
           <div>Progress: ${spellingIndex + 1} / ${questions.length}</div>
         `;
-        document.getElementById("spelling-input").focus();
-        document.getElementById("submit-spelling").onclick = checkSpelling;
-      }
 
-      function checkSpelling() {
-        const userInput = document.getElementById("spelling-input").value.trim().toLowerCase();
-        const correctEnglish = questions[spellingIndex].english.toLowerCase();
-        const feedback = document.getElementById("spelling-feedback");
-        if (userInput === correctEnglish) {
-          spellingScore++;
-          feedback.innerHTML = '<span style="color:green">✅ Correct!</span>';
-        } else {
-          feedback.innerHTML = `<span style="color:red">❌ Incorrect! The correct answer is: <b>${questions[spellingIndex].english}</b></span>`;
-        }
-        spellingIndex++;
-        setTimeout(showSpellingQuestion, 1200);
+        document.querySelectorAll(".def-choice").forEach(btn => {
+          btn.onclick = function() {
+            const selected = btn.textContent;
+            const feedback = document.getElementById("spelling-feedback");
+            if (selected === correctDef) {
+              spellingScore++;
+              feedback.innerHTML = '<span style="color:green">✅ Correct!</span>';
+            } else {
+              feedback.innerHTML = `<span style="color:red">❌ Incorrect! The correct answer is: <b>${correctDef}</b></span>`;
+            }
+            spellingIndex++;
+            setTimeout(showSpellingQuestion, 1200);
+          };
+        });
       }
 
       showSpellingQuestion();
