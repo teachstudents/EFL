@@ -10,40 +10,57 @@
       background-color: #f0f8ff;
       color: #333;
       text-align: center;
+      margin: 0;
+      padding: 0;
     }
     h1 {
       color: #ff6347;
+      margin-top: 20px;
     }
-    .question {
+    #app-container {
+      max-width: 550px;
+      margin: 0 auto;
       padding: 20px;
+    }
+    .question, .mcq {
       background-color: #fff;
       border: 2px solid #ff6347;
       border-radius: 10px;
-      margin: 20px auto;
-      max-width: 90%;
+      margin: 20px auto 0 auto;
+      padding: 20px;
+      max-width: 100%;
+      box-sizing: border-box;
+      min-height: 120px;
     }
     .mcq {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
+      border: none;
+      padding: 0 0 20px 0;
     }
     .mcq button {
-      padding: 15px 30px;
-      font-size: 20px;
+      padding: 14px 24px;
+      font-size: 19px;
       cursor: pointer;
-      margin: 10px;
+      margin: 8px;
       background-color: #ff6347;
       color: white;
       border: none;
       border-radius: 10px;
       transition: background-color 0.3s;
+      flex: 1 1 40%;
+      min-width: 120px;
+      max-width: 46%;
+      word-break: break-word;
     }
-    .mcq button:hover {
+    .mcq button:hover, .mcq button.selected {
       background-color: #ff4500;
     }
     .timer, .score {
-      font-size: 24px;
-      margin: 10px;
+      font-size: 22px;
+      margin: 10px 8px 0 8px;
+      display: inline-block;
     }
     .progress-bar {
       width: 100%;
@@ -51,9 +68,10 @@
       border-radius: 10px;
       overflow: hidden;
       margin: 20px 0;
+      height: 18px;
     }
     .progress {
-      height: 20px;
+      height: 100%;
       background-color: #4caf50;
       width: 100%;
       transition: width 1s;
@@ -74,24 +92,32 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
+    @media (max-width: 600px) {
+      #app-container { padding: 4px; }
+      .question { padding: 10px; }
+      .mcq button { font-size: 17px; min-width: 75px; max-width: 98%; }
+    }
   </style>
 </head>
 <body>
-  <h1>List 18</h1>
-  <input type="text" id="name-input" placeholder="Enter your name" style="padding: 10px; font-size: 18px; border-radius: 5px; margin-bottom: 20px;">
-  <button id="start-button">Start Quiz</button>
-  <div id="question-container" class="question"></div>
-  <div id="timer-container" class="timer"></div>
-  <div id="score-container" class="score"></div>
-  <div class="progress-bar">
-    <div id="progress" class="progress"></div>
+  <div id="app-container">
+    <h1>List 18</h1>
+    <input type="text" id="name-input" placeholder="Enter your name" style="padding: 10px; font-size: 18px; border-radius: 5px; margin-bottom: 20px;">
+    <button id="start-button">Start Quiz</button>
+    <div id="status-bar">
+      <span id="timer-container" class="timer"></span>
+      <span id="score-container" class="score"></span>
+    </div>
+    <div class="progress-bar">
+      <div id="progress" class="progress"></div>
+    </div>
+    <div id="question-container" class="question"></div>
+    <audio id="correct-sound" src="game1.mp3"></audio>
+    <audio id="incorrect-sound" src="wrong.mp3"></audio>
   </div>
-  <audio id="correct-sound" src="game1.mp3"></audio>
-  <audio id="incorrect-sound" src="wrong.mp3"></audio>
-
   <script>
-    // Quiz data for List 18
-    const questions = [
+    // List 18 Data
+    const questionsData = [
       { english: "choose", translations: ["选择", "折扣", "数字"] },
       { english: "medical", translations: ["医疗的", "金字塔", "旋转"] },
       { english: "awake", translations: ["醒着的", "到期的 / 应得的", "惩罚"] },
@@ -114,105 +140,56 @@
       { english: "aware", translations: ["意识到的", "品牌", "爆炸"] }
     ];
 
-    let currentQuestion = 0;
-    let score = 100;
-    let timer = 600;
+    let part1Questions = [];
+    let part2Questions = [];
+    let allDefs = [];
     let name = "";
+    let currentQuestionIndex = 0;
+    let score = 100;
+    let timer = 300; // 5 minutes
     let timerInterval = null;
-    let currentShuffled = [];
+    let inPart = 1; // 1 or 2
+    let isTransitioning = false;
 
-    // Shuffle helper
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
+    // Helper: Shuffle array
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+        [arr[i], arr[j]] = [arr[j], arr[i]];
       }
+      return arr;
     }
 
-    // Start Quiz logic
-    function startQuiz() {
-      name = document.getElementById("name-input").value.trim();
-      if (!name) {
-        showAlert("Please enter your name!");
-        return;
-      }
-      document.getElementById("name-input").style.display = "none";
-      document.getElementById("start-button").style.display = "none";
-      currentQuestion = 0;
-      score = 100;
-      timer = 600;
-      updateQuestion();
-      updateTimer();
-      updateScore();
-      document.getElementById("timer-container").style.display = "";
-      document.getElementById("score-container").style.display = "";
-      document.querySelector(".progress-bar").style.display = "";
+    // Setup definitions pool for part 2
+    function buildAllDefs() {
+      const defSet = new Set();
+      questionsData.forEach(q => q.translations.forEach(def => defSet.add(def)));
+      allDefs = Array.from(defSet);
     }
 
-    // Attach startQuiz to the button *after* DOM is ready
-    document.getElementById("start-button").onclick = startQuiz;
-    // Also expose globally for any inline "onclick"
-    window.startQuiz = startQuiz;
-
-    // Question rendering
-    function updateQuestion() {
-      const translations = [...questions[currentQuestion].translations];
-      shuffleArray(translations);
-      currentShuffled = translations;
-      document.getElementById("question-container").innerHTML = `
-        <h2>${questions[currentQuestion].english}</h2>
-        <div class="mcq">
-          ${translations.map((translation, index) =>
-            `<button data-index="${index}" onclick="checkAnswer(${index})">${translation}</button>`
-          ).join('')}
-        </div>
-      `;
-    }
-
-    // Timer logic
-    function updateTimer() {
+    // Timer logic (shared for both parts)
+    function startTimer() {
+      updateTimerUI();
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         timer--;
-        const progressPercentage = (timer / 600) * 100;
-        document.getElementById("progress").style.width = `${progressPercentage}%`;
-        document.getElementById("timer-container").innerHTML = `Time: ${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')} seconds`;
-
-        if (timer <= 0) {
-          endQuiz();
-          clearInterval(timerInterval);
+        if (timer < 0) {
+          endQuiz('timeup');
+          return;
         }
+        updateTimerUI();
       }, 1000);
     }
 
-    // Score update
-    function updateScore() {
-      document.getElementById("score-container").innerHTML = `Score: ${score} out of 100%`;
+    function updateTimerUI() {
+      document.getElementById("timer-container").textContent = `Time: ${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')}`;
+      const pct = Math.max(0, timer / 300) * 100;
+      document.getElementById("progress").style.width = `${pct}%`;
     }
 
-    // Multiple choice answer checking
-    function checkAnswer(index) {
-      const selected = currentShuffled[index];
-      const correct = questions[currentQuestion].translations[0];
-      if (selected === correct) {
-        score = Math.min(score + 10, 100);
-        document.getElementById("correct-sound").play();
-        showAlert("🎉 Correct! 🎉");
-      } else {
-        score = Math.max(score - 10, 0);
-        document.getElementById("incorrect-sound").play();
-        showAlert("❌ Incorrect! ❌");
-      }
-      currentQuestion++;
-      if (currentQuestion >= questions.length) {
-        endQuiz();
-      } else {
-        updateQuestion();
-      }
-      updateScore();
+    function updateScoreUI() {
+      document.getElementById("score-container").textContent = `Score: ${score}%`;
     }
-    // Expose for inline onclick
-    window.checkAnswer = checkAnswer;
 
     // Alert helper
     function showAlert(message) {
@@ -221,105 +198,142 @@
       alertBox.className = "alert";
       document.body.appendChild(alertBox);
       setTimeout(() => {
-        if (alertBox.parentNode) {
-          alertBox.parentNode.removeChild(alertBox);
-        }
-      }, 2000);
+        if (alertBox.parentNode) alertBox.parentNode.removeChild(alertBox);
+      }, 1600);
     }
 
-    // End of quiz
-    function endQuiz() {
+    // ---------------------- PART 1: MCQ with Retry -----------------------
+    function startPart1() {
+      inPart = 1;
+      part1Questions = questionsData.map((q, i) => ({...q, origIndex: i})); // track origIndex for retry
+      shuffleArray(part1Questions);
+      currentQuestionIndex = 0;
+      document.getElementById("question-container").innerHTML = "";
+      nextPart1Question();
+    }
+
+    function nextPart1Question() {
+      if (timer < 0) return;
+      if (part1Questions.length === 0) {
+        startPart2();
+        return;
+      }
+      const q = part1Questions[0];
+      const options = shuffleArray([...q.translations]);
       document.getElementById("question-container").innerHTML = `
-        <h2>Quiz Over!</h2>
-        <p>Name: ${name}</p>
-        <p>Final Score: ${score} out of 100%</p>
-        <p>Time Used: ${600 - timer} seconds</p>
-        <button id="start-spelling-quiz">Start Spelling Quiz (Part 2)</button>
+        <div><b>Part 1 / 英文选中文</b></div>
+        <div style="font-size:1.4em;margin-bottom:10px;"><b>${q.english}</b></div>
+        <div class="mcq">
+          ${options.map((option, idx) => `<button data-idx="${idx}">${option}</button>`).join('')}
+        </div>
+        <div style="font-size:0.95em;margin-top:10px;color:#888;">Questions left: ${part1Questions.length}</div>
       `;
-      document.getElementById("timer-container").style.display = "none";
-      document.getElementById("score-container").style.display = "none";
-      document.querySelector(".progress-bar").style.display = "none";
-      clearInterval(timerInterval);
-      document.getElementById("start-spelling-quiz").onclick = startSpellingQuiz;
-    }
-
-    // Spelling/definition matching Quiz with 10 choices
-    function startSpellingQuiz() {
-      let spellingScore = 0;
-      let spellingIndex = 0;
-      document.getElementById("question-container").innerHTML = '';
-      document.getElementById("timer-container").style.display = "none";
-      document.getElementById("score-container").style.display = "none";
-      document.querySelector(".progress-bar").style.display = "none";
-
-      // Gather all unique possible definitions
-      let allDefs = [];
-      questions.forEach(q => {
-        q.translations.forEach(def => {
-          if (!allDefs.includes(def)) allDefs.push(def);
-        });
+      document.querySelectorAll(".mcq button").forEach((btn, i) => {
+        btn.onclick = () => {
+          if(isTransitioning) return;
+          isTransitioning = true;
+          const selected = options[i];
+          const correct = q.translations[0];
+          if(selected === correct) {
+            document.getElementById("correct-sound").play();
+            part1Questions.shift();
+            showAlert("🎉 Correct!");
+          } else {
+            document.getElementById("incorrect-sound").play();
+            score = Math.max(0, score - 5);
+            // Move current question to end for retry
+            part1Questions.push(part1Questions.shift());
+            showAlert(`❌ Incorrect!`);
+          }
+          updateScoreUI();
+          setTimeout(() => {
+            isTransitioning = false;
+            nextPart1Question();
+          }, 600);
+        };
       });
-
-      function getRandomItems(arr, n, avoid) {
-        const arrCopy = arr.filter(item => item !== avoid);
-        const res = [];
-        for (let i = 0; i < n && arrCopy.length > 0; i++) {
-          const idx = Math.floor(Math.random() * arrCopy.length);
-          res.push(arrCopy.splice(idx, 1)[0]);
-        }
-        return res;
-      }
-
-      function showSpellingQuestion() {
-        if (spellingIndex >= questions.length) {
-          document.getElementById("question-container").innerHTML = `
-            <h2>Spelling Quiz Over!</h2>
-            <p>Score: ${spellingScore} out of ${questions.length}</p>
-            <button onclick="location.reload()">Restart Entire Quiz</button>
-          `;
-          return;
-        }
-        const english = questions[spellingIndex].english;
-        const correctDef = questions[spellingIndex].translations[0];
-
-        // Get 9 random incorrect definitions (excluding the correct one)
-        const randomIncorrect = getRandomItems(allDefs, 9, correctDef);
-
-        // Combine and shuffle
-        const choices = [correctDef, ...randomIncorrect];
-        shuffleArray(choices);
-
-        document.getElementById("question-container").innerHTML = `
-          <h2>Choose the correct definition for: <span style="color:#ff6347">${english}</span></h2>
-          <div class="mcq">
-            ${choices.map((choice, idx) =>
-              `<button data-index="${idx}" class="def-choice">${choice}</button>`
-            ).join('')}
-          </div>
-          <div id="spelling-feedback" style="margin-top:14px;height:30px;"></div>
-          <div>Progress: ${spellingIndex + 1} / ${questions.length}</div>
-        `;
-
-        document.querySelectorAll(".def-choice").forEach(btn => {
-          btn.onclick = function() {
-            const selected = btn.textContent;
-            const feedback = document.getElementById("spelling-feedback");
-            if (selected === correctDef) {
-              spellingScore++;
-              feedback.innerHTML = '<span style="color:green">✅ Correct!</span>';
-            } else {
-              feedback.innerHTML = `<span style="color:red">❌ Incorrect! The correct answer is: <b>${correctDef}</b></span>`;
-            }
-            spellingIndex++;
-            setTimeout(showSpellingQuestion, 1200);
-          };
-        });
-      }
-
-      showSpellingQuestion();
     }
-    // Expose for button
-    window.startSpellingQuiz = startSpellingQuiz;
+
+    // ---------------------- PART 2: Definitions MCQ -----------------------
+    function startPart2() {
+      inPart = 2;
+      buildAllDefs();
+      part2Questions = shuffleArray(questionsData.map(q => ({...q})));
+      currentQuestionIndex = 0;
+      nextPart2Question();
+    }
+
+    function nextPart2Question() {
+      if (timer < 0) return;
+      if (currentQuestionIndex >= part2Questions.length) {
+        endQuiz('done');
+        return;
+      }
+      const q = part2Questions[currentQuestionIndex];
+      // Get 9 incorrect definitions, add correct, shuffle
+      let incorrectDefs = allDefs.filter(def => def !== q.translations[0]);
+      shuffleArray(incorrectDefs);
+      const choices = shuffleArray([q.translations[0], ...incorrectDefs.slice(0,9)]);
+      document.getElementById("question-container").innerHTML = `
+        <div><b>Part 2 / 选中文定义</b></div>
+        <div style="font-size:1.4em;margin-bottom:10px;"><b>${q.english}</b></div>
+        <div class="mcq">
+          ${choices.map((choice, idx) => `<button data-idx="${idx}">${choice}</button>`).join('')}
+        </div>
+        <div style="font-size:0.95em;margin-top:10px;color:#888;">${currentQuestionIndex+1} / ${part2Questions.length}</div>
+      `;
+      document.querySelectorAll(".mcq button").forEach((btn, i) => {
+        btn.onclick = () => {
+          if(isTransitioning) return;
+          isTransitioning = true;
+          const selected = choices[i];
+          const correct = q.translations[0];
+          if(selected === correct) {
+            document.getElementById("correct-sound").play();
+            showAlert("🎉 Correct!");
+          } else {
+            document.getElementById("incorrect-sound").play();
+            score = Math.max(0, score - 5);
+            showAlert(`❌ Incorrect!`);
+          }
+          updateScoreUI();
+          setTimeout(() => {
+            isTransitioning = false;
+            currentQuestionIndex++;
+            nextPart2Question();
+          }, 600);
+        };
+      });
+    }
+
+    // ---------------------- End and Start Logic -----------------------
+    function endQuiz(reason) {
+      clearInterval(timerInterval);
+      document.getElementById("timer-container").textContent = `Time: ${Math.max(0, timer)}s`;
+      document.getElementById("question-container").innerHTML = `
+        <div style="font-size:1.5em;margin:15px 0;"><b>Quiz Over!</b></div>
+        <div>Name: ${name}</div>
+        <div>Final Score: ${score}%</div>
+        <div>Time Used: ${300 - Math.max(0, timer)} seconds</div>
+        <button onclick="location.reload()">Restart</button>
+      `;
+    }
+
+    // ---------------------- Start button and entry -----------------------
+    document.getElementById("start-button").onclick = function() {
+      name = document.getElementById("name-input").value.trim();
+      if(!name) { showAlert("Please enter your name!"); return; }
+      document.getElementById("name-input").style.display = "none";
+      document.getElementById("start-button").style.display = "none";
+      updateScoreUI();
+      startTimer();
+      startPart1();
+    };
+
+    // On reload, always show only name and start
+    document.getElementById("question-container").innerHTML = "";
+    document.getElementById("timer-container").textContent = "";
+    document.getElementById("score-container").textContent = "";
 
   </script>
 </body>
