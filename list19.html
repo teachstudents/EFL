@@ -5,84 +5,58 @@
   <title>List 19 Vocabulary Matching Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <style>
-    :root {
-      --main-bg: #f6f8fc;
-      --panel-bg: #fcfdff;
-      --accent: #5a73b5;
-      --accent-soft: #b3c3e6;
-      --accent-green: #43b581;
-      --accent-red: #ea5d68;
-      --text-main: #23272f;
-      --text-soft: #6a768f;
-      --button-bg: #e7ecfa;
-      --button-hover: #dde4f7;
-      --border: #e0e6ed;
-      --shadow: 0 2px 8px 0 rgba(60,72,88,0.07);
-    }
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: var(--main-bg);
-      color: var(--text-main);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-      font-size: 17px;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
     body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
+      background: #f6f8fc;
+      color: #23272f;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      margin: 0; padding: 0;
       min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
     }
     h1 {
-      font-size: 1rem;
-      margin: 16px 0 8px 0;
-      color: var(--accent);
+      font-size: 1.1rem;
+      margin: 18px 0 10px 0;
+      color: #5a73b5;
       font-weight: 600;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
     }
     .top-bar {
-      font-size: 0.98rem;
-      color: var(--text-soft);
+      font-size: 1.04rem;
+      color: #6a768f;
       display: flex;
       justify-content: center;
-      gap: 1.7em;
-      margin-bottom: 6px;
+      gap: 2em;
+      margin-bottom: 8px;
       flex-wrap: wrap;
       align-items: center;
     }
     .game-panel {
-      background: var(--panel-bg);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      width: 97vw;
-      max-width: 680px;
-      min-height: 340px;
+      background: #fcfdff;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px 0 rgba(60,72,88,0.07);
+      width: 97vw; max-width: 680px;
       margin: 0 0 18px 0;
       padding: 18px 2vw 10px 2vw;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      border: 1.2px solid var(--border);
+      display: flex; flex-direction: column; align-items: center;
+      border: 1.2px solid #e0e6ed;
+      min-height: 320px;
     }
     .section-title {
-      font-size: 1.08em;
-      color: var(--text-soft);
+      font-size: 1.09em;
+      color: #6a768f;
       margin: 0 0 4px 0;
       font-weight: 500;
     }
     .main-word {
       font-size: clamp(2.1rem, 6vw, 2.5rem);
       font-weight: 800;
-      color: var(--accent);
+      color: #5a73b5;
       margin: 5px 0 5px 0;
       letter-spacing: 0.01em;
     }
     .word-def {
       font-size: 1.13rem;
-      color: var(--text-main);
+      color: #23272f;
       font-weight: 500;
       margin-bottom: 10px;
       margin-top: 0;
@@ -97,9 +71,9 @@
     .choice-btn {
       padding: 13px 10px;
       border-radius: 11px;
-      background: var(--button-bg);
-      border: 1.2px solid var(--border);
-      color: var(--text-main);
+      background: #e7ecfa;
+      border: 1.2px solid #e0e6ed;
+      color: #23272f;
       font-size: 1.08rem;
       text-align: left;
       cursor: pointer;
@@ -110,31 +84,27 @@
       white-space: normal;
     }
     .choice-btn:hover, .choice-btn[aria-pressed="true"] {
-      background: var(--button-hover);
-      border-color: var(--accent);
+      background: #dde4f7;
+      border-color: #5a73b5;
     }
-    .choice-btn.correct { background: #e2fbec; border-color: var(--accent-green); color: var(--accent-green);}
-    .choice-btn.incorrect { background: #ffe8eb; border-color: var(--accent-red); color: var(--accent-red);}
-    .gif-reward {
-      width: 60px; height: 60px; margin: 10px auto 0 auto;
-      display: block;
-    }
+    .choice-btn.correct { background: #e2fbec; border-color: #43b581; color: #43b581;}
+    .choice-btn.incorrect { background: #ffe8eb; border-color: #ea5d68; color: #ea5d68;}
     .question-counter {
       margin-top: 10px;
-      color: var(--text-soft);
+      color: #6a768f;
       font-size: 1.05em;
       font-weight: 500;
     }
     .score-final {
-      color: var(--accent-green);
-      font-size: 1.12em;
+      color: #43b581;
+      font-size: 1.15em;
       font-weight: 600;
-      margin: 10px 0 3px 0;
+      margin: 12px 0 5px 0;
     }
     .alert {
-      background: var(--accent-soft);
+      background: #b3c3e6;
       color: #fff;
-      padding: 8px 20px;
+      padding: 7px 20px;
       border-radius: 6px;
       display: inline-block;
       margin: 7px 0;
@@ -149,7 +119,7 @@
       padding: 12px 32px;
       margin: 16px 0 10px 0;
       border-radius: 8px;
-      background: var(--accent);
+      background: #5a73b5;
       color: #fff;
       border: none;
       font-weight: 600;
@@ -157,18 +127,17 @@
       box-shadow: 0 2px 6px 0 rgba(60,72,88,0.08);
       transition: background 0.14s;
     }
-    #start-btn:hover { background: var(--accent-soft);}
+    #start-btn:hover { background: #b3c3e6;}
     #name-input {
       font-size: 1.03rem;
       padding: 9px 16px;
       border-radius: 6px;
-      border: 1.2px solid var(--border);
+      border: 1.2px solid #e0e6ed;
       margin-top: 16px;
-      width: 90vw;
-      max-width: 260px;
+      width: 90vw; max-width: 260px;
       margin-bottom: 7px;
       background: #fff;
-      color: var(--text-main);
+      color: #23272f;
     }
     @media (max-width: 800px) {
       .game-panel { max-width: 99vw; padding: 10px 1vw 7px 1vw;}
@@ -226,32 +195,16 @@
       { word: "helicopter", zh: "直升机", def: "A flying vehicle with spinning blades on top." }
     ];
 
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-    function getDistractors(correctIndex) {
-      let indices = [...Array(vocab.length).keys()].filter(i => i !== correctIndex);
-      shuffle(indices);
-      return [vocab[correctIndex].zh, vocab[indices[0]].zh, vocab[indices[1]].zh].sort(() => Math.random() - 0.5);
-    }
-
-    // =========== STATE ===========
+    // =========== GAME STATE ===========
     let playerName = "";
-    let part = 1;
-    let score = 0;
-    let timer = 0;
-    let qIndex = 0;
+    let score = 100;
+    let timer = 300; // 5 minutes in seconds
     let timerInterval = null;
-    let part1Order = [];
+    let part = 1; // 1 or 2
+    let p1q = []; // queue for part 1 (indexes)
+    let p1current = 0;
     let part2Order = [];
-    let part1Block = 0;
-    let part2Block = 0;
-    let part1Blocks = [[],[]];
-    let part2Blocks = [[],[]];
+    let p2current = 0;
 
     // =========== DOM ===========
     const startBtn = document.getElementById('start-btn');
@@ -262,6 +215,34 @@
     const timerBar = document.getElementById('timer-bar');
     const scoreBar = document.getElementById('score-bar');
 
+    // =========== UTILS ===========
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // =========== TIMER ===========
+    function startTimer() {
+      updateBars();
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timer--;
+        updateBars();
+        if (timer <= 0) {
+          clearInterval(timerInterval);
+          showGameOver();
+        }
+      }, 1000);
+    }
+    function updateBars() {
+      timerBar.textContent = `Time Left: ${Math.floor(timer/60)}:${('0'+(timer%60)).slice(-2)}`;
+      scoreBar.textContent = `Score: ${score}%`;
+    }
+
+    // =========== GAME FLOW ===========
     startBtn.onclick = startGame;
     function startGame() {
       playerName = nameInput.value.trim();
@@ -271,41 +252,35 @@
       }
       startBtn.classList.add("hidden");
       nameInput.classList.add("hidden");
-      score = 0; part = 1; qIndex = 0; part1Block = 0; part2Block = 0;
-      part1Order = shuffle([...Array(vocab.length).keys()]);
-      part1Blocks = [part1Order.slice(0,13), part1Order.slice(13)];
-      timer = 150;
-      updateBars();
-      showPart1();
+      score = 100;
+      timer = 300;
+      part = 1;
+      p1q = shuffle([...Array(vocab.length).keys()]);
+      p1current = 0;
+      p2current = 0;
+      part2Order = shuffle([...Array(vocab.length).keys()]);
       startTimer();
-    }
-    function startTimer() {
-      updateBars();
-      if (timerInterval) clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        timer--;
-        updateBars();
-        if (timer <= 0) {
-          clearInterval(timerInterval);
-          if (part === 1) part1End();
-          else part2End();
-        }
-      }, 1000);
-    }
-    function updateBars() {
-      timerBar.textContent = `Time Left: ${Math.floor(timer/60)}:${('0'+(timer%60)).slice(-2)}`;
-      scoreBar.textContent = `Score: ${score}`;
+      showPart1();
     }
 
     // =========== PART 1 ===========
     function showPart1() {
-      let block = part1Blocks[part1Block];
-      let idx = block[qIndex];
+      if (timer <= 0) return showGameOver();
+      if (p1q.length === 0) {
+        part = 2;
+        p2current = 0;
+        showPart2();
+        return;
+      }
+      let idx = p1q[0];
       let vocabItem = vocab[idx];
-      let choices = getDistractors(idx);
+      // choices: correct + 2 incorrect zhs
+      let choices = [vocabItem.zh];
+      let distractors = shuffle([...Array(vocab.length).keys()].filter(i => i !== idx)).slice(0,2).map(i => vocab[i].zh);
+      choices = shuffle(choices.concat(distractors));
       gameContainer.innerHTML = `
         <div class="game-panel">
-          <div class="section-title">Part 1 (2.5 min): English + Definition → Chinese Translation</div>
+          <div class="section-title">Part 1: English + Definition → Chinese Translation</div>
           <div class="main-word">${vocabItem.word}</div>
           <div class="word-def">${vocabItem.def}</div>
           <div class="choices-row">
@@ -313,157 +288,102 @@
               `<button class="choice-btn" onclick="selectPart1('${zh.replace(/'/g, "\\'")}', this)">${String.fromCharCode(65+i)}. ${zh}</button>`
             ).join('')}
           </div>
-          <div class="question-counter">Question ${qIndex+1 + part1Block*part1Blocks[0].length} / 25</div>
+          <div class="question-counter">Question ${vocab.length-p1q.length+1} / ${vocab.length}</div>
         </div>
       `;
       window.selectPart1 = selectPart1;
     }
+
     function selectPart1(selectedZh, btn) {
-      let block = part1Blocks[part1Block];
-      let idx = block[qIndex];
+      let idx = p1q[0];
       let correctZh = vocab[idx].zh;
       let buttons = document.querySelectorAll('.choice-btn');
       buttons.forEach(b => b.disabled = true);
       if (selectedZh === correctZh) {
-        score++;
         btn.classList.add("correct");
         correctSound.play();
-        showReward("reward1.gif");
+        p1q.shift();
       } else {
         btn.classList.add("incorrect");
         let correctBtn = Array.from(buttons).find(b => b.textContent.includes(correctZh));
         if (correctBtn) correctBtn.classList.add("correct");
         incorrectSound.play();
-        showAlert(`❌ Incorrect! 正确答案: ${correctZh}`);
-      }
-      setTimeout(() => {
-        qIndex++;
-        if (qIndex >= part1Blocks[part1Block].length) {
-          if (part1Block === 0) {
-            part1Block = 1; qIndex = 0;
-            showPart1BlockEnd();
-          } else {
-            clearInterval(timerInterval);
-            part1End();
-          }
-        } else {
-          showPart1();
-        }
+        showAlert(`❌ 错误! 再试一次。`);
+        // Deduct score & move to end of queue for retry
+        score = Math.max(0, score - 5);
+        p1q.push(p1q.shift());
+        setTimeout(showPart1, 1150);
         updateBars();
-      }, 1100);
-    }
-    function showPart1BlockEnd() {
-      gameContainer.innerHTML = `<div class="game-panel">
-        <div class="score-final">Block 1 Complete!</div>
-        <div class="score-final">Score so far: ${score} / 25</div>
-        <button id="next-block1">Next ${part1Blocks[1].length} Questions</button>
-      </div>`;
-      document.getElementById('next-block1').onclick = () => { showPart1(); };
-    }
-    function part1End() {
-      gameContainer.innerHTML = `
-        <div class="game-panel">
-          <div class="score-final">Part 1 Complete!</div>
-          <div class="score-final">Score: ${score} / 25</div>
-          <p>Time Used: ${150 - timer} seconds</p>
-          <button id="start-part2">Start Part 2</button>
-        </div>
-      `;
-      document.getElementById('start-part2').onclick = startPart2;
-    }
-    function showReward(gif) {
-      let img = document.createElement('img');
-      img.src = gif;
-      img.className = 'gif-reward';
-      document.querySelector('.game-panel').appendChild(img);
+        return;
+      }
+      setTimeout(showPart1, 800);
+      updateBars();
     }
 
     // =========== PART 2 ===========
-    function startPart2() {
-      part = 2; qIndex = 0; part2Block = 0;
-      part2Order = shuffle([...Array(vocab.length).keys()]);
-      part2Blocks = [part2Order.slice(0,13), part2Order.slice(13)];
-      timer = 180;
-      updateBars();
-      showPart2();
-      startTimer();
-    }
     function showPart2() {
-      let block = part2Blocks[part2Block];
-      let idx = block[qIndex];
+      if (timer <= 0) return showGameOver();
+      if (p2current >= vocab.length) {
+        showGameOver();
+        return;
+      }
+      let idx = part2Order[p2current];
       let word = vocab[idx].word;
-      // Build a set of 9 random incorrect definitions + 1 correct
       let correctDef = vocab[idx].def;
       let allDefs = vocab.map((v, i) => ({def: v.def, idx: i}));
-      let incorrectDefs = allDefs.filter(d => d.idx !== idx);
-      shuffle(incorrectDefs);
-      let defs10 = [ {def: correctDef, idx: idx}, ...incorrectDefs.slice(0,9) ];
-      shuffle(defs10);
+      let incorrectDefs = shuffle(allDefs.filter(d => d.idx !== idx)).slice(0,9);
+      let defs10 = shuffle([{def: correctDef, idx: idx}, ...incorrectDefs]);
       gameContainer.innerHTML = `
         <div class="game-panel">
-          <div class="section-title">Part 2 (3 min): English Word → Definition</div>
+          <div class="section-title">Part 2: English Word → Definition</div>
           <div class="main-word">${word}</div>
           <div class="choices-row">
             ${defs10.map((d, i) =>
               `<button class="choice-btn" style="white-space:normal;" onclick="selectPart2(${idx},${d.idx},this)">${String.fromCharCode(65+i)}. ${d.def}</button>`
             ).join('')}
           </div>
-          <div class="question-counter">Question ${qIndex+1 + part2Block*part2Blocks[0].length} / 25</div>
+          <div class="question-counter">Question ${p2current+1} / ${vocab.length}</div>
         </div>
       `;
       window.selectPart2 = selectPart2;
     }
+
     function selectPart2(wordIdx, defIdx, btn) {
       let correctIdx = wordIdx;
       let buttons = document.querySelectorAll('.choice-btn');
       buttons.forEach(b => b.disabled = true);
       if (defIdx === correctIdx) {
-        score++;
         btn.classList.add("correct");
         correctSound.play();
-        showReward("reward2.gif");
       } else {
         btn.classList.add("incorrect");
         let correctDef = vocab[correctIdx].def;
         let correctBtn = Array.from(buttons).find(b => b.textContent.includes(correctDef));
         if (correctBtn) correctBtn.classList.add("correct");
         incorrectSound.play();
-        showAlert("❌ Incorrect! 正确答案: " + correctDef);
+        showAlert("❌ 错误! 正确答案: " + correctDef);
+        score = Math.max(0, score - 5);
       }
       setTimeout(() => {
-        qIndex++;
-        if (qIndex >= part2Blocks[part2Block].length) {
-          if (part2Block === 0) {
-            part2Block = 1; qIndex = 0;
-            showPart2BlockEnd();
-          } else {
-            clearInterval(timerInterval);
-            part2End();
-          }
-        } else {
-          showPart2();
-        }
+        p2current++;
+        showPart2();
         updateBars();
       }, 1100);
     }
-    function showPart2BlockEnd() {
-      gameContainer.innerHTML = `<div class="game-panel">
-        <div class="score-final">Block 1 Complete!</div>
-        <div class="score-final">Score so far: ${score} / 25</div>
-        <button id="next-block2">Next ${part2Blocks[1].length} Questions</button>
-      </div>`;
-      document.getElementById('next-block2').onclick = () => { showPart2(); };
-    }
-    function part2End() {
+
+    // =========== GAME OVER ===========
+    function showGameOver() {
+      clearInterval(timerInterval);
       gameContainer.innerHTML = `
         <div class="game-panel">
           <div class="score-final">Game Over!</div>
-          <div class="score-final">Final Score: ${score} / 25 (Part 2)</div>
+          <div class="score-final">Final Score: ${score}%</div>
           <p>Well done, ${playerName}!</p>
           <button onclick="location.reload()">Restart Game</button>
         </div>
       `;
     }
+
     // =========== ALERT =============
     function showAlert(msg) {
       const div = document.createElement('div');
