@@ -2,325 +2,476 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>List 16</title>
+  <title>List 19 Vocabulary Matching Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <style>
+    :root {
+      --main-bg: #f6f8fc;
+      --panel-bg: #fcfdff;
+      --accent: #5a73b5;
+      --accent-soft: #b3c3e6;
+      --accent-green: #43b581;
+      --accent-red: #ea5d68;
+      --text-main: #23272f;
+      --text-soft: #6a768f;
+      --button-bg: #e7ecfa;
+      --button-hover: #dde4f7;
+      --border: #e0e6ed;
+      --shadow: 0 2px 8px 0 rgba(60,72,88,0.07);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--main-bg);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      font-size: 17px;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background-color: #f0f8ff;
-      color: #333;
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
     }
     h1 {
-      color: #ff6347;
+      font-size: 1rem;
+      margin: 16px 0 8px 0;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0.04em;
     }
-    .question {
-      padding: 20px;
-      background-color: #fff;
-      border: 2px solid #ff6347;
-      border-radius: 10px;
-      margin: 20px auto;
-      max-width: 90%;
-    }
-    .mcq {
+    .top-bar {
+      font-size: 0.98rem;
+      color: var(--text-soft);
       display: flex;
-      flex-wrap: wrap;
       justify-content: center;
+      gap: 1.7em;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+      align-items: center;
     }
-    .mcq button {
-      padding: 15px 30px;
-      font-size: 20px;
+    .game-panel {
+      background: var(--panel-bg);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      width: 97vw;
+      max-width: 680px;
+      min-height: 340px;
+      margin: 0 0 18px 0;
+      padding: 18px 2vw 10px 2vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1.2px solid var(--border);
+    }
+    .section-title {
+      font-size: 1.08em;
+      color: var(--text-soft);
+      margin: 0 0 4px 0;
+      font-weight: 500;
+    }
+    .main-word {
+      font-size: clamp(2.1rem, 6vw, 2.5rem);
+      font-weight: 800;
+      color: var(--accent);
+      margin: 5px 0 5px 0;
+      letter-spacing: 0.01em;
+    }
+    .word-def {
+      font-size: 1.13rem;
+      color: var(--text-main);
+      font-weight: 500;
+      margin-bottom: 10px;
+      margin-top: 0;
+    }
+    .choices-row {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      width: 100%;
+      margin: 10px 0 0 0;
+    }
+    .choice-btn {
+      padding: 13px 10px;
+      border-radius: 11px;
+      background: var(--button-bg);
+      border: 1.2px solid var(--border);
+      color: var(--text-main);
+      font-size: 1.08rem;
+      text-align: left;
       cursor: pointer;
-      margin: 10px;
-      background-color: #ff6347;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      transition: background-color 0.3s;
+      transition: background 0.14s, border-color 0.13s;
+      font-family: inherit;
+      font-weight: 500;
+      box-shadow: 0 1px 3px 0 rgba(60,72,88,0.03);
+      white-space: normal;
     }
-    .mcq button:hover {
-      background-color: #ff4500;
+    .choice-btn:hover, .choice-btn[aria-pressed="true"] {
+      background: var(--button-hover);
+      border-color: var(--accent);
     }
-    .timer, .score {
-      font-size: 24px;
-      margin: 10px;
+    .choice-btn.correct { background: #e2fbec; border-color: var(--accent-green); color: var(--accent-green);}
+    .choice-btn.incorrect { background: #ffe8eb; border-color: var(--accent-red); color: var(--accent-red);}
+    .gif-reward {
+      width: 60px; height: 60px; margin: 10px auto 0 auto;
+      display: block;
     }
-    .progress-bar {
-      width: 100%;
-      background-color: #ddd;
-      border-radius: 10px;
-      overflow: hidden;
-      margin: 20px 0;
+    .question-counter {
+      margin-top: 10px;
+      color: var(--text-soft);
+      font-size: 1.05em;
+      font-weight: 500;
     }
-    .progress {
-      height: 20px;
-      background-color: #4caf50;
-      width: 100%;
-      transition: width 1s;
+    .score-final {
+      color: var(--accent-green);
+      font-size: 1.12em;
+      font-weight: 600;
+      margin: 10px 0 3px 0;
     }
     .alert {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #f0ad4e;
+      background: var(--accent-soft);
       color: #fff;
-      padding: 10px 20px;
-      border-radius: 5px;
-      z-index: 1000;
-      animation: fadeIn 0.5s;
+      padding: 8px 20px;
+      border-radius: 6px;
+      display: inline-block;
+      margin: 7px 0;
+      font-size: 1.03em;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      box-shadow: 0 1px 4px 0 rgba(60,72,88,0.07);
     }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .hidden { display: none !important; }
+    #start-btn {
+      font-size: 1.07rem;
+      padding: 12px 32px;
+      margin: 16px 0 10px 0;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 6px 0 rgba(60,72,88,0.08);
+      transition: background 0.14s;
+    }
+    #start-btn:hover { background: var(--accent-soft);}
+    #name-input {
+      font-size: 1.03rem;
+      padding: 9px 16px;
+      border-radius: 6px;
+      border: 1.2px solid var(--border);
+      margin-top: 16px;
+      width: 90vw;
+      max-width: 260px;
+      margin-bottom: 7px;
+      background: #fff;
+      color: var(--text-main);
+    }
+    @media (max-width: 800px) {
+      .game-panel { max-width: 99vw; padding: 10px 1vw 7px 1vw;}
+      .main-word { font-size: clamp(1.5rem, 8vw, 2.1rem);}
+      .word-def { font-size: 1.01rem;}
+    }
+    @media (max-width: 550px) {
+      .main-word { font-size: 1.1rem;}
+      .word-def { font-size: 0.97rem;}
+      .choice-btn { font-size: 0.91rem; padding: 10px 7px;}
+      .game-panel { min-height: 0; padding: 6px 2vw 2px 2vw;}
+      .top-bar { font-size: 0.96rem;}
+      #name-input { font-size: 0.95rem; }
     }
   </style>
 </head>
 <body>
-  <h1>List 16</h1>
-  <input type="text" id="name-input" placeholder="Enter your name" style="padding: 10px; font-size: 18px; border-radius: 5px; margin-bottom: 20px;">
-  <button id="start-button">Start Quiz</button>
-  <div id="question-container" class="question"></div>
-  <div id="timer-container" class="timer"></div>
-  <div id="score-container" class="score"></div>
-  <div class="progress-bar">
-    <div id="progress" class="progress"></div>
+  <h1>List 19 Vocabulary Matching Game</h1>
+  <div class="top-bar">
+    <span id="timer-bar"></span>
+    <span id="score-bar"></span>
   </div>
+  <input id="name-input" type="text" placeholder="Enter your name">
+  <button id="start-btn">Start Game</button>
+  <div id="game-container"></div>
   <audio id="correct-sound" src="game1.mp3"></audio>
   <audio id="incorrect-sound" src="wrong.mp3"></audio>
-
   <script>
-    // Quiz data
-    const questions = [
-      { english: "somehow", translations: ["不知怎么地", "建议", "变成"] },
-      { english: "suggestion", translations: ["建议", "不知怎么地", "危险"] },
-      { english: "become", translations: ["变成", "幻想", "代替"] },
-      { english: "entire", translations: ["全部的", "虚荣的", "细绳"] },
-      { english: "superior", translations: ["更好的 / 优越的", "羞愧的", "危险"] },
-      { english: "superb", translations: ["极好的", "变成", "剑"] },
-      { english: "authority", translations: ["权威", "幻想", "抓住"] },
-      { english: "awesome", translations: ["令人敬畏的 / 极好的", "拖拉", "细绳"] },
-      { english: "vain", translations: ["虚荣的 / 徒劳的", "成熟的（水果）", "建议"] },
-      { english: "instead", translations: ["代替", "虚荣的", "抓住"] },
-      { english: "surround", translations: ["包围", "变成", "之后"] },
-      { english: "string", translations: ["细绳 / 一串", "剑", "幻想"] },
-      { english: "dust", translations: ["灰尘", "剑", "幻想"] },
-      { english: "afterward(s)", translations: ["之后", "建议", "权威"] },
-      { english: "sword", translations: ["剑", "抓住", "危险"] },
-      { english: "ashamed", translations: ["羞愧的", "变成", "幻想"] },
-      { english: "beg", translations: ["乞求", "全部的", "剑"] },
-      { english: "danger", translations: ["危险", "幻想", "乞求"] },
-      { english: "fantasy", translations: ["幻想", "灰尘", "乞求"] },
-      { english: "childhood", translations: ["童年", "剑", "虚荣的"] }
+    // ================ DATA ================
+    const vocab = [
+      { word: "publish", zh: "出版", def: "To make something available to the public, especially in print." },
+      { word: "local", zh: "当地的", def: "Related to a nearby area or neighborhood." },
+      { word: "adaptation", zh: "适应 / 改编", def: "A change made to fit new conditions." },
+      { word: "respect", zh: "尊重", def: "A feeling of admiration or regard." },
+      { word: "click", zh: "点击 / 咔哒声", def: "A short sound made by pressing something." },
+      { word: "secure", zh: "安全的 / 获得", def: "To make something safe or protected." },
+      { word: "orbit", zh: "轨道", def: "The path one object takes around another in space." },
+      { word: "gradual", zh: "逐渐的", def: "Happening slowly over time." },
+      { word: "toward(s)", zh: "朝向", def: "In the direction of something." },
+      { word: "bedding", zh: "床上用品", def: "Sheets and blankets used on a bed." },
+      { word: "annual", zh: "每年的", def: "Happening once every year." },
+      { word: "bush", zh: "灌木", def: "A low plant with many branches." },
+      { word: "promise", zh: "承诺", def: "A statement that someone will definitely do something." },
+      { word: "noble", zh: "高贵的 / 贵族的", def: "Having high moral qualities or being of high social rank." },
+      { word: "stop", zh: "停止", def: "To bring something to an end." },
+      { word: "swallow", zh: "吞咽", def: "To make food or drink go down your throat." },
+      { word: "compulsory", zh: "强制的 / 必须的", def: "Required by law or rules." },
+      { word: "dress", zh: "连衣裙 / 穿衣", def: "A piece of clothing worn by women or girls." },
+      { word: "iron", zh: "铁 / 熨斗", def: "A strong metal used in tools and construction." },
+      { word: "barber", zh: "理发师", def: "A person whose job is cutting hair." },
+      { word: "mature", zh: "成熟的", def: "Fully grown or developed." },
+      { word: "lounge", zh: "休息室", def: "A room for relaxing or waiting." },
+      { word: "cure", zh: "治愈", def: "Something that makes a sick person healthy again." },
+      { word: "dormitory", zh: "宿舍", def: "A building where students live at school or college." },
+      { word: "helicopter", zh: "直升机", def: "A flying vehicle with spinning blades on top." }
     ];
 
-    let currentQuestion = 0;
-    let score = 100;
-    let timer = 600;
-    let name = "";
-    let timerInterval = null;
-    let currentShuffled = [];
-
-    // Shuffle helper
-    function shuffleArray(array) {
+    function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
       }
+      return array;
+    }
+    function getDistractors(correctIndex) {
+      let indices = [...Array(vocab.length).keys()].filter(i => i !== correctIndex);
+      shuffle(indices);
+      return [vocab[correctIndex].zh, vocab[indices[0]].zh, vocab[indices[1]].zh].sort(() => Math.random() - 0.5);
     }
 
-    // Start Quiz logic
-    function startQuiz() {
-      name = document.getElementById("name-input").value.trim();
-      if (!name) {
+    // =========== STATE ===========
+    let playerName = "";
+    let part = 1;
+    let score = 0;
+    let timer = 0;
+    let qIndex = 0;
+    let timerInterval = null;
+    let part1Order = [];
+    let part2Order = [];
+    let part1Block = 0;
+    let part2Block = 0;
+    let part1Blocks = [[],[]];
+    let part2Blocks = [[],[]];
+
+    // =========== DOM ===========
+    const startBtn = document.getElementById('start-btn');
+    const gameContainer = document.getElementById('game-container');
+    const nameInput = document.getElementById('name-input');
+    const correctSound = document.getElementById('correct-sound');
+    const incorrectSound = document.getElementById('incorrect-sound');
+    const timerBar = document.getElementById('timer-bar');
+    const scoreBar = document.getElementById('score-bar');
+
+    startBtn.onclick = startGame;
+    function startGame() {
+      playerName = nameInput.value.trim();
+      if (!playerName) {
         showAlert("Please enter your name!");
         return;
       }
-      document.getElementById("name-input").style.display = "none";
-      document.getElementById("start-button").style.display = "none";
-      currentQuestion = 0;
-      score = 100;
-      timer = 600;
-      updateQuestion();
-      updateTimer();
-      updateScore();
-      document.getElementById("timer-container").style.display = "";
-      document.getElementById("score-container").style.display = "";
-      document.querySelector(".progress-bar").style.display = "";
+      startBtn.classList.add("hidden");
+      nameInput.classList.add("hidden");
+      score = 0; part = 1; qIndex = 0; part1Block = 0; part2Block = 0;
+      part1Order = shuffle([...Array(vocab.length).keys()]);
+      part1Blocks = [part1Order.slice(0,13), part1Order.slice(13)];
+      timer = 150;
+      updateBars();
+      showPart1();
+      startTimer();
     }
-
-    // Attach startQuiz to the button *after* DOM is ready
-    document.getElementById("start-button").onclick = startQuiz;
-    // Also expose globally for any inline "onclick"
-    window.startQuiz = startQuiz;
-
-    // Question rendering
-    function updateQuestion() {
-      const translations = [...questions[currentQuestion].translations];
-      shuffleArray(translations);
-      currentShuffled = translations;
-      document.getElementById("question-container").innerHTML = `
-        <h2>${questions[currentQuestion].english}</h2>
-        <div class="mcq">
-          ${translations.map((translation, index) =>
-            `<button data-index="${index}" onclick="checkAnswer(${index})">${translation}</button>`
-          ).join('')}
-        </div>
-      `;
-    }
-
-    // Timer logic
-    function updateTimer() {
+    function startTimer() {
+      updateBars();
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         timer--;
-        const progressPercentage = (timer / 600) * 100;
-        document.getElementById("progress").style.width = `${progressPercentage}%`;
-        document.getElementById("timer-container").innerHTML = `Time: ${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')} seconds`;
-
+        updateBars();
         if (timer <= 0) {
-          endQuiz();
           clearInterval(timerInterval);
+          if (part === 1) part1End();
+          else part2End();
         }
       }, 1000);
     }
-
-    // Score update
-    function updateScore() {
-      document.getElementById("score-container").innerHTML = `Score: ${score} out of 100%`;
+    function updateBars() {
+      timerBar.textContent = `Time Left: ${Math.floor(timer/60)}:${('0'+(timer%60)).slice(-2)}`;
+      scoreBar.textContent = `Score: ${score}`;
     }
 
-    // Multiple choice answer checking
-    function checkAnswer(index) {
-      const selected = currentShuffled[index];
-      const correct = questions[currentQuestion].translations[0];
-      if (selected === correct) {
-        score = Math.min(score + 10, 100);
-        document.getElementById("correct-sound").play();
-        showAlert("🎉 Correct! 🎉");
-      } else {
-        score = Math.max(score - 10, 0);
-        document.getElementById("incorrect-sound").play();
-        showAlert("❌ Incorrect! ❌");
-      }
-      currentQuestion++;
-      if (currentQuestion >= questions.length) {
-        endQuiz();
-      } else {
-        updateQuestion();
-      }
-      updateScore();
-    }
-    // Expose for inline onclick
-    window.checkAnswer = checkAnswer;
-
-    // Alert helper
-    function showAlert(message) {
-      const alertBox = document.createElement("div");
-      alertBox.innerText = message;
-      alertBox.className = "alert";
-      document.body.appendChild(alertBox);
-      setTimeout(() => {
-        if (alertBox.parentNode) {
-          alertBox.parentNode.removeChild(alertBox);
-        }
-      }, 2000);
-    }
-
-    // End of quiz
-    function endQuiz() {
-      document.getElementById("question-container").innerHTML = `
-        <h2>Quiz Over!</h2>
-        <p>Name: ${name}</p>
-        <p>Final Score: ${score} out of 100%</p>
-        <p>Time Used: ${600 - timer} seconds</p>
-        <button id="start-spelling-quiz">Start Spelling Quiz (Part 2)</button>
-      `;
-      document.getElementById("timer-container").style.display = "none";
-      document.getElementById("score-container").style.display = "none";
-      document.querySelector(".progress-bar").style.display = "none";
-      clearInterval(timerInterval);
-      document.getElementById("start-spelling-quiz").onclick = startSpellingQuiz;
-    }
-
-    // Spelling/definition matching Quiz with 10 choices
-    function startSpellingQuiz() {
-      let spellingScore = 0;
-      let spellingIndex = 0;
-      document.getElementById("question-container").innerHTML = '';
-      document.getElementById("timer-container").style.display = "none";
-      document.getElementById("score-container").style.display = "none";
-      document.querySelector(".progress-bar").style.display = "none";
-
-      // Gather all unique possible definitions
-      let allDefs = [];
-      questions.forEach(q => {
-        q.translations.forEach(def => {
-          if (!allDefs.includes(def)) allDefs.push(def);
-        });
-      });
-
-      function getRandomItems(arr, n, avoid) {
-        const arrCopy = arr.filter(item => item !== avoid);
-        const res = [];
-        for (let i = 0; i < n && arrCopy.length > 0; i++) {
-          const idx = Math.floor(Math.random() * arrCopy.length);
-          res.push(arrCopy.splice(idx, 1)[0]);
-        }
-        return res;
-      }
-
-      function showSpellingQuestion() {
-        if (spellingIndex >= questions.length) {
-          document.getElementById("question-container").innerHTML = `
-            <h2>Spelling Quiz Over!</h2>
-            <p>Score: ${spellingScore} out of ${questions.length}</p>
-            <button onclick="location.reload()">Restart Entire Quiz</button>
-          `;
-          return;
-        }
-        const english = questions[spellingIndex].english;
-        const correctDef = questions[spellingIndex].translations[0];
-
-        // Get 9 random incorrect definitions (excluding the correct one)
-        const randomIncorrect = getRandomItems(allDefs, 9, correctDef);
-
-        // Combine and shuffle
-        const choices = [correctDef, ...randomIncorrect];
-        shuffleArray(choices);
-
-        document.getElementById("question-container").innerHTML = `
-          <h2>Choose the correct definition for: <span style="color:#ff6347">${english}</span></h2>
-          <div class="mcq">
-            ${choices.map((choice, idx) =>
-              `<button data-index="${idx}" class="def-choice">${choice}</button>`
+    // =========== PART 1 ===========
+    function showPart1() {
+      let block = part1Blocks[part1Block];
+      let idx = block[qIndex];
+      let vocabItem = vocab[idx];
+      let choices = getDistractors(idx);
+      gameContainer.innerHTML = `
+        <div class="game-panel">
+          <div class="section-title">Part 1 (2.5 min): English + Definition → Chinese Translation</div>
+          <div class="main-word">${vocabItem.word}</div>
+          <div class="word-def">${vocabItem.def}</div>
+          <div class="choices-row">
+            ${choices.map((zh, i) =>
+              `<button class="choice-btn" onclick="selectPart1('${zh.replace(/'/g, "\\'")}', this)">${String.fromCharCode(65+i)}. ${zh}</button>`
             ).join('')}
           </div>
-          <div id="spelling-feedback" style="margin-top:14px;height:30px;"></div>
-          <div>Progress: ${spellingIndex + 1} / ${questions.length}</div>
-        `;
-
-        document.querySelectorAll(".def-choice").forEach(btn => {
-          btn.onclick = function() {
-            const selected = btn.textContent;
-            const feedback = document.getElementById("spelling-feedback");
-            if (selected === correctDef) {
-              spellingScore++;
-              feedback.innerHTML = '<span style="color:green">✅ Correct!</span>';
-            } else {
-              feedback.innerHTML = `<span style="color:red">❌ Incorrect! The correct answer is: <b>${correctDef}</b></span>`;
-            }
-            spellingIndex++;
-            setTimeout(showSpellingQuestion, 1200);
-          };
-        });
-      }
-
-      showSpellingQuestion();
+          <div class="question-counter">Question ${qIndex+1 + part1Block*part1Blocks[0].length} / 25</div>
+        </div>
+      `;
+      window.selectPart1 = selectPart1;
     }
-    // Expose for button
-    window.startSpellingQuiz = startSpellingQuiz;
+    function selectPart1(selectedZh, btn) {
+      let block = part1Blocks[part1Block];
+      let idx = block[qIndex];
+      let correctZh = vocab[idx].zh;
+      let buttons = document.querySelectorAll('.choice-btn');
+      buttons.forEach(b => b.disabled = true);
+      if (selectedZh === correctZh) {
+        score++;
+        btn.classList.add("correct");
+        correctSound.play();
+        showReward("reward1.gif");
+      } else {
+        btn.classList.add("incorrect");
+        let correctBtn = Array.from(buttons).find(b => b.textContent.includes(correctZh));
+        if (correctBtn) correctBtn.classList.add("correct");
+        incorrectSound.play();
+        showAlert(`❌ Incorrect! 正确答案: ${correctZh}`);
+      }
+      setTimeout(() => {
+        qIndex++;
+        if (qIndex >= part1Blocks[part1Block].length) {
+          if (part1Block === 0) {
+            part1Block = 1; qIndex = 0;
+            showPart1BlockEnd();
+          } else {
+            clearInterval(timerInterval);
+            part1End();
+          }
+        } else {
+          showPart1();
+        }
+        updateBars();
+      }, 1100);
+    }
+    function showPart1BlockEnd() {
+      gameContainer.innerHTML = `<div class="game-panel">
+        <div class="score-final">Block 1 Complete!</div>
+        <div class="score-final">Score so far: ${score} / 25</div>
+        <button id="next-block1">Next ${part1Blocks[1].length} Questions</button>
+      </div>`;
+      document.getElementById('next-block1').onclick = () => { showPart1(); };
+    }
+    function part1End() {
+      gameContainer.innerHTML = `
+        <div class="game-panel">
+          <div class="score-final">Part 1 Complete!</div>
+          <div class="score-final">Score: ${score} / 25</div>
+          <p>Time Used: ${150 - timer} seconds</p>
+          <button id="start-part2">Start Part 2</button>
+        </div>
+      `;
+      document.getElementById('start-part2').onclick = startPart2;
+    }
+    function showReward(gif) {
+      let img = document.createElement('img');
+      img.src = gif;
+      img.className = 'gif-reward';
+      document.querySelector('.game-panel').appendChild(img);
+    }
 
+    // =========== PART 2 ===========
+    function startPart2() {
+      part = 2; qIndex = 0; part2Block = 0;
+      part2Order = shuffle([...Array(vocab.length).keys()]);
+      part2Blocks = [part2Order.slice(0,13), part2Order.slice(13)];
+      timer = 180;
+      updateBars();
+      showPart2();
+      startTimer();
+    }
+    function showPart2() {
+      let block = part2Blocks[part2Block];
+      let idx = block[qIndex];
+      let word = vocab[idx].word;
+      // Build a set of 9 random incorrect definitions + 1 correct
+      let correctDef = vocab[idx].def;
+      let allDefs = vocab.map((v, i) => ({def: v.def, idx: i}));
+      let incorrectDefs = allDefs.filter(d => d.idx !== idx);
+      shuffle(incorrectDefs);
+      let defs10 = [ {def: correctDef, idx: idx}, ...incorrectDefs.slice(0,9) ];
+      shuffle(defs10);
+      gameContainer.innerHTML = `
+        <div class="game-panel">
+          <div class="section-title">Part 2 (3 min): English Word → Definition</div>
+          <div class="main-word">${word}</div>
+          <div class="choices-row">
+            ${defs10.map((d, i) =>
+              `<button class="choice-btn" style="white-space:normal;" onclick="selectPart2(${idx},${d.idx},this)">${String.fromCharCode(65+i)}. ${d.def}</button>`
+            ).join('')}
+          </div>
+          <div class="question-counter">Question ${qIndex+1 + part2Block*part2Blocks[0].length} / 25</div>
+        </div>
+      `;
+      window.selectPart2 = selectPart2;
+    }
+    function selectPart2(wordIdx, defIdx, btn) {
+      let correctIdx = wordIdx;
+      let buttons = document.querySelectorAll('.choice-btn');
+      buttons.forEach(b => b.disabled = true);
+      if (defIdx === correctIdx) {
+        score++;
+        btn.classList.add("correct");
+        correctSound.play();
+        showReward("reward2.gif");
+      } else {
+        btn.classList.add("incorrect");
+        let correctDef = vocab[correctIdx].def;
+        let correctBtn = Array.from(buttons).find(b => b.textContent.includes(correctDef));
+        if (correctBtn) correctBtn.classList.add("correct");
+        incorrectSound.play();
+        showAlert("❌ Incorrect! 正确答案: " + correctDef);
+      }
+      setTimeout(() => {
+        qIndex++;
+        if (qIndex >= part2Blocks[part2Block].length) {
+          if (part2Block === 0) {
+            part2Block = 1; qIndex = 0;
+            showPart2BlockEnd();
+          } else {
+            clearInterval(timerInterval);
+            part2End();
+          }
+        } else {
+          showPart2();
+        }
+        updateBars();
+      }, 1100);
+    }
+    function showPart2BlockEnd() {
+      gameContainer.innerHTML = `<div class="game-panel">
+        <div class="score-final">Block 1 Complete!</div>
+        <div class="score-final">Score so far: ${score} / 25</div>
+        <button id="next-block2">Next ${part2Blocks[1].length} Questions</button>
+      </div>`;
+      document.getElementById('next-block2').onclick = () => { showPart2(); };
+    }
+    function part2End() {
+      gameContainer.innerHTML = `
+        <div class="game-panel">
+          <div class="score-final">Game Over!</div>
+          <div class="score-final">Final Score: ${score} / 25 (Part 2)</div>
+          <p>Well done, ${playerName}!</p>
+          <button onclick="location.reload()">Restart Game</button>
+        </div>
+      `;
+    }
+    // =========== ALERT =============
+    function showAlert(msg) {
+      const div = document.createElement('div');
+      div.className = 'alert';
+      div.textContent = msg;
+      document.querySelector('.game-panel').appendChild(div);
+      setTimeout(() => div.remove(), 1150);
+    }
   </script>
 </body>
 </html>
