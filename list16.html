@@ -221,6 +221,7 @@
       { word: "furniture", zh: "家具", def: "Items like chairs and tables used in a room." }
     ];
 
+    // =========== HELPERS ===========
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -236,17 +237,14 @@
 
     // =========== STATE ===========
     let playerName = "";
-    let part = 1;
-    let score = 0;
-    let timer = 0;
-    let qIndex = 0;
+    let score = 100; // Percentage
+    let timer = 300; // 5 min = 300 sec
     let timerInterval = null;
-    let part1Order = [];
+    let part = 1;
+    let qIndex = 0;
+    let part1Queue = [];
     let part2Order = [];
-    let part1Block = 0;
-    let part2Block = 0;
-    let part1Blocks = [[],[]];
-    let part2Blocks = [[],[]];
+    let part2QIndex = 0;
 
     // =========== DOM ===========
     const startBtn = document.getElementById('start-btn');
@@ -266,10 +264,12 @@
       }
       startBtn.classList.add("hidden");
       nameInput.classList.add("hidden");
-      score = 0; part = 1; qIndex = 0; part1Block = 0; part2Block = 0;
-      part1Order = shuffle([...Array(vocab.length).keys()]);
-      part1Blocks = [part1Order.slice(0,10), part1Order.slice(10)];
-      timer = 120;
+      score = 100;
+      timer = 300;
+      part = 1;
+      qIndex = 0;
+      part2QIndex = 0;
+      part1Queue = shuffle([...Array(vocab.length).keys()]);
       updateBars();
       showPart1();
       startTimer();
@@ -282,89 +282,68 @@
         updateBars();
         if (timer <= 0) {
           clearInterval(timerInterval);
-          if (part === 1) part1End();
-          else part2End();
+          endQuiz();
         }
       }, 1000);
     }
     function updateBars() {
       timerBar.textContent = `Time Left: ${Math.floor(timer/60)}:${('0'+(timer%60)).slice(-2)}`;
-      scoreBar.textContent = `Score: ${score}`;
+      scoreBar.textContent = `Score: ${score}%`;
     }
 
     // =========== PART 1 ===========
     function showPart1() {
-      let block = part1Blocks[part1Block];
-      let idx = block[qIndex];
+      if (timer <= 0) { endQuiz(); return; }
+      if (part1Queue.length === 0) {
+        // Move to part 2 automatically
+        part = 2;
+        part2Order = shuffle([...Array(vocab.length).keys()]);
+        part2QIndex = 0;
+        showPart2();
+        return;
+      }
+      let idx = part1Queue[0];
       let vocabItem = vocab[idx];
       let choices = getDistractors(idx);
       gameContainer.innerHTML = `
         <div class="game-panel">
-          <div class="section-title">Part 1 (2 min): English + Definition → Chinese Translation</div>
+          <div class="section-title">Part 1: English + Definition → Chinese Translation</div>
           <div class="main-word">${vocabItem.word}</div>
           <div class="word-def">${vocabItem.def}</div>
           <div class="choices-row">
             ${choices.map((zh, i) =>
-              `<button class="choice-btn" onclick="selectPart1('${zh.replace(/'/g, "\\'")}', this)">${String.fromCharCode(65+i)}. ${zh}</button>`
+              `<button class="choice-btn" onclick="selectPart1('${zh.replace(/'/g, "\\'")}', this)">${zh}</button>`
             ).join('')}
           </div>
-          <div class="question-counter">Question ${qIndex+1 + part1Block*10} / 20</div>
+          <div class="question-counter">Remaining: ${part1Queue.length}</div>
         </div>
       `;
       window.selectPart1 = selectPart1;
     }
     function selectPart1(selectedZh, btn) {
-      let block = part1Blocks[part1Block];
-      let idx = block[qIndex];
+      let idx = part1Queue[0];
       let correctZh = vocab[idx].zh;
       let buttons = document.querySelectorAll('.choice-btn');
       buttons.forEach(b => b.disabled = true);
       if (selectedZh === correctZh) {
-        score++;
         btn.classList.add("correct");
         correctSound.play();
         showReward("reward1.gif");
+        part1Queue.shift(); // Remove from queue
       } else {
         btn.classList.add("incorrect");
-        let correctBtn = Array.from(buttons).find(b => b.textContent.includes(correctZh));
+        let correctBtn = Array.from(buttons).find(b => b.textContent === correctZh);
         if (correctBtn) correctBtn.classList.add("correct");
         incorrectSound.play();
         showAlert(`❌ Incorrect! 正确答案: ${correctZh}`);
+        // Re-insert at a random position after the next question
+        let reinsertPos = Math.floor(Math.random() * (part1Queue.length-1)) + 1;
+        part1Queue.splice(reinsertPos, 0, part1Queue[0]);
+        part1Queue.shift(); // Remove current
+        score = Math.max(score - 5, 0);
       }
-      setTimeout(() => {
-        qIndex++;
-        if (qIndex >= 10) {
-          if (part1Block === 0) {
-            part1Block = 1; qIndex = 0;
-            showPart1BlockEnd();
-          } else {
-            clearInterval(timerInterval);
-            part1End();
-          }
-        } else {
-          showPart1();
-        }
-        updateBars();
-      }, 1100);
-    }
-    function showPart1BlockEnd() {
-      gameContainer.innerHTML = `<div class="game-panel">
-        <div class="score-final">Block 1 Complete!</div>
-        <div class="score-final">Score so far: ${score} / 20</div>
-        <button id="next-block1">Next 10 Questions</button>
-      </div>`;
-      document.getElementById('next-block1').onclick = () => { showPart1(); };
-    }
-    function part1End() {
-      gameContainer.innerHTML = `
-        <div class="game-panel">
-          <div class="score-final">Part 1 Complete!</div>
-          <div class="score-final">Score: ${score} / 20</div>
-          <p>Time Used: ${120 - timer} seconds</p>
-          <button id="start-part2">Start Part 2</button>
-        </div>
-      `;
-      document.getElementById('start-part2').onclick = startPart2;
+      updateBars();
+      setTimeout(showPart1, 1100);
     }
     function showReward(gif) {
       let img = document.createElement('img');
@@ -374,18 +353,13 @@
     }
 
     // =========== PART 2 ===========
-    function startPart2() {
-      part = 2; qIndex = 0; part2Block = 0;
-      part2Order = shuffle([...Array(vocab.length).keys()]);
-      part2Blocks = [part2Order.slice(0,10), part2Order.slice(10)];
-      timer = 180;
-      updateBars();
-      showPart2();
-      startTimer();
-    }
     function showPart2() {
-      let block = part2Blocks[part2Block];
-      let idx = block[qIndex];
+      if (timer <= 0) { endQuiz(); return; }
+      if (part2QIndex >= vocab.length) {
+        endQuiz();
+        return;
+      }
+      let idx = part2Order[part2QIndex];
       let word = vocab[idx].word;
       // Build a set of 9 random incorrect definitions + 1 correct
       let correctDef = vocab[idx].def;
@@ -396,14 +370,14 @@
       shuffle(defs10);
       gameContainer.innerHTML = `
         <div class="game-panel">
-          <div class="section-title">Part 2 (3 min): English Word → Definition</div>
+          <div class="section-title">Part 2: English Word → Definition</div>
           <div class="main-word">${word}</div>
           <div class="choices-row">
             ${defs10.map((d, i) =>
-              `<button class="choice-btn" style="white-space:normal;" onclick="selectPart2(${idx},${d.idx},this)">${String.fromCharCode(65+i)}. ${d.def}</button>`
+              `<button class="choice-btn" style="white-space:normal;" onclick="selectPart2(${idx},${d.idx},this)">${d.def}</button>`
             ).join('')}
           </div>
-          <div class="question-counter">Question ${qIndex+1 + part2Block*10} / 20</div>
+          <div class="question-counter">Remaining: ${vocab.length - part2QIndex}</div>
         </div>
       `;
       window.selectPart2 = selectPart2;
@@ -413,48 +387,33 @@
       let buttons = document.querySelectorAll('.choice-btn');
       buttons.forEach(b => b.disabled = true);
       if (defIdx === correctIdx) {
-        score++;
         btn.classList.add("correct");
         correctSound.play();
         showReward("reward2.gif");
       } else {
         btn.classList.add("incorrect");
         let correctDef = vocab[correctIdx].def;
-        let correctBtn = Array.from(buttons).find(b => b.textContent.includes(correctDef));
+        let correctBtn = Array.from(buttons).find(b => b.textContent === correctDef);
         if (correctBtn) correctBtn.classList.add("correct");
         incorrectSound.play();
         showAlert("❌ Incorrect! 正确答案: " + correctDef);
+        score = Math.max(score - 5, 0);
       }
+      updateBars();
       setTimeout(() => {
-        qIndex++;
-        if (qIndex >= 10) {
-          if (part2Block === 0) {
-            part2Block = 1; qIndex = 0;
-            showPart2BlockEnd();
-          } else {
-            clearInterval(timerInterval);
-            part2End();
-          }
-        } else {
-          showPart2();
-        }
-        updateBars();
+        part2QIndex++;
+        showPart2();
       }, 1100);
     }
-    function showPart2BlockEnd() {
-      gameContainer.innerHTML = `<div class="game-panel">
-        <div class="score-final">Block 1 Complete!</div>
-        <div class="score-final">Score so far: ${score} / 20</div>
-        <button id="next-block2">Next 10 Questions</button>
-      </div>`;
-      document.getElementById('next-block2').onclick = () => { showPart2(); };
-    }
-    function part2End() {
+
+    // =========== END QUIZ ===========
+    function endQuiz() {
+      clearInterval(timerInterval);
       gameContainer.innerHTML = `
         <div class="game-panel">
-          <div class="score-final">Game Over!</div>
-          <div class="score-final">Final Score: ${score} / 20 (Part 2)</div>
-          <p>Well done, ${playerName}!</p>
+          <div class="score-final">Test Complete!</div>
+          <div class="score-final">Final Score: ${score}%</div>
+          <p>Great work, ${playerName}!</p>
           <button onclick="location.reload()">Restart Game</button>
         </div>
       `;
@@ -465,7 +424,7 @@
       div.className = 'alert';
       div.textContent = msg;
       document.querySelector('.game-panel').appendChild(div);
-      setTimeout(() => div.remove(), 1150);
+      setTimeout(() => div.remove(), 1050);
     }
   </script>
 </body>
