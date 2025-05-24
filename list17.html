@@ -231,13 +231,32 @@
   <audio id="correct-sound" src="game1.mp3"></audio>
   <audio id="incorrect-sound" src="wrong.mp3"></audio>
   <script>
-    // ================ DATA ================
     const vocab = [
-      // Replace these with your actual List 17 vocabulary:
-      // Format: { word: "ENGLISH", zh: "中文", def: "Simple English definition." },
-      { word: "sample1", zh: "样本1", def: "This is the first sample definition." },
-      { word: "sample2", zh: "样本2", def: "This is the second sample definition." }
-      // ...continue for all List 17 words...
+      { word: "somehow", zh: "不知怎么地", def: "In a way that is not known or certain." },
+      { word: "suggestion", zh: "建议", def: "An idea or plan offered for someone to consider." },
+      { word: "become", zh: "变成", def: "To begin to be something." },
+      { word: "entire", zh: "全部的", def: "Whole; complete." },
+      { word: "superior", zh: "更好的 / 优越的", def: "Better than something else." },
+      { word: "superb", zh: "极好的", def: "Excellent; of very high quality." },
+      { word: "authority", zh: "权威", def: "The power to give orders or make decisions." },
+      { word: "awesome", zh: "令人敬畏的 / 极好的", def: "Very impressive or excellent." },
+      { word: "vain", zh: "虚荣的 / 徒劳的", def: "Too proud of your looks or achievements." },
+      { word: "instead", zh: "代替", def: "In place of something else." },
+      { word: "surround", zh: "包围", def: "To be all around something." },
+      { word: "string", zh: "细绳 / 一串", def: "A thin piece of cord or thread." },
+      { word: "dust", zh: "灰尘", def: "Very small particles of dirt." },
+      { word: "afterward(s)", zh: "之后", def: "At a later time; after something else." },
+      { word: "sword", zh: "剑", def: "A weapon with a long metal blade." },
+      { word: "ashamed", zh: "羞愧的", def: "Feeling guilty or embarrassed." },
+      { word: "beg", zh: "乞求", def: "To ask for something in a desperate way." },
+      { word: "danger", zh: "危险", def: "The possibility of harm or injury." },
+      { word: "fantasy", zh: "幻想", def: "A story or idea that is not real." },
+      { word: "childhood", zh: "童年", def: "The time when someone is a child." },
+      { word: "ripe", zh: "成熟的（水果）", def: "Fully grown and ready to eat (fruit)." },
+      { word: "mistake", zh: "错误", def: "A wrong action or decision." },
+      { word: "catch", zh: "抓住", def: "To grab or take hold of something." },
+      { word: "drag", zh: "拖拉", def: "To pull something along the ground." },
+      { word: "chat", zh: "聊天", def: "To talk in a friendly and informal way." }
     ];
 
     function shuffle(array) {
@@ -259,10 +278,9 @@
       return shuffle(defs);
     }
 
-    // =========== STATE ===========
     let playerName = "";
-    let score = 100; // Percentage
-    let totalSecs = 300; // 5 min = 300 sec
+    let score = 100;
+    let totalSecs = 300;
     let mainTimer = null;
     let part1Secs = 120;
     let part2Secs = 180;
@@ -273,7 +291,6 @@
     let part2QIndex = 0;
     let part2Timer = null;
 
-    // =========== DOM ===========
     const startBtn = document.getElementById('start-btn');
     const gameContainer = document.getElementById('game-container');
     const nameInput = document.getElementById('name-input');
@@ -436,13 +453,14 @@
       updateTimersBar();
       let idx = part2Order[part2QIndex];
       let word = vocab[idx].word;
+      let zh = vocab[idx].zh;
       let correctDef = vocab[idx].def;
       let choices = getFiveDefs(idx);
       gameContainer.innerHTML = `
         <div class="game-panel">
-          <div class="section-title">Part 2: English Word → Definition</div>
+          <div class="section-title">Part 2: English Word + Chinese → Definition</div>
           <div class="main-word">${word}</div>
-          <div class="word-def">${correctDef}</div>
+          <div class="word-def">${zh}</div>
           <div class="choices-row">
             ${choices.map(def =>
               `<button class="choice-btn" style="white-space:normal;" onclick="selectPart2('${correctDef.replace(/'/g, "\\'")}', '${def.replace(/'/g, "\\'")}', this)">${def}</button>`
@@ -475,7 +493,6 @@
       }, 1100);
     }
 
-    // =========== END QUIZ ===========
     function endQuiz() {
       if (mainTimer) clearInterval(mainTimer);
       if (part1Timer) clearInterval(part1Timer);
@@ -492,7 +509,6 @@
       bottomReward.classList.add("hidden");
       topLeftReward.style.display = 'none';
     }
-    // =========== ALERT =============
     function showAlert(msg) {
       const div = document.createElement('div');
       div.className = 'alert';
