@@ -187,11 +187,22 @@
       pointer-events: none;
       opacity: 0.75;
     }
+    #top-left-reward {
+      position:fixed;
+      top:18px;
+      left:18px;
+      width:54px;
+      height:54px;
+      z-index:999;
+      display:none;
+      pointer-events:none;
+    }
     @media (max-width: 800px) {
       .game-panel { max-width: 99vw; padding: 10px 1vw 50px 1vw;}
       .main-word { font-size: clamp(1.5rem, 8vw, 2.1rem);}
       .word-def { font-size: 1.01rem;}
       .bottom-reward { width: 58px; height: 58px; }
+      #top-left-reward { width:42px;height:42px;top:6px;left:6px;}
     }
     @media (max-width: 550px) {
       .main-word { font-size: 1.1rem;}
@@ -201,6 +212,7 @@
       .top-bar { font-size: 0.96rem;}
       #name-input { font-size: 0.95rem; }
       .bottom-reward { width: 48px; height: 48px; }
+      #top-left-reward { width:32px;height:32px;top:4px;left:4px;}
     }
   </style>
 </head>
@@ -214,6 +226,7 @@
   <button id="start-btn">Start Game</button>
   <div id="game-container"></div>
   <img id="bottom-reward" class="bottom-reward hidden" src="reward2.gif" alt="Reward" />
+  <img id="top-left-reward" src="reward1.gif" alt="Reward1" />
   <audio id="correct-sound" src="game1.mp3"></audio>
   <audio id="incorrect-sound" src="wrong.mp3"></audio>
   <script>
@@ -253,7 +266,6 @@
       shuffle(indices);
       return [vocab[correctIndex].zh, vocab[indices[0]].zh, vocab[indices[1]].zh].sort(() => Math.random() - 0.5);
     }
-    // For part 2, get 4 incorrect plus correct, shuffle
     function getFiveDefs(correctIndex) {
       let indices = [...Array(vocab.length).keys()].filter(i => i !== correctIndex);
       shuffle(indices);
@@ -284,6 +296,7 @@
     const globalTimerBar = document.getElementById('global-timer-bar');
     const scoreBar = document.getElementById('score-bar');
     const bottomReward = document.getElementById('bottom-reward');
+    const topLeftReward = document.getElementById('top-left-reward');
 
     startBtn.onclick = startGame;
 
@@ -358,6 +371,11 @@
       } else {
         timerInfo = `<span>Part 2: ${Math.floor(part2Secs/60)}:${('0'+(part2Secs%60)).slice(-2)}</span>`;
       }
+      if (!document.querySelector('.timers-bar')) {
+        let tb = document.createElement('div');
+        tb.className = 'timers-bar';
+        gameContainer.parentNode.insertBefore(tb, gameContainer);
+      }
       document.querySelector('.timers-bar').innerHTML = timerInfo;
     }
 
@@ -368,11 +386,6 @@
       if (part1Queue.length === 0) {
         goToPart2();
         return;
-      }
-      if (!document.querySelector('.timers-bar')) {
-        let tb = document.createElement('div');
-        tb.className = 'timers-bar';
-        gameContainer.parentNode.insertBefore(tb, gameContainer);
       }
       updateTimersBar();
       let idx = part1Queue[0];
@@ -401,13 +414,13 @@
       if (selectedZh === correctZh) {
         btn.classList.add("correct");
         correctSound.play();
+        showTopLeftReward();
       } else {
         btn.classList.add("incorrect");
         let correctBtn = Array.from(buttons).find(b => b.textContent === correctZh);
         if (correctBtn) correctBtn.classList.add("correct");
         incorrectSound.play();
         showAlert(`❌ Incorrect! 正确答案: ${correctZh}`);
-        // Re-insert at a random position after the next question
         let reinsertPos = Math.floor(Math.random() * (part1Queue.length-1)) + 1;
         part1Queue.splice(reinsertPos, 0, part1Queue[0]);
         score = Math.max(score - 5, 0);
@@ -459,6 +472,7 @@
       if (selectedDef === correctDef) {
         btn.classList.add("correct");
         correctSound.play();
+        showTopLeftReward();
       } else {
         btn.classList.add("incorrect");
         let correctBtn = Array.from(buttons).find(b => b.textContent === correctDef);
@@ -489,6 +503,7 @@
         </div>
       `;
       bottomReward.classList.add("hidden");
+      topLeftReward.style.display = 'none';
     }
     // =========== ALERT =============
     function showAlert(msg) {
@@ -501,6 +516,10 @@
     function showBottomReward(src) {
       bottomReward.src = src;
       bottomReward.classList.remove("hidden");
+    }
+    function showTopLeftReward() {
+      topLeftReward.style.display = 'block';
+      setTimeout(() => { topLeftReward.style.display = 'none'; }, 1000);
     }
   </script>
 </body>
