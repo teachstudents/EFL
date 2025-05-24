@@ -5,10 +5,216 @@
   <title>List 17 Vocabulary Matching Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <style>
-    /* --- Copy the same CSS from List 16, unchanged --- */
-    :root { /* ...all your CSS variables... */ }
-    /* ... (rest of your CSS as in List 16) ... */
-    /* For brevity, not repeated here, but use exactly the same CSS as List 16! */
+    :root {
+      --main-bg: #f6f8fc;
+      --panel-bg: #fcfdff;
+      --accent: #5a73b5;
+      --accent-soft: #b3c3e6;
+      --accent-green: #43b581;
+      --accent-red: #ea5d68;
+      --text-main: #23272f;
+      --text-soft: #6a768f;
+      --button-bg: #FFF9E5;
+      --button-hover: #faebc3;
+      --border: #e0e6ed;
+      --shadow: 0 2px 8px 0 rgba(60,72,88,0.07);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--main-bg);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      font-size: 17px;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+    }
+    h1 {
+      font-size: 1rem;
+      margin: 16px 0 8px 0;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .top-bar {
+      font-size: 0.98rem;
+      color: var(--text-soft);
+      display: flex;
+      justify-content: center;
+      gap: 1.7em;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .game-panel {
+      background: var(--panel-bg);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      width: 97vw;
+      max-width: 680px;
+      min-height: 340px;
+      margin: 0 0 18px 0;
+      padding: 18px 2vw 60px 2vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1.2px solid var(--border);
+      position: relative;
+    }
+    .section-title {
+      font-size: 1.08em;
+      color: var(--text-soft);
+      margin: 0 0 4px 0;
+      font-weight: 500;
+    }
+    .main-word {
+      font-size: clamp(2.1rem, 6vw, 2.5rem);
+      font-weight: 800;
+      color: var(--accent);
+      margin: 5px 0 5px 0;
+      letter-spacing: 0.01em;
+    }
+    .word-def {
+      font-size: 1.13rem;
+      color: var(--text-main);
+      font-weight: 500;
+      margin-bottom: 10px;
+      margin-top: 0;
+      text-align: center;
+    }
+    .timers-bar {
+      display: flex;
+      gap: 2em;
+      justify-content: center;
+      font-size: 0.98rem;
+      color: var(--text-soft);
+      margin: 0 0 6px 0;
+      flex-wrap: wrap;
+    }
+    .choices-row {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      width: 100%;
+      margin: 10px 0 0 0;
+    }
+    .choice-btn {
+      padding: 13px 10px;
+      border-radius: 11px;
+      background: var(--button-bg);
+      border: 1.2px solid var(--border);
+      color: var(--text-main);
+      font-size: 1.08rem;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.14s, border-color 0.13s;
+      font-family: inherit;
+      font-weight: bold;
+      box-shadow: 0 1px 3px 0 rgba(60,72,88,0.03);
+      white-space: normal;
+    }
+    .choice-btn:hover, .choice-btn[aria-pressed="true"] {
+      background: var(--button-hover);
+      border-color: var(--accent);
+    }
+    .choice-btn.correct { background: #e2fbec; border-color: var(--accent-green); color: var(--accent-green);}
+    .choice-btn.incorrect { background: #ffe8eb; border-color: var(--accent-red); color: var(--accent-red);}
+    .question-counter {
+      margin-top: 10px;
+      color: var(--text-soft);
+      font-size: 1.05em;
+      font-weight: 500;
+    }
+    .score-final {
+      color: var(--accent-green);
+      font-size: 1.12em;
+      font-weight: 600;
+      margin: 10px 0 3px 0;
+    }
+    .alert {
+      background: var(--accent-soft);
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 6px;
+      display: inline-block;
+      margin: 7px 0;
+      font-size: 1.03em;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      box-shadow: 0 1px 4px 0 rgba(60,72,88,0.07);
+    }
+    .hidden { display: none !important; }
+    #start-btn {
+      font-size: 1.07rem;
+      padding: 12px 32px;
+      margin: 16px 0 10px 0;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 6px 0 rgba(60,72,88,0.08);
+      transition: background 0.14s;
+    }
+    #start-btn:hover { background: var(--accent-soft);}
+    #name-input {
+      font-size: 1.03rem;
+      padding: 9px 16px;
+      border-radius: 6px;
+      border: 1.2px solid var(--border);
+      margin-top: 16px;
+      width: 90vw;
+      max-width: 260px;
+      margin-bottom: 7px;
+      background: #fff;
+      color: var(--text-main);
+    }
+    .bottom-reward {
+      width: 70px;
+      height: 70px;
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 14px;
+      z-index: 10;
+      pointer-events: none;
+      opacity: 0.75;
+    }
+    #top-left-reward {
+      position:fixed;
+      top:18px;
+      left:18px;
+      width:54px;
+      height:54px;
+      z-index:999;
+      display:none;
+      pointer-events:none;
+    }
+    @media (max-width: 800px) {
+      .game-panel { max-width: 99vw; padding: 10px 1vw 50px 1vw;}
+      .main-word { font-size: clamp(1.5rem, 8vw, 2.1rem);}
+      .word-def { font-size: 1.01rem;}
+      .bottom-reward { width: 58px; height: 58px; }
+      #top-left-reward { width:42px;height:42px;top:6px;left:6px;}
+    }
+    @media (max-width: 550px) {
+      .main-word { font-size: 1.1rem;}
+      .word-def { font-size: 0.97rem;}
+      .choice-btn { font-size: 0.91rem; padding: 10px 7px;}
+      .game-panel { min-height: 0; padding: 6px 2vw 38px 2vw;}
+      .top-bar { font-size: 0.96rem;}
+      #name-input { font-size: 0.95rem; }
+      .bottom-reward { width: 48px; height: 48px; }
+      #top-left-reward { width:32px;height:32px;top:4px;left:4px;}
+    }
   </style>
 </head>
 <body>
@@ -27,16 +233,13 @@
   <script>
     // ================ DATA ================
     const vocab = [
-      // -------------- FILL IN YOUR LIST 17 WORDS BELOW --------------
-      // Example:
-      { word: "example", zh: "例子", def: "A thing characteristic of its kind or illustrating a general rule." },
-      { word: "hungry", zh: "饥饿的", def: "Feeling or displaying the need for food." },
-      // ...add all List 17 words here in same format...
-      // eg: { word: "____", zh: "____", def: "_____" },
+      // Replace these with your actual List 17 vocabulary:
+      // Format: { word: "ENGLISH", zh: "中文", def: "Simple English definition." },
+      { word: "sample1", zh: "样本1", def: "This is the first sample definition." },
+      { word: "sample2", zh: "样本2", def: "This is the second sample definition." }
+      // ...continue for all List 17 words...
     ];
 
-    // All the rest of the script is **identical** to List 16!
-    // (copy/paste the whole script, unchanged)
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
