@@ -451,13 +451,14 @@
       updateTimersBar();
       let idx = part2Order[part2QIndex];
       let word = vocab[idx].word;
+      let zh = vocab[idx].zh;
       let correctDef = vocab[idx].def;
       let choices = getFiveDefs(idx);
       gameContainer.innerHTML = `
         <div class="game-panel">
           <div class="section-title">Part 2: English Word → Definition</div>
           <div class="main-word">${word}</div>
-          <div class="word-def">${correctDef}</div>
+          <div class="word-def">${zh}</div>
           <div class="choices-row">
             ${choices.map(def =>
               `<button class="choice-btn" style="white-space:normal;" onclick="selectPart2('${correctDef.replace(/'/g, "\\'")}', '${def.replace(/'/g, "\\'")}', this)">${def}</button>`
