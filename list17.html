@@ -15,59 +15,71 @@
     }
     h1 {
       color: #ff6347;
+      margin-bottom: 0.2em;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 2vw 0 2vw;
+      position: relative;
+      max-width: 650px;
+      margin: auto;
+    }
+    .timers {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      font-size: 18px;
+    }
+    .score {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 1px;
     }
     .question {
-      padding: 20px;
-      margin: 20px auto;
+      padding: 22px 10px;
+      margin: 24px auto 18px auto;
       background: #fff;
       border: 2px solid #ff6347;
       border-radius: 10px;
       max-width: 500px;
+      min-height: 90px;
     }
     .mcq {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       margin-top: 16px;
+      gap: 8px;
     }
     .mcq button {
-      padding: 12px 22px;
-      font-size: 19px;
+      padding: 15px 24px;
+      font-size: 20px;
       cursor: pointer;
-      margin: 8px;
       background-color: #ff6347;
       color: white;
       border: none;
       border-radius: 10px;
-      transition: background-color 0.3s;
       min-width: 120px;
       max-width: 90vw;
       word-break: break-word;
+      transition: background-color 0.3s;
     }
-    .mcq button:hover {
+    .mcq button:hover, .mcq button:focus {
       background-color: #ff4500;
-    }
-    .timer, .score {
-      font-size: 22px;
-      margin: 8px 8px 0 8px;
-      display: inline-block;
-    }
-    .score {
-      margin-right: 0;
-      margin-left: 18px;
     }
     .progress-bar {
       width: 100%;
       background-color: #ddd;
       border-radius: 10px;
       overflow: hidden;
-      margin: 20px 0;
       max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
+      margin: 18px auto;
+      height: 18px;
     }
     .progress {
-      height: 20px;
+      height: 100%;
       background-color: #4caf50;
       width: 100%;
       transition: width 1s;
@@ -83,31 +95,80 @@
       border-radius: 5px;
       z-index: 1000;
       animation: fadeIn 0.5s;
+      font-size: 1.2em;
     }
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
+    .reward-top-left {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 1100;
+      width: 56px;
+      height: 56px;
+      animation: fadeIn 0.5s, fadeOut 0.5s 1.3s;
+      pointer-events: none;
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    .bottom-reward {
+      width: 75px;
+      max-width: 24vw;
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+    input[type="text"] {
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      border: 1.5px solid #ff6347;
+      width: 220px;
+      max-width: 80vw;
+    }
+    button#start-button {
+      margin-bottom: 8px;
+      font-size: 19px;
+      border-radius: 5px;
+      background: #ff6347;
+      color: #fff;
+      padding: 12px 30px;
+      border: none;
+      font-weight: 600;
+    }
     @media (max-width: 600px) {
-      .question, .progress-bar { max-width: 97vw; }
-      .mcq button { font-size: 16px; padding: 10px 8px; }
+      .question, .progress-bar { max-width: 99vw; }
+      .mcq button { font-size: 16px; padding: 10px 8px; min-width: 95px; }
+      .score { font-size: 18px; }
     }
   </style>
 </head>
 <body>
   <h1>List 17</h1>
-  <div>
-    <span id="timer-container" class="timer"></span>
+  <div class="top-bar">
+    <div class="timers">
+      <span id="global-timer">Global: 5:00</span>
+      <span id="block-timer"></span>
+    </div>
     <span id="score-container" class="score"></span>
   </div>
   <div class="progress-bar">
     <div id="progress" class="progress"></div>
   </div>
-  <input type="text" id="name-input" placeholder="Enter your name" style="padding: 10px; font-size: 18px; border-radius: 5px; margin-bottom: 20px;">
+  <input type="text" id="name-input" placeholder="Enter your name">
   <button id="start-button">Start Quiz</button>
   <div id="question-container" class="question"></div>
   <audio id="correct-sound" src="game1.mp3"></audio>
   <audio id="incorrect-sound" src="wrong.mp3"></audio>
+  <img id="reward-bottom" class="bottom-reward" style="display:none" src="" alt="reward">
+  <img id="reward-top" class="reward-top-left" style="display:none" src="reward1.gif" alt="correct!">
   <script>
     // ------------------- Data -------------------
     const questions = [
@@ -133,19 +194,18 @@
       { english: "childhood", translations: ["童年", "剑", "虚荣的"] }
     ];
 
-    // ------------------- Game State -------------------
-    let timer = 300; // 5 minutes for both parts
-    let timerInterval = null;
+    // ------------------- State -------------------
     let score = 100;
     let name = "";
-    let part1Queue = [];
-    let part1Done = [];
-    let part1Current = null;
-    let part2Index = 0;
+    let globalTimer = 300, part1Timer = 120, part2Timer = 180;
+    let globalInterval = null, part1Interval = null, part2Interval = null;
     let allDefs = [];
+    let part1Queue = [], part1Done = [], part1Current = null;
+    let part2Index = 0;
+    let mode = 1; // 1 = Part 1, 2 = Part 2, 0 = idle/end
     let showAlertTimeout = null;
 
-    // ------------------- Utility -------------------
+    // ------------------- Utilities -------------------
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -165,17 +225,28 @@
     function updateScore() {
       document.getElementById("score-container").innerHTML = `Score: ${score}%`;
     }
-    function updateTimer() {
-      let minutes = Math.floor(timer / 60);
-      let seconds = (timer % 60).toString().padStart(2, '0');
-      document.getElementById("timer-container").innerHTML = `Time: ${minutes}:${seconds}`;
-      document.getElementById("progress").style.width = `${(timer/300)*100}%`;
+    function updateTimers() {
+      document.getElementById("global-timer").textContent = "Global: " + fmt(globalTimer);
+      document.getElementById("block-timer").textContent = (
+        mode === 1 ? "Part 1: " + fmt(part1Timer) :
+        mode === 2 ? "Part 2: " + fmt(part2Timer) : ""
+      );
+      document.getElementById("progress").style.width = `${(globalTimer/300)*100}%`;
     }
     function playSound(isCorrect) {
       if (isCorrect) document.getElementById("correct-sound").play();
       else document.getElementById("incorrect-sound").play();
     }
-
+    function fmt(sec) {
+      return Math.floor(sec/60) + ":" + (sec%60).toString().padStart(2, "0");
+    }
+    function showRewardTop() {
+      let img = document.getElementById("reward-top");
+      img.style.display = "block";
+      img.src = "reward1.gif";
+      img.style.opacity = "1";
+      setTimeout(() => { img.style.display = "none"; }, 1800);
+    }
     // ------------------- Game Start -------------------
     document.getElementById("start-button").onclick = startGame;
     function startGame() {
@@ -187,48 +258,77 @@
       document.getElementById("score-container").style.display = "";
       document.querySelector(".progress-bar").style.display = "";
       score = 100;
-      timer = 300;
-      updateScore();
-      updateTimer();
+      globalTimer = 300; part1Timer = 120; part2Timer = 180;
       allDefs = [];
       questions.forEach(q => q.translations.forEach(def => { if (!allDefs.includes(def)) allDefs.push(def); }));
-      startTimer();
+      updateScore(); updateTimers();
+      document.getElementById("reward-bottom").src = "reward2.gif";
+      document.getElementById("reward-bottom").style.display = "block";
+      startGlobalTimer();
       startPart1();
     }
 
-    // ------------------- Timer -------------------
-    function startTimer() {
-      if (timerInterval) clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        timer--;
-        updateTimer();
-        if (timer <= 0) {
-          timer = 0;
-          updateTimer();
-          clearInterval(timerInterval);
+    // ------------------- Timers -------------------
+    function startGlobalTimer() {
+      if (globalInterval) clearInterval(globalInterval);
+      globalInterval = setInterval(() => {
+        globalTimer--;
+        updateTimers();
+        if (globalTimer <= 0) {
+          globalTimer = 0;
+          stopBlockTimers();
           endGame("Time's up!");
         }
       }, 1000);
     }
-
-    // ------------------- Part 1: MCQ English→Chinese with re-insert -------------------
+    function startPart1Timer() {
+      if (part1Interval) clearInterval(part1Interval);
+      part1Interval = setInterval(() => {
+        part1Timer--;
+        updateTimers();
+        if (part1Timer <= 0) {
+          part1Timer = 0;
+          clearInterval(part1Interval);
+          setTimeout(() => { startPart2(); }, 400);
+        }
+      }, 1000);
+    }
+    function startPart2Timer() {
+      if (part2Interval) clearInterval(part2Interval);
+      part2Interval = setInterval(() => {
+        part2Timer--;
+        updateTimers();
+        if (part2Timer <= 0) {
+          part2Timer = 0;
+          clearInterval(part2Interval);
+          endGame("Time's up!");
+        }
+      }, 1000);
+    }
+    function stopBlockTimers() {
+      if (part1Interval) clearInterval(part1Interval);
+      if (part2Interval) clearInterval(part2Interval);
+    }
+    // ------------------- Part 1 -------------------
     function startPart1() {
-      part1Queue = [...questions.keys()]; // [0,1,...,19]
+      mode = 1;
+      part1Queue = [...questions.keys()];
       shuffleArray(part1Queue);
       part1Done = [];
+      document.getElementById("reward-bottom").src = "reward2.gif";
+      document.getElementById("reward-bottom").style.display = "block";
+      startPart1Timer();
       nextPart1Question();
     }
     function nextPart1Question() {
-      if (timer <= 0) return;
+      if (globalTimer <= 0 || part1Timer <= 0) return;
       if (part1Queue.length === 0) {
-        // Go straight to Part 2
-        startPart2();
+        setTimeout(() => { startPart2(); }, 400);
         return;
       }
       let idx = part1Queue.shift();
       part1Current = idx;
       let q = questions[idx];
-      // Shuffle choices for this question
       let options = [...q.translations];
       shuffleArray(options);
       document.getElementById("question-container").innerHTML = `
@@ -243,42 +343,46 @@
         let userAns = options[i];
         let correct = q.translations[0];
         if (userAns === correct) {
-          playSound(true);
-          showAlert("🎉 Correct!");
+          playSound(true); showRewardTop();
           part1Done.push(idx);
         } else {
-          playSound(false);
-          showAlert("❌ Incorrect!");
-          // Deduct score
+          playSound(false); showAlert("❌ Incorrect!");
           score = Math.max(score - 5, 0);
           updateScore();
-          // Re-insert the current question randomly after the next 2-4 questions
+          // Re-insert this question 2-4 spots later
           let pos = Math.min(part1Queue.length, Math.floor(Math.random()*3)+2);
           part1Queue.splice(pos, 0, idx);
         }
+        updateScore();
         setTimeout(nextPart1Question, 600);
       };
       updateScore();
-      updateTimer();
+      updateTimers();
     }
 
-    // ------------------- Part 2: MCQ English→Definition (10 options, no A/B/C) -------------------
+    // ------------------- Part 2 -------------------
     function startPart2() {
+      mode = 2;
+      stopBlockTimers();
+      document.getElementById("reward-bottom").src = "reward3.gif";
+      document.getElementById("reward-bottom").style.display = "block";
       part2Index = 0;
+      part2Timer = 180;
+      updateTimers();
+      startPart2Timer();
       showPart2Question();
     }
     function showPart2Question() {
-      if (timer <= 0) return;
+      if (globalTimer <= 0 || part2Timer <= 0) return;
       if (part2Index >= questions.length) {
         endGame("Test complete!");
         return;
       }
       let q = questions[part2Index];
-      // Get 9 incorrect definitions (excluding correct)
       let correctDef = q.translations[0];
       let incorrect = allDefs.filter(def => def !== correctDef);
       shuffleArray(incorrect);
-      let choices = [correctDef, ...incorrect.slice(0,9)];
+      let choices = [correctDef, ...incorrect.slice(0,4)];
       shuffleArray(choices);
       document.getElementById("question-container").innerHTML = `
         <h2>Choose the correct definition for: <span style="color:#ff6347">${q.english}</span></h2>
@@ -292,11 +396,11 @@
       `;
       document.querySelectorAll(".def-choice").forEach(btn => {
         btn.onclick = function() {
-          if (timer <= 0) return;
+          if (globalTimer <= 0 || part2Timer <= 0) return;
           let selected = btn.textContent;
           let feedback = document.getElementById("spelling-feedback");
           if (selected === correctDef) {
-            playSound(true);
+            playSound(true); showRewardTop();
             feedback.innerHTML = '<span style="color:green">✅ Correct!</span>';
           } else {
             playSound(false);
@@ -305,35 +409,32 @@
             updateScore();
           }
           part2Index++;
-          setTimeout(showPart2Question, 1100);
+          setTimeout(showPart2Question, 950);
         };
       });
       updateScore();
-      updateTimer();
+      updateTimers();
     }
 
     // ------------------- End Game -------------------
     function endGame(msg) {
-      if (timerInterval) clearInterval(timerInterval);
+      stopBlockTimers();
+      if (globalInterval) clearInterval(globalInterval);
       document.getElementById("question-container").innerHTML = `
         <h2>${msg}</h2>
         <p>Name: ${name}</p>
         <p>Final Score: ${score}%</p>
-        <p>Time Used: ${300-timer} seconds</p>
+        <p>Time Used: ${300-globalTimer} seconds</p>
         <button onclick="location.reload()">Restart</button>
       `;
-      document.getElementById("timer-container").style.display = "";
-      document.getElementById("score-container").style.display = "";
-      document.querySelector(".progress-bar").style.display = "";
+      document.getElementById("reward-bottom").style.display = "none";
     }
 
-    // ------------------- UI Setup -------------------
-    // Always visible
-    document.getElementById("timer-container").style.display = "";
+    // ------------------- UI setup -------------------
+    document.getElementById("timer-container")?.style.display = "";
     document.getElementById("score-container").style.display = "";
     document.querySelector(".progress-bar").style.display = "";
-    updateScore();
-    updateTimer();
+    updateScore(); updateTimers();
   </script>
 </body>
 </html>
