@@ -6,7 +6,7 @@
   <title>List 17</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
       background-color: #f0f8ff;
       color: #333;
       text-align: center;
@@ -46,6 +46,15 @@
       max-width: 500px;
       min-height: 90px;
     }
+    .def-block {
+      margin-bottom: 8px;
+      color: #888;
+      font-size: 1.08em;
+    }
+    .def-block span {
+      color: #ff6347;
+      font-weight: bold;
+    }
     .mcq {
       display: flex;
       flex-wrap: wrap;
@@ -57,17 +66,24 @@
       padding: 15px 24px;
       font-size: 20px;
       cursor: pointer;
-      background-color: #ff6347;
-      color: white;
+      background-color: #FFF7E6;
+      color: #333;
       border: none;
       border-radius: 10px;
       min-width: 120px;
       max-width: 90vw;
       word-break: break-word;
+      font-weight: bold;
       transition: background-color 0.3s;
+      box-shadow: 0 1px 6px #0001;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .mcq button:hover, .mcq button:focus {
-      background-color: #ff4500;
+      background-color: #FFE8B5;
+      color: #222;
     }
     .progress-bar {
       width: 100%;
@@ -193,6 +209,30 @@
       { english: "fantasy", translations: ["幻想", "灰尘", "乞求"] },
       { english: "childhood", translations: ["童年", "剑", "虚荣的"] }
     ];
+    // English definitions
+    const englishDefinitions = {
+      "somehow": "In a way not specified or known",
+      "suggestion": "An idea or plan offered for consideration",
+      "become": "Begin to be; turn into",
+      "entire": "With no part left out; whole",
+      "superior": "Of higher quality or status",
+      "superb": "Excellent; of the highest quality",
+      "authority": "The power or right to give orders",
+      "awesome": "Extremely impressive or daunting",
+      "vain": "Having excessive pride; also, futile",
+      "instead": "In place of; as an alternative",
+      "surround": "To be all around something or someone",
+      "string": "A thin piece of cord or thread",
+      "dust": "Fine, dry particles of matter",
+      "afterward(s)": "At a later or future time",
+      "sword": "A weapon with a long metal blade",
+      "ashamed": "Feeling guilt or embarrassment",
+      "beg": "To ask for something earnestly",
+      "danger": "The possibility of harm or injury",
+      "fantasy": "Imagination, especially when extravagant",
+      "childhood": "The state or period of being a child"
+    };
+    const allEnglishDefs = Object.values(englishDefinitions);
 
     // ------------------- State -------------------
     let score = 100;
@@ -333,6 +373,9 @@
       shuffleArray(options);
       document.getElementById("question-container").innerHTML = `
         <h2>${q.english}</h2>
+        <div class="def-block">
+          Definition: <span>${q.translations[0]}</span>
+        </div>
         <div class="mcq">
           ${options.map((t,i)=> `<button onclick="checkPart1(${i})">${t}</button>`).join("")}
         </div>
@@ -349,7 +392,6 @@
           playSound(false); showAlert("❌ Incorrect!");
           score = Math.max(score - 5, 0);
           updateScore();
-          // Re-insert this question 2-4 spots later
           let pos = Math.min(part1Queue.length, Math.floor(Math.random()*3)+2);
           part1Queue.splice(pos, 0, idx);
         }
@@ -379,13 +421,17 @@
         return;
       }
       let q = questions[part2Index];
-      let correctDef = q.translations[0];
-      let incorrect = allDefs.filter(def => def !== correctDef);
-      shuffleArray(incorrect);
-      let choices = [correctDef, ...incorrect.slice(0,4)];
+      let correctDef = englishDefinitions[q.english];
+      let incorrectDefs = allEnglishDefs.filter(def => def !== correctDef);
+      shuffleArray(incorrectDefs);
+      let choices = [correctDef, ...incorrectDefs.slice(0, 4)];
       shuffleArray(choices);
+
       document.getElementById("question-container").innerHTML = `
         <h2>Choose the correct definition for: <span style="color:#ff6347">${q.english}</span></h2>
+        <div class="def-block">
+          Definition: <span>${correctDef}</span>
+        </div>
         <div class="mcq">
           ${choices.map((choice, idx) =>
             `<button class="def-choice" data-index="${idx}">${choice}</button>`
