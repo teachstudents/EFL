@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloze Exercise Quiz</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .exercise { margin-bottom: 20px; }
+        .gap { width: 150px; }
+        .timer { font-weight: bold; }
+    </style>
+    <script>
+        function startTimer(duration, display) {
+            var timer = duration, minutes, seconds;
+            setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    timer = duration;
+                    alert("Time's up!");
+                }
+            }, 1000);
+        }
+
+        window.onload = function () {
+            var fiveMinutes = 60 * 5,
+                displays = document.querySelectorAll('.timer');
+            displays.forEach(function(display) {
+                startTimer(fiveMinutes, display);
+            });
+        };
+
+        function checkAnswers(exerciseNumber) {
+            var answers = document.querySelectorAll('.exercise' + exerciseNumber + ' .gap');
+            var correctAnswers = [
+                ["required", "quiet", "maintaining", "warned", "forbidden"],
+                ["prepared", "joyful", "encouraging", "impressed", "participation"],
+                ["prioritized", "strict", "supervised", "crucial", "secure"],
+                ["factual", "respectful", "considered", "civil", "engaged"]
+            ];
+            var correct = true;
+            answers.forEach(function(answer, index) {
+                if (answer.value.toLowerCase() !== correctAnswers[exerciseNumber - 1][index]) {
+                    correct = false;
+                    answer.style.borderColor = "red";
+                } else {
+                    answer.style.borderColor = "green";
+                }
+            });
+            if (correct) {
+                alert("All answers are correct!");
+            } else {
+                alert("Some answers are incorrect. Please try again.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Cloze Exercise Quiz</h1>
+<div class="exercise exercise1">
+<h2>Exercise 1</h2>
+<p> 1:**
+In our school library, silence is <input type='text' class='gap' /> (REQUIRE) to maintain an effective learning environment. Every student is expected to remain <input type='text' class='gap' /> (QUIET) and respectful while inside. The librarian stresses the importance of <input type='text' class='gap' /> (MAINTAIN) order. If a student disrupts this environment, they are <input type='text' class='gap' /> (WARN) and, if the behavior persists, eventually <input type='text' class='gap' /> (FORBID) from entering.
+
+</p>
+<button onclick="checkAnswers(1)">Submit</button>
+<div class="timer">05:00</div>
+</div>
+<div class="exercise exercise2">
+<h2>Exercise 2</h2>
+<p> 2:**
+During our annual school picnic, every student is <input type='text' class='gap' /> (PREPARE) to contribute by bringing a dish. The event is known for its <input type='text' class='gap' /> (JOY) atmosphere and <input type='text' class='gap' /> (ENCOURAGE) interactions among classmates. Teachers are <input type='text' class='gap' /> (IMPRESS) by the high level of <input type='text' class='gap' /> (PARTICIPATE) and cooperation displayed by everyone.
+
+</p>
+<button onclick="checkAnswers(2)">Submit</button>
+<div class="timer">05:00</div>
+</div>
+<div class="exercise exercise3">
+<h2>Exercise 3</h2>
+<p> 3:**
+In our science classroom, safety is <input type='text' class='gap' /> (PRIORITIZE) above all else. All experiments are carried out following <input type='text' class='gap' /> (STRICT) protocols to minimize risk. Students are always <input type='text' class='gap' /> (SUPERVISE) by our lab instructor during experiments, and it is <input type='text' class='gap' /> (CRUCIAL) that everyone abides by these rules to maintain a <input type='text' class='gap' /> (SECURE) environment.
+
+</p>
+<button onclick="checkAnswers(3)">Submit</button>
+<div class="timer">05:00</div>
+</div>
+<div class="exercise exercise4">
+<h2>Exercise 4</h2>
+<p> 4:**
+In our history class debate, every student is encouraged to present <input type='text' class='gap' /> (FACT) evidence to support their views. The teacher values <input type='text' class='gap' /> (RESPECT) discussion and ensures that each opinion is <input type='text' class='gap' /> (CONSIDER) carefully. It is considered <input type='text' class='gap' /> (CIVIL) for students to listen attentively, and those who are <input type='text' class='gap' /> (ENGAGE) in open dialogue often find the debates truly <input type='text' class='gap' /> (ENRICH).
+
+</p>
+<button onclick="checkAnswers(4)">Submit</button>
+<div class="timer">05:00</div>
+</div>
+
+</body>
+</html>
