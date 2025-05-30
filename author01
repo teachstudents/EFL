@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>List 16 Vocabulary Matching Game</title>
+  <title>Author's Purpose: Multiple-Choice Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <style>
     :root {
@@ -38,7 +37,7 @@
       min-height: 100vh;
     }
     h1 {
-      font-size: 1rem;
+      font-size: 1.1rem;
       margin: 16px 0 8px 0;
       color: var(--accent);
       font-weight: 600;
@@ -69,35 +68,13 @@
       border: 1.2px solid var(--border);
       position: relative;
     }
-    .section-title {
-      font-size: 1.08em;
-      color: var(--text-soft);
-      margin: 0 0 4px 0;
-      font-weight: 500;
-    }
-    .main-word {
-      font-size: clamp(2.1rem, 6vw, 2.5rem);
-      font-weight: 800;
-      color: var(--accent);
-      margin: 5px 0 5px 0;
-      letter-spacing: 0.01em;
-    }
-    .word-def {
-      font-size: 1.13rem;
+    .main-question {
+      font-size: 1.08rem;
       color: var(--text-main);
-      font-weight: 500;
-      margin-bottom: 10px;
-      margin-top: 0;
+      font-weight: 600;
+      margin: 10px 0 15px 0;
       text-align: center;
-    }
-    .timers-bar {
-      display: flex;
-      gap: 2em;
-      justify-content: center;
-      font-size: 0.98rem;
-      color: var(--text-soft);
-      margin: 0 0 6px 0;
-      flex-wrap: wrap;
+      letter-spacing: 0.01em;
     }
     .choices-row {
       display: flex;
@@ -178,48 +155,31 @@
       background: #fff;
       color: var(--text-main);
     }
-    .bottom-reward {
-      width: 70px;
-      height: 70px;
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 14px;
-      z-index: 10;
-      pointer-events: none;
-      opacity: 0.75;
-    }
-    #top-left-reward {
-      position:fixed;
-      top:18px;
-      left:18px;
-      width:54px;
-      height:54px;
-      z-index:999;
-      display:none;
-      pointer-events:none;
+    .timers-bar {
+      display: flex;
+      gap: 2em;
+      justify-content: center;
+      font-size: 0.98rem;
+      color: var(--text-soft);
+      margin: 0 0 6px 0;
+      flex-wrap: wrap;
     }
     @media (max-width: 800px) {
       .game-panel { max-width: 99vw; padding: 10px 1vw 50px 1vw;}
-      .main-word { font-size: clamp(1.5rem, 8vw, 2.1rem);}
-      .word-def { font-size: 1.01rem;}
+      .main-question { font-size: 1.01rem;}
       .bottom-reward { width: 58px; height: 58px; }
-      #top-left-reward { width:42px;height:42px;top:6px;left:6px;}
     }
     @media (max-width: 550px) {
-      .main-word { font-size: 1.1rem;}
-      .word-def { font-size: 0.97rem;}
+      .main-question { font-size: 0.96rem;}
       .choice-btn { font-size: 0.91rem; padding: 10px 7px;}
       .game-panel { min-height: 0; padding: 6px 2vw 38px 2vw;}
       .top-bar { font-size: 0.96rem;}
       #name-input { font-size: 0.95rem; }
-      .bottom-reward { width: 48px; height: 48px; }
-      #top-left-reward { width:32px;height:32px;top:4px;left:4px;}
     }
   </style>
 </head>
 <body>
-  <h1>List 16 Vocabulary Matching Game</h1>
+  <h1>Author's Purpose: Multiple-Choice Game</h1>
   <div class="top-bar">
     <span id="global-timer-bar"></span>
     <span id="score-bar"></span>
@@ -227,78 +187,152 @@
   <input id="name-input" type="text" placeholder="Enter your name">
   <button id="start-btn">Start Game</button>
   <div id="game-container"></div>
-  <img id="bottom-reward" class="bottom-reward hidden" src="reward2.gif" alt="Reward" />
-  <img id="top-left-reward" src="reward1.gif" alt="Reward1" />
-  <audio id="correct-sound" src="game1.mp3"></audio>
-  <audio id="incorrect-sound" src="wrong.mp3"></audio>
   <script>
-    // ================ DATA ================
-    const vocab = [
-      { word: "allowance", zh: "津贴 / 补助", def: "Money given regularly for spending." },
-      { word: "mark", zh: "标记 / 分数", def: "A symbol or sign made on something." },
-      { word: "pulse", zh: "脉搏", def: "The regular beat of the heart." },
-      { word: "clerk", zh: "职员 / 店员", def: "A person who works in an office or store." },
-      { word: "skate", zh: "滑冰", def: "To move on ice using special shoes." },
-      { word: "souvenir", zh: "纪念品", def: "Something kept to remember a place or event." },
-      { word: "robot", zh: "机器人", def: "A machine that can do tasks automatically." },
-      { word: "sail", zh: "航行 / 帆", def: "To travel on water using a boat with sails." },
-      { word: "quarrel", zh: "争吵", def: "A verbal argument or fight." },
-      { word: "cupboard", zh: "橱柜", def: "A piece of furniture with shelves for storage." },
-      { word: "single", zh: "单身的 / 单个的", def: "One only; not in a pair or group." },
-      { word: "peace", zh: "和平", def: "A time without war or conflict." },
-      { word: "alphabet", zh: "字母表", def: "A set of letters used in a language." },
-      { word: "case", zh: "盒子 / 容器", def: "A container used to hold or protect something." },
-      { word: "principle", zh: "原则", def: "A basic rule or belief." },
-      { word: "patient", zh: "病人", def: "A person receiving medical treatment." },
-      { word: "nation", zh: "国家", def: "A country or group of people with the same government." },
-      { word: "atmosphere", zh: "大气 / 气氛", def: "The layer of gases around the Earth." },
-      { word: "tube", zh: "管子", def: "A long, hollow object." },
-      { word: "furniture", zh: "家具", def: "Items like chairs and tables used in a room." }
+    // ========== DATA ==========
+    const questions = [
+      // Nature
+      {
+        text: "Although the weather was stormy, the team continued their journey up the mountain. If they reached the top before nightfall, they would set up camp and rest. The leader believed that pushing forward was the best choice, even if it was risky.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "A) To Inform"
+      },
+      {
+        text: "Although the dog was tired, it kept running after the ball. If it caught it, it would bring it back proudly.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "C) To Entertain"
+      },
+      {
+        text: "If the rain continues, the river will overflow and flood the nearby fields. Although the farmers are worried, they are preparing for the worst.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "A) To Inform"
+      },
+      {
+        text: "Although the forest was dense, the hikers managed to find their way through. If they stayed on the trail, they would reach the waterfall by noon.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "A) To Inform"
+      },
+      {
+        text: "If the sun sets, the temperature will drop significantly. Although the campers are prepared, they need to light a fire to stay warm.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "A) To Inform"
+      },
+      // Technology
+      {
+        text: "Although the new smartphone is expensive, it offers many advanced features. If you buy it, you will have access to the latest technology.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "B) To Persuade"
+      },
+      {
+        text: "If the computer crashes, you may lose all your data. Although backups are important, many people forget to do them regularly.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "A) To Inform"
+      },
+      {
+        text: "Although the internet connection was slow, the video call continued without major interruptions. If the connection improves, the quality will be better.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "A) To Inform"
+      },
+      {
+        text: "If you upgrade your software, you will have access to new features. Although the process may take time, it is worth it.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "B) To Persuade"
+      },
+      {
+        text: "Although the robot was designed to assist with household chores, it sometimes made mistakes. If it learns from its errors, it will become more efficient.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "A) To Inform"
+      },
+      // Health
+      {
+        text: "Although exercise is important, many people find it difficult to stay motivated. If you set realistic goals, you can improve your fitness.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "B) To Persuade"
+      },
+      {
+        text: "If you eat a balanced diet, you will maintain a healthy weight. Although junk food is tempting, it can lead to health problems.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "B) To Persuade"
+      },
+      {
+        text: "Although the patient was in pain, the medication helped alleviate the symptoms. If the treatment continues, the patient will recover soon.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "A) To Inform"
+      },
+      {
+        text: "If you get enough sleep, you will feel more energized. Although many people struggle with insomnia, there are ways to improve sleep quality.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "A) To Inform"
+      },
+      {
+        text: "Although the doctor recommended surgery, the patient decided to try alternative treatments first. If the condition worsens, surgery may be necessary.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "A) To Inform"
+      },
+      // Education
+      {
+        text: "Although online learning is convenient, it requires self-discipline. If you manage your time well, you can succeed in your studies.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "B) To Persuade"
+      },
+      {
+        text: "If you study regularly, you will improve your grades. Although exams are stressful, preparation can help reduce anxiety.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "B) To Persuade"
+      },
+      {
+        text: "Although the teacher explained the concept clearly, some students still had questions. If they review the material, they will understand it better.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "A) To Inform"
+      },
+      {
+        text: "If you participate in class discussions, you will enhance your learning experience. Although some students are shy, speaking up can be beneficial.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "B) To Persuade"
+      },
+      {
+        text: "Although the school offers many extracurricular activities, students must balance them with their academic responsibilities. If they manage their time well, they can enjoy both.",
+        choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"],
+        answer: "A) To Inform"
+      }
     ];
 
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-    function getDistractors(correctIndex) {
-      let indices = [...Array(vocab.length).keys()].filter(i => i !== correctIndex);
-      shuffle(indices);
-      return [vocab[correctIndex].zh, vocab[indices[0]].zh, vocab[indices[1]].zh].sort(() => Math.random() - 0.5);
-    }
-    function getFiveDefs(correctIndex) {
-      let indices = [...Array(vocab.length).keys()].filter(i => i !== correctIndex);
-      shuffle(indices);
-      let defs = [vocab[correctIndex].def, vocab[indices[0]].def, vocab[indices[1]].def, vocab[indices[2]].def, vocab[indices[3]].def];
-      return shuffle(defs);
-    }
+    // Explanations for feedback
+    const answerKey = [
+      "The paragraph describes a real situation with factual details about a mountain journey. It uses “although” and “if” to explain conditions and decisions, aiming to inform the reader.",
+      "The story about a dog chasing a ball is light and playful. It’s meant to amuse the reader, not to teach or persuade.",
+      "This passage explains a natural event (flooding) and how people respond. It uses “if” and “although” to describe cause and effect, aiming to inform.",
+      "The paragraph gives information about hiking through a forest and reaching a waterfall. It’s descriptive and factual.",
+      "This sentence explains what happens when the sun sets and how campers prepare. It’s informative and practical.",
+      "The author is trying to convince the reader to buy a smartphone by highlighting its features, even though it’s expensive.",
+      "This explains the importance of backups and the risks of losing data. It’s factual and educational.",
+      "The paragraph describes a situation with a slow internet connection and its effects. It’s not trying to persuade or entertain.",
+      "The author encourages the reader to upgrade software by listing benefits, using “if” and “although” to support the argument.",
+      "This explains how a robot works and its learning process. It’s informative and not persuasive or entertaining.",
+      "The author is encouraging the reader to exercise by explaining its benefits and addressing common challenges.",
+      "This paragraph promotes healthy eating by contrasting junk food with a balanced diet.",
+      "It describes a medical situation and treatment effects. The purpose is to inform, not persuade or entertain.",
+      "The paragraph explains the benefits of sleep and how to improve it. It’s factual and educational.",
+      "This describes a patient’s decision-making process and possible outcomes. It’s informative.",
+      "The author is encouraging students to manage their time and succeed in online learning.",
+      "This paragraph promotes regular study habits and preparation for exams.",
+      "It explains a classroom situation and how students can improve understanding. It’s not persuasive or entertaining.",
+      "The author encourages participation in class discussions by explaining the benefits.",
+      "This explains how students can balance academics and extracurricular activities. It’s informative."
+    ];
 
     // =========== STATE ===========
-    let playerName = "";
-    let score = 100; // Percentage
-    let totalSecs = 300; // 5 min = 300 sec
+    let playerName = '';
+    let score = 100;
+    let totalSecs = 300; // 5 min
     let mainTimer = null;
-    let part1Secs = 120;
-    let part2Secs = 180;
-    let part = 1;
-    let part1Queue = [];
-    let part1Timer = null;
-    let part2Order = [];
-    let part2QIndex = 0;
-    let part2Timer = null;
+    let qIndex = 0;
 
     // =========== DOM ===========
     const startBtn = document.getElementById('start-btn');
     const gameContainer = document.getElementById('game-container');
     const nameInput = document.getElementById('name-input');
-    const correctSound = document.getElementById('correct-sound');
-    const incorrectSound = document.getElementById('incorrect-sound');
     const globalTimerBar = document.getElementById('global-timer-bar');
     const scoreBar = document.getElementById('score-bar');
-    const bottomReward = document.getElementById('bottom-reward');
-    const topLeftReward = document.getElementById('top-left-reward');
 
     startBtn.onclick = startGame;
 
@@ -311,19 +345,12 @@
       startBtn.classList.add("hidden");
       nameInput.classList.add("hidden");
       score = 100;
-      part = 1;
       totalSecs = 300;
-      part1Secs = 120;
-      part2Secs = 180;
-      part1Queue = shuffle([...Array(vocab.length).keys()]);
-      part2Order = [];
-      part2QIndex = 0;
-      showBottomReward("reward2.gif");
+      qIndex = 0;
       updateGlobalTimer();
       updateScoreBar();
-      showPart1();
+      showQuestion();
       startMainTimer();
-      startPart1Timer();
     }
 
     function startMainTimer() {
@@ -337,28 +364,6 @@
         }
       }, 1000);
     }
-    function startPart1Timer() {
-      if (part1Timer) clearInterval(part1Timer);
-      part1Timer = setInterval(() => {
-        part1Secs--;
-        updateTimersBar();
-        if (part1Secs <= 0) {
-          clearInterval(part1Timer);
-          goToPart2();
-        }
-      }, 1000);
-    }
-    function startPart2Timer() {
-      if (part2Timer) clearInterval(part2Timer);
-      part2Timer = setInterval(() => {
-        part2Secs--;
-        updateTimersBar();
-        if (part2Secs <= 0) {
-          clearInterval(part2Timer);
-          endQuiz();
-        }
-      }, 1000);
-    }
 
     function updateGlobalTimer() {
       globalTimerBar.textContent = `Total Time: ${Math.floor(totalSecs/60)}:${('0'+(totalSecs%60)).slice(-2)}`;
@@ -366,138 +371,55 @@
     function updateScoreBar() {
       scoreBar.textContent = `Score: ${score}%`;
     }
-    function updateTimersBar() {
-      let timerInfo = '';
-      if (part === 1) {
-        timerInfo = `<span>Part 1: ${Math.floor(part1Secs/60)}:${('0'+(part1Secs%60)).slice(-2)}</span>`;
-      } else {
-        timerInfo = `<span>Part 2: ${Math.floor(part2Secs/60)}:${('0'+(part2Secs%60)).slice(-2)}</span>`;
-      }
-      if (!document.querySelector('.timers-bar')) {
-        let tb = document.createElement('div');
-        tb.className = 'timers-bar';
-        gameContainer.parentNode.insertBefore(tb, gameContainer);
-      }
-      document.querySelector('.timers-bar').innerHTML = timerInfo;
-    }
 
-    // =========== PART 1 ===========
-    function showPart1() {
+    // =========== GAME FLOW ===========
+    function showQuestion() {
       if (totalSecs <= 0) { endQuiz(); return; }
-      if (part1Secs <= 0) { goToPart2(); return; }
-      if (part1Queue.length === 0) {
-        goToPart2();
-        return;
-      }
-      updateTimersBar();
-      let idx = part1Queue[0];
-      let vocabItem = vocab[idx];
-      let choices = getDistractors(idx);
-      gameContainer.innerHTML = `
-        <div class="game-panel">
-          <div class="section-title">Part 1: English + Definition → Chinese Translation</div>
-          <div class="main-word">${vocabItem.word}</div>
-          <div class="word-def">${vocabItem.def}</div>
-          <div class="choices-row">
-            ${choices.map(zh =>
-              `<button class="choice-btn" onclick="selectPart1('${zh.replace(/'/g, "\\'")}', this)">${zh}</button>`
-            ).join('')}
-          </div>
-          <div class="question-counter">Remaining: ${part1Queue.length}</div>
-        </div>
-      `;
-      window.selectPart1 = selectPart1;
-    }
-    function selectPart1(selectedZh, btn) {
-      let idx = part1Queue[0];
-      let correctZh = vocab[idx].zh;
-      let buttons = document.querySelectorAll('.choice-btn');
-      buttons.forEach(b => b.disabled = true);
-      if (selectedZh === correctZh) {
-        btn.classList.add("correct");
-        correctSound.play();
-        showTopLeftReward();
-      } else {
-        btn.classList.add("incorrect");
-        let correctBtn = Array.from(buttons).find(b => b.textContent === correctZh);
-        if (correctBtn) correctBtn.classList.add("correct");
-        incorrectSound.play();
-        showAlert(`❌ Incorrect! 正确答案: ${correctZh}`);
-        let reinsertPos = Math.floor(Math.random() * (part1Queue.length-1)) + 1;
-        part1Queue.splice(reinsertPos, 0, part1Queue[0]);
-        score = Math.max(score - 5, 0);
-      }
-      part1Queue.shift();
-      updateScoreBar();
-      setTimeout(showPart1, 1100);
-    }
-
-    function goToPart2() {
-      part = 2;
-      if (part1Timer) clearInterval(part1Timer);
-      part2Order = shuffle([...Array(vocab.length).keys()]);
-      part2QIndex = 0;
-      showBottomReward("reward3.gif");
-      showPart2();
-      startPart2Timer();
-    }
-
-    // =========== PART 2 ===========
-    function showPart2() {
-      if (totalSecs <= 0 || part2Secs <= 0) { endQuiz(); return; }
-      if (part2QIndex >= vocab.length) {
+      if (qIndex >= questions.length) {
         endQuiz();
         return;
       }
-      updateTimersBar();
-      let idx = part2Order[part2QIndex];
-      let word = vocab[idx].word;
-      let zh = vocab[idx].zh;
-      let correctDef = vocab[idx].def;
-      let choices = getFiveDefs(idx);
+      const q = questions[qIndex];
+
       gameContainer.innerHTML = `
         <div class="game-panel">
-          <div class="section-title">Part 2: English Word → Definition</div>
-          <div class="main-word">${word}</div>
-          <div class="word-def">${zh}</div>
+          <div class="section-title">Question ${qIndex+1} of ${questions.length}</div>
+          <div class="main-question">${q.text}</div>
           <div class="choices-row">
-            ${choices.map(def =>
-              `<button class="choice-btn" style="white-space:normal;" onclick="selectPart2('${correctDef.replace(/'/g, "\\'")}', '${def.replace(/'/g, "\\'")}', this)">${def}</button>`
+            ${q.choices.map((choice, i) =>
+              `<button class="choice-btn" onclick="selectChoice('${choice.replace(/'/g, "\\'")}', this)">${choice}</button>`
             ).join('')}
           </div>
-          <div class="question-counter">Remaining: ${vocab.length - part2QIndex}</div>
+          <div class="question-counter">Remaining: ${questions.length - qIndex - 1}</div>
         </div>
       `;
-      window.selectPart2 = selectPart2;
+      window.selectChoice = selectChoice;
     }
-    function selectPart2(correctDef, selectedDef, btn) {
+
+    function selectChoice(selected, btn) {
+      const q = questions[qIndex];
+      const correct = q.answer;
       let buttons = document.querySelectorAll('.choice-btn');
       buttons.forEach(b => b.disabled = true);
-      if (selectedDef === correctDef) {
+      if (selected === correct) {
         btn.classList.add("correct");
-        correctSound.play();
-        showTopLeftReward();
       } else {
         btn.classList.add("incorrect");
-        let correctBtn = Array.from(buttons).find(b => b.textContent === correctDef);
+        let correctBtn = Array.from(buttons).find(b => b.textContent === correct);
         if (correctBtn) correctBtn.classList.add("correct");
-        incorrectSound.play();
-        showAlert("❌ Incorrect! 正确答案: " + correctDef);
+        showAlert(`❌ Incorrect! The correct answer is: ${correct}\n${answerKey[qIndex]}`);
         score = Math.max(score - 5, 0);
       }
       updateScoreBar();
       setTimeout(() => {
-        part2QIndex++;
-        showPart2();
-      }, 1100);
+        qIndex++;
+        showQuestion();
+      }, 1600);
     }
 
     // =========== END QUIZ ===========
     function endQuiz() {
       if (mainTimer) clearInterval(mainTimer);
-      if (part1Timer) clearInterval(part1Timer);
-      if (part2Timer) clearInterval(part2Timer);
-      document.querySelector('.timers-bar')?.remove();
       gameContainer.innerHTML = `
         <div class="game-panel">
           <div class="score-final">Test Complete!</div>
@@ -506,25 +428,21 @@
           <button onclick="location.reload()">Restart Game</button>
         </div>
       `;
-      bottomReward.classList.add("hidden");
-      topLeftReward.style.display = 'none';
     }
+
     // =========== ALERT =============
     function showAlert(msg) {
       const div = document.createElement('div');
       div.className = 'alert';
+      div.style.whiteSpace = "pre-line";
       div.textContent = msg;
       document.querySelector('.game-panel').appendChild(div);
-      setTimeout(() => div.remove(), 1050);
+      setTimeout(() => div.remove(), 1500);
     }
-    function showBottomReward(src) {
-      bottomReward.src = src;
-      bottomReward.classList.remove("hidden");
-    }
-    function showTopLeftReward() {
-      topLeftReward.style.display = 'block';
-      setTimeout(() => { topLeftReward.style.display = 'none'; }, 1000);
-    }
+
+    // Initial UI update
+    updateGlobalTimer();
+    updateScoreBar();
   </script>
 </body>
 </html>
