@@ -73,7 +73,7 @@
       color: var(--text-main);
       font-weight: 600;
       margin: 10px 0 15px 0;
-      text-align: center;
+      text-align: left;
       letter-spacing: 0.01em;
     }
     .choices-row {
@@ -190,58 +190,97 @@
   <script>
     // ========== DATA ==========
     const questions = [
+      // Food
+      { text: "Although the recipe was complex, the chef managed to prepare the dish perfectly. If you follow the steps carefully, you can recreate it at home.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although fast food is convenient, it is often unhealthy. If you want to maintain a balanced diet, you should cook at home.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "B) To Persuade" },
+      { text: "Although the cake was burnt, the baker decided to serve it with a humorous story about kitchen mishaps.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "C) To Entertain" },
+      { text: "Although the ingredients were expensive, the chef insisted on using the best quality for the dish. If you want to taste the difference, try it yourself.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the restaurant was crowded, the waiter managed to serve everyone efficiently. If you visit during peak hours, expect a wait.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the food was delicious, the portion sizes were small. If you are very hungry, you might need to order extra.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the chef was tired, he continued to cook with passion. If you want to taste his creations, visit the restaurant.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "C) To Entertain" },
+      { text: "Although the recipe was simple, the flavors were complex and delightful. If you want to impress your guests, try this dish.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "B) To Persuade" },
+      { text: "Although the ingredients were unusual, the dish turned out to be a hit. If you are adventurous, give it a try.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "C) To Entertain" },
+      { text: "Although the restaurant was new, it quickly became popular. If you want to experience the hype, make a reservation.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      // Media
+      { text: "Although the movie received mixed reviews, it was a box office hit. If you enjoy action-packed films, you might like it.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the news report was brief, it covered the main points effectively. If you want to stay updated, watch the evening news.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the book was long, it kept readers engaged with its thrilling plot. If you love mysteries, this is a must-read.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "B) To Persuade" },
+      { text: "Although the TV show was canceled, fans continued to support it online. If you want to join the discussion, visit the fan forums.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the article was controversial, it sparked important conversations. If you want to understand different perspectives, read it.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "B) To Persuade" },
+      { text: "Although the podcast was new, it quickly gained a large following. If you enjoy true crime stories, give it a listen.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the documentary was sad, it highlighted important issues. If you want to learn more about the topic, watch it.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "B) To Persuade" },
+      { text: "Although the magazine was expensive, it was filled with high-quality content. If you want to treat yourself, buy a copy.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "B) To Persuade" },
+      { text: "Although the radio show was old-fashioned, it had a loyal audience. If you appreciate classic entertainment, tune in.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the blog was personal, it resonated with many readers. If you want to connect with the author, leave a comment.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      // Relationships
+      { text: "Although they argued often, they always made up quickly. If you want to maintain a healthy relationship, communication is key.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although she was shy, she decided to join the club to make new friends. If you want to expand your social circle, take a chance.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "B) To Persuade" },
+      { text: "Although he was nervous, he proposed to her in a romantic setting. If you want to hear the full story, ask them about it.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "C) To Entertain" },
+      { text: "Although they lived far apart, they stayed connected through video calls. If you want to keep in touch with loved ones, technology can help.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the friendship was new, they felt like they had known each other for years. If you want to experience this bond, be open to new connections.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "B) To Persuade" },
+      { text: "Although the breakup was tough, she focused on self-care and healing. If you are going through a similar situation, take time for yourself.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although he was busy, he always made time for his family. If you want to strengthen your relationships, prioritize quality time.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although they had different interests, they found common ground in their love for music. If you want to build strong relationships, find shared passions.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although she was heartbroken, she found solace in writing poetry. If you want to read her work, visit her blog.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "C) To Entertain" },
+      { text: "Although they were opposites, they complemented each other perfectly. If you want to understand their dynamic, spend time with them.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
       // Science
-      { text: "Although the experiment failed, the scientist learned valuable information. If the hypothesis is correct, the results will be groundbreaking.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "If the planet is in the habitable zone, it could support life. Although it is far away, scientists are excited about the discovery.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "Although the vaccine is new, it has shown promising results. If more people get vaccinated, the spread of the disease will decrease.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "If the theory is proven, it will change our understanding of physics. Although it is complex, many researchers are working on it.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "Although the robot malfunctioned, it provided useful data. If the engineers fix the issue, it will perform better in future tests.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      // Sports
-      { text: "Although the team lost, they played well. If they continue to improve, they will win the next match.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "If the athlete trains hard, they will break the record. Although it is challenging, they are determined to succeed.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "B) To Persuade" },
-      { text: "Although the weather was bad, the game continued. If the conditions worsen, it will be postponed.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "If the player scores, the team will advance to the finals. Although the pressure is high, they are focused.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "Although the coach is new, the team has adapted well. If they follow the strategy, they will perform better.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      // Work
-      { text: "Although the project is difficult, the team is making progress. If they meet the deadline, it will be a great achievement.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "If the employee works hard, they will get a promotion. Although the workload is heavy, they are motivated.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "B) To Persuade" },
-      { text: "Although the meeting was long, it was productive. If they implement the ideas, the company will benefit.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "If the proposal is accepted, it will bring new opportunities. Although it is risky, it has potential.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "Although the task is complex, the team is collaborating well. If they continue to communicate, they will succeed.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      // Culture
-      { text: "Although the festival was crowded, it was enjoyable. If you attend next year, you will have a great time.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "If the museum opens a new exhibit, it will attract more visitors. Although it is expensive, it is worth it.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "Although the concert was loud, the music was fantastic. If the band returns, many fans will attend.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "If the movie is released, it will be a hit. Although the production took years, it is highly anticipated.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
-      { text: "Although the play was long, the performance was captivating. If you watch it, you will be impressed.", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" }
+      { text: "Although the experiment was risky, it yielded groundbreaking results. If you want to learn more about the findings, read the research paper.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the theory was complex, the scientist explained it clearly. If you want to understand it better, attend the lecture.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the discovery was accidental, it changed the course of science. If you want to know the full story, watch the documentary.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "C) To Entertain" },
+      { text: "Although the data was inconclusive, the researchers continued their work. If you want to support their efforts, consider donating.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "B) To Persuade" },
+      { text: "Although the technology was new, it showed great promise. If you want to see it in action, visit the lab.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the hypothesis was controversial, it sparked important debates. If you want to join the discussion, attend the conference.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "B) To Persuade" },
+      { text: "Although the scientist faced many challenges, she persevered. If you want to hear her inspiring story, read her autobiography.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "C) To Entertain" },
+      { text: "Although the results were unexpected, they opened new avenues for research. If you want to explore these possibilities, read the journal article.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the experiment failed, it provided valuable insights. If you want to learn from the mistakes, review the study.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "A) To Inform" },
+      { text: "Although the project was ambitious, it achieved remarkable success. If you want to be part of the next phase, apply to join the team.<br>What is the author's purpose?", choices: ["A) To Inform", "B) To Persuade", "C) To Entertain"], answer: "B) To Persuade" }
     ];
 
-    // Explanations for feedback
     const answerKey = [
+      // Food
+      "The paragraph describes a real situation with factual details about preparing a dish.",
+      "The author is trying to convince the reader to cook at home for a balanced diet.",
+      "The story about the burnt cake is humorous and meant to entertain.",
+      "The paragraph explains the importance of using quality ingredients.",
+      "The paragraph describes the efficiency of the waiter in a crowded restaurant.",
+      "The paragraph explains the portion sizes and what to expect.",
+      "The paragraph describes the chef's passion in a dramatic way.",
+      "The author is trying to convince the reader to try the recipe.",
+      "The paragraph describes an adventurous dish in a playful way.",
+      "The paragraph explains the popularity of the new restaurant.",
+      // Media
+      "The paragraph describes the movie's box office success and reviews.",
+      "The paragraph explains the effectiveness of the news report.",
+      "The author is trying to convince the reader to read the mystery book.",
+      "The paragraph describes the continued support for the canceled TV show.",
+      "The author is trying to convince the reader to read the controversial article.",
+      "The paragraph explains the popularity of the new podcast.",
+      "The author is trying to convince the reader to watch the documentary.",
+      "The author is trying to convince the reader to buy the magazine.",
+      "The paragraph describes the loyal audience of the radio show.",
+      "The paragraph explains the personal connection of the blog.",
+      // Relationships
+      "The paragraph describes the importance of communication in a relationship.",
+      "The author is trying to convince the reader to join a club to make friends.",
+      "The paragraph describes a romantic proposal in a dramatic way.",
+      "The paragraph explains how technology helps maintain long-distance relationships.",
+      "The author is trying to convince the reader to be open to new connections.",
+      "The paragraph describes the importance of self-care after a breakup.",
+      "The paragraph explains the importance of prioritizing family time.",
+      "The paragraph describes how shared passions strengthen relationships.",
+      "The paragraph describes finding solace in writing poetry.",
+      "The paragraph explains the complementary dynamic of opposites in a relationship.",
       // Science
-      "The paragraph describes a scientific experiment and its outcomes, aiming to inform the reader.",
-      "The passage explains the conditions for a planet to support life, providing factual information.",
-      "This sentence explains the benefits of a new vaccine and its impact on disease spread.",
-      "The paragraph describes a scientific theory and the efforts to prove it, aiming to inform.",
-      "This passage explains the malfunction of a robot and the potential improvements, providing information.",
-      // Sports
-      "The paragraph describes a sports team's performance and future prospects, aiming to inform.",
-      "The passage encourages the athlete to train hard by highlighting the potential reward.",
-      "This sentence explains the continuation of a game despite bad weather, providing information.",
-      "The paragraph describes the conditions for a team's advancement in a tournament, aiming to inform.",
-      "This passage explains the adaptation of a team to a new coach and the potential benefits.",
-      // Work
-      "The paragraph describes the progress of a difficult project and the potential achievement, aiming to inform.",
-      "The passage encourages the employee to work hard by highlighting the potential reward.",
-      "This sentence explains the productivity of a long meeting and its potential benefits.",
-      "The paragraph describes the potential opportunities from a proposal, aiming to inform.",
-      "This passage explains the collaboration of a team on a complex task and the potential success.",
-      // Culture
-      "The paragraph describes the enjoyment of a crowded festival and the potential experience next year.",
-      "The passage explains the potential attraction of a new museum exhibit, providing information.",
-      "This sentence explains the enjoyment of a loud concert and the potential return of the band.",
-      "The paragraph describes the potential success of a movie release and its anticipation.",
-      "This passage explains the captivating performance of a long play and the potential impression."
+      "The paragraph describes the groundbreaking results of a risky experiment.",
+      "The paragraph explains the theory and encourages attending the lecture.",
+      "The paragraph describes an accidental discovery in a dramatic way.",
+      "The author is trying to convince the reader to support the researchers.",
+      "The paragraph explains the promise of new technology.",
+      "The author is trying to convince the reader to join the debate.",
+      "The paragraph describes the scientist's perseverance in an inspiring way.",
+      "The paragraph explains the unexpected results and new research avenues.",
+      "The paragraph describes the valuable insights from a failed experiment.",
+      "The author is trying to convince the reader to join the successful project."
     ];
 
     // =========== STATE ===========
@@ -356,12 +395,16 @@
 
     // =========== ALERT =============
     function showAlert(msg) {
+      const panel = document.querySelector('.game-panel');
+      // Remove any previous alert
+      let prev = panel.querySelector('.alert');
+      if (prev) prev.remove();
       const div = document.createElement('div');
       div.className = 'alert';
       div.style.whiteSpace = "pre-line";
       div.textContent = msg;
-      document.querySelector('.game-panel').appendChild(div);
-      setTimeout(() => div.remove(), 1500);
+      panel.appendChild(div);
+      // Feedback stays until next question appears (no timeout)
     }
 
     // Initial UI update
