@@ -1,1 +1,79 @@
+!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Tense Verb Story</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .story {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #3e8e41;
+        }
+    </style>
+</head>
+<body>
 
+    <h1>Story Time!</h1>
+    <div id="story"></div>
+    <input type="text" id="verb-input" placeholder="Enter a past tense 
+verb (e.g. ran, jumped, ate)">
+
+    <button class="button" onclick="generateNextSentence()">Next</button>
+
+    <script>
+        let story = [
+            'Leo and Elsa were walking in the park.',
+            'They saw a group of children playing soccer.',
+            'The children were laughing and having fun.',
+            'But then they heard a loud noise behind them.',
+            'They turned around to see a big dog running towards them.',
+            // ... add more sentences here ...
+        ];
+
+        let currentSentenceIndex = 0;
+
+        function generateNextSentence() {
+            const verbInputValue = 
+document.getElementById('verb-input').value;
+            if (verbInputValue) {
+                const verb = verbInputValue + 'ed';
+                story[currentSentenceIndex] += ' They ' + verb + ' to the 
+park. ';
+                currentSentenceIndex++;
+                document.getElementById('story').innerHTML = '';
+                displayStory();
+            }
+        }
+
+        function displayStory() {
+            for (let i = 0; i < Math.min(currentSentenceIndex, 
+story.length); i++) {
+                const sentenceDiv = document.createElement('div');
+                sentenceDiv.classList.add('story');
+                sentenceDiv.innerHTML = story[i];
+                document.getElementById('story').appendChild(sentenceDiv);
+            }
+        }
+
+        displayStory();
+    </script>
+
+</body>
+</html>
