@@ -60,11 +60,12 @@
         ];
 
         let currentSentenceIndex = 0;
-        let userAnswer;
+        let userName;
 
         function startGame() {
-            const userName = document.getElementById('name').value;
-            if (userName) {
+            const nameInput = document.getElementById('name');
+            if (nameInput.value) {
+                userName = nameInput.value;
                 displayStoryContainer();
                 updateVerbOptions();
             } else {
@@ -73,13 +74,20 @@
         }
 
         function generateNextSentence() {
-            if (userAnswer && userAnswer.value === verbOptions.find(option 
-=> option.text === story[currentSentenceIndex].split(' ').pop()).value) {
-                currentSentenceIndex++;
-                displayStoryContainer();
-            } else if (currentSentenceIndex < 50) {
-                displayStoryContainer();
-                updateVerbOptions();
+            if (currentSentenceIndex < 50) {
+                const choicesElement = 
+document.querySelector('.choices-element');
+                if (choicesElement.style.display === 'block') {
+                    choicesElement.style.display = 'none';
+                } else {
+                    const dangerButton = 
+document.querySelector('.danger-button');
+                    if (dangerButton.style.display !== 'none') {
+                        dangerButton.style.display = 'none';
+                    }
+                }
+
+                generateNextSentenceLogic();
             }
         }
 
@@ -128,23 +136,6 @@ option.text === 'ran').value;
             }
         }
 
-        function displayChoices() {
-            const choicesElement = document.createElement('div');
-            choicesElement.classList.add('choices-element');
-            for (const option of verbOptions) {
-                const buttonElement = document.createElement('button');
-                buttonElement.classList.add('choices-button');
-                buttonElement.innerHTML = `<p>${option.text}</p>`;
-                choicesElement.appendChild(buttonElement);
-            }
-
-            choicesElement.style.display = 'block';
-
-            storyElement.appendChild(choicesElement);
-
-            choicesButton.style.display = 'none';
-        }
-
         function updateVerbOptions() {
             const verbButtonElements = 
 document.querySelectorAll('.button');
@@ -153,6 +144,69 @@ document.querySelectorAll('.button');
                 button.addEventListener('click', () => {
                     userAnswer = button;
                 });
+            }
+        }
+
+        function generateNextSentenceLogic() {
+            if (currentSentenceIndex < 30) {
+                const randomChoice = Math.floor(Math.random() * 
+verbOptions.length);
+                let choiceText;
+                switch (randomChoice) {
+                    case 0:
+                        choiceText = verbOptions[randomChoice].text;
+                        break;
+                    case 1:
+                        choiceText = verbOptions[randomChoice].text;
+                        break;
+                    case 2:
+                        choiceText = verbOptions[randomChoice].text;
+                        break;
+                }
+
+                userAnswer.value = choiceText;
+
+                if (currentSentenceIndex === 29) {
+                    generateFinalSentence();
+                } else {
+                    const nextButton = document.createElement('button');
+                    nextButton.classList.add('next-button');
+                    nextButton.innerHTML = `You ${choiceText} to the 
+forest.`;
+                    storyElement.appendChild(nextButton);
+
+                    nextButton.addEventListener('click', () => {
+                        currentSentenceIndex++;
+                        generateNextSentenceLogic();
+                    });
+                }
+            } else if (currentSentenceIndex === 30) {
+                const dangerButton = 
+document.querySelector('.danger-button');
+                if (dangerButton.style.display !== 'none') {
+                    dangerButton.style.display = 'block';
+                }
+
+                if (userAnswer.value === verbOptions.find(option => 
+option.text === 'ran').value) {
+                    userAnswer.value = verbOptions.find(option => 
+option.text === 'jumped').value;
+                } else {
+                    generateFinalSentence();
+                }
+            }
+        }
+
+        function generateFinalSentence() {
+            const finalSentenceDiv = document.createElement('div');
+            finalSentenceDiv.classList.add('final-sentence');
+            finalSentenceDiv.innerHTML = `They ${userAnswer.value} over 
+the mountain and found a hidden cave.`;
+            storyElement.appendChild(finalSentenceDiv);
+
+            if (currentSentenceIndex === 49) {
+                alert(`Congratulations! You have completed the adventure 
+story.`);
             }
         }
 
