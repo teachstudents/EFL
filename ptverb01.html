@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Past Tense Verb Adventure</title>
+    <title>Past Tense Verb Adventure - Enhanced!</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
-            background-color: #f0f8ff;
+            background-color: #e6f7ff;
             margin: 0;
             padding: 20px;
+            color: #333;
         }
         #game-container {
             background-color: white;
             max-width: 90%;
-            margin: 0 auto;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            min-width: 300px; /* Ensure a minimum width for better layout */
+            margin: 20px auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
         }
         #start-screen, #game-screen, #end-screen {
             display: none;
@@ -26,36 +28,99 @@
         .active-screen {
             display: block;
         }
-        input {
-            padding: 10px;
-            margin: 10px;
-            width: 80%;
-            max-width: 250px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+        input[type="text"] {
+            padding: 12px;
+            margin: 15px 0;
+            width: calc(80% - 24px); /* Adjust for padding */
+            max-width: 300px;
+            border-radius: 6px;
+            border: 1px solid #b0c4de;
+            font-size: 16px;
         }
         button {
-            padding: 12px;
+            padding: 12px 18px;
             font-size: 16px;
-            border-radius: 5px;
+            border-radius: 6px;
             border: none;
-            background-color: #4CAF50;
+            background-color: #007bff; /* Primary button color */
             color: white;
             cursor: pointer;
             margin: 10px 5px;
-            width: 80%;
-            max-width: 200px;
+            min-width: 150px;
+            transition: background-color 0.3s ease;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #0056b3; /* Darker shade on hover */
         }
-        #score {
+        button.option-btn {
+            background-color: #6c757d; /* Option button color */
+            width: auto; /* Adjust width based on content */
+            max-width: 180px;
+        }
+        button.option-btn:hover {
+            background-color: #5a6268;
+        }
+        button.correct {
+            background-color: #28a745 !important; /* Green for correct */
+            color: white !important;
+        }
+        button.incorrect {
+            background-color: #dc3545 !important; /* Red for incorrect */
+            color: white !important;
+        }
+        button.show-correct {
+            border: 2px solid #28a745; /* Highlight correct answer if user was wrong */
+            background-color: #e6ffe6;
+            color: #28a745;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #score-area {
             font-size: 20px;
             margin: 15px;
+            color: #0056b3;
         }
         #story-text {
-            margin: 20px;
+            margin: 25px 0;
+            font-size: 19px;
+            line-height: 1.6;
+            color: #555;
+        }
+        #options-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+            justify-content: center; /* Center buttons */
+            gap: 10px; /* Spacing between buttons */
+        }
+        #feedback-area {
+            margin: 20px 0;
             font-size: 18px;
+            font-weight: bold;
+            min-height: 25px; /* Reserve space for feedback */
+        }
+        .feedback-correct {
+            color: #28a745;
+        }
+        .feedback-incorrect {
+            color: #dc3545;
+        }
+        #progress-indicator {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        #next-question-btn {
+            background-color: #ffc107; /* Yellow for next */
+            color: #333;
+        }
+        #next-question-btn:hover {
+            background-color: #e0a800;
+        }
+        h1, h2 {
+            color: #0056b3;
         }
     </style>
 </head>
@@ -63,141 +128,233 @@
     <div id="game-container">
         <div id="start-screen" class="active-screen">
             <h1>Past Tense Verb Adventure</h1>
-            <p>Enter your name to start the game:</p>
+            <p>Enter your name to start the adventure:</p>
             <input type="text" id="user-name" placeholder="Your Name">
             <button onclick="startGame()">Start Game</button>
         </div>
 
         <div id="game-screen">
             <h2 id="welcome-message"></h2>
-            <div id="score">Score: <span id="current-score">0</span></div>
+            <div id="score-area">Score: <span id="current-score">0</span></div>
+            <div id="progress-indicator"></div>
             <p id="story-text">Story will appear here.</p>
-            <div id="options">
-                <!-- Options will be dynamically inserted here -->
-            </div>
+            <div id="feedback-area"></div>
+            <div id="options-container">
+                </div>
+            <button id="next-question-btn" onclick="proceedToNextStory()" style="display: none;">Next Question</button>
         </div>
 
         <div id="end-screen">
             <h2>Game Over!</h2>
             <p id="final-score"></p>
+            <p id="final-feedback"></p>
             <button onclick="restartGame()">Restart Game</button>
         </div>
     </div>
 
     <script>
-const stories = [
-    { text: "Leo woke up early in the morning and decided to ______ for a run.", verb: "go", pastOptions: ["went", "gone", "going"], correctPast: "went" },
-    { text: "After his run, he ______ a big breakfast to refuel.", verb: "eat", pastOptions: ["ate", "eaten", "eating"], correctPast: "ate" },
-    { text: "He ______ his favorite book while drinking his morning coffee.", verb: "read", pastOptions: ["read", "reading", "red"], correctPast: "read" },
-    { text: "He ______ his dog for a walk in the park.", verb: "take", pastOptions: ["took", "taken", "taking"], correctPast: "took" },
-    { text: "They ______ a movie last night that was really exciting.", verb: "watch", pastOptions: ["watched", "watching", "watches"], correctPast: "watched" },
-    { text: "She ______ a beautiful song at the concert.", verb: "sing", pastOptions: ["sang", "sung", "singing"], correctPast: "sang" },
-    { text: "He ______ his homework before going out to play.", verb: "do", pastOptions: ["did", "done", "doing"], correctPast: "did" },
-    { text: "We ______ a fantastic time at the beach yesterday.", verb: "have", pastOptions: ["had", "having", "has"], correctPast: "had" },
-    { text: "The cat ______ all the milk from the bowl.", verb: "drink", pastOptions: ["drank", "drunk", "drinking"], correctPast: "drank" },
-    { text: "They ______ a new car last month.", verb: "buy", pastOptions: ["bought", "buying", "buys"], correctPast: "bought" },
-    { text: "He ______ to the store to get some groceries.", verb: "drive", pastOptions: ["drove", "driven", "driving"], correctPast: "drove" },
-    { text: "She ______ a letter to her friend yesterday.", verb: "write", pastOptions: ["wrote", "written", "writing"], correctPast: "wrote" },
-    { text: "They ______ to the mountains for their vacation.", verb: "travel", pastOptions: ["traveled", "traveling", "travels"], correctPast: "traveled" },
-    { text: "He ______ his keys on the table.", verb: "leave", pastOptions: ["left", "leaving", "leaves"], correctPast: "left" },
-    { text: "We ______ a delicious pizza for dinner.", verb: "make", pastOptions: ["made", "making", "makes"], correctPast: "made" },
-    { text: "She ______ a beautiful dress for the party.", verb: "wear", pastOptions: ["wore", "wearing", "wears"], correctPast: "wore" },
-    { text: "They ______ a new house last year.", verb: "build", pastOptions: ["built", "building", "builds"], correctPast: "built" },
-    { text: "He ______ his bicycle to the park.", verb: "ride", pastOptions: ["rode", "riding", "rides"], correctPast: "rode" },
-    { text: "She ______ a picture of the beautiful sunset.", verb: "take", pastOptions: ["took", "taking", "takes"], correctPast: "took" },
-    { text: "We ______ a great time at the party last night.", verb: "have", pastOptions: ["had", "having", "has"], correctPast: "had" },
-    { text: "He ______ his homework before dinner.", verb: "finish", pastOptions: ["finished", "finishing", "finishes"], correctPast: "finished" },
-    { text: "They ______ to the concert and enjoyed the music.", verb: "go", pastOptions: ["went", "gone", "going"], correctPast: "went" },
-    { text: "She ______ a cake for her friend's birthday.", verb: "bake", pastOptions: ["baked", "baking", "bakes"], correctPast: "baked" },
-    { text: "He ______ his room before his parents came home.", verb: "clean", pastOptions: ["cleaned", "cleaning", "cleans"], correctPast: "cleaned" },
-    { text: "We ______ a fantastic movie at the cinema.", verb: "see", pastOptions: ["saw", "seen", "seeing"], correctPast: "saw" },
-    { text: "She ______ a new language for her trip abroad.", verb: "learn", pastOptions: ["learned", "learning", "learns"], correctPast: "learned" },
-    { text: "They ______ a lot of money on their vacation.", verb: "spend", pastOptions: ["spent", "spending", "spends"], correctPast: "spent" },
-    { text: "He ______ his friend at the coffee shop.", verb: "meet", pastOptions: ["met", "meeting", "meets"], correctPast: "met" },
-    { text: "She ______ a beautiful painting at the art gallery.", verb: "see", pastOptions: ["saw", "seen", "seeing"], correctPast: "saw" },
-    { text: "We ______ a great time at the amusement park.", verb: "have", pastOptions: ["had", "having", "has"], correctPast: "had" },
-    { text: "He ______ his phone at home and had to go back.", verb: "forget", pastOptions: ["forgot", "forgetting", "forgets"], correctPast: "forgot" },
-    { text: "They ______ a new restaurant in town and loved the food.", verb: "try", pastOptions: ["tried", "trying", "tries"], correctPast: "tried" },
-    { text: "She ______ a beautiful flower in the garden.", verb: "see", pastOptions: ["saw", "seen", "seeing"], correctPast: "saw" },
-    { text: "He ______ his best to finish the project on time.", verb: "do", pastOptions: ["did", "done", "doing"], correctPast: "did" },
-    { text: "We ______ a wonderful time at the family reunion.", verb: "have", pastOptions: ["had", "having", "has"], correctPast: "had" },
-    { text: "She ______ a delicious meal for her family.", verb: "cook", pastOptions: ["cooked", "cooking", "cooks"], correctPast: "cooked" },
-    { text: "They ______ a new game and played it all day.", verb: "get", pastOptions: ["got", "getting", "gets"], correctPast: "got" },
-    { text: "He ______ his sister with her homework.", verb: "help", pastOptions: ["helped", "helping", "helps"], correctPast: "helped" },
-    { text: "She ______ a beautiful song on the piano.", verb: "play", pastOptions: ["played", "playing", "plays"], correctPast: "played" },
-    { text: "We ______ a fantastic time at the music festival.", verb: "have", pastOptions: ["had", "having", "has"], correctPast: "had" },
-    { text: "He ______ his friend a funny joke.", verb: "tell", pastOptions: ["told", "telling", "tells"], correctPast: "told" },
-    { text: "They ______ a new TV show and binge-watched it all weekend.", verb: "find", pastOptions: ["found", "finding", "finds"], correctPast: "found" },
-    { text: "She ______ a beautiful dress for the special occasion.", verb: "choose", pastOptions: ["chose", "choosing", "chooses"], correctPast: "chose" },
-    { text: "He ______ his best friend at the mall.", verb: "meet", pastOptions: ["met", "meeting", "meets"], correctPast: "met" },
-    { text: "We ______ a great time at the beach and enjoyed the sun.", verb: "have", pastOptions: ["had", "having", "has"], correctPast: "had" },
-    { text: "She ______ a beautiful picture of the sunset.", verb: "take", pastOptions: ["took", "taking", "takes"], correctPast: "took" },
-    { text: "They ______ a new board game and played it with friends.", verb: "buy", pastOptions: ["bought", "buying", "buys"], correctPast: "bought" },
-    { text: "He ______ his homework and then went to bed.", verb: "finish", pastOptions: ["finished", "finishing", "finishes"], correctPast: "finished" },
-    { text: "She ______ a beautiful song at the talent show.", verb: "sing", pastOptions: ["sang", "sung", "singing"], correctPast: "sang" },
-    { text: "We ______ a fantastic time at the party and danced all night.", verb: "have", pastOptions: ["had", "having", "has"], correctPast: "had" },
-    { text: "He ______ his friend a gift for her birthday.", verb: "give", pastOptions: ["gave", "giving", "gives"], correctPast: "gave" },
-    { text: "They ______ a new recipe and cooked a delicious meal.", verb: "try", pastOptions: ["tried", "trying", "tries"], correctPast: "tried" },
-    { text: "She ______ a beautiful painting at the art exhibition.", verb: "see", pastOptions: ["saw", "seen", "seeing"], correctPast: "saw" },
-    { text: "He ______ his best to win the competition.", verb: "do", pastOptions: ["did", "done", "doing"], correctPast: "did" },
-    { text: "We ______ a wonderful time at the family gathering.", verb: "have", pastOptions: ["had", "having", "has"], correctPast: "had" },
-    { text: "She ______ a delicious cake for the party.", verb: "bake", pastOptions: ["baked", "baking", "bakes"], correctPast: "baked" },
-    { text: "They ______ a new video game and played it all day.", verb: "get", pastOptions: ["got", "getting", "gets"], correctPast: "got" }
-];
+    const stories = [
+        { text: "Leo woke up early and decided to ______ for a run.", verb: "go", pastOptions: ["went", "gone", "going"], correctPast: "went" },
+        { text: "After his run, he ______ a big breakfast.", verb: "eat", pastOptions: ["ate", "eaten", "eating"], correctPast: "ate" },
+        { text: "He ______ his favorite book while drinking coffee.", verb: "read", pastOptions: ["read", "reading", "red"], correctPast: "read" }, // Note: "read" (past) is pronounced "red"
+        { text: "He ______ his dog for a walk in the park.", verb: "take", pastOptions: ["took", "taken", "taking"], correctPast: "took" },
+        { text: "They ______ a movie last night that was exciting.", verb: "watch", pastOptions: ["watched", "watching", "watches"], correctPast: "watched" },
+        { text: "She ______ a beautiful song at the concert.", verb: "sing", pastOptions: ["sang", "sung", "singing"], correctPast: "sang" },
+        { text: "He ______ his homework before going out.", verb: "do", pastOptions: ["did", "done", "doing"], correctPast: "did" },
+        { text: "We ______ a fantastic time at the beach yesterday.", verb: "have", pastOptions: ["had", "having", "has"], correctPast: "had" },
+        { text: "The cat ______ all the milk from the bowl.", verb: "drink", pastOptions: ["drank", "drunk", "drinking"], correctPast: "drank" },
+        { text: "They ______ a new car last month.", verb: "buy", pastOptions: ["bought", "buying", "buys"], correctPast: "bought" },
+        { text: "He ______ to the store to get some groceries.", verb: "drive", pastOptions: ["drove", "driven", "driving"], correctPast: "drove" },
+        { text: "She ______ a letter to her friend yesterday.", verb: "write", pastOptions: ["wrote", "written", "writing"], correctPast: "wrote" },
+        { text: "They ______ to the mountains for their vacation.", verb: "travel", pastOptions: ["traveled", "traveling", "travels"], correctPast: "traveled" },
+        { text: "He ______ his keys on the table.", verb: "leave", pastOptions: ["left", "leaving", "leaves"], correctPast: "left" },
+        { text: "We ______ a delicious pizza for dinner.", verb: "make", pastOptions: ["made", "making", "makes"], correctPast: "made" },
+        { text: "She ______ a beautiful dress for the party.", verb: "wear", pastOptions: ["wore", "wearing", "wears"], correctPast: "wore" },
+        { text: "They ______ a new house last year.", verb: "build", pastOptions: ["built", "building", "builds"], correctPast: "built" },
+        { text: "He ______ his bicycle to the park.", verb: "ride", pastOptions: ["rode", "riding", "rides"], correctPast: "rode" },
+        // { text: "She ______ a picture of the beautiful sunset.", verb: "take", pastOptions: ["took", "taking", "takes"], correctPast: "took" }, // Duplicate verb, varied sentence
+        { text: "The artist ______ a stunning portrait of the sunset.", verb: "paint", pastOptions: ["painted", "painting", "paints"], correctPast: "painted" },
+        { text: "We ______ a great time at the party last night.", verb: "have", pastOptions: ["had", "having", "has"], correctPast: "had" },
+        { text: "He ______ his homework before dinner.", verb: "finish", pastOptions: ["finished", "finishing", "finishes"], correctPast: "finished" },
+        { text: "They ______ to the concert and enjoyed the music.", verb: "go", pastOptions: ["went", "gone", "going"], correctPast: "went" },
+        { text: "She ______ a cake for her friend's birthday.", verb: "bake", pastOptions: ["baked", "baking", "bakes"], correctPast: "baked" },
+        { text: "He ______ his room before his parents came home.", verb: "clean", pastOptions: ["cleaned", "cleaning", "cleans"], correctPast: "cleaned" },
+        { text: "We ______ a fantastic movie at the cinema.", verb: "see", pastOptions: ["saw", "seen", "seeing"], correctPast: "saw" },
+        { text: "She ______ a new language for her trip abroad.", verb: "learn", pastOptions: ["learned", "learning", "learns"], correctPast: "learned" },
+        { text: "They ______ a lot of money on their vacation.", verb: "spend", pastOptions: ["spent", "spending", "spends"], correctPast: "spent" },
+        { text: "He ______ his friend at the coffee shop.", verb: "meet", pastOptions: ["met", "meeting", "meets"], correctPast: "met" },
+        // { text: "She ______ a beautiful painting at the art gallery.", verb: "see", pastOptions: ["saw", "seen", "seeing"], correctPast: "saw" }, // Duplicate verb
+        { text: "The children ______ happily in the garden.", verb: "play", pastOptions: ["played", "playing", "plays"], correctPast: "played" },
+        { text: "He ______ his phone at home and had to go back.", verb: "forget", pastOptions: ["forgot", "forgetting", "forgets"], correctPast: "forgot" },
+        { text: "They ______ a new restaurant in town and loved the food.", verb: "try", pastOptions: ["tried", "trying", "tries"], correctPast: "tried" },
+        { text: "The sun ______ brightly all day long.", verb: "shine", pastOptions: ["shone", "shined", "shining"], correctPast: "shone" }, // 'shined' is also acceptable but 'shone' is common
+        { text: "He ______ his best to finish the project on time.", verb: "do", pastOptions: ["did", "done", "doing"], correctPast: "did" },
+        { text: "She ______ a delicious meal for her family.", verb: "cook", pastOptions: ["cooked", "cooking", "cooks"], correctPast: "cooked" },
+        { text: "They ______ a new game and played it all day.", verb: "get", pastOptions: ["got", "getting", "gets"], correctPast: "got" },
+        { text: "He ______ his sister with her homework.", verb: "help", pastOptions: ["helped", "helping", "helps"], correctPast: "helped" },
+        // { text: "She ______ a beautiful song on the piano.", verb: "play", pastOptions: ["played", "playing", "plays"], correctPast: "played" }, // Duplicate
+        { text: "The bird ______ a sweet melody from the treetop.", verb: "sing", pastOptions: ["sang", "sung", "singing"], correctPast: "sang" },
+        { text: "He ______ his friend a funny joke.", verb: "tell", pastOptions: ["told", "telling", "tells"], correctPast: "told" },
+        { text: "They ______ a new TV show and binge-watched it.", verb: "find", pastOptions: ["found", "finding", "finds"], correctPast: "found" },
+        { text: "She ______ a beautiful dress for the occasion.", verb: "choose", pastOptions: ["chose", "choosing", "chooses"], correctPast: "chose" },
+        { text: "The teacher ______ the lesson clearly.", verb: "explain", pastOptions: ["explained", "explaining", "explains"], correctPast: "explained" },
+        { text: "She ______ a glass of water because she was thirsty.", verb: "drink", pastOptions: ["drank", "drunk", "drinking"], correctPast: "drank" },
+        { text: "They ______ a sandcastle on the beach.", verb: "build", pastOptions: ["built", "building", "builds"], correctPast: "built" },
+        { text: "He ______ the ball very far.", verb: "throw", pastOptions: ["threw", "thrown", "throwing"], correctPast: "threw" },
+        { text: "She ______ a prize in the competition.", verb: "win", pastOptions: ["won", "winning", "wins"], correctPast: "won" },
+        { text: "The flowers ______ beautifully in the spring.", verb: "bloom", pastOptions: ["bloomed", "blooming", "blooms"], correctPast: "bloomed" },
+        { text: "He ______ over the fence to get the ball.", verb: "jump", pastOptions: ["jumped", "jumping", "jumps"], correctPast: "jumped" },
+        { text: "She ______ the door quietly.", verb: "close", pastOptions: ["closed", "closing", "closes"], correctPast: "closed" },
+        { text: "They ______ for the bus for a long time.", verb: "wait", pastOptions: ["waited", "waiting", "waits"], correctPast: "waited" },
+        { text: "He ______ up the stairs quickly.", verb: "run", pastOptions: ["ran", "run", "running"], correctPast: "ran" }
+    ];
 
-let userName = \"\";
-let currentScore = 0;
-let currentStoryIndex = 0;
+    let userName = "";
+    let currentScore = 0;
+    let questionsAnswered = 0; // Use this to track progress through shuffled list
+    let shuffledStories = [];
+    let totalQuestions = 0;
 
-function startGame() {
-    userName = document.getElementById('user-name').value || \"Player\";
-    document.getElementById('welcome-message').textContent = `Welcome, ${userName}!`;
-    document.getElementById('start-screen').classList.remove('active-screen');
-    document.getElementById('game-screen').classList.add('active-screen');
-    loadNewStory();
-}
+    const startScreen = document.getElementById('start-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const endScreen = document.getElementById('end-screen');
+    const userNameInput = document.getElementById('user-name');
+    const welcomeMessage = document.getElementById('welcome-message');
+    const currentScoreDisplay = document.getElementById('current-score');
+    const storyTextElement = document.getElementById('story-text');
+    const optionsContainer = document.getElementById('options-container');
+    const feedbackArea = document.getElementById('feedback-area');
+    const finalScoreDisplay = document.getElementById('final-score');
+    const finalFeedbackDisplay = document.getElementById('final-feedback');
+    const nextQuestionBtn = document.getElementById('next-question-btn');
+    const progressIndicator = document.getElementById('progress-indicator');
 
-function loadNewStory() {
-    if (currentStoryIndex >= stories.length) {
-        endGame();
-        return;
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+        }
     }
 
-    const story = stories[currentStoryIndex];
-    document.getElementById('story-text').textContent = story.text;
-    document.getElementById('options').innerHTML = '';
+    function startGame() {
+        userName = userNameInput.value.trim() || "Player";
+        welcomeMessage.textContent = `Good luck, ${userName}!`;
+        
+        currentScore = 0;
+        questionsAnswered = 0;
+        currentScoreDisplay.textContent = currentScore;
 
-    story.pastOptions.forEach(option => {
-        const button = document.createElement('button');
-        button.textContent = option;
-        button.onclick = () => checkAnswer(option, story.correctPast);
-        document.getElementById('options').appendChild(button);
-    });
-}
+        shuffledStories = [...stories]; // Create a copy to shuffle
+        shuffleArray(shuffledStories);
+        totalQuestions = shuffledStories.length; // Or set a fixed number like 10 for a shorter game
 
-function checkAnswer(selectedOption, correctPast) {
-    if (selectedOption === correctPast) {
-        currentScore++;
-        document.getElementById('current-score').textContent = currentScore;
+        startScreen.classList.remove('active-screen');
+        gameScreen.classList.add('active-screen');
+        endScreen.classList.remove('active-screen');
+        
+        feedbackArea.textContent = "";
+        nextQuestionBtn.style.display = "none";
+        
+        loadNewStory();
     }
 
-    currentStoryIndex++;
-    loadNewStory();
-}
+    function loadNewStory() {
+        if (questionsAnswered >= totalQuestions) {
+            endGame();
+            return;
+        }
 
-function endGame() {
-    document.getElementById('game-screen').classList.remove('active-screen');
-    document.getElementById('end-screen').classList.add('active-screen');
-    document.getElementById('final-score').textContent = `${userName}, your final score is ${currentScore}!`;
-}
+        const story = shuffledStories[questionsAnswered];
+        storyTextElement.textContent = story.text;
+        optionsContainer.innerHTML = ''; // Clear previous options
+        feedbackArea.textContent = "";
+        feedbackArea.className = 'feedback-area'; // Reset feedback class
+        nextQuestionBtn.style.display = "none";
+        progressIndicator.textContent = `Question ${questionsAnswered + 1} of ${totalQuestions}`;
 
-function restartGame() {
-    currentScore = 0;
-    currentStoryIndex = 0;
-    document.getElementById('current-score').textContent = currentScore;
-    document.getElementById('end-screen').classList.remove('active-screen');
+        // Shuffle options for more variety, though not strictly necessary for past tense
+        const displayOptions = [...story.pastOptions];
+        shuffleArray(displayOptions); // Optional: shuffle the order of answer buttons
+
+        displayOptions.forEach(option => {
+            const button = document.createElement('button');
+            button.textContent = option;
+            button.classList.add('option-btn');
+            button.onclick = () => checkAnswer(option, story.correctPast, button);
+            optionsContainer.appendChild(button);
+        });
+    }
+
+    function checkAnswer(selectedOption, correctPast, clickedButton) {
+        // Disable all option buttons after an answer
+        const optionButtons = optionsContainer.getElementsByTagName('button');
+        for (let btn of optionButtons) {
+            btn.disabled = true;
+        }
+
+        if (selectedOption === correctPast) {
+            currentScore++;
+            currentScoreDisplay.textContent = currentScore;
+            feedbackArea.textContent = "Correct!";
+            feedbackArea.className = 'feedback-correct';
+            clickedButton.classList.add('correct');
+        } else {
+            feedbackArea.textContent = `Not quite! The correct answer was "${correctPast}".`;
+            feedbackArea.className = 'feedback-incorrect';
+            clickedButton.classList.add('incorrect');
+            // Highlight the correct button
+            for (let btn of optionButtons) {
+                if (btn.textContent === correctPast) {
+                    btn.classList.add('show-correct'); // Could also use 'correct' if preferred
+                }
+            }
+        }
+        
+        questionsAnswered++;
+        nextQuestionBtn.style.display = "inline-block"; // Show next question button
+    }
+
+    function proceedToNextStory() {
+        loadNewStory();
+    }
+
+    function endGame() {
+        gameScreen.classList.remove('active-screen');
+        endScreen.classList.add('active-screen');
+        finalScoreDisplay.textContent = `${userName}, your final score is ${currentScore} out of ${totalQuestions}!`;
+
+        let performanceFeedback = "";
+        const percentage = (currentScore / totalQuestions) * 100;
+        if (percentage >= 90) {
+            performanceFeedback = "Excellent work! You're a past tense master!";
+        } else if (percentage >= 70) {
+            performanceFeedback = "Great job! Very well done.";
+        } else if (percentage >= 50) {
+            performanceFeedback = "Good effort! Keep practicing.";
+        } else {
+            performanceFeedback = "Keep practicing to improve your skills!";
+        }
+        finalFeedbackDisplay.textContent = performanceFeedback;
+    }
+
+    function restartGame() {
+        currentScore = 0;
+        questionsAnswered = 0; // Reset this counter
+        userNameInput.value = ""; // Clear the name input field
+
+        // Reset displays
+        currentScoreDisplay.textContent = currentScore;
+        feedbackArea.textContent = "";
+        progressIndicator.textContent = "";
+        
+        endScreen.classList.remove('active-screen');
+        startScreen.classList.add('active-screen');
+    }
+
+    // Initial setup: Show start screen
     document.getElementById('start-screen').classList.add('active-screen');
-}
+
     </script>
 </body>
 </html>
