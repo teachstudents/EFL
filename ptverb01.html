@@ -8,16 +8,20 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
         }
         .story-container {
             margin-bottom: 20px;
             padding: 10px;
             border: 1px solid #ccc;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            width: 80%;
+            margin: 40px auto;
         }
         .button-container {
-            display: flex;
-            justify-content: center;
+            text-align: center;
         }
         .button {
             padding: 10px 20px;
@@ -31,30 +35,61 @@
         .button:hover {
             background-color: #3e8e41;
         }
+        .choices-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            height: 200px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .choices-item {
+            padding: 10px 20px;
+            border: none;
+            background-color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .choices-item:hover {
+            background-color: #ccc;
+        }
+        .danger-button {
+            font-size: 24px;
+            margin-top: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Story Time!</h1>
+    <h1 style="text-align: center; color: #00698f;">Story Time!</h1>
     <form id="user-form">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name"><br><br>
         <button class="button" onclick="startGame()">Start Game</button>
     </form>
 
+    <div class="story-container">
+        <h2 style="text-align: center; color: #00698f;">Welcome to the 
+Adventure Story!</h2>
+        <p>You are a brave adventurer who is on a quest to find the 
+legendary treasure.</p>
+        <img src="https://picsum.photos/200/300" alt="Adventure 
+Background">
+    </div>
+
     <div id="story-container"></div>
 
     <script>
         let story = [
-            'Leo and Elsa were walking in the park.',
-            'They saw a group of children playing soccer.',
-            'The children were laughing and having fun.',
-            'But then they heard a loud noise behind them.',
-            'They turned around to see a big dog running towards them.'
+            'You are walking through the forest when you hear a strange 
+noise.',
+            'Suddenly, a wild boar charges towards you!',
+            'But you're not afraid. You grab your trusty sword and prepare 
+to defend yourself.'
         ];
 
         let verbOptions = [
-            { text: 'went', value: 'went' },
             { text: 'ran', value: 'ran' },
             { text: 'jumped', value: 'jumped' }
         ];
@@ -73,82 +108,8 @@
             }
         }
 
-        function generateNextSentence() {
-            if (currentSentenceIndex < 50) {
-                const choicesElement = 
-document.querySelector('.choices-element');
-                if (choicesElement.style.display === 'block') {
-                    choicesElement.style.display = 'none';
-                } else {
-                    const dangerButton = 
-document.querySelector('.danger-button');
-                    if (dangerButton.style.display !== 'none') {
-                        dangerButton.style.display = 'none';
-                    }
-                }
-
-                generateNextSentenceLogic();
-            }
-        }
-
-        function displayStoryContainer() {
-            const storyElement = 
-document.getElementById('story-container');
-            while (storyElement.firstChild) {
-                storyElement.removeChild(storyElement.firstChild);
-            }
-            for (let i = 0; i < currentSentenceIndex; i++) {
-                const sentenceDiv = document.createElement('div');
-                sentenceDiv.classList.add('story');
-                if (!i && currentSentenceIndex === 0) {
-                    sentenceDiv.innerHTML = 
-`<p><strong>${userName}</strong> walked into the park.</p>`;
-                } else if (i === 0) {
-                    sentenceDiv.innerHTML = `They 
-${verbOptions.find(option => option.value === story[i].split(' 
-').pop()).text} to the park.`;
-                } else {
-                    sentenceDiv.innerHTML = `${story[i]}<br><br>`;
-                }
-                storyElement.appendChild(sentenceDiv);
-            }
-
-            if (currentSentenceIndex >= 10) {
-                const choicesButton = document.createElement('button');
-                choicesButton.classList.add('choices-button');
-                choicesButton.innerHTML = 'Make a choice';
-                storyElement.appendChild(choicesButton);
-
-                choicesButton.addEventListener('click', () => {
-                    displayChoices();
-                });
-            } else if (currentSentenceIndex >= 20) {
-                const dangerButton = document.createElement('button');
-                dangerButton.classList.add('danger-button');
-                dangerButton.innerHTML = 'Avoid danger';
-                storyElement.appendChild(dangerButton);
-
-                dangerButton.addEventListener('click', () => {
-                    userAnswer.value = verbOptions.find(option => 
-option.text === 'ran').value;
-                    generateNextSentence();
-                });
-            }
-        }
-
-        function updateVerbOptions() {
-            const verbButtonElements = 
-document.querySelectorAll('.button');
-            for (const button of verbButtonElements) {
-                button.style.display = 'inline-block';
-                button.addEventListener('click', () => {
-                    userAnswer = button;
-                });
-            }
-        }
-
         function generateNextSentenceLogic() {
-            if (currentSentenceIndex < 30) {
+            if (currentSentenceIndex < 3) {
                 const randomChoice = Math.floor(Math.random() * 
 verbOptions.length);
                 let choiceText;
@@ -166,43 +127,109 @@ verbOptions.length);
 
                 userAnswer.value = choiceText;
 
-                if (currentSentenceIndex === 29) {
+                if (currentSentenceIndex === 2) {
                     generateFinalSentence();
                 } else {
                     const nextButton = document.createElement('button');
                     nextButton.classList.add('next-button');
-                    nextButton.innerHTML = `You ${choiceText} to the 
-forest.`;
-                    storyElement.appendChild(nextButton);
+                    nextButton.innerHTML = `You ${choiceText} away from 
+the boar.`;
+                    
+document.querySelector('.story-container').appendChild(nextButton);
 
                     nextButton.addEventListener('click', () => {
                         currentSentenceIndex++;
                         generateNextSentenceLogic();
                     });
                 }
-            } else if (currentSentenceIndex === 30) {
-                const dangerButton = 
-document.querySelector('.danger-button');
-                if (dangerButton.style.display !== 'none') {
-                    dangerButton.style.display = 'block';
-                }
+            } else if (currentSentenceIndex === 3) {
+                const dangerButton = document.createElement('button');
+                dangerButton.classList.add('danger-button');
+                dangerButton.innerHTML = 'Run away!';
+                
+document.querySelector('.story-container').appendChild(dangerButton);
 
-                if (userAnswer.value === verbOptions.find(option => 
-option.text === 'ran').value) {
+                dangerButton.addEventListener('click', () => {
                     userAnswer.value = verbOptions.find(option => 
-option.text === 'jumped').value;
-                } else {
+option.text === 'ran').value;
                     generateFinalSentence();
+                });
+            }
+        }
+
+        function displayStoryContainer() {
+            const storyElement = 
+document.getElementById('story-container');
+            while (storyElement.firstChild) {
+                storyElement.removeChild(storyElement.firstChild);
+            }
+            for (let i = 0; i < currentSentenceIndex; i++) {
+                const sentenceDiv = document.createElement('div');
+                sentenceDiv.classList.add('sentence');
+                if (!i && currentSentenceIndex === 0) {
+                    sentenceDiv.innerHTML = 
+`<p><strong>${userName}</strong> walked into the forest.</p>`;
+                } else if (i === 0) {
+                    sentenceDiv.innerHTML = `They 
+${verbOptions.find(option => option.value === story[i].split(' 
+').pop()).text} through the dense foliage.`;
+                } else {
+                    sentenceDiv.innerHTML = `${story[i]}<br><br>`;
                 }
+                
+document.querySelector('.story-container').appendChild(sentenceDiv);
+            }
+
+            if (currentSentenceIndex >= 10) {
+                const choicesContainer = document.createElement('div');
+                choicesContainer.classList.add('choices-container');
+                for (let i = 0; i < verbOptions.length; i++) {
+                    const choicesItem = document.createElement('button');
+                    choicesItem.classList.add('choices-item');
+                    choicesItem.innerHTML = `Go ${verbOptions[i].text} 
+towards the sound of running water.`;
+                    choicesContainer.appendChild(choicesItem);
+
+                    choicesItem.addEventListener('click', () => {
+                        userAnswer.value = verbOptions[i].text;
+                        generateNextSentenceLogic();
+                    });
+                }
+                
+document.querySelector('.story-container').appendChild(choicesContainer);
+            } else if (currentSentenceIndex >= 20) {
+                const dangerButton = document.createElement('button');
+                dangerButton.classList.add('danger-button');
+                dangerButton.innerHTML = 'Run away!';
+                
+document.querySelector('.story-container').appendChild(dangerButton);
+
+                dangerButton.addEventListener('click', () => {
+                    userAnswer.value = verbOptions.find(option => 
+option.text === 'ran').value;
+                    generateFinalSentence();
+                });
+            }
+        }
+
+        function updateVerbOptions() {
+            const buttonContainer = document.querySelectorAll('.button');
+            for (const button of buttonContainer) {
+                button.style.display = 'inline-block';
+                button.addEventListener('click', () => {
+                    userAnswer.value = button.innerHTML.replace(' ', 
+'_').toLowerCase();
+                });
             }
         }
 
         function generateFinalSentence() {
             const finalSentenceDiv = document.createElement('div');
             finalSentenceDiv.classList.add('final-sentence');
-            finalSentenceDiv.innerHTML = `They ${userAnswer.value} over 
-the mountain and found a hidden cave.`;
-            storyElement.appendChild(finalSentenceDiv);
+            finalSentenceDiv.innerHTML = `You found the treasure and 
+returned home victorious!</p>`;
+            
+document.querySelector('.story-container').appendChild(finalSentenceDiv);
 
             if (currentSentenceIndex === 49) {
                 alert(`Congratulations! You have completed the adventure 
