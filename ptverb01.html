@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
         }
-        .story {
+        .story-container {
             margin-bottom: 20px;
             padding: 10px;
             border: 1px solid #ccc;
@@ -53,110 +53,107 @@
             'They turned around to see a big dog running towards them.'
         ];
 
+        let verbOptions = [
+            { text: 'went', value: 'went' },
+            { text: 'ran', value: 'ran' },
+            { text: 'jumped', value: 'jumped' }
+        ];
+
         let currentSentenceIndex = 0;
+        let userAnswer;
 
         function startGame() {
             const userName = document.getElementById('name').value;
             if (userName) {
                 displayStoryContainer();
-                generateNextSentence();
+                updateVerbOptions();
             } else {
                 alert('Please enter your name first!');
             }
         }
 
         function generateNextSentence() {
-            const verbInputValue = 
-document.getElementById('verb-input').value;
-            if (verbInputValue) {
-                story[currentSentenceIndex] += ` They ${verbInputValue} to 
-the park. `;
+            if (userAnswer && userAnswer.value === verbOptions.find(option 
+=> option.text === story[currentSentenceIndex].split(' ').pop()).value) {
                 currentSentenceIndex++;
                 displayStoryContainer();
-                generateNextSentence();
-            } else {
-                alert('Please enter a verb!');
+            } else if (currentSentenceIndex < 50) {
+                displayStoryContainer();
+                updateVerbOptions();
             }
         }
 
         function displayStoryContainer() {
             const storyElement = 
 document.getElementById('story-container');
-            if (storyElement) {
-                for (let i = 0; i < Math.min(currentSentenceIndex, 
-story.length); i++) {
-                    const sentenceDiv = document.createElement('div');
-                    sentenceDiv.classList.add('story');
-                    sentenceDiv.innerHTML = story[i];
-                    storyElement.appendChild(sentenceDiv);
+            while (storyElement.firstChild) {
+                storyElement.removeChild(storyElement.firstChild);
+            }
+            for (let i = 0; i < currentSentenceIndex; i++) {
+                const sentenceDiv = document.createElement('div');
+                sentenceDiv.classList.add('story');
+                if (!i && currentSentenceIndex === 0) {
+                    sentenceDiv.innerHTML = 
+`<p><strong>${userName}</strong> walked into the park.</p>`;
+                } else if (i === 0) {
+                    sentenceDiv.innerHTML = `They 
+${verbOptions.find(option => option.value === story[i].split(' 
+').pop()).text} to the park.`;
+                } else {
+                    sentenceDiv.innerHTML = `${story[i]}<br><br>`;
                 }
-            } else {
-                storyElement.style.display = 'flex';
-                for (const button of buttons) {
-                    button.addEventListener('click', () => {
-                        const verbInputValue = '';
-                        if (button.dataset.verb === 'went') {
-                            verbInputValue = 'went';
-                        } else if (button.dataset.verb === 'ran') {
-                            verbInputValue = 'ran';
-                        } else if (button.dataset.verb === 'jumped') {
-                            verbInputValue = 'jumped';
-                        } else if (button.dataset.verb === 'ate') {
-                            verbInputValue = 'ate';
-                        } else if (button.dataset.verb === 'drank') {
-                            verbInputValue = 'drank';
-                        } else if (button.dataset.verb === 'read') {
-                            verbInputValue = 'read';
-                        } else if (button.dataset.verb === 'heard') {
-                            verbInputValue = 'heard';
-                        } else if (button.dataset.verb === 'saw') {
-                            verbInputValue = 'saw';
-                        } else if (button.dataset.verb === 'played') {
-                            verbInputValue = 'played';
-                        } else if (button.dataset.verb === 'made') {
-                            verbInputValue = 'made';
-                        }
-                        document.getElementById('verb-input').value = 
-verbInputValue;
-                        generateNextSentence();
-                    });
-                }
+                storyElement.appendChild(sentenceDiv);
+            }
+
+            if (currentSentenceIndex >= 10) {
+                const choicesButton = document.createElement('button');
+                choicesButton.classList.add('choices-button');
+                choicesButton.innerHTML = 'Make a choice';
+                storyElement.appendChild(choicesButton);
+
+                choicesButton.addEventListener('click', () => {
+                    displayChoices();
+                });
+            } else if (currentSentenceIndex >= 20) {
+                const dangerButton = document.createElement('button');
+                dangerButton.classList.add('danger-button');
+                dangerButton.innerHTML = 'Avoid danger';
+                storyElement.appendChild(dangerButton);
+
+                dangerButton.addEventListener('click', () => {
+                    userAnswer.value = verbOptions.find(option => 
+option.text === 'ran').value;
+                    generateNextSentence();
+                });
             }
         }
 
-        const buttons = document.querySelectorAll('.button');
-        for (const button of buttons) {
-            button.addEventListener('click', () => {
-                if (story.length <= currentSentenceIndex) {
-                    alert('No more sentences to add!');
-                } else {
-                    let verbInputValue = '';
-                    if (button.dataset.verb === 'went') {
-                        verbInputValue = 'went';
-                    } else if (button.dataset.verb === 'ran') {
-                        verbInputValue = 'ran';
-                    } else if (button.dataset.verb === 'jumped') {
-                        verbInputValue = 'jumped';
-                    } else if (button.dataset.verb === 'ate') {
-                        verbInputValue = 'ate';
-                    } else if (button.dataset.verb === 'drank') {
-                        verbInputValue = 'drank';
-                    } else if (button.dataset.verb === 'read') {
-                        verbInputValue = 'read';
-                    } else if (button.dataset.verb === 'heard') {
-                        verbInputValue = 'heard';
-                    } else if (button.dataset.verb === 'saw') {
-                        verbInputValue = 'saw';
-                    } else if (button.dataset.verb === 'played') {
-                        verbInputValue = 'played';
-                    } else if (button.dataset.verb === 'made') {
-                        verbInputValue = 'made';
-                    }
-                    document.getElementById('verb-input').value = 
-verbInputValue;
-                    generateNextSentence();
-                }
-            });
+        function displayChoices() {
+            const choicesElement = document.createElement('div');
+            choicesElement.classList.add('choices-element');
+            for (const option of verbOptions) {
+                const buttonElement = document.createElement('button');
+                buttonElement.classList.add('choices-button');
+                buttonElement.innerHTML = `<p>${option.text}</p>`;
+                choicesElement.appendChild(buttonElement);
+            }
+
+            choicesElement.style.display = 'block';
+
+            storyElement.appendChild(choicesElement);
+
+            choicesButton.style.display = 'none';
+        }
+
+        function updateVerbOptions() {
+            const verbButtonElements = 
+document.querySelectorAll('.button');
+            for (const button of verbButtonElements) {
+                button.style.display = 'inline-block';
+                button.addEventListener('click', () => {
+                    userAnswer = button;
+                });
+            }
         }
 
         startGame();
