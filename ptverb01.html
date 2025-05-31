@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TTS Demo</title>
+    <title>Parrot's Forest Adventure</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,47 +12,83 @@
 </head>
 <body>
 
-    <button id="start-button">Start TTS</button>
-    <button id="stop-button" style="display: none;">Stop TTS</button>
-    <audio id="tts-audio" controls></audio>
+    <h1>Parrot's Forest Adventure</h1>
+
+    <p id="instructions">Welcome to Parrot's Forest Adventure! Your goal is to find food (acorns) scattered throughout the forest.</p>
+
+    <button id="start-game">Start Game</button>
 
     <script src="https://cdn.jsdelivr.net/npm/parrot-tts@1.2.0/dist/parrot-tts.min.js"></script>
     <script>
         const parrot = new ParrotTTS();
-        let audioContext;
 
-        document.getElementById("start-button").addEventListener("click", startTts);
-        document.getElementById("stop-button").addEventListener("click", stopTts);
+        document.getElementById("start-game").addEventListener("click", () => {
+          startGame();
+        });
 
-        function startTts() {
-            // Create a new audio context
-            audioContext = new Audio();
+        function startGame() {
+          let forest = [
+            { location: "tree1", sound: "Bird chirp" },
+            { location: "river", sound: "Water splashing" },
+            { location: "acorn1", sound: "Acorn cracking" },
+            { location: "tree2", sound: "Branch swaying" },
+            { location: "acorn2", sound: "More acorns!" }
+          ];
 
-            // Set up the voice and language
-            parrot.setVoice('British')
-            parrot.setLanguage('en-GB');
+          let playerLocation = forest[0].location;
+          let currentSound = parrot.speak(`You are at the ${playerLocation}!`);
 
-            // Speak some text
-            const text = "Hello, world!";
-            audioContext.srcObject = parrot.speak(text);
-            audioContext.play();
+          document.getElementById("instructions").innerHTML += `
+            <p id="current-location">Current Location: ${playerLocation}</p>
+            <button id="move-left" onclick="moveLeft()">Move Left</button>
+            <button id="move-right" onclick="moveRight()">Move Right</button>
+            <button id="move-up" onclick="moveUp()">Move Up</button>
+          `;
 
-            // Add event listeners to stop the TTS when clicked
-            document.getElementById("stop-button").style.display = "block";
+          document.getElementById("current-location").innerHTML = `${currentSound} You are at the ${playerLocation}!`;
         }
 
-        function stopTts() {
-            // Stop the TTS
-            audioContext.pause();
-            audioContext.currentTime = 0;
+        function moveLeft() {
+          let newLocation = forest[0].location;
+          parrot.speak(`You fly to the ${newLocation}, but it's empty!`);
 
-            // Remove the stop button
-            document.getElementById("stop-button").style.display = "none";
+          playerLocation = newLocation;
 
-            // Reset the parrot object
-            parrot.reset();
+          currentSound = parrot.speak(`You are at the ${playerLocation}!`);
+          document.getElementById("current-location").innerHTML = `${currentSound}`;
+
+          if (forest.find(item => item.location === "acorn1")) {
+            console.log("Found acorn!");
+          }
+        }
+
+        function moveRight() {
+          let newLocation = forest[2].location;
+          parrot.speak(`You fly to the ${newLocation}, and find an acorn!`);
+
+          playerLocation = newLocation;
+
+          currentSound = parrot.speak(`You are at the ${playerLocation}!`);
+          document.getElementById("current-location").innerHTML = `${currentSound}`;
+
+          if (forest.find(item => item.location === "acorn2")) {
+            console.log("Found more acorns!");
+          }
+        }
+
+        function moveUp() {
+          let newLocation = forest[3].location;
+          parrot.speak(`You fly to the ${newLocation}, and find a tree!`);
+
+          playerLocation = newLocation;
+
+          currentSound = parrot.speak(`You are at the ${playerLocation}!`);
+          document.getElementById("current-location").innerHTML = `${currentSound}`;
+
+          if (forest.find(item => item.location === "acorn1")) {
+            console.log("Found acorn!");
+          }
         }
     </script>
-
 </body>
 </html>
