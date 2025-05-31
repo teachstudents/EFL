@@ -31,6 +31,7 @@
             color: #fff;
             cursor: pointer;
             margin: 0 10px;
+            width: 100px;
         }
         .button:hover {
             background-color: #3e8e41;
@@ -49,6 +50,7 @@
             background-color: #fff;
             border-radius: 5px;
             cursor: pointer;
+            width: 100px;
         }
         .choices-item:hover {
             background-color: #ccc;
@@ -85,17 +87,19 @@ Background">
             'You are walking through the forest when you hear a strange 
 noise.',
             'Suddenly, a wild boar charges towards you!',
-            'But you're not afraid. You grab your trusty sword and prepare 
-to defend yourself.'
+            'But you\'re not afraid. You grab your trusty sword and 
+prepare to defend yourself.'
         ];
 
         let verbOptions = [
-            { text: 'ran', value: 'ran' },
-            { text: 'jumped', value: 'jumped' }
+            { text: 'RAN', value: 'ran' },
+            { text: 'JUMPED', value: 'jumped' }
         ];
 
         let currentSentenceIndex = 0;
         let userName;
+
+        const AlexaPolly = new AlexaPolly('YOUR_ALEXA_POLLY_ACCESS_KEY');
 
         function startGame() {
             const nameInput = document.getElementById('name');
@@ -115,13 +119,13 @@ verbOptions.length);
                 let choiceText;
                 switch (randomChoice) {
                     case 0:
-                        choiceText = verbOptions[randomChoice].text;
+                        choiceText = 'RAN';
                         break;
                     case 1:
-                        choiceText = verbOptions[randomChoice].text;
+                        choiceText = 'JUMPED';
                         break;
                     case 2:
-                        choiceText = verbOptions[randomChoice].text;
+                        choiceText = 'WALKED';
                         break;
                 }
 
@@ -132,8 +136,8 @@ verbOptions.length);
                 } else {
                     const nextButton = document.createElement('button');
                     nextButton.classList.add('next-button');
-                    nextButton.innerHTML = `You ${choiceText} away from 
-the boar.`;
+                    nextButton.innerHTML = `You ${choiceText} through the 
+dense foliage.`;
                     
 document.querySelector('.story-container').appendChild(nextButton);
 
@@ -151,7 +155,7 @@ document.querySelector('.story-container').appendChild(dangerButton);
 
                 dangerButton.addEventListener('click', () => {
                     userAnswer.value = verbOptions.find(option => 
-option.text === 'ran').value;
+option.value === 'ran').text;
                     generateFinalSentence();
                 });
             }
@@ -186,8 +190,13 @@ document.querySelector('.story-container').appendChild(sentenceDiv);
                 for (let i = 0; i < verbOptions.length; i++) {
                     const choicesItem = document.createElement('button');
                     choicesItem.classList.add('choices-item');
-                    choicesItem.innerHTML = `Go ${verbOptions[i].text} 
-towards the sound of running water.`;
+                    if (verbOptions[i].value === 'ran') {
+                        choicesItem.innerHTML = `<img 
+src="https://picsum.photos/100/100" alt="Running"> Run`;
+                    } else if (verbOptions[i].value === 'jumped') {
+                        choicesItem.innerHTML = `<img 
+src="https://picsum.photos/100/101" alt="Jumping"> Jump`;
+                    }
                     choicesContainer.appendChild(choicesItem);
 
                     choicesItem.addEventListener('click', () => {
@@ -206,7 +215,7 @@ document.querySelector('.story-container').appendChild(dangerButton);
 
                 dangerButton.addEventListener('click', () => {
                     userAnswer.value = verbOptions.find(option => 
-option.text === 'ran').value;
+option.value === 'ran').text;
                     generateFinalSentence();
                 });
             }
@@ -216,10 +225,13 @@ option.text === 'ran').value;
             const buttonContainer = document.querySelectorAll('.button');
             for (const button of buttonContainer) {
                 button.style.display = 'inline-block';
-                button.addEventListener('click', () => {
-                    userAnswer.value = button.innerHTML.replace(' ', 
-'_').toLowerCase();
-                });
+                if (verbOptions[0].value === 'ran') {
+                    button.innerHTML = `<img 
+src="https://picsum.photos/100/100" alt="Running"> RAN`;
+                } else if (verbOptions[1].value === 'jumped') {
+                    button.innerHTML = `<img 
+src="https://picsum.photos/100/101" alt="Jumping"> JUMPED`;
+                }
             }
         }
 
@@ -235,6 +247,15 @@ document.querySelector('.story-container').appendChild(finalSentenceDiv);
                 alert(`Congratulations! You have completed the adventure 
 story.`);
             }
+        }
+
+        function speakText(text) {
+            AlexaPolly.speak(text, { voiceId: 'Jarvis' }).then((result) => 
+{
+                console.log(result);
+            }).catch((err) => {
+                console.error(err);
+            });
         }
 
         startGame();
