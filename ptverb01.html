@@ -3,91 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parrot's Forest Adventure</title>
+    <title>Past Tense Verb Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+        #game-container {
+            background-color: white;
+            max-width: 90%;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        #start-screen, #game-screen, #score-screen {
+            display: none;
+        }
+        .active-screen {
+            display: block;
+        }
+        input {
+            padding: 10px;
+            margin: 10px;
+            width: 80%;
+            max-width: 250px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            margin: 10px 5px;
+            width: 80%;
+            max-width: 200px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #timer, #score {
+            font-size: 20px;
+            margin: 15px;
+        }
+        #reward-image {
+            width: 100px;
+            height: 100px;
+            margin: 10px auto;
+            display: none;
         }
     </style>
 </head>
 <body>
+    <div id="game-container">
+        <div id="start-screen" class="active-screen">
+            <h1>Past Tense Verb Game</h1>
+            <p>Enter your name to start the game:</p>
+            <input type="text" id="user-name" placeholder="Your Name">
+            <button onclick="startGame()">Start Game</button>
+        </div>
 
-    <h1>Parrot's Forest Adventure</h1>
+        <div id="game-screen">
+            <h2 id="welcome-message"></h2>
+            <div id="timer">Time left: <span id="time-left">10</span>s</div>
+            <div id="score">Score: <span id="current-score">0</span></div>
+            <p id="question">What is the past tense of "go"?</p>
+            <div id="options">
+                <!-- Options will be dynamically inserted here -->
+            </div>
+            <img id="reward-image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iYmx1ZSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQwIiBmaWxsPSJ5ZWxsb3ciLz48L3N2Zz4=" alt="Reward">
+            <audio id="reward-sound" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU..."></audio>
+        </div>
 
-    <p id="instructions">Welcome to Parrot's Forest Adventure! Your goal is to find food (acorns) scattered throughout the forest.</p>
+        <div id="score-screen">
+            <h2>Game Over!</h2>
+            <p id="final-score"></p>
+            <button onclick="restartGame()">Restart Game</button>
+        </div>
+    </div>
 
-    <button id="start-game">Start Game</button>
-
-    <script src="https://cdn.jsdelivr.net/npm/parrot-tts@1.2.0/dist/parrot-tts.min.js"></script>
     <script>
-        const parrot = new ParrotTTS();
+        const verbs = [
+            { present: "go", past: "went" },
+            { present: "eat", past: "ate" },
+            { present: "see", past: "saw" },
+            { present: "take", past: "took" },
+            { present: "run", past: "ran" },
+            { present: "sing", past: "sang" },
+            { present: "drink", past: "drank" },
+            { present: "write", past: "wrote" },
+            { present: "drive", past: "drove" },
+            { present: "ride", past: "rode" }
+        ];
 
-        document.getElementById("start-game").addEventListener("click", () => {
-          startGame();
-        });
+        let userName = "";
+        let currentScore = 0;
+        let timeLeft = 10;
+        let timer;
+        let currentVerbIndex = 0;
 
         function startGame() {
-          let forest = [
-            { location: "tree1", sound: "Bird chirp" },
-            { location: "river", sound: "Water splashing" },
-            { location: "acorn1", sound: "Acorn cracking" },
-            { location: "tree2", sound: "Branch swaying" },
-            { location: "acorn2", sound: "More acorns!" }
-          ];
-
-          let playerLocation = forest[0].location;
-          let currentSound = parrot.speak(`You are at the ${playerLocation}!`);
-
-          document.getElementById("instructions").innerHTML += `
-            <p id="current-location">Current Location: ${playerLocation}</p>
-            <button id="move-left" onclick="moveLeft()">Move Left</button>
-            <button id="move-right" onclick="moveRight()">Move Right</button>
-            <button id="move-up" onclick="moveUp()">Move Up</button>
-          `;
-
-          document.getElementById("current-location").innerHTML = `${currentSound} You are at the ${playerLocation}!`;
+            userName = document.getElementById('user-name').value || "Player";
+            document.getElementById('welcome-message').textContent = `Welcome, ${userName}!`;
+            document.getElementById('start-screen').classList.remove('active-screen');
+            document.getElementById('game-screen').classList.add('active-screen');
+            loadNewQuestion();
         }
 
-        function moveLeft() {
-          let newLocation = forest[0].location;
-          parrot.speak(`You fly to the ${newLocation}, but it's empty!`);
+        function loadNewQuestion() {
+            clearInterval(timer);
+            timeLeft = 10;
+            document.getElementById('time-left').textContent = timeLeft;
 
-          playerLocation = newLocation;
+            currentVerbIndex = Math.floor(Math.random() * verbs.length);
+            const verb = verbs[currentVerbIndex];
+            document.getElementById('question').textContent = `What is the past tense of "${verb.present}"?`;
 
-          currentSound = parrot.speak(`You are at the ${playerLocation}!`);
-          document.getElementById("current-location").innerHTML = `${currentSound}`;
+            const options = document.getElementById('options');
+            options.innerHTML = '';
 
-          if (forest.find(item => item.location === "acorn1")) {
-            console.log("Found acorn!");
-          }
+            const correctAnswer = verb.past;
+            const incorrectOptions = verbs.filter(v => v.past !== correctAnswer).sort(() => 0.5 - Math.random()).slice(0, 2).map(v => v.past);
+
+            const allOptions = [correctAnswer, ...incorrectOptions].sort(() => 0.5 - Math.random());
+
+            allOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = () => checkAnswer(option, verb.present);
+                options.appendChild(button);
+            });
+
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time-left').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    endGame();
+                }
+            }, 1000);
         }
 
-        function moveRight() {
-          let newLocation = forest[2].location;
-          parrot.speak(`You fly to the ${newLocation}, and find an acorn!`);
+        function checkAnswer(selectedOption, presentTense) {
+            clearInterval(timer);
+            const correctAnswer = verbs.find(v => v.present === presentTense).past;
 
-          playerLocation = newLocation;
+            if (selectedOption === correctAnswer) {
+                currentScore++;
+                document.getElementById('current-score').textContent = currentScore;
+                showReward();
+            }
 
-          currentSound = parrot.speak(`You are at the ${playerLocation}!`);
-          document.getElementById("current-location").innerHTML = `${currentSound}`;
-
-          if (forest.find(item => item.location === "acorn2")) {
-            console.log("Found more acorns!");
-          }
+            loadNewQuestion();
         }
 
-        function moveUp() {
-          let newLocation = forest[3].location;
-          parrot.speak(`You fly to the ${newLocation}, and find a tree!`);
+        function showReward() {
+            const rewardImage = document.getElementById('reward-image');
+            rewardImage.style.display = 'block';
+            const rewardSound = document.getElementById('reward-sound');
+            rewardSound.currentTime = 0;
+            rewardSound.play().catch(e => console.log("Audio play failed:", e));
 
-          playerLocation = newLocation;
+            setTimeout(() => {
+                rewardImage.style.display = 'none';
+            }, 1000);
+        }
 
-          currentSound = parrot.speak(`You are at the ${playerLocation}!`);
-          document.getElementById("current-location").innerHTML = `${currentSound}`;
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('active-screen');
+            document.getElementById('score-screen').classList.add('active-screen');
+            document.getElementById('final-score').textContent = `${userName}, your final score is ${currentScore}!`;
+        }
 
-          if (forest.find(item => item.location === "acorn1")) {
-            console.log("Found acorn!");
-          }
+        function restartGame() {
+            currentScore = 0;
+            document.getElementById('current-score').textContent = currentScore;
+            document.getElementById('score-screen').classList.remove('active-screen');
+            document.getElementById('start-screen').classList.add('active-screen');
         }
     </script>
 </body>
