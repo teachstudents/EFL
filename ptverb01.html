@@ -1,4 +1,4 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -15,6 +15,10 @@
             border: 1px solid #ccc;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
         .button {
             padding: 10px 20px;
             border: none;
@@ -22,6 +26,7 @@
             background-color: #4CAF50;
             color: #fff;
             cursor: pointer;
+            margin: 0 10px;
         }
         .button:hover {
             background-color: #3e8e41;
@@ -32,10 +37,21 @@
 
     <h1>Story Time!</h1>
     <div id="story"></div>
-    <input type="text" id="verb-input" placeholder="Enter a past tense 
-verb (e.g. ran, jumped, ate)">
 
-    <button class="button" onclick="generateNextSentence()">Next</button>
+    <p>Leo and Elsa were walking in the park.</p>
+
+    <div class="button-container">
+        <button class="button" data-verb="went">Went</button>
+        <button class="button" data-verb="ran">Ran</button>
+        <button class="button" data-verb="jumped">Jumped</button>
+        <button class="button" data-verb="ate">Ate</button>
+        <button class="button" data-verb="drank">Drank</button>
+        <button class="button" data-verb="read">Read</button>
+        <button class="button" data-verb="heard">Heard</button>
+        <button class="button" data-verb="saw">Saw</button>
+        <button class="button" data-verb="played">Played</button>
+        <button class="button" data-verb="made">Made</button>
+    </div>
 
     <script>
         let story = [
@@ -43,8 +59,7 @@ verb (e.g. ran, jumped, ate)">
             'They saw a group of children playing soccer.',
             'The children were laughing and having fun.',
             'But then they heard a loud noise behind them.',
-            'They turned around to see a big dog running towards them.',
-            // ... add more sentences here ...
+            'They turned around to see a big dog running towards them.'
         ];
 
         let currentSentenceIndex = 0;
@@ -53,11 +68,9 @@ verb (e.g. ran, jumped, ate)">
             const verbInputValue = 
 document.getElementById('verb-input').value;
             if (verbInputValue) {
-                const verb = verbInputValue + 'ed';
-                story[currentSentenceIndex] += ' They ' + verb + ' to the 
-park. ';
+                story[currentSentenceIndex] += ` They ${verbInputValue} to 
+the park. `;
                 currentSentenceIndex++;
-                document.getElementById('story').innerHTML = '';
                 displayStory();
             }
         }
@@ -73,6 +86,37 @@ story.length); i++) {
         }
 
         displayStory();
+
+        const buttons = document.querySelectorAll('.button');
+        for (const button of buttons) {
+            button.addEventListener('click', () => {
+                let verbInputValue = '';
+                if (button.dataset.verb === 'went') {
+                    verbInputValue = 'went';
+                } else if (button.dataset.verb === 'ran') {
+                    verbInputValue = 'ran';
+                } else if (button.dataset.verb === 'jumped') {
+                    verbInputValue = 'jumped';
+                } else if (button.dataset.verb === 'ate') {
+                    verbInputValue = 'ate';
+                } else if (button.dataset.verb === 'drank') {
+                    verbInputValue = 'drank';
+                } else if (button.dataset.verb === 'read') {
+                    verbInputValue = 'read';
+                } else if (button.dataset.verb === 'heard') {
+                    verbInputValue = 'heard';
+                } else if (button.dataset.verb === 'saw') {
+                    verbInputValue = 'saw';
+                } else if (button.dataset.verb === 'played') {
+                    verbInputValue = 'played';
+                } else if (button.dataset.verb === 'made') {
+                    verbInputValue = 'made';
+                }
+                document.getElementById('verb-input').value = 
+verbInputValue;
+                generateNextSentence();
+            });
+        }
     </script>
 
 </body>
