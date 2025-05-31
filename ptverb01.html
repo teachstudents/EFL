@@ -36,22 +36,13 @@
 <body>
 
     <h1>Story Time!</h1>
-    <div id="story"></div>
+    <form id="user-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name"><br><br>
+        <button class="button" onclick="startGame()">Start Game</button>
+    </form>
 
-    <p>Leo and Elsa were walking in the park.</p>
-
-    <div class="button-container">
-        <button class="button" data-verb="went">Went</button>
-        <button class="button" data-verb="ran">Ran</button>
-        <button class="button" data-verb="jumped">Jumped</button>
-        <button class="button" data-verb="ate">Ate</button>
-        <button class="button" data-verb="drank">Drank</button>
-        <button class="button" data-verb="read">Read</button>
-        <button class="button" data-verb="heard">Heard</button>
-        <button class="button" data-verb="saw">Saw</button>
-        <button class="button" data-verb="played">Played</button>
-        <button class="button" data-verb="made">Made</button>
-    </div>
+    <div id="story-container"></div>
 
     <script>
         let story = [
@@ -64,6 +55,16 @@
 
         let currentSentenceIndex = 0;
 
+        function startGame() {
+            const userName = document.getElementById('name').value;
+            if (userName) {
+                displayStoryContainer();
+                generateNextSentence();
+            } else {
+                alert('Please enter your name first!');
+            }
+        }
+
         function generateNextSentence() {
             const verbInputValue = 
 document.getElementById('verb-input').value;
@@ -71,52 +72,94 @@ document.getElementById('verb-input').value;
                 story[currentSentenceIndex] += ` They ${verbInputValue} to 
 the park. `;
                 currentSentenceIndex++;
-                displayStory();
+                displayStoryContainer();
+                generateNextSentence();
+            } else {
+                alert('Please enter a verb!');
             }
         }
 
-        function displayStory() {
-            for (let i = 0; i < Math.min(currentSentenceIndex, 
+        function displayStoryContainer() {
+            const storyElement = 
+document.getElementById('story-container');
+            if (storyElement) {
+                for (let i = 0; i < Math.min(currentSentenceIndex, 
 story.length); i++) {
-                const sentenceDiv = document.createElement('div');
-                sentenceDiv.classList.add('story');
-                sentenceDiv.innerHTML = story[i];
-                document.getElementById('story').appendChild(sentenceDiv);
+                    const sentenceDiv = document.createElement('div');
+                    sentenceDiv.classList.add('story');
+                    sentenceDiv.innerHTML = story[i];
+                    storyElement.appendChild(sentenceDiv);
+                }
+            } else {
+                storyElement.style.display = 'flex';
+                for (const button of buttons) {
+                    button.addEventListener('click', () => {
+                        const verbInputValue = '';
+                        if (button.dataset.verb === 'went') {
+                            verbInputValue = 'went';
+                        } else if (button.dataset.verb === 'ran') {
+                            verbInputValue = 'ran';
+                        } else if (button.dataset.verb === 'jumped') {
+                            verbInputValue = 'jumped';
+                        } else if (button.dataset.verb === 'ate') {
+                            verbInputValue = 'ate';
+                        } else if (button.dataset.verb === 'drank') {
+                            verbInputValue = 'drank';
+                        } else if (button.dataset.verb === 'read') {
+                            verbInputValue = 'read';
+                        } else if (button.dataset.verb === 'heard') {
+                            verbInputValue = 'heard';
+                        } else if (button.dataset.verb === 'saw') {
+                            verbInputValue = 'saw';
+                        } else if (button.dataset.verb === 'played') {
+                            verbInputValue = 'played';
+                        } else if (button.dataset.verb === 'made') {
+                            verbInputValue = 'made';
+                        }
+                        document.getElementById('verb-input').value = 
+verbInputValue;
+                        generateNextSentence();
+                    });
+                }
             }
         }
-
-        displayStory();
 
         const buttons = document.querySelectorAll('.button');
         for (const button of buttons) {
             button.addEventListener('click', () => {
-                let verbInputValue = '';
-                if (button.dataset.verb === 'went') {
-                    verbInputValue = 'went';
-                } else if (button.dataset.verb === 'ran') {
-                    verbInputValue = 'ran';
-                } else if (button.dataset.verb === 'jumped') {
-                    verbInputValue = 'jumped';
-                } else if (button.dataset.verb === 'ate') {
-                    verbInputValue = 'ate';
-                } else if (button.dataset.verb === 'drank') {
-                    verbInputValue = 'drank';
-                } else if (button.dataset.verb === 'read') {
-                    verbInputValue = 'read';
-                } else if (button.dataset.verb === 'heard') {
-                    verbInputValue = 'heard';
-                } else if (button.dataset.verb === 'saw') {
-                    verbInputValue = 'saw';
-                } else if (button.dataset.verb === 'played') {
-                    verbInputValue = 'played';
-                } else if (button.dataset.verb === 'made') {
-                    verbInputValue = 'made';
-                }
-                document.getElementById('verb-input').value = 
+                if (story.length <= currentSentenceIndex) {
+                    alert('No more sentences to add!');
+                } else {
+                    let verbInputValue = '';
+                    if (button.dataset.verb === 'went') {
+                        verbInputValue = 'went';
+                    } else if (button.dataset.verb === 'ran') {
+                        verbInputValue = 'ran';
+                    } else if (button.dataset.verb === 'jumped') {
+                        verbInputValue = 'jumped';
+                    } else if (button.dataset.verb === 'ate') {
+                        verbInputValue = 'ate';
+                    } else if (button.dataset.verb === 'drank') {
+                        verbInputValue = 'drank';
+                    } else if (button.dataset.verb === 'read') {
+                        verbInputValue = 'read';
+                    } else if (button.dataset.verb === 'heard') {
+                        verbInputValue = 'heard';
+                    } else if (button.dataset.verb === 'saw') {
+                        verbInputValue = 'saw';
+                    } else if (button.dataset.verb === 'played') {
+                        verbInputValue = 'played';
+                    } else if (button.dataset.verb === 'made') {
+                        verbInputValue = 'made';
+                    }
+                    document.getElementById('verb-input').value = 
 verbInputValue;
-                generateNextSentence();
+                    generateNextSentence();
+                }
             });
         }
+
+        startGame();
     </script>
 
 </body>
