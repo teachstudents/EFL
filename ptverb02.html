@@ -168,7 +168,9 @@
     </style>
 </head>
 <body>
-    <audio id="correctSoundEffect" preload="auto"></audio> <div id="start-screen" class="game-container text-center">
+    <audio id="correctSoundEffect" preload="auto"></audio> 
+
+    <div id="start-screen" class="game-container text-center">
         <h1 class="text-4xl font-bold mb-4 text-indigo-600">Past Tense Power-Up!</h1>
         <p class="mb-6 text-slate-600 text-lg">Enter your name and let's test your verb skills!</p>
         <div class="flex flex-col sm:flex-row items-center justify-center">
@@ -190,7 +192,7 @@
         </div>
 
         <div class="voice-selector-container">
-            <label for="voiceSelect" class="text-slate-700 font-semibold">Select Voice:</label>
+            <label for="voiceSelect" class="text-slate-700 font-semibold">Select Voice (Fallback):</label>
             <select id="voiceSelect"></select>
         </div>
         
@@ -211,7 +213,8 @@
             <p id="question-sentence-display" class="mb-4 text-slate-600 italic text-lg"></p>
             <p id="question-text" class="mb-5 text-xl font-semibold text-slate-800"></p>
             <div id="answer-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                </div>
+                {/* Answer buttons will be dynamically added here by JavaScript */}
+            </div>
             <div id="feedback" class="mt-5"></div>
             <button id="next-question-button-modal" class="game-button mt-5 hidden w-full !bg-emerald-500 hover:!bg-emerald-600">Next Question</button>
         </div>
@@ -261,13 +264,15 @@
             const playAgainButton = document.getElementById('play-again-button');
 
             // --- Game Data & Config ---
-            const TOTAL_QUESTIONS_PER_GAME = 10;
+            const TOTAL_QUESTIONS_PER_GAME = 10; // Can be up to 50
             const TIME_PER_QUESTION = 20; 
             let gameData = {};
             let currentSentenceObject = null; 
             let questionTimerInterval = null;
             let voices = [];
-            let selectedVoice = null;
+            let userSelectedVoice = null; // Voice selected by user in dropdown
+            let currentNarratorVoice = null; // Voice determined by question set
+
             let shuffledSentenceIndices = [];
             let currentQuestionIndexInShuffledList = 0;
 
@@ -277,10 +282,36 @@
             ];
             
             // --- TTS Functions ---
-            function populateVoiceList() {
-                console.log("populateVoiceList called");
-                voices = speechSynthesis.getVoices();
-                console.log("Voices found:", voices.length);
+            function getVoiceByName(namePart) {
+                if (!voices || voices.length === 0) return null;
+                const lowerNamePart = namePart.toLowerCase();
+                return voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes(lowerNamePart));
+            }
+
+            function getVoiceForCurrentQuestionSet(questionNum) { // questionNum is 0-indexed (0-9 for first 10 Qs)
+                let targetVoiceName = "";
+                if (questionNum < 10) targetVoiceName = "emma";
+                else if (questionNum < 20) targetVoiceName = "roger";
+                else if (questionNum < 30) targetVoiceName = "jenny";
+                else if (questionNum < 40) targetVoiceName = "eric";
+                else if (questionNum < 50) targetVoiceName = "thomas";
+
+                if (targetVoiceName) {
+                    const foundVoice = getVoiceByName(targetVoiceName);
+                    if (foundVoice) {
+                        console.log(`Voice for question set (Q ${questionNum + 1}): ${foundVoice.name}`);
+                        return foundVoice;
+                    }
+                    console.log(`Voice "${targetVoiceName}" not found for question set. Falling back.`);
+                }
+                // Fallback to user-selected (or initial default) voice
+                return userSelectedVoice || (voices.length > 0 ? voices[0] : null);
+            }
+
+
+            function populateVoiceList(loadedVoices) {
+                console.log("populateVoiceList called with", loadedVoices.length, "voices");
+                voices = loadedVoices; 
                 voiceSelect.innerHTML = '';
                 const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
                 
@@ -294,18 +325,24 @@
 
                 if (englishVoices.length > 0) {
                     console.log("English voices found:", englishVoices.length);
-                    const naturalKeywords = ["natural", "neural", "wavenet", "studio", "enhanced", "premium"];
-                    let defaultVoice = englishVoices.find(v => naturalKeywords.some(kw => v.name.toLowerCase().includes(kw)));
+                    let initialDefaultVoice = getVoiceByName("emma"); // Prioritize Emma as initial default
+
+                    if (!initialDefaultVoice) { // Fallback if Emma is not found
+                        const naturalKeywords = ["natural", "neural", "wavenet", "studio", "enhanced", "premium"];
+                        initialDefaultVoice = englishVoices.find(v => naturalKeywords.some(kw => v.name.toLowerCase().includes(kw)));
+                        if (!initialDefaultVoice) initialDefaultVoice = englishVoices.find(v => v.name === "Google US English" || v.name.toLowerCase().includes("united states"));
+                        if (!initialDefaultVoice) initialDefaultVoice = englishVoices.find(v => v.name === "Microsoft Zira Desktop - English (United States)");
+                        if (!initialDefaultVoice) initialDefaultVoice = englishVoices.find(v => v.default && v.lang.startsWith('en')); 
+                        if (!initialDefaultVoice) initialDefaultVoice = englishVoices[0]; 
+                    }
                     
-                    if (!defaultVoice) defaultVoice = englishVoices.find(v => v.name === "Google US English" || v.name.toLowerCase().includes("united states"));
-                    if (!defaultVoice) defaultVoice = englishVoices.find(v => v.name === "Microsoft Zira Desktop - English (United States)");
-                    if (!defaultVoice) defaultVoice = englishVoices.find(v => v.default && v.lang.startsWith('en')); 
-                    if (!defaultVoice) defaultVoice = englishVoices[0]; 
+                    userSelectedVoice = initialDefaultVoice; // This is the overall default / user's manual choice
+                    currentNarratorVoice = userSelectedVoice; // Initially, narrator is the same as default
+
+                    console.log("Initial default voice (userSelectedVoice):", userSelectedVoice ? userSelectedVoice.name : "None");
                     
-                    selectedVoice = defaultVoice;
-                    console.log("Default voice selected:", selectedVoice ? selectedVoice.name : "None");
                     for (let i = 0; i < voiceSelect.options.length; i++) {
-                        if (voiceSelect.options[i].dataset.name === selectedVoice.name && voiceSelect.options[i].dataset.lang === selectedVoice.lang) {
+                        if (voiceSelect.options[i].dataset.name === userSelectedVoice.name && voiceSelect.options[i].dataset.lang === userSelectedVoice.lang) {
                             voiceSelect.selectedIndex = i;
                             break;
                         }
@@ -317,57 +354,96 @@
                     console.warn("No English voices found.");
                 }
             }
+            
+            function initSpeechSynthesis() {
+                 if ('speechSynthesis' in window) {
+                    console.log("Speech Synthesis API supported.");
+                    const tryPopulate = () => {
+                        const currentVoices = speechSynthesis.getVoices();
+                        if (currentVoices.length > 0) {
+                            populateVoiceList(currentVoices);
+                        } else {
+                             console.log("getVoices() returned empty list initially.");
+                        }
+                    };
 
-            if ('speechSynthesis' in window) {
-                console.log("Speech Synthesis API supported.");
-                // speechSynthesis.getVoices() might be empty on first call for some browsers,
-                // so rely on onvoiceschanged.
-                if (speechSynthesis.getVoices().length > 0) {
-                    populateVoiceList();
-                }
-                if (speechSynthesis.onvoiceschanged !== undefined) {
-                    speechSynthesis.onvoiceschanged = populateVoiceList;
-                } else { // Fallback for browsers that don't fire onvoiceschanged consistently
-                     setTimeout(populateVoiceList, 500); // Try after a short delay
-                }
+                    if (speechSynthesis.onvoiceschanged !== undefined) {
+                        speechSynthesis.onvoiceschanged = tryPopulate;
+                    }
 
-                voiceSelect.addEventListener('change', (e) => {
-                    const selectedOption = e.target.options[e.target.selectedIndex];
-                    selectedVoice = voices.find(voice => voice.name === selectedOption.dataset.name && voice.lang === selectedOption.dataset.lang);
-                    console.log("Voice changed to:", selectedVoice ? selectedVoice.name : "None");
-                });
-            } else {
-                console.warn("Speech Synthesis not supported");
-                if(voiceSelect.parentElement) voiceSelect.parentElement.classList.add('hidden');
-                 currentActivityDisplay.textContent = "Text-to-Speech is not supported in your browser.";
-                 initiateQuestionButton.disabled = true; 
+                    tryPopulate(); 
+                    setTimeout(tryPopulate, 250); 
+                    setTimeout(tryPopulate, 1000); 
+
+
+                    voiceSelect.addEventListener('change', (e) => {
+                        const selectedOption = e.target.options[e.target.selectedIndex];
+                        userSelectedVoice = voices.find(voice => voice.name === selectedOption.dataset.name && voice.lang === selectedOption.dataset.lang);
+                        console.log("User changed voice to:", userSelectedVoice ? userSelectedVoice.name : "None");
+                    });
+                } else {
+                    console.warn("Speech Synthesis not supported");
+                    if(voiceSelect.parentElement) voiceSelect.parentElement.classList.add('hidden');
+                    currentActivityDisplay.textContent = "Text-to-Speech is not supported in your browser.";
+                    initiateQuestionButton.disabled = true; 
+                }
             }
+            initSpeechSynthesis(); 
+
 
             function speak(text, callback) {
-                console.log("Attempting to speak:", text);
+                console.log("Attempting to speak:", text ? text.substring(0,30) + "..." : "No text provided");
                 if (!('speechSynthesis' in window) || !text) {
                     console.warn("Speak function: TTS not supported or no text.");
-                    if(callback) callback(); 
+                    if(callback) {
+                        setTimeout(callback, 0); 
+                    }
                     return;
                 }
-                speechSynthesis.cancel(); 
-                const utterance = new SpeechSynthesisUtterance(text);
-                if (selectedVoice) {
-                    utterance.voice = selectedVoice;
-                    console.log("Using voice:", selectedVoice.name);
-                } else {
-                    console.warn("No selected voice, using browser default.");
+
+                if (speechSynthesis.speaking || speechSynthesis.pending) {
+                    console.log("Canceling previous speech before speaking new text.");
+                    speechSynthesis.cancel(); 
                 }
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Determine voice: use specific narrator for current question set, or fallback to user's selection
+                currentNarratorVoice = getVoiceForCurrentQuestionSet(gameData.questionsAnswered || 0);
+                utterance.voice = currentNarratorVoice || userSelectedVoice; // Ensure there's always a voice object
+
+                if (!utterance.voice && voices && voices.length > 0) { // Absolute fallback if somehow currentNarrator/userSelectedVoice is null
+                     let fallbackVoice = voices.find(v => v.default && v.lang.startsWith('en'));
+                     if (!fallbackVoice) fallbackVoice = voices.find(v => v.lang.startsWith('en'));
+                     if (!fallbackVoice) fallbackVoice = voices[0];
+                     utterance.voice = fallbackVoice;
+                     console.warn("Using absolute fallback voice:", fallbackVoice ? fallbackVoice.name : "None available");
+                }
+                 console.log("Speaking with voice:", utterance.voice ? utterance.voice.name : "Browser default (no specific voice object)");
+
+                
+                utterance.onstart = () => {
+                     console.log("Speech actually started for:", text.substring(0,30) + "...");
+                };
+
                 utterance.onend = () => {
-                    console.log("Speech finished for:", text.substring(0,20) + "...");
+                    console.log("Speech finished for:", text.substring(0,30) + "...");
                     if(callback) callback();
                 };
                 utterance.onerror = (event) => {
-                    console.error("SpeechSynthesisUtterance.onerror", event);
-                    currentActivityDisplay.textContent = "Error playing audio. Please try a different voice or check console.";
+                    console.error("SpeechSynthesisUtterance.onerror. Event:", event, "Specific error type:", event.error);
+                    let errorMessage = `Error playing audio (${event.error || 'Unknown TTS Error'}).`;
+                    // Avoid flooding UI for 'canceled' if it's part of rapid interaction
+                    if (event.error !== 'canceled' && event.error !== 'interrupted') {
+                        currentActivityDisplay.textContent = errorMessage + " Try a different voice or check console.";
+                    }
                     if(callback) callback(); 
                 };
-                speechSynthesis.speak(utterance);
+
+                setTimeout(() => {
+                    console.log("Executing speechSynthesis.speak for:", text.substring(0,30) + "...");
+                    speechSynthesis.speak(utterance);
+                }, 50); 
             }
 
             // --- Game Logic Functions ---
@@ -387,7 +463,8 @@
 
                 updateGameStatsDisplay();
                 initiateQuestionButton.textContent = "Start First Question";
-                initiateQuestionButton.disabled = !('speechSynthesis' in window) || (voices && voices.filter(v => v.lang.startsWith('en')).length === 0);
+                const englishVoicesExist = voices && voices.filter(v => v.lang.startsWith('en')).length > 0;
+                initiateQuestionButton.disabled = !('speechSynthesis' in window) || !englishVoicesExist;
                 currentActivityDisplay.textContent = "Click 'Start First Question' to begin!";
                  if (initiateQuestionButton.disabled) {
                     currentActivityDisplay.textContent = "Text-to-Speech is not available or no English voices found. Cannot start game.";
@@ -452,8 +529,7 @@
 
                 if (currentQuestionIndexInShuffledList >= shuffledSentenceIndices.length) {
                     console.warn("Ran out of unique sentences. This shouldn't happen if TOTAL_QUESTIONS_PER_GAME <= pastTenseSentences.length");
-                    // This case should ideally not be hit if TOTAL_QUESTIONS_PER_GAME is less than or equal to sentence count
-                    endGame(); // End game if we truly run out of sentences.
+                    endGame(); 
                     return;
                 }
 
@@ -559,8 +635,8 @@
                     gameData.correctStreak++;
 
                     // --- IMPORTANT: Set SRC for sound and GIF here ---
-                    // e.g., correctSoundEffect.src = 'assets/correct.mp3'; // Make sure this path is relative to your HTML file
-                    // e.g., rewardGif.src = 'assets/reward1.gif';        // Make sure this path is relative to your HTML file
+                    // e.g., correctSoundEffect.src = 'assets/correct.mp3'; 
+                    // e.g., rewardGif.src = 'assets/reward1.gif';        
                     // --- --- --- --- --- --- --- --- --- --- --- ---
 
                     if (correctSoundEffect.src && !correctSoundEffect.src.endsWith('/') && !correctSoundEffect.src.startsWith('blob:')) { 
@@ -631,10 +707,10 @@
             function endGame() {
                 console.log("endGame called");
                 initiateQuestionButton.textContent = "Play Again?"; 
-                initiateQuestionButton.disabled = false; // Allow play again
-                // gameScreen.classList.add('hidden'); // Option: keep game screen visible with final message
+                initiateQuestionButton.disabled = false; 
                 questionModal.classList.add('hidden'); 
                 gameOverScreen.classList.remove('hidden');
+                gameScreen.classList.add('hidden'); 
                 finalUsernameDisplay.textContent = gameData.username;
                 finalScoreDisplay.textContent = gameData.score;
                 finalBadgesDisplay.innerHTML = gameData.badges.length > 0 ? 
@@ -656,7 +732,8 @@
             startButton.addEventListener('click', startGame);
             playAgainButton.addEventListener('click', () => {
                 gameOverScreen.classList.add('hidden');
-                startGame(); 
+                startScreen.classList.remove('hidden'); 
+                usernameInput.value = gameData.username; 
             });
             nextQuestionButtonModal.addEventListener('click', proceedAfterModal);
             initiateQuestionButton.addEventListener('click', startNewQuestionRound);
