@@ -3,24 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Past Tense Verb Adventure - Enhanced!</title>
+    <title>Leo & Elsa's Simple Past Adventure!</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, Helvetica, sans-serif; /* Simple, widely available font */
             text-align: center;
-            background-color: #e6f7ff;
+            background-color: #e0f7fa; /* Light, friendly blue */
             margin: 0;
-            padding: 20px;
+            padding: 10px; /* Reduced padding for smaller screens */
             color: #333;
+            font-size: 16px; /* Base font size */
         }
         #game-container {
             background-color: white;
-            max-width: 90%;
-            min-width: 300px; /* Ensure a minimum width for better layout */
-            margin: 20px auto;
-            padding: 25px;
+            max-width: 700px; /* Max width for larger screens */
+            width: 95%;     /* Responsive width */
+            margin: 10px auto; /* Reduced margin */
+            padding: 20px;
             border-radius: 12px;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
         }
         #start-screen, #game-screen, #end-screen {
             display: none;
@@ -31,330 +32,612 @@
         input[type="text"] {
             padding: 12px;
             margin: 15px 0;
-            width: calc(80% - 24px); /* Adjust for padding */
+            width: calc(90% - 26px); /* Adjust for padding and border, more responsive */
             max-width: 300px;
             border-radius: 6px;
-            border: 1px solid #b0c4de;
-            font-size: 16px;
+            border: 1px solid #90a4ae; /* Softer border */
+            font-size: 1em; /* Relative font size */
         }
         button {
-            padding: 12px 18px;
-            font-size: 16px;
-            border-radius: 6px;
+            padding: 12px 15px; /* Adjusted padding */
+            font-size: 1em; /* Relative font size */
+            border-radius: 8px; /* Slightly more rounded */
             border: none;
-            background-color: #007bff; /* Primary button color */
+            background-color: #0288d1; /* Friendly blue */
             color: white;
             cursor: pointer;
-            margin: 10px 5px;
-            min-width: 150px;
-            transition: background-color 0.3s ease;
+            margin: 8px 5px;
+            min-width: 120px; /* Adjusted min-width */
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            line-height: 1.4; /* Ensure text fits */
         }
         button:hover {
-            background-color: #0056b3; /* Darker shade on hover */
+            background-color: #0277bd;
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0px);
         }
         button.option-btn {
-            background-color: #6c757d; /* Option button color */
-            width: auto; /* Adjust width based on content */
-            max-width: 180px;
+            background-color: #546e7a; /* Darker grey for options */
+            width: auto; /* Fit content */
+            max-width: 160px; /* Adjusted max-width */
         }
         button.option-btn:hover {
-            background-color: #5a6268;
+            background-color: #455a64;
         }
         button.correct {
-            background-color: #28a745 !important; /* Green for correct */
-            color: white !important;
+            background-color: #388e3c !important; /* Green for correct */
         }
         button.incorrect {
-            background-color: #dc3545 !important; /* Red for incorrect */
-            color: white !important;
+            background-color: #d32f2f !important; /* Red for incorrect */
         }
         button.show-correct {
-            border: 2px solid #28a745; /* Highlight correct answer if user was wrong */
-            background-color: #e6ffe6;
-            color: #28a745;
+            box-shadow: 0 0 0 3px rgba(56, 142, 60, 0.5); /* Green glow */
         }
         button:disabled {
-            background-color: #ccc;
+            background-color: #b0bec5; /* Lighter grey for disabled */
             cursor: not-allowed;
+            transform: none;
         }
-        #score-area {
-            font-size: 20px;
-            margin: 15px;
-            color: #0056b3;
+        #score-area, #timer-area {
+            font-size: 1.1em; /* Relative font size */
+            margin: 8px 10px;
+            color: #01579b; /* Darker blue */
+            display: inline-block;
         }
         #story-text {
-            margin: 25px 0;
-            font-size: 19px;
+            margin: 20px 0;
+            font-size: 1.2em; /* Larger story text, relative */
             line-height: 1.6;
-            color: #555;
+            color: #37474f; /* Dark grey for text */
+            min-height: 50px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        #story-text.speaking {
+            background-color: #b3e5fc; /* Lighter blue when speaking */
+            outline: 2px solid #0288d1;
         }
         #options-container {
-            margin-top: 20px;
+            margin-top: 15px;
             display: flex;
-            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
-            justify-content: center; /* Center buttons */
-            gap: 10px; /* Spacing between buttons */
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px; /* Reduced gap */
         }
-        #feedback-area {
-            margin: 20px 0;
-            font-size: 18px;
-            font-weight: bold;
-            min-height: 25px; /* Reserve space for feedback */
+        #feedback-area, #ai-story-twist-area {
+            margin: 15px 0;
+            font-size: 1em;
+            min-height: 20px;
+            padding: 8px;
+            border-radius: 6px;
+            background-color: #eceff1; /* Very light grey */
+            border: 1px solid #cfd8dc;
         }
-        .feedback-correct {
-            color: #28a745;
+        #ai-story-twist-area {
+            color: #37474f;
+            font-style: italic;
         }
-        .feedback-incorrect {
-            color: #dc3545;
-        }
+        .feedback-correct { color: #388e3c; font-weight: bold; }
+        .feedback-incorrect { color: #d32f2f; font-weight: bold; }
         #progress-indicator {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 15px;
+            font-size: 0.9em; /* Relative font size */
+            color: #455a64;
+            margin-bottom: 10px;
         }
-        #next-question-btn {
-            background-color: #ffc107; /* Yellow for next */
-            color: #333;
+        #next-question-btn, #read-story-btn, .ai-button {
+            background-color: #ff9800; /* Orange for special buttons */
+            color: white;
         }
-        #next-question-btn:hover {
-            background-color: #e0a800;
+        #next-question-btn:hover, #read-story-btn:hover, .ai-button:hover {
+            background-color: #f57c00; /* Darker orange */
         }
-        h1, h2 {
-            color: #0056b3;
+        .ai-button {
+            background-color: #0097a7; /* Teal for AI buttons */
+        }
+        .ai-button:hover {
+            background-color: #00838f;
+        }
+        h1 {
+            font-size: 1.6em; /* Relative font size */
+            color: #01579b;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 1.3em; /* Relative font size */
+            color: #01579b;
+            margin: 10px 0;
+        }
+
+        #awards-area, #ai-summary-area {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #b3e5fc; /* Light blue for these areas */
+            border-radius: 6px;
+            text-align: left;
+        }
+        #awards-area h3, #ai-summary-area h3 {
+            text-align: center;
+            margin-top: 0;
+            font-size: 1.1em;
+        }
+        #awards-area p, #ai-summary-area p {
+            margin: 8px 0;
+            font-size: 1em;
+            color: #01579b;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: #ffb300; /* Softer yellow for badge */
+            color: #424242; /* Dark grey text for badge */
+            border-radius: 4px;
+            margin-right: 8px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .loading-indicator {
+            font-style: italic;
+            color: #0288d1;
+        }
+
+        /* Responsive adjustments for header elements */
+        .header-flex-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 10px; /* Space between items if they wrap */
+            margin-bottom: 10px;
+        }
+        .header-flex-container h2 {
+            margin: 0; /* Remove default margin for h2 */
         }
     </style>
 </head>
 <body>
     <div id="game-container">
         <div id="start-screen" class="active-screen">
-            <h1>Past Tense Verb Adventure</h1>
-            <p>Enter your name to start the adventure:</p>
+            <h1>Leo & Elsa's Simple Past Adventure!</h1>
+            <p>What is your name?</p>
             <input type="text" id="user-name" placeholder="Your Name">
             <button onclick="startGame()">Start Game</button>
         </div>
 
         <div id="game-screen">
-            <h2 id="welcome-message"></h2>
+            <div class="header-flex-container">
+                <h2 id="welcome-message">Hi!</h2>
+                <div id="timer-area">Time: <span id="time-display">10:00</span></div>
+            </div>
             <div id="score-area">Score: <span id="current-score">0</span></div>
             <div id="progress-indicator"></div>
-            <p id="story-text">Story will appear here.</p>
+            <p id="story-text">The story is here.</p>
+            <button id="read-story-btn" onclick="speakStory()" title="Read story aloud">Read Story</button>
             <div id="feedback-area"></div>
+            <div id="ai-story-twist-area" style="display: none;"></div>
             <div id="options-container">
                 </div>
-            <button id="next-question-btn" onclick="proceedToNextStory()" style="display: none;">Next Question</button>
+            <button id="ai-story-twist-btn" class="ai-button" onclick="getAiStoryTwist()" style="display: none;">✨ AI Story Idea</button>
+            <button id="next-question-btn" onclick="proceedToNextStory()" style="display: none;">Next</button>
         </div>
 
         <div id="end-screen">
             <h2>Game Over!</h2>
             <p id="final-score"></p>
             <p id="final-feedback"></p>
-            <button onclick="restartGame()">Restart Game</button>
+            <div id="awards-area">
+                <h3>Your Awards:</h3>
+            </div>
+            <div id="ai-summary-area" style="display:none;">
+                <h3>✨ AI Story Summary:</h3>
+                <p id="ai-summary-text" class="loading-indicator">AI is writing...</p>
+            </div>
+            <button id="get-ai-summary-btn" class="ai-button" onclick="displayAiAdventureSummary()">✨ Get AI Summary</button>
+            <button onclick="restartGame()">Play Again</button>
         </div>
     </div>
 
     <script>
+    console.log("Script loaded. Initializing game.");
+
+    // CEFR A1-A2 Simplified Stories
     const stories = [
-        { text: "Leo woke up early and decided to ______ for a run.", verb: "go", pastOptions: ["went", "gone", "going"], correctPast: "went" },
-        { text: "After his run, he ______ a big breakfast.", verb: "eat", pastOptions: ["ate", "eaten", "eating"], correctPast: "ate" },
-        { text: "He ______ his favorite book while drinking coffee.", verb: "read", pastOptions: ["read", "reading", "red"], correctPast: "read" }, // Note: "read" (past) is pronounced "red"
-        { text: "He ______ his dog for a walk in the park.", verb: "take", pastOptions: ["took", "taken", "taking"], correctPast: "took" },
-        { text: "They ______ a movie last night that was exciting.", verb: "watch", pastOptions: ["watched", "watching", "watches"], correctPast: "watched" },
-        { text: "She ______ a beautiful song at the concert.", verb: "sing", pastOptions: ["sang", "sung", "singing"], correctPast: "sang" },
-        { text: "He ______ his homework before going out.", verb: "do", pastOptions: ["did", "done", "doing"], correctPast: "did" },
-        { text: "We ______ a fantastic time at the beach yesterday.", verb: "have", pastOptions: ["had", "having", "has"], correctPast: "had" },
-        { text: "The cat ______ all the milk from the bowl.", verb: "drink", pastOptions: ["drank", "drunk", "drinking"], correctPast: "drank" },
-        { text: "They ______ a new car last month.", verb: "buy", pastOptions: ["bought", "buying", "buys"], correctPast: "bought" },
-        { text: "He ______ to the store to get some groceries.", verb: "drive", pastOptions: ["drove", "driven", "driving"], correctPast: "drove" },
-        { text: "She ______ a letter to her friend yesterday.", verb: "write", pastOptions: ["wrote", "written", "writing"], correctPast: "wrote" },
-        { text: "They ______ to the mountains for their vacation.", verb: "travel", pastOptions: ["traveled", "traveling", "travels"], correctPast: "traveled" },
-        { text: "He ______ his keys on the table.", verb: "leave", pastOptions: ["left", "leaving", "leaves"], correctPast: "left" },
-        { text: "We ______ a delicious pizza for dinner.", verb: "make", pastOptions: ["made", "making", "makes"], correctPast: "made" },
-        { text: "She ______ a beautiful dress for the party.", verb: "wear", pastOptions: ["wore", "wearing", "wears"], correctPast: "wore" },
-        { text: "They ______ a new house last year.", verb: "build", pastOptions: ["built", "building", "builds"], correctPast: "built" },
-        { text: "He ______ his bicycle to the park.", verb: "ride", pastOptions: ["rode", "riding", "rides"], correctPast: "rode" },
-        // { text: "She ______ a picture of the beautiful sunset.", verb: "take", pastOptions: ["took", "taking", "takes"], correctPast: "took" }, // Duplicate verb, varied sentence
-        { text: "The artist ______ a stunning portrait of the sunset.", verb: "paint", pastOptions: ["painted", "painting", "paints"], correctPast: "painted" },
-        { text: "We ______ a great time at the party last night.", verb: "have", pastOptions: ["had", "having", "has"], correctPast: "had" },
-        { text: "He ______ his homework before dinner.", verb: "finish", pastOptions: ["finished", "finishing", "finishes"], correctPast: "finished" },
-        { text: "They ______ to the concert and enjoyed the music.", verb: "go", pastOptions: ["went", "gone", "going"], correctPast: "went" },
-        { text: "She ______ a cake for her friend's birthday.", verb: "bake", pastOptions: ["baked", "baking", "bakes"], correctPast: "baked" },
-        { text: "He ______ his room before his parents came home.", verb: "clean", pastOptions: ["cleaned", "cleaning", "cleans"], correctPast: "cleaned" },
-        { text: "We ______ a fantastic movie at the cinema.", verb: "see", pastOptions: ["saw", "seen", "seeing"], correctPast: "saw" },
-        { text: "She ______ a new language for her trip abroad.", verb: "learn", pastOptions: ["learned", "learning", "learns"], correctPast: "learned" },
-        { text: "They ______ a lot of money on their vacation.", verb: "spend", pastOptions: ["spent", "spending", "spends"], correctPast: "spent" },
-        { text: "He ______ his friend at the coffee shop.", verb: "meet", pastOptions: ["met", "meeting", "meets"], correctPast: "met" },
-        // { text: "She ______ a beautiful painting at the art gallery.", verb: "see", pastOptions: ["saw", "seen", "seeing"], correctPast: "saw" }, // Duplicate verb
-        { text: "The children ______ happily in the garden.", verb: "play", pastOptions: ["played", "playing", "plays"], correctPast: "played" },
-        { text: "He ______ his phone at home and had to go back.", verb: "forget", pastOptions: ["forgot", "forgetting", "forgets"], correctPast: "forgot" },
-        { text: "They ______ a new restaurant in town and loved the food.", verb: "try", pastOptions: ["tried", "trying", "tries"], correctPast: "tried" },
-        { text: "The sun ______ brightly all day long.", verb: "shine", pastOptions: ["shone", "shined", "shining"], correctPast: "shone" }, // 'shined' is also acceptable but 'shone' is common
-        { text: "He ______ his best to finish the project on time.", verb: "do", pastOptions: ["did", "done", "doing"], correctPast: "did" },
-        { text: "She ______ a delicious meal for her family.", verb: "cook", pastOptions: ["cooked", "cooking", "cooks"], correctPast: "cooked" },
-        { text: "They ______ a new game and played it all day.", verb: "get", pastOptions: ["got", "getting", "gets"], correctPast: "got" },
-        { text: "He ______ his sister with her homework.", verb: "help", pastOptions: ["helped", "helping", "helps"], correctPast: "helped" },
-        // { text: "She ______ a beautiful song on the piano.", verb: "play", pastOptions: ["played", "playing", "plays"], correctPast: "played" }, // Duplicate
-        { text: "The bird ______ a sweet melody from the treetop.", verb: "sing", pastOptions: ["sang", "sung", "singing"], correctPast: "sang" },
-        { text: "He ______ his friend a funny joke.", verb: "tell", pastOptions: ["told", "telling", "tells"], correctPast: "told" },
-        { text: "They ______ a new TV show and binge-watched it.", verb: "find", pastOptions: ["found", "finding", "finds"], correctPast: "found" },
-        { text: "She ______ a beautiful dress for the occasion.", verb: "choose", pastOptions: ["chose", "choosing", "chooses"], correctPast: "chose" },
-        { text: "The teacher ______ the lesson clearly.", verb: "explain", pastOptions: ["explained", "explaining", "explains"], correctPast: "explained" },
-        { text: "She ______ a glass of water because she was thirsty.", verb: "drink", pastOptions: ["drank", "drunk", "drinking"], correctPast: "drank" },
-        { text: "They ______ a sandcastle on the beach.", verb: "build", pastOptions: ["built", "building", "builds"], correctPast: "built" },
-        { text: "He ______ the ball very far.", verb: "throw", pastOptions: ["threw", "thrown", "throwing"], correctPast: "threw" },
-        { text: "She ______ a prize in the competition.", verb: "win", pastOptions: ["won", "winning", "wins"], correctPast: "won" },
-        { text: "The flowers ______ beautifully in the spring.", verb: "bloom", pastOptions: ["bloomed", "blooming", "blooms"], correctPast: "bloomed" },
-        { text: "He ______ over the fence to get the ball.", verb: "jump", pastOptions: ["jumped", "jumping", "jumps"], correctPast: "jumped" },
-        { text: "She ______ the door quietly.", verb: "close", pastOptions: ["closed", "closing", "closes"], correctPast: "closed" },
-        { text: "They ______ for the bus for a long time.", verb: "wait", pastOptions: ["waited", "waiting", "waits"], correctPast: "waited" },
-        { text: "He ______ up the stairs quickly.", verb: "run", pastOptions: ["ran", "run", "running"], correctPast: "ran" }
+        { text: "It is morning. Leo and Elsa ______ up. A new day!", verb: "wake", pastVerb: "woke", pastOptions: ["woke", "waked", "woken"], correctPast: "woke" },
+        { text: "Elsa ______ a map. The map is for the woods.", verb: "find", pastVerb: "found", pastOptions: ["found", "finded", "finding"], correctPast: "found" },
+        { text: "Leo ______ a bag. He puts food in the bag.", verb: "pack", pastVerb: "packed", pastOptions: ["packed", "packt", "packing"], correctPast: "packed" },
+        { text: "They ______ 'goodbye' to their dog.", verb: "wave", pastVerb: "waved", pastOptions: ["waved", "wove", "waving"], correctPast: "waved" },
+        { text: "They ______ to the woods. The sun is nice.", verb: "go", pastVerb: "went", pastOptions: ["went", "gone", "goed"], correctPast: "went" },
+        { text: "Oh look! They ______ a big, red mushroom.", verb: "see", pastVerb: "saw", pastOptions: ["saw", "seen", "seeing"], correctPast: "saw" },
+        { text: "Leo ______ down. He looks at the mushroom.", verb: "bend", pastVerb: "bent", pastOptions: ["bent", "bended", "bending"], correctPast: "bent" },
+        { text: "Elsa ______ a photo with her camera.", verb: "take", pastVerb: "took", pastOptions: ["took", "taked", "taken"], correctPast: "took" },
+        { text: "Then, they ______ a blue river.", verb: "reach", pastVerb: "reached", pastOptions: ["reached", "reacht", "reaching"], correctPast: "reached" },
+        { text: "They ______ on an old bridge.", verb: "walk", pastVerb: "walked", pastOptions: ["walked", "walken", "walking"], correctPast: "walked" },
+        { text: "They ______ old stones and old walls.", verb: "discover", pastVerb: "discovered", pastOptions: ["discovered", "discoverd", "discovering"], correctPast: "discovered"},
+        { text: "A paper ______ them a question.", verb: "give", pastVerb: "gave", pastOptions: ["gave", "given", "giving"], correctPast: "gave"},
+        { text: "They ______ for a long time. Then, an idea!", verb: "think", pastVerb: "thought", pastOptions: ["thought", "thinked", "thinking"], correctPast: "thought"},
+        { text: "The idea ______ a new path to a waterfall.", verb: "show", pastVerb: "showed", pastOptions: ["showed", "shown", "showing"], correctPast: "showed"}, // Changed verb for simplicity
+        { text: "It is night. They ______ home. Good job!", verb: "come", pastVerb: "came", pastOptions: ["came", "comed", "coming"], correctPast: "came"} // Changed verb for simplicity
     ];
 
     let userName = "";
     let currentScore = 0;
-    let questionsAnswered = 0; // Use this to track progress through shuffled list
-    let shuffledStories = [];
-    let totalQuestions = 0;
+    let currentQuestionIndex = 0;
+    let totalQuestions = stories.length;
 
-    const startScreen = document.getElementById('start-screen');
-    const gameScreen = document.getElementById('game-screen');
-    const endScreen = document.getElementById('end-screen');
-    const userNameInput = document.getElementById('user-name');
-    const welcomeMessage = document.getElementById('welcome-message');
-    const currentScoreDisplay = document.getElementById('current-score');
-    const storyTextElement = document.getElementById('story-text');
-    const optionsContainer = document.getElementById('options-container');
-    const feedbackArea = document.getElementById('feedback-area');
-    const finalScoreDisplay = document.getElementById('final-score');
-    const finalFeedbackDisplay = document.getElementById('final-feedback');
-    const nextQuestionBtn = document.getElementById('next-question-btn');
-    const progressIndicator = document.getElementById('progress-indicator');
+    const GAME_DURATION_SECONDS = 10 * 60;
+    let timeLeft = GAME_DURATION_SECONDS;
+    let timerInterval;
 
+    let startScreen, gameScreen, endScreen, userNameInput, welcomeMessage, currentScoreDisplay,
+        storyTextElement, optionsContainer, feedbackArea, finalScoreDisplay, finalFeedbackDisplay,
+        awardsAreaDisplay, nextQuestionBtn, progressIndicator, timeDisplay, aiStoryTwistArea,
+        aiStoryTwistBtn, aiSummaryArea, aiSummaryTextElement, getAiSummaryBtn;
+    
+    let correctSound, incorrectSound, clickSound;
+
+    const ttsSupported = 'speechSynthesis' in window;
+    const utterance = ttsSupported ? new SpeechSynthesisUtterance() : null;
+    if (utterance) {
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+    }
+    
+    const GEMINI_API_KEY = ""; 
+    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+    async function callGeminiAPI(prompt) {
+        console.log("Calling Gemini API with prompt:", prompt);
+        const payload = {
+            contents: [{ role: "user", parts: [{ text: prompt }] }]
+        };
+        try {
+            const response = await fetch(GEMINI_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                const errorBody = await response.text();
+                console.error("Gemini API request failed:", response.status, errorBody);
+                throw new Error(`API error: ${response.statusText} - ${errorBody}`);
+            }
+            const result = await response.json();
+            console.log("Gemini API response:", result);
+            if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts[0].text) {
+                return result.candidates[0].content.parts[0].text;
+            } else {
+                console.error("Bad response structure from Gemini API:", result);
+                throw new Error("Cannot get text from API response.");
+            }
+        } catch (error) {
+            console.error("Error calling Gemini API:", error);
+            return `Sorry, AI cannot write now. Error: ${error.message}.`;
+        }
+    }
+
+    async function getAiStoryTwist() {
+        playSound(clickSound);
+        aiStoryTwistBtn.disabled = true;
+        aiStoryTwistArea.style.display = 'block';
+        aiStoryTwistArea.innerHTML = '<p class="loading-indicator">✨ AI is thinking...</p>';
+
+        const currentStory = stories[currentQuestionIndex];
+        const storySegmentText = currentStory.text.replace("______", currentStory.correctPast);
+        const verb = currentStory.pastVerb;
+
+        const prompt = `This is for a simple English game (A1-A2 level). The story is: "${storySegmentText}". The past tense verb is "${verb}". Write 1 very simple 'what if' sentence (max 10 words). Use the verb "${verb}" (past tense). Make it fun and easy to understand. For example, if story is "Leo saw a cat." and verb is "saw", you say "What if Leo saw a dog?"`;
+        
+        const twist = await callGeminiAPI(prompt);
+        aiStoryTwistArea.innerHTML = `<p><strong>✨ AI Idea:</strong> ${twist}</p>`;
+        speakText(`AI Idea: ${twist}`);
+    }
+
+    async function displayAiAdventureSummary() {
+        playSound(clickSound);
+        getAiSummaryBtn.disabled = true;
+        aiSummaryArea.style.display = 'block';
+        aiSummaryTextElement.className = 'loading-indicator';
+        aiSummaryTextElement.textContent = '✨ AI is writing...';
+
+        const completedAdventureHighlights = stories.slice(0, currentQuestionIndex +1)
+            .map(s => s.text.replace("______", s.correctPast).replace(/\./g, ';')) // Replace periods to avoid premature sentence end in prompt
+            .join(" ");
+
+        const prompt = `This is for a simple English game (A1-A2 level). Leo and Elsa had an adventure: "${completedAdventureHighlights}". Write a very short, happy summary (1-2 simple sentences, max 20 words). For example: "Leo and Elsa had a fun day! They saw a mushroom and a river."`;
+        
+        const summary = await callGeminiAPI(prompt);
+        aiSummaryTextElement.className = '';
+        aiSummaryTextElement.textContent = summary;
+        speakText(`AI Summary: ${summary}`);
+    }
+
+    function initializeSounds() {
+        correctSound = document.getElementById('correct-sound');
+        incorrectSound = document.getElementById('incorrect-sound');
+        clickSound = document.getElementById('click-sound');
+    }
+
+    function playSound(soundElement) {
+        if (soundElement && typeof soundElement.play === 'function') {
+            soundElement.currentTime = 0;
+            soundElement.play().catch(error => console.warn("Sound play error:", error.message));
+        }
+    }
+
+    function speakText(textToSpeak, elementToHighlight = null) {
+        if (utterance && ttsSupported) {
+            window.speechSynthesis.cancel();
+            utterance.text = textToSpeak;
+            utterance.onstart = () => { if (elementToHighlight) elementToHighlight.classList.add('speaking'); };
+            utterance.onend = () => { if (elementToHighlight) elementToHighlight.classList.remove('speaking'); };
+            utterance.onerror = (event) => {
+                console.warn('TTS error:', event.error);
+                if (elementToHighlight) elementToHighlight.classList.remove('speaking');
+            };
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+    
+    function speakStory() {
+        playSound(clickSound);
+        const story = stories[currentQuestionIndex];
+        if (story) {
+            speakText(story.text.replace("______", "blank space"), storyTextElement);
+        }
+    }
 
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            [array[i], array[j]] = [array[j], array[i]];
         }
     }
 
     function startGame() {
-        userName = userNameInput.value.trim() || "Player";
-        welcomeMessage.textContent = `Good luck, ${userName}!`;
+        console.log("startGame");
+        playSound(clickSound);
+        userName = userNameInput.value.trim() || "Friend"; // Simpler default name
+        welcomeMessage.textContent = `Hi, ${userName}!`;
         
         currentScore = 0;
-        questionsAnswered = 0;
+        currentQuestionIndex = 0;
         currentScoreDisplay.textContent = currentScore;
-
-        shuffledStories = [...stories]; // Create a copy to shuffle
-        shuffleArray(shuffledStories);
-        totalQuestions = shuffledStories.length; // Or set a fixed number like 10 for a shorter game
+        totalQuestions = stories.length;
 
         startScreen.classList.remove('active-screen');
         gameScreen.classList.add('active-screen');
         endScreen.classList.remove('active-screen');
         
         feedbackArea.textContent = "";
+        aiStoryTwistArea.style.display = 'none';
+        aiStoryTwistArea.innerHTML = '';
+        aiStoryTwistBtn.style.display = 'none';
+        aiStoryTwistBtn.disabled = false; 
         nextQuestionBtn.style.display = "none";
+
+        awardsAreaDisplay.innerHTML = "<h3>Your Awards:</h3>"; 
+        aiSummaryArea.style.display = 'none';
+        aiSummaryTextElement.textContent = 'AI is writing...';
+        getAiSummaryBtn.disabled = false;
         
+        startTimer();
         loadNewStory();
     }
 
+    function startTimer() {
+        timeLeft = GAME_DURATION_SECONDS;
+        updateTimerDisplay();
+        clearInterval(timerInterval); 
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimerDisplay();
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                feedbackArea.textContent = "Time is up!";
+                endGame(true); 
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timeDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+    }
+
     function loadNewStory() {
-        if (questionsAnswered >= totalQuestions) {
+        aiStoryTwistArea.style.display = 'none';
+        aiStoryTwistBtn.style.display = 'none';
+        aiStoryTwistBtn.disabled = false;
+
+        if (currentQuestionIndex >= totalQuestions) {
             endGame();
             return;
         }
 
-        const story = shuffledStories[questionsAnswered];
+        const story = stories[currentQuestionIndex];
+        if (!story) {
+            console.error("Error: Story not found at index", currentQuestionIndex);
+            endGame(false, true);
+            return;
+        }
+
         storyTextElement.textContent = story.text;
-        optionsContainer.innerHTML = ''; // Clear previous options
+        optionsContainer.innerHTML = ''; 
         feedbackArea.textContent = "";
-        feedbackArea.className = 'feedback-area'; // Reset feedback class
+        feedbackArea.className = 'feedback-area';
         nextQuestionBtn.style.display = "none";
-        progressIndicator.textContent = `Question ${questionsAnswered + 1} of ${totalQuestions}`;
+        progressIndicator.textContent = `Part ${currentQuestionIndex + 1} of ${totalQuestions}`;
 
-        // Shuffle options for more variety, though not strictly necessary for past tense
         const displayOptions = [...story.pastOptions];
-        shuffleArray(displayOptions); // Optional: shuffle the order of answer buttons
+        shuffleArray(displayOptions);
 
-        displayOptions.forEach(option => {
+        displayOptions.forEach(optionText => {
             const button = document.createElement('button');
-            button.textContent = option;
+            button.textContent = optionText;
             button.classList.add('option-btn');
-            button.onclick = () => checkAnswer(option, story.correctPast, button);
+            button.onclick = () => {
+                playSound(clickSound);
+                checkAnswer(optionText, story.correctPast, button);
+            };
+            button.onmouseover = () => {
+                if (ttsSupported && !button.disabled) speakText(optionText);
+            };
             optionsContainer.appendChild(button);
         });
     }
 
     function checkAnswer(selectedOption, correctPast, clickedButton) {
-        // Disable all option buttons after an answer
         const optionButtons = optionsContainer.getElementsByTagName('button');
         for (let btn of optionButtons) {
             btn.disabled = true;
+            btn.onmouseover = null; 
         }
 
         if (selectedOption === correctPast) {
             currentScore++;
             currentScoreDisplay.textContent = currentScore;
-            feedbackArea.textContent = "Correct!";
+            feedbackArea.textContent = "Good job!";
             feedbackArea.className = 'feedback-correct';
             clickedButton.classList.add('correct');
+            playSound(correctSound);
+            speakText("Good job!");
+            aiStoryTwistBtn.style.display = 'inline-block'; // Show AI twist button on correct answer
         } else {
-            feedbackArea.textContent = `Not quite! The correct answer was "${correctPast}".`;
+            feedbackArea.textContent = `Oops! The answer is "${correctPast}".`;
             feedbackArea.className = 'feedback-incorrect';
             clickedButton.classList.add('incorrect');
-            // Highlight the correct button
+            playSound(incorrectSound);
+            speakText(`Oops! The answer is ${correctPast}.`);
             for (let btn of optionButtons) {
                 if (btn.textContent === correctPast) {
-                    btn.classList.add('show-correct'); // Could also use 'correct' if preferred
+                    btn.classList.add('show-correct'); 
                 }
             }
         }
-        
-        questionsAnswered++;
-        nextQuestionBtn.style.display = "inline-block"; // Show next question button
+        nextQuestionBtn.style.display = "inline-block";
     }
 
     function proceedToNextStory() {
+        playSound(clickSound);
+        currentQuestionIndex++;
         loadNewStory();
     }
 
-    function endGame() {
+    function endGame(timedOut = false, errorOccurred = false) {
+        stopTimer();
         gameScreen.classList.remove('active-screen');
         endScreen.classList.add('active-screen');
-        finalScoreDisplay.textContent = `${userName}, your final score is ${currentScore} out of ${totalQuestions}!`;
+        
+        if (errorOccurred) {
+            finalScoreDisplay.textContent = "Oh no! An error. Please try again.";
+            finalFeedbackDisplay.textContent = "";
+            awardsAreaDisplay.innerHTML = "<h3>Your Awards:</h3><p>No awards now.</p>";
+            return;
+        }
+
+        let scoreMessage = `${userName}, your score is ${currentScore} / ${totalQuestions}.`;
+        if (timedOut && currentQuestionIndex < totalQuestions) {
+            scoreMessage += " (Time up!)";
+        }
+        finalScoreDisplay.textContent = scoreMessage;
 
         let performanceFeedback = "";
-        const percentage = (currentScore / totalQuestions) * 100;
-        if (percentage >= 90) {
-            performanceFeedback = "Excellent work! You're a past tense master!";
-        } else if (percentage >= 70) {
-            performanceFeedback = "Great job! Very well done.";
+        const percentage = totalQuestions > 0 ? (currentScore / totalQuestions) * 100 : 0;
+
+        if (timedOut && currentQuestionIndex < totalQuestions) {
+            performanceFeedback = "Time is up! Play again soon.";
+        } else if (percentage === 100) {
+            performanceFeedback = "Wow! Perfect score! You are great!";
+        } else if (percentage >= 75) {
+            performanceFeedback = "Very good! You know many past verbs.";
         } else if (percentage >= 50) {
-            performanceFeedback = "Good effort! Keep practicing.";
+            performanceFeedback = "Good work! Keep learning.";
         } else {
-            performanceFeedback = "Keep practicing to improve your skills!";
+            performanceFeedback = "Nice try! Practice more to be better.";
         }
         finalFeedbackDisplay.textContent = performanceFeedback;
+
+        awardsAreaDisplay.innerHTML = "<h3>Your Awards:</h3>"; 
+        let badgesAwarded = 0;
+        if (percentage === 100 && !timedOut) {
+            awardsAreaDisplay.innerHTML += '<p><span class="badge">Super Storyteller</span> All correct!</p>';
+            badgesAwarded++;
+        }
+        if (currentScore >= Math.floor(totalQuestions * 0.7) && totalQuestions > 0) { 
+             awardsAreaDisplay.innerHTML += '<p><span class="badge">Verb Star</span> Many verbs correct!</p>';
+             badgesAwarded++;
+        }
+        if (currentQuestionIndex === totalQuestions && !timedOut) { 
+            awardsAreaDisplay.innerHTML += '<p><span class="badge">Adventure Hero</span> You finished the story!</p>';
+            badgesAwarded++;
+        }
+        if (badgesAwarded === 0) {
+            awardsAreaDisplay.innerHTML += "<p>Play more to get badges!</p>";
+        }
+        speakText(`${scoreMessage} ${performanceFeedback}`);
     }
 
     function restartGame() {
+        playSound(clickSound);
+        stopTimer();
+        userNameInput.value = ""; 
         currentScore = 0;
-        questionsAnswered = 0; // Reset this counter
-        userNameInput.value = ""; // Clear the name input field
-
-        // Reset displays
+        currentQuestionIndex = 0;
+        
         currentScoreDisplay.textContent = currentScore;
         feedbackArea.textContent = "";
         progressIndicator.textContent = "";
-        
+        timeDisplay.textContent = "10:00"; 
+
         endScreen.classList.remove('active-screen');
         startScreen.classList.add('active-screen');
     }
 
-    // Initial setup: Show start screen
-    document.getElementById('start-screen').classList.add('active-screen');
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("DOM loaded. Setting up elements.");
+        // Initialize DOM element variables
+        startScreen = document.getElementById('start-screen');
+        gameScreen = document.getElementById('game-screen');
+        endScreen = document.getElementById('end-screen');
+        userNameInput = document.getElementById('user-name');
+        welcomeMessage = document.getElementById('welcome-message');
+        currentScoreDisplay = document.getElementById('current-score');
+        storyTextElement = document.getElementById('story-text');
+        optionsContainer = document.getElementById('options-container');
+        feedbackArea = document.getElementById('feedback-area');
+        finalScoreDisplay = document.getElementById('final-score');
+        finalFeedbackDisplay = document.getElementById('final-feedback');
+        awardsAreaDisplay = document.getElementById('awards-area');
+        nextQuestionBtn = document.getElementById('next-question-btn');
+        progressIndicator = document.getElementById('progress-indicator');
+        timeDisplay = document.getElementById('time-display');
+        aiStoryTwistArea = document.getElementById('ai-story-twist-area');
+        aiStoryTwistBtn = document.getElementById('ai-story-twist-btn');
+        aiSummaryArea = document.getElementById('ai-summary-area');
+        aiSummaryTextElement = document.getElementById('ai-summary-text');
+        getAiSummaryBtn = document.getElementById('get-ai-summary-btn');
 
+        if(startScreen) startScreen.classList.add('active-screen');
+        else console.error("Start screen not found!");
+        if(gameScreen) gameScreen.classList.remove('active-screen');
+        if(endScreen) endScreen.classList.remove('active-screen');
+        
+        initializeSounds();
+
+        // Basic check for critical elements
+        if (!storyTextElement || !optionsContainer || !feedbackArea) {
+            console.error("CRITICAL: Core game elements missing!");
+            alert("Error: Game cannot start. Important parts are missing.");
+        } else {
+            console.log("Core game elements found.");
+        }
+    });
     </script>
 </body>
 </html>
