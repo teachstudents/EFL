@@ -23,10 +23,14 @@
             border-radius: 12px;
             box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
         }
+        /* All screens are hidden by default */
         #start-screen, #game-screen, #end-screen {
             display: none;
         }
-        .active-screen {
+        /* A screen becomes visible when it has its ID AND the .active-screen class */
+        #start-screen.active-screen,
+        #game-screen.active-screen,
+        #end-screen.active-screen {
             display: block;
         }
         input[type="text"] {
@@ -106,54 +110,52 @@
             justify-content: center;
             gap: 8px; /* Reduced gap */
         }
-        #feedback-area { /* Combined feedback and AI area styling as AI area is removed */
+        #feedback-area { 
             margin: 15px 0;
             font-size: 1em;
             min-height: 20px;
             padding: 8px;
             border-radius: 6px;
-            background-color: #eceff1; /* Very light grey */
+            background-color: #eceff1; 
             border: 1px solid #cfd8dc;
         }
         .feedback-correct { color: #388e3c; font-weight: bold; }
         .feedback-incorrect { color: #d32f2f; font-weight: bold; }
         #progress-indicator {
-            font-size: 0.9em; /* Relative font size */
+            font-size: 0.9em; 
             color: #455a64;
             margin-bottom: 10px;
         }
-        #next-question-btn, #read-story-btn { /* Removed .ai-button from this rule */
-            background-color: #ff9800; /* Orange for special buttons */
+        #next-question-btn, #read-story-btn { 
+            background-color: #ff9800; 
             color: white;
         }
-        #next-question-btn:hover, #read-story-btn:hover { /* Removed .ai-button from this rule */
-            background-color: #f57c00; /* Darker orange */
+        #next-question-btn:hover, #read-story-btn:hover { 
+            background-color: #f57c00; 
         }
-        /* Removed .ai-button specific styles as they are no longer needed */
         h1 {
-            font-size: 1.6em; /* Relative font size */
+            font-size: 1.6em; 
             color: #01579b;
             margin-bottom: 10px;
         }
         h2 {
-            font-size: 1.3em; /* Relative font size */
+            font-size: 1.3em; 
             color: #01579b;
             margin: 10px 0;
         }
-
-        #awards-area { /* Removed #ai-summary-area from this rule */
+        #awards-area { 
             margin-top: 15px;
             padding: 10px;
-            background-color: #b3e5fc; /* Light blue for these areas */
+            background-color: #b3e5fc; 
             border-radius: 6px;
             text-align: left;
         }
-        #awards-area h3 { /* Removed #ai-summary-area from this rule */
+        #awards-area h3 { 
             text-align: center;
             margin-top: 0;
             font-size: 1.1em;
         }
-        #awards-area p { /* Removed #ai-summary-area from this rule */
+        #awards-area p { 
             margin: 8px 0;
             font-size: 1em;
             color: #01579b;
@@ -161,35 +163,33 @@
         .badge {
             display: inline-block;
             padding: 4px 8px;
-            background-color: #ffb300; /* Softer yellow for badge */
-            color: #424242; /* Dark grey text for badge */
+            background-color: #ffb300; 
+            color: #424242; 
             border-radius: 4px;
             margin-right: 8px;
             font-weight: bold;
             font-size: 0.9em;
         }
-        .loading-indicator { /* Kept in case other async features are added later, but not used now */
+        .loading-indicator { 
             font-style: italic;
             color: #0288d1;
         }
-
-        /* Responsive adjustments for header elements */
         .header-flex-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap; /* Allow wrapping on small screens */
-            gap: 10px; /* Space between items if they wrap */
+            flex-wrap: wrap; 
+            gap: 10px; 
             margin-bottom: 10px;
         }
         .header-flex-container h2 {
-            margin: 0; /* Remove default margin for h2 */
+            margin: 0; 
         }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <div id="start-screen" class="active-screen">
+        <div id="start-screen"> 
             <h1>Leo & Elsa's Simple Past Adventure!</h1>
             <p>What is your name?</p>
             <input type="text" id="user-name" placeholder="Your Name">
@@ -225,7 +225,6 @@
     <script>
     console.log("Script loaded. Initializing game (Offline Version).");
 
-    // CEFR A1-A2 Simplified Stories
     const stories = [
         { text: "It is morning. Leo and Elsa ______ up. A new day!", verb: "wake", pastVerb: "woke", pastOptions: ["woke", "waked", "woken"], correctPast: "woke" },
         { text: "Elsa ______ a map. The map is for the woods.", verb: "find", pastVerb: "found", pastOptions: ["found", "finded", "finding"], correctPast: "found" },
@@ -311,13 +310,13 @@
     function startGame() {
         console.log("startGame function called.");
         playSound(clickSound);
-        if (!userNameInput) { // Defensive check
+        if (!userNameInput) { 
             console.error("userNameInput element not found in startGame!");
             return;
         }
         userName = userNameInput.value.trim() || "Friend"; 
         
-        if (!welcomeMessage) { // Defensive check
+        if (!welcomeMessage) { 
             console.error("welcomeMessage element not found in startGame!");
         } else {
             welcomeMessage.textContent = `Hi, ${userName}!`;
@@ -546,11 +545,12 @@
         console.log("User name input element:", userNameInput);
 
         if(startScreen) {
-            startScreen.classList.add('active-screen');
-            console.log("Start screen 'active-screen' class added.");
+            startScreen.classList.add('active-screen'); // JS now explicitly makes start-screen active
+            console.log("Start screen 'active-screen' class added by JS.");
         } else {
             console.error("Start screen element NOT FOUND!");
         }
+        // Ensure other screens are not active initially
         if(gameScreen) gameScreen.classList.remove('active-screen');
         if(endScreen) endScreen.classList.remove('active-screen');
         
