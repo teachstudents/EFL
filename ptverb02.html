@@ -226,6 +226,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM Fully Loaded and Parsed");
             // --- DOM Elements ---
             const startScreen = document.getElementById('start-screen');
             const gameScreen = document.getElementById('game-screen');
@@ -277,7 +278,9 @@
             
             // --- TTS Functions ---
             function populateVoiceList() {
+                console.log("populateVoiceList called");
                 voices = speechSynthesis.getVoices();
+                console.log("Voices found:", voices.length);
                 voiceSelect.innerHTML = '';
                 const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
                 
@@ -290,6 +293,7 @@
                 });
 
                 if (englishVoices.length > 0) {
+                    console.log("English voices found:", englishVoices.length);
                     const naturalKeywords = ["natural", "neural", "wavenet", "studio", "enhanced", "premium"];
                     let defaultVoice = englishVoices.find(v => naturalKeywords.some(kw => v.name.toLowerCase().includes(kw)));
                     
@@ -299,27 +303,38 @@
                     if (!defaultVoice) defaultVoice = englishVoices[0]; 
                     
                     selectedVoice = defaultVoice;
+                    console.log("Default voice selected:", selectedVoice ? selectedVoice.name : "None");
                     for (let i = 0; i < voiceSelect.options.length; i++) {
                         if (voiceSelect.options[i].dataset.name === selectedVoice.name && voiceSelect.options[i].dataset.lang === selectedVoice.lang) {
                             voiceSelect.selectedIndex = i;
                             break;
                         }
                     }
-                    initiateQuestionButton.disabled = false; // Enable button if voices are found
+                    initiateQuestionButton.disabled = false; 
                 } else {
                     currentActivityDisplay.textContent = "No English voices found for Text-to-Speech. Game may not function correctly.";
-                    initiateQuestionButton.disabled = true; // Disable if no voices
+                    initiateQuestionButton.disabled = true; 
+                    console.warn("No English voices found.");
                 }
             }
 
             if ('speechSynthesis' in window) {
-                populateVoiceList();
+                console.log("Speech Synthesis API supported.");
+                // speechSynthesis.getVoices() might be empty on first call for some browsers,
+                // so rely on onvoiceschanged.
+                if (speechSynthesis.getVoices().length > 0) {
+                    populateVoiceList();
+                }
                 if (speechSynthesis.onvoiceschanged !== undefined) {
                     speechSynthesis.onvoiceschanged = populateVoiceList;
+                } else { // Fallback for browsers that don't fire onvoiceschanged consistently
+                     setTimeout(populateVoiceList, 500); // Try after a short delay
                 }
+
                 voiceSelect.addEventListener('change', (e) => {
                     const selectedOption = e.target.options[e.target.selectedIndex];
                     selectedVoice = voices.find(voice => voice.name === selectedOption.dataset.name && voice.lang === selectedOption.dataset.lang);
+                    console.log("Voice changed to:", selectedVoice ? selectedVoice.name : "None");
                 });
             } else {
                 console.warn("Speech Synthesis not supported");
@@ -344,7 +359,7 @@
                     console.warn("No selected voice, using browser default.");
                 }
                 utterance.onend = () => {
-                    console.log("Speech finished.");
+                    console.log("Speech finished for:", text.substring(0,20) + "...");
                     if(callback) callback();
                 };
                 utterance.onerror = (event) => {
@@ -372,11 +387,10 @@
 
                 updateGameStatsDisplay();
                 initiateQuestionButton.textContent = "Start First Question";
-                // Ensure button is enabled only if TTS is supported and voices are loaded
-                initiateQuestionButton.disabled = !('speechSynthesis' in window) || voices.length === 0;
+                initiateQuestionButton.disabled = !('speechSynthesis' in window) || (voices && voices.filter(v => v.lang.startsWith('en')).length === 0);
                 currentActivityDisplay.textContent = "Click 'Start First Question' to begin!";
                  if (initiateQuestionButton.disabled) {
-                    currentActivityDisplay.textContent = "Text-to-Speech is not available or no voices found. Cannot start game.";
+                    currentActivityDisplay.textContent = "Text-to-Speech is not available or no English voices found. Cannot start game.";
                 }
             }
 
@@ -427,8 +441,9 @@
             }
             
             function startNewQuestionRound() {
-                console.log("startNewQuestionRound called. Questions answered:", gameData.questionsAnswered);
+                console.log("startNewQuestionRound called. Questions answered:", gameData.questionsAnswered, "Total Qs:", TOTAL_QUESTIONS_PER_GAME);
                 if (gameData.questionsAnswered >= TOTAL_QUESTIONS_PER_GAME) { 
+                    console.log("Ending game because all questions answered.");
                     endGame();
                     return;
                 }
@@ -436,11 +451,10 @@
                 currentActivityDisplay.textContent = "Listen carefully to the sentence...";
 
                 if (currentQuestionIndexInShuffledList >= shuffledSentenceIndices.length) {
-                    console.warn("Ran out of unique sentences before reaching TOTAL_QUESTIONS_PER_GAME. Resetting shuffled list.");
-                    shuffledSentenceIndices = Array.from(Array(pastTenseSentences.length).keys());
-                    shuffleArray(shuffledSentenceIndices);
-                    currentQuestionIndexInShuffledList = 0;
-                    // Potentially add logic to avoid immediate repeats if desired, though less likely with 50 sentences.
+                    console.warn("Ran out of unique sentences. This shouldn't happen if TOTAL_QUESTIONS_PER_GAME <= pastTenseSentences.length");
+                    // This case should ideally not be hit if TOTAL_QUESTIONS_PER_GAME is less than or equal to sentence count
+                    endGame(); // End game if we truly run out of sentences.
+                    return;
                 }
 
                 const actualSentenceIndex = shuffledSentenceIndices[currentQuestionIndexInShuffledList];
@@ -448,7 +462,7 @@
                 
                 console.log("Preparing to speak sentence:", currentSentenceObject.sentence);
                 speak(currentSentenceObject.sentence, () => {
-                    console.log("Speak callback triggered, displaying question modal.");
+                    console.log("Speak callback triggered, displaying question modal for:", currentSentenceObject.verb);
                     displayQuestionModal(currentSentenceObject);
                 });
             }
@@ -473,7 +487,7 @@
                     const choiceBtn = document.createElement('button');
                     choiceBtn.classList.add('choice-button');
                     choiceBtn.textContent = optionText;
-                    choiceBtn.disabled = false; // Ensure buttons are enabled
+                    choiceBtn.disabled = false; 
                     choiceBtn.addEventListener('click', () => checkAnswer(optionText, correctAnswer, choiceBtn));
                     answerOptionsContainer.appendChild(choiceBtn);
                 });
@@ -545,14 +559,10 @@
                     gameData.correctStreak++;
 
                     // --- IMPORTANT: Set SRC for sound and GIF here ---
-                    // e.g., correctSoundEffect.src = 'assets/correct.mp3'; // Make sure this path is correct
-                    // e.g., rewardGif.src = 'assets/reward1.gif';        // Make sure this path is correct
+                    // e.g., correctSoundEffect.src = 'assets/correct.mp3'; // Make sure this path is relative to your HTML file
+                    // e.g., rewardGif.src = 'assets/reward1.gif';        // Make sure this path is relative to your HTML file
                     // --- --- --- --- --- --- --- --- --- --- --- ---
 
-                    // For testing without actual files, you can comment out the .play() and .classList.remove parts
-                    // or use the console.log placeholders.
-
-                    // Check if src is a valid path and not just the base URL or blob
                     if (correctSoundEffect.src && !correctSoundEffect.src.endsWith('/') && !correctSoundEffect.src.startsWith('blob:')) { 
                         correctSoundEffect.currentTime = 0;
                         correctSoundEffect.play().catch(e => console.warn("Could not play correct.mp3. Error:", e, "Current src:", correctSoundEffect.src));
@@ -560,11 +570,10 @@
                         console.log("Placeholder: Play correct.mp3 (src not set or is invalid). Current src:", correctSoundEffect.src);
                     }
                     
-                    // Check if src is a valid path and not just the base URL or blob or placeholder
                     if (rewardGif.src && !rewardGif.src.endsWith('/') && !rewardGif.src.startsWith('blob:') && !rewardGif.src.includes('placehold.co')) {
                          rewardGif.classList.remove('hidden');
                     } else { 
-                        rewardGif.src = 'https://placehold.co/120x120/a7f3d0/14532d?text=Awesome!'; // Default placeholder
+                        rewardGif.src = 'https://placehold.co/120x120/a7f3d0/14532d?text=Awesome!'; 
                         rewardGif.classList.remove('hidden');
                         console.log("Placeholder: Show reward1.gif (src not set or is invalid, showing placeholder). Current src:", rewardGif.src);
                     }
@@ -620,9 +629,11 @@
             }
             
             function endGame() {
+                console.log("endGame called");
                 initiateQuestionButton.textContent = "Play Again?"; 
-                initiateQuestionButton.disabled = true; 
-                questionModal.classList.add('hidden'); // Ensure modal is hidden
+                initiateQuestionButton.disabled = false; // Allow play again
+                // gameScreen.classList.add('hidden'); // Option: keep game screen visible with final message
+                questionModal.classList.add('hidden'); 
                 gameOverScreen.classList.remove('hidden');
                 finalUsernameDisplay.textContent = gameData.username;
                 finalScoreDisplay.textContent = gameData.score;
