@@ -1,1 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-to-Speech on Hover: 50 Past Tense Sentences</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* justify-content: center; */ /* Adjusted for scrolling */
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f3f4f6; /* Tailwind gray-100 */
+            color: #1f2937; /* Tailwind gray-800 */
+            padding: 20px;
+            text-align: center;
+        }
+        .content-wrapper {
+            width: 100%;
+            max-width: 1000px; /* Max width for content */
+            margin-bottom: 40px; /* Space at the bottom */
+        }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px; /* Spacing between buttons */
+            justify-content: center;
+            margin-top: 25px;
+            padding: 10px;
+        }
+        .tts-button {
+            padding: 10px 15px;
+            font-size: 0.9rem; /* Slightly smaller font for more buttons */
+            font-weight: 500;
+            color: white;
+            background-color: #3b82f6; /* Tailwind blue-500 */
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            min-width: 120px; /* Ensure buttons have some width */
+            text-align: left;
+        }
+        .tts-button:hover {
+            background-color: #2563eb; /* Tailwind blue-600 */
+            transform: translateY(-2px);
+        }
+        .tts-button:active {
+            transform: translateY(0px);
+        }
+        .status {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #4b5563; /* Tailwind gray-600 */
+        }
+        .voice-selector-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: inline-block; /* Center the container itself */
+        }
+        .voice-selector-container label {
+            margin-right: 10px;
+            font-weight: 500;
+        }
+        #voiceSelect {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db; /* Tailwind gray-300 */
+            background-color: white;
+            min-width: 200px;
+        }
+        .sentence-group {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .sentence-group h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #111827; /* Tailwind gray-900 */
+            margin-bottom: 20px;
+        }
+        .verb-label {
+            font-weight: bold;
+            color: #1e40af; /* Tailwind blue-800 */
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <header class="text-center my-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Text-to-Speech: Past Tense Verbs</h1>
+            <p class="text-lg text-gray-600 mt-2">Hover over the buttons to hear the sentences.</p>
+        </header>
 
+        <div class="voice-selector-container">
+            <label for="voiceSelect">Select a Voice:</label>
+            <select id="voiceSelect"></select>
+        </div>
+
+        <div id="status" class="status">
+            Speech synthesis is not supported by your browser or no voices found.
+        </div>
+
+        <div class="sentence-group">
+            <h2>50 Past Tense Sentences</h2>
+            <div class="button-container" id="sentencesContainer">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusDiv = document.getElementById('status');
+            const voiceSelect = document.getElementById('voiceSelect');
+            const sentencesContainer = document.getElementById('sentencesContainer');
+            let voices = [];
+            let selectedVoice = null;
+
+            // Array of 50 sentences, each with a unique past tense verb
+            const pastTenseSentences = [
+                { verb: "ate", sentence: "The curious squirrel quickly ate the nut it found." },
+                { verb: "walked", sentence: "She walked through the ancient forest with her friends." },
+                { verb: "saw", sentence: "From the mountaintop, we saw a breathtaking valley." },
+                { verb: "wrote", sentence: "He wrote a long story about his adventures abroad." },
+                { verb: "played", sentence: "The children played joyfully in the park until dusk." },
+                { verb: "ran", sentence: "The athlete ran a new personal best in the marathon." },
+                { verb: "slept", sentence: "After a tiring day, the old dog slept soundly by the fire." },
+                { verb: "drank", sentence: "They drank fresh lemonade on a hot summer afternoon." },
+                { verb: "spoke", sentence: "The professor spoke eloquently about historical events." },
+                { verb: "read", sentence: "I read an interesting article about space exploration." }, // Pronounced "red"
+                { verb: "built", sentence: "The community built a new playground for the children." },
+                { verb: "sang", sentence: "She sang her favorite song at the karaoke night." },
+                { verb: "swam", sentence: "He swam across the clear blue lake." },
+                { verb: "drove", sentence: "My father drove us to the beach last weekend." },
+                { verb: "flew", sentence: "The eagle flew high above the towering cliffs." },
+                { verb: "caught", sentence: "The fisherman caught a surprisingly large fish." },
+                { verb: "taught", sentence: "The mentor taught valuable lessons to her students." },
+                { verb: "thought", sentence: "She thought carefully before making a decision." },
+                { verb: "bought", sentence: "He bought a beautiful bouquet of flowers for her." },
+                { verb: "brought", sentence: "My friend brought delicious cookies to the party." },
+                { verb: "chose", sentence: "They chose the scenic route for their road trip." },
+                { verb: "came", sentence: "The guest of honor came fashionably late to the event." },
+                { verb: "did", sentence: "He did his homework diligently every evening." },
+                { verb: "drew", sentence: "The artist drew a stunning portrait of the landscape." },
+                { verb: "fell", sentence: "The autumn leaves fell gracefully from the trees." },
+                { verb: "found", sentence: "She found her lost keys under the sofa cushions." },
+                { verb: "gave", sentence: "He gave a generous donation to the local charity." },
+                { verb: "went", sentence: "We went to the museum to see the new exhibition." },
+                { verb: "heard", sentence: "I heard a faint melody playing in the distance." },
+                { verb: "knew", sentence: "She knew the answer to the difficult question." },
+                { verb: "left", sentence: "He left his umbrella on the bus by mistake." },
+                { verb: "made", sentence: "My grandmother made a delicious apple pie from scratch." },
+                { verb: "met", sentence: "They met their old friends at the reunion." },
+                { verb: "paid", sentence: "She paid the bill after enjoying a wonderful meal." },
+                { verb: "put", sentence: "He put the book back on the shelf after reading it." }, // Past tense is "put"
+                { verb: "quit", sentence: "She quit her job to pursue her passion for art." }, // Past tense is "quit"
+                { verb: "rode", sentence: "The children rode their bicycles around the neighborhood." },
+                { verb: "said", sentence: "The teacher said to study hard for the upcoming exam." },
+                { verb: "sold", sentence: "The artist sold his most famous painting at the auction." },
+                { verb: "sent", sentence: "She sent a postcard from her vacation in Italy." },
+                { verb: "shook", sentence: "He shook his head in disbelief at the news." },
+                { verb: "sat", sentence: "The cat sat patiently by the window, watching birds." },
+                { verb: "stood", sentence: "The tall lighthouse stood firmly against the stormy sea." },
+                { verb: "took", sentence: "She took a photograph of the beautiful scenery." },
+                { verb: "told", sentence: "He told an amusing story that made everyone laugh." },
+                { verb: "understood", sentence: "They finally understood the complex mathematical problem." },
+                { verb: "woke", sentence: "The alarm clock woke him up early in the morning." },
+                { verb: "wore", sentence: "She wore her favorite dress to the special occasion." },
+                { verb: "won", sentence: "The team won the championship after a thrilling game." },
+                { verb: "began", sentence: "The concert began with a spectacular light show." }
+            ];
+
+            // Dynamically create buttons for each sentence
+            pastTenseSentences.forEach((item, index) => {
+                const button = document.createElement('button');
+                button.classList.add('tts-button');
+                // Display sentence number and the verb for easier identification
+                button.innerHTML = `Sentence ${index + 1} (<span class="verb-label">${item.verb}</span>)`;
+                // Store the full sentence to be spoken in a data attribute
+                button.dataset.textToSpeak = item.sentence;
+                sentencesContainer.appendChild(button);
+            });
+            
+            // Get all buttons (including dynamically added ones) to attach event listeners
+            const allTtsButtons = document.querySelectorAll('.tts-button');
+
+            // Check for browser support for Speech Synthesis
+            if ('speechSynthesis' in window) {
+                statusDiv.textContent = 'Hover over a button to hear the sentence.';
+
+                // Function to populate the voice selection dropdown
+                function populateVoiceList() {
+                    voices = speechSynthesis.getVoices(); // Get available voices
+                    voiceSelect.innerHTML = ''; // Clear previous options
+
+                    if (voices.length === 0) {
+                        statusDiv.textContent = 'No voices found. Speech synthesis might be loading or unavailable.';
+                        return;
+                    }
+                    
+                    // Preferred voices (common on various OS/browsers)
+                    const preferredVoices = [
+                        "Google US English", "Microsoft Zira Desktop - English (United States)", 
+                        "Samantha", "Alex", "Google UK English Female", "Google UK English Male"
+                    ];
+                    let defaultVoiceIndex = 0; // Index for the voice to be selected by default
+                    let foundPreferred = false;
+
+                    voices.forEach((voice) => {
+                        if (voice.lang.startsWith('en')) { // Filter for English voices
+                            const option = document.createElement('option');
+                            option.textContent = `${voice.name} (${voice.lang})`;
+                            if (voice.default) { // Mark if it's the browser's default voice
+                                option.textContent += ' [DEFAULT]';
+                            }
+                            // Store voice details in data attributes for easy retrieval
+                            option.setAttribute('data-lang', voice.lang);
+                            option.setAttribute('data-name', voice.name);
+                            voiceSelect.appendChild(option);
+
+                            // Logic to select a preferred default voice from our list
+                            if (!foundPreferred) {
+                                if (preferredVoices.includes(voice.name)) {
+                                    defaultVoiceIndex = voiceSelect.options.length - 1;
+                                    foundPreferred = true;
+                                } else if (voice.default && defaultVoiceIndex === 0) { // Fallback to browser default English
+                                    defaultVoiceIndex = voiceSelect.options.length - 1;
+                                }
+                            }
+                        }
+                    });
+                    
+                    if (voiceSelect.options.length > 0) {
+                        voiceSelect.selectedIndex = defaultVoiceIndex;
+                        // Set the initially selected voice object
+                        const initialSelectedOption = voiceSelect.options[defaultVoiceIndex];
+                        selectedVoice = voices.find(v => v.name === initialSelectedOption?.dataset.name && v.lang === initialSelectedOption?.dataset.lang) || voices.find(v => v.lang.startsWith('en'));
+                    } else {
+                         statusDiv.textContent = 'No English voices found. Speech synthesis might be unavailable.';
+                    }
+                }
+
+                populateVoiceList(); // Initial population
+                // Voices can load asynchronously, so repopulate if they change
+                if (speechSynthesis.onvoiceschanged !== undefined) {
+                    speechSynthesis.onvoiceschanged = populateVoiceList;
+                }
+
+                // Event listener for when the user changes the selected voice
+                voiceSelect.addEventListener('change', (e) => {
+                    const selectedOption = e.target.options[e.target.selectedIndex];
+                    selectedVoice = voices.find(voice => voice.name === selectedOption.dataset.name && voice.lang === selectedOption.dataset.lang);
+                });
+
+                // Add hover event listeners to all TTS buttons
+                allTtsButtons.forEach(button => {
+                    const textToSpeak = button.dataset.textToSpeak || button.textContent; // Get text from data attribute
+
+                    button.addEventListener('mouseenter', () => {
+                        speechSynthesis.cancel(); // Cancel any ongoing speech
+                        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                        
+                        // Set the selected voice for the utterance
+                        if (selectedVoice) {
+                            utterance.voice = selectedVoice;
+                        } else if (voices.length > 0) {
+                            // Fallback to the first available English voice if none is selected
+                            utterance.voice = voices.find(voice => voice.lang.startsWith('en')) || voices[0];
+                        }
+                        
+                        // Handle speech errors
+                        utterance.onerror = (event) => {
+                            console.error('SpeechSynthesisUtterance.onerror', event);
+                            statusDiv.textContent = `Error speaking: ${event.error}`;
+                        };
+                        
+                        speechSynthesis.speak(utterance); // Speak the text
+                    });
+
+                    // Optional: Cancel speech on mouseleave
+                    // For short sentences, it's often better to let them finish.
+                    // button.addEventListener('mouseleave', () => {
+                    //     speechSynthesis.cancel(); 
+                    // });
+                });
+
+            } else {
+                // Handle browsers that don't support speech synthesis
+                statusDiv.textContent = 'Sorry, your browser does not support text-to-speech.';
+                console.warn('Speech Synthesis not supported.');
+                sentencesContainer.innerHTML = '<p>Text-to-speech functionality is not available in your browser.</p>';
+            }
+        });
+    </script>
+
+</body>
+</html>
