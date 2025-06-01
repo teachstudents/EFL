@@ -288,6 +288,8 @@
 
     async function callGeminiAPI(prompt) {
         console.log("Calling Gemini API with prompt:", prompt);
+        // Removed the premature check for GEMINI_API_KEY.
+        // The platform is expected to inject the key during the fetch call if GEMINI_API_KEY is an empty string.
         const payload = {
             contents: [{ role: "user", parts: [{ text: prompt }] }]
         };
@@ -341,7 +343,7 @@
         aiSummaryTextElement.textContent = '✨ AI is writing...';
 
         const completedAdventureHighlights = stories.slice(0, currentQuestionIndex +1)
-            .map(s => s.text.replace("______", s.correctPast).replace(/\./g, ';')) // Replace periods to avoid premature sentence end in prompt
+            .map(s => s.text.replace("______", s.correctPast).replace(/\./g, ';')) 
             .join(" ");
 
         const prompt = `This is for a simple English game (A1-A2 level). Leo and Elsa had an adventure: "${completedAdventureHighlights}". Write a very short, happy summary (1-2 simple sentences, max 20 words). For example: "Leo and Elsa had a fun day! They saw a mushroom and a river."`;
@@ -397,7 +399,7 @@
     function startGame() {
         console.log("startGame");
         playSound(clickSound);
-        userName = userNameInput.value.trim() || "Friend"; // Simpler default name
+        userName = userNameInput.value.trim() || "Friend"; 
         welcomeMessage.textContent = `Hi, ${userName}!`;
         
         currentScore = 0;
@@ -507,7 +509,7 @@
             clickedButton.classList.add('correct');
             playSound(correctSound);
             speakText("Good job!");
-            aiStoryTwistBtn.style.display = 'inline-block'; // Show AI twist button on correct answer
+            aiStoryTwistBtn.style.display = 'inline-block'; // Always show button, rely on API call success/fail
         } else {
             feedbackArea.textContent = `Oops! The answer is "${correctPast}".`;
             feedbackArea.className = 'feedback-incorrect';
@@ -538,6 +540,7 @@
             finalScoreDisplay.textContent = "Oh no! An error. Please try again.";
             finalFeedbackDisplay.textContent = "";
             awardsAreaDisplay.innerHTML = "<h3>Your Awards:</h3><p>No awards now.</p>";
+            getAiSummaryBtn.style.display = 'none'; 
             return;
         }
 
@@ -580,6 +583,8 @@
         if (badgesAwarded === 0) {
             awardsAreaDisplay.innerHTML += "<p>Play more to get badges!</p>";
         }
+        
+        getAiSummaryBtn.style.display = 'inline-block'; // Always show button, rely on API call success/fail
         speakText(`${scoreMessage} ${performanceFeedback}`);
     }
 
@@ -631,9 +636,9 @@
         initializeSounds();
 
         // Basic check for critical elements
-        if (!storyTextElement || !optionsContainer || !feedbackArea) {
+        if (!storyTextElement || !optionsContainer || !feedbackArea || !startScreen || !gameScreen || !endScreen) {
             console.error("CRITICAL: Core game elements missing!");
-            alert("Error: Game cannot start. Important parts are missing.");
+            alert("Error: Game cannot start. Important parts are missing. Please check console for details (Right-click -> Inspect -> Console).");
         } else {
             console.log("Core game elements found.");
         }
