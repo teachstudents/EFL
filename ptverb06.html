@@ -187,7 +187,7 @@
         
         <div id="game-stats" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 text-slate-700">
             <div>Score: <span id="score" class="font-bold text-xl">0</span></div>
-            <div>Questions: <span id="questions-answered" class="font-bold text-xl">0</span>/<span id="total-questions" class="text-xl">40</span></div> {/* UPDATED */}
+            <div>Questions: <span id="questions-answered" class="font-bold text-xl">0</span>/<span id="total-questions" class="text-xl">40</span></div>
             <div>Badges: <span id="badges-display">None</span></div>
         </div>
 
@@ -264,7 +264,7 @@
             const playAgainButton = document.getElementById('play-again-button');
 
             // --- Game Data & Config ---
-            const TOTAL_QUESTIONS_PER_GAME = 40; // UPDATED to 40
+            const TOTAL_QUESTIONS_PER_GAME = 40; 
             const TIME_PER_QUESTION = 20; 
             let gameData = {};
             let currentSentenceObject = null; 
@@ -273,6 +273,7 @@
             let userSelectedVoice = null; 
             let currentNarratorVoice = null; 
             let speakTimeoutId = null; 
+            let voicesPopulated = false; // Flag for voice list population
 
             let shuffledSentenceIndices = [];
             let currentQuestionIndexInShuffledList = 0;
@@ -297,7 +298,7 @@
                 else if (upcomingQuestionIndex < 20) targetVoiceName = "roger";
                 else if (upcomingQuestionIndex < 30) targetVoiceName = "jenny";
                 else if (upcomingQuestionIndex < 40) targetVoiceName = "eric";
-                else if (upcomingQuestionIndex < 50) targetVoiceName = "thomas"; // Covered up to 50
+                else if (upcomingQuestionIndex < 50) targetVoiceName = "thomas";
 
                 if (targetVoiceName) {
                     const foundVoice = getVoiceByName(targetVoiceName);
@@ -310,7 +311,9 @@
 
 
             function populateVoiceList(loadedVoices) {
+                if (voicesPopulated && loadedVoices.length === voices.length) return; // Avoid redundant population if list hasn't changed
                 console.log("populateVoiceList called with", loadedVoices.length, "voices");
+                
                 voices = loadedVoices; 
                 voiceSelect.innerHTML = '';
                 const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
@@ -324,6 +327,7 @@
                 });
 
                 if (englishVoices.length > 0) {
+                    voicesPopulated = true; // Mark as populated
                     console.log("English voices found:", englishVoices.length);
                     let initialDefaultVoice = getVoiceByName("emma"); 
 
@@ -360,9 +364,12 @@
                     console.log("Speech Synthesis API supported.");
                     const tryPopulate = () => {
                         const currentVoices = speechSynthesis.getVoices();
-                        if (currentVoices.length > 0 && (!voices || voices.length !== currentVoices.length || voiceSelect.options.length === 0)) {
-                            populateVoiceList(currentVoices);
-                        } else if (currentVoices.length === 0 && voices.length === 0){
+                        // Only populate if the list is actually different or not yet populated
+                        if (currentVoices.length > 0 ) {
+                             if (!voicesPopulated || voices.length !== currentVoices.length) {
+                                populateVoiceList(currentVoices);
+                             }
+                        } else if (currentVoices.length === 0 && !voicesPopulated){ // Keep logging if still empty on first tries
                              console.log("getVoices() returned empty list initially.");
                         }
                     };
@@ -372,8 +379,8 @@
                     }
 
                     tryPopulate(); 
-                    setTimeout(tryPopulate, 250); 
-                    setTimeout(tryPopulate, 1000); 
+                    setTimeout(tryPopulate, 300); // Adjusted delay
+                    setTimeout(tryPopulate, 1200); // Adjusted delay
 
 
                     voiceSelect.addEventListener('change', (e) => {
@@ -395,12 +402,13 @@
                 console.log("Speak request for:", text ? text.substring(0,30) + "..." : "No text provided");
                 if (!('speechSynthesis'in window) || !text) {
                     console.warn("Speak function: TTS not supported or no text.");
-                    if (callback) setTimeout(callback, 0);
+                    if (callback) setTimeout(callback, 0); // Ensure async callback
                     return;
                 }
 
                 if (speakTimeoutId) { 
                     clearTimeout(speakTimeoutId);
+                    speakTimeoutId = null;
                 }
 
                 const utterance = new SpeechSynthesisUtterance(text);
@@ -414,7 +422,6 @@
                      utterance.voice = fallbackVoice;
                      console.warn("Using absolute fallback voice for speak:", fallbackVoice ? fallbackVoice.name : "None available");
                 }
-                // console.log("Attempting to speak with voice:", utterance.voice ? utterance.voice.name : "Browser default (no specific voice object)"); // Reduced verbosity
                 
                 let hasCalledBack = false;
                 const ensureCallback = () => {
@@ -437,7 +444,7 @@
                     if (event.error && event.error !== 'canceled' && event.error !== 'interrupted') {
                         currentActivityDisplay.textContent = errorMessage + " Try another voice.";
                     } else if (event.error === 'canceled') {
-                        console.warn("Speech was canceled. This might be intentional (e.g., new speak request or browser behavior).");
+                        console.warn("Speech was canceled. This might be intentional or a browser quirk.");
                     }
                     ensureCallback(); 
                 };
@@ -450,8 +457,11 @@
                 if (speechSynthesis.speaking || speechSynthesis.pending) {
                     console.log("Speech is speaking or pending. Canceling current speech queue...");
                     speechSynthesis.cancel(); 
-                    speakTimeoutId = setTimeout(doSpeak, 250); 
+                    // It's crucial that the cancel operation completes before a new speak is issued.
+                    // A timeout helps, but the exact duration can be browser-dependent.
+                    speakTimeoutId = setTimeout(doSpeak, 250); // Delay after cancel
                 } else {
+                    // If nothing is speaking, a shorter delay or immediate speak might be fine.
                     speakTimeoutId = setTimeout(doSpeak, 50); 
                 }
             }
@@ -485,7 +495,7 @@
                 displayUsername.textContent = gameData.username;
                 scoreDisplay.textContent = gameData.score;
                 questionsAnsweredDisplay.textContent = gameData.questionsAnswered;
-                totalQuestionsDisplay.textContent = gameData.totalQuestions; // This will now show 40
+                totalQuestionsDisplay.textContent = gameData.totalQuestions;
                 updateBadgesDisplay();
             }
             
@@ -538,11 +548,7 @@
                 currentActivityDisplay.textContent = "Listen carefully to the sentence...";
 
                 if (currentQuestionIndexInShuffledList >= shuffledSentenceIndices.length) {
-                    // This condition implies we've used all 50 unique sentences, 
-                    // but TOTAL_QUESTIONS_PER_GAME might be less.
-                    // If TOTAL_QUESTIONS_PER_GAME is > 50, this indicates an issue or need to allow repeats.
-                    // For now, assuming TOTAL_QUESTIONS_PER_GAME <= 50.
-                    console.warn("Ran out of unique sentences from shuffled list. Current index:", currentQuestionIndexInShuffledList, "List length:", shuffledSentenceIndices.length);
+                    console.warn("Ran out of unique sentences. Current index:", currentQuestionIndexInShuffledList, "List length:", shuffledSentenceIndices.length);
                     endGame(); 
                     return;
                 }
