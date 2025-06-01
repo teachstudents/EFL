@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Tense Verb Game - 40 Questions Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-image: linear-gradient(to bottom right, #bae6fd, #c7d2fe); /* Tailwind sky-200 to indigo-200 */
+            color: #334155; /* Tailwind slate-700 */
+            padding: 20px;
+            text-align: center;
+        }
+        .hidden { display: none !important; }
+        .game-container {
+            background-color: white;
+            padding: 25px 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15); 
+            width: 100%;
+            max-width: 700px; 
+            margin-top: 20px;
+        }
+        #start-screen input[type="text"] {
+            border: 2px solid #e2e8f0; 
+            padding: 12px 15px; 
+            border-radius: 8px;
+            margin-right: 10px;
+            width: calc(100% - 140px); 
+            max-width: 320px;
+            transition: border-color 0.3s ease;
+        }
+        #start-screen input[type="text"]:focus {
+            border-color: #4f46e5; 
+            outline: none;
+        }
+        .game-button, .choice-button, .action-button { 
+            padding: 12px 24px; 
+            font-size: 1.05rem; 
+            font-weight: 600; 
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .game-button { background-color: #4f46e5; }
+        .game-button:hover:not(:disabled) { background-color: #4338ca; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        .game-button:disabled {
+            background-color: #94a3b8; /* Tailwind slate-400 */
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .choice-button {
+            background-color: #f59e0b; 
+            margin: 6px;
+            display: block;
+            width: 100%;
+        }
+        .choice-button:hover:not(:disabled) { background-color: #d97706; transform: translateY(-2px); }
+        .choice-button.correct { background-color: #10b981; }
+        .choice-button.incorrect { background-color: #f43f5e; }
+        .choice-button:disabled {
+             opacity: 0.7;
+        }
+
+
+        .action-button { 
+            background-color: #6366f1; 
+            font-size: 0.9rem;
+            padding: 8px 16px;
+        }
+        .action-button:hover {
+            background-color: #4f46e5; 
+        }
+        
+        #game-stats div { margin: 6px 0; font-size: 1rem; color: #475569; }
+        #game-stats span.font-bold { color: #1e293b; }
+
+        #question-modal {
+            background-color: rgba(30, 41, 59, 0.6); 
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+        #question-modal-content {
+            background-color: white;
+            padding: 30px; 
+            border-radius: 12px; 
+            width: 95%;
+            max-width: 550px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative; 
+        }
+        #feedback { font-weight: 600; margin-top: 20px; min-height: 28px; font-size: 1.1rem; }
+        #badges-display span {
+            background-color: #fde047; 
+            color: #713f12; 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin: 0 4px;
+            display: inline-block;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .voice-selector-container {
+            margin: 20px 0; padding: 15px; background-color: #f0f9ff; border-radius: 10px;
+            border: 1px solid #e0f2fe; 
+        }
+        #voiceSelect {
+            padding: 10px 14px; 
+            border-radius: 8px;
+            border: 2px solid #cbd5e1; 
+            background-color: white;
+            min-width: 220px;
+            font-weight: 500;
+            transition: border-color 0.3s ease;
+        }
+        #voiceSelect:focus {
+            border-color: #0ea5e9; 
+            outline: none;
+        }
+        #current-activity-display {
+            min-height: 60px; 
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #e0e7ff; 
+            border-radius: 8px;
+            border: 1px solid #c7d2fe; 
+            color: #3730a3; 
+            font-style: italic;
+            font-weight: 500;
+        }
+        #rewardGif {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 150px; 
+            max-height: 150px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1001; 
+        }
+
+        @media (max-width: 480px) { 
+            #start-screen input[type="text"] {
+                 width: 100%; max-width: none; margin-bottom:10px; margin-right:0;
+            }
+            .game-button, .choice-button, .action-button { padding: 10px 18px; font-size: 0.95rem;}
+            .game-container { padding: 20px 15px; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="correctSoundEffect" preload="auto"></audio> 
+
+    <div id="start-screen" class="game-container text-center">
+        <h1 class="text-4xl font-bold mb-4 text-indigo-600">Past Tense Power-Up!</h1>
+        <p class="mb-6 text-slate-600 text-lg">Enter your name and let's test your verb skills!</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center">
+            <input type="text" id="username" placeholder="Your Gamer Name">
+            <button id="start-button" class="game-button mt-3 sm:mt-0">Start Game</button>
+        </div>
+    </div>
+
+    <div id="game-screen" class="game-container hidden">
+        <div class="flex flex-wrap justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold text-indigo-600">Go, <span id="display-username"></span>!</h2>
+            <button id="quit-button" class="game-button !bg-rose-500 hover:!bg-rose-600 text-sm px-4 py-2">Quit</button>
+        </div>
+        
+        <div id="game-stats" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 text-slate-700">
+            <div>Score: <span id="score" class="font-bold text-xl">0</span></div>
+            <div>Questions: <span id="questions-answered" class="font-bold text-xl">0</span>/<span id="total-questions" class="text-xl">40</span></div> {/* UPDATED */}
+            <div>Badges: <span id="badges-display">None</span></div>
+        </div>
+
+        <div class="voice-selector-container">
+            <label for="voiceSelect" class="text-slate-700 font-semibold">Select Voice (Fallback):</label>
+            <select id="voiceSelect"></select>
+        </div>
+        
+        <div id="current-activity-display" class="text-lg">
+            Click "Next Question" to begin!
+        </div>
+        <button id="initiate-question-button" class="game-button mt-4">Start First Question / Next Question</button>
+
+    </div>
+
+    <div id="question-modal" class="hidden">
+        <div id="question-modal-content">
+            <img id="rewardGif" class="hidden" alt="Reward Animation"> 
+            <div class="flex justify-between items-center mb-2">
+                <p class="text-sm text-slate-500">Question Timer: <span id="modal-timer" class="font-bold text-base">--</span>s</p>
+                <button id="repeat-sentence-button" class="action-button">Repeat Sentence</button>
+            </div>
+            <p id="question-sentence-display" class="mb-4 text-slate-600 italic text-lg"></p>
+            <p id="question-text" class="mb-5 text-xl font-semibold text-slate-800"></p>
+            <div id="answer-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Answer buttons will be dynamically added here by JavaScript */}
+            </div>
+            <div id="feedback" class="mt-5"></div>
+            <button id="next-question-button-modal" class="game-button mt-5 hidden w-full !bg-emerald-500 hover:!bg-emerald-600">Next Question</button>
+        </div>
+    </div>
+    
+    <div id="game-over-screen" class="game-container hidden text-center">
+        <h2 class="text-3xl font-bold text-indigo-600 mb-5">Game Over, <span id="final-username"></span>!</h2>
+        <p class="text-2xl text-slate-700 mb-3">Final Score: <span id="final-score" class="font-bold text-indigo-600">0</span></p>
+        <p class="text-xl text-slate-600 mb-6">Badges Earned: <span id="final-badges-display">None</span></p>
+        <button id="play-again-button" class="game-button">Play Again!</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM Fully Loaded and Parsed");
+            // --- DOM Elements ---
+            const startScreen = document.getElementById('start-screen');
+            const gameScreen = document.getElementById('game-screen');
+            const gameOverScreen = document.getElementById('game-over-screen');
+            const usernameInput = document.getElementById('username');
+            const startButton = document.getElementById('start-button');
+            const quitButton = document.getElementById('quit-button');
+            const displayUsername = document.getElementById('display-username');
+            const scoreDisplay = document.getElementById('score');
+            const questionsAnsweredDisplay = document.getElementById('questions-answered');
+            const totalQuestionsDisplay = document.getElementById('total-questions');
+            const badgesDisplay = document.getElementById('badges-display');
+            const voiceSelect = document.getElementById('voiceSelect');
+            const currentActivityDisplay = document.getElementById('current-activity-display');
+            const initiateQuestionButton = document.getElementById('initiate-question-button');
+            
+            const questionModal = document.getElementById('question-modal');
+            const modalTimerDisplay = document.getElementById('modal-timer');
+            const questionSentenceDisplay = document.getElementById('question-sentence-display');
+            const questionTextDisplay = document.getElementById('question-text');
+            const answerOptionsContainer = document.getElementById('answer-options');
+            const feedbackDisplay = document.getElementById('feedback');
+            const nextQuestionButtonModal = document.getElementById('next-question-button-modal');
+            const repeatSentenceButton = document.getElementById('repeat-sentence-button');
+            const correctSoundEffect = document.getElementById('correctSoundEffect'); 
+            const rewardGif = document.getElementById('rewardGif'); 
+
+
+            const finalUsernameDisplay = document.getElementById('final-username');
+            const finalScoreDisplay = document.getElementById('final-score');
+            const finalBadgesDisplay = document.getElementById('final-badges-display');
+            const playAgainButton = document.getElementById('play-again-button');
+
+            // --- Game Data & Config ---
+            const TOTAL_QUESTIONS_PER_GAME = 40; // UPDATED to 40
+            const TIME_PER_QUESTION = 20; 
+            let gameData = {};
+            let currentSentenceObject = null; 
+            let questionTimerInterval = null;
+            let voices = [];
+            let userSelectedVoice = null; 
+            let currentNarratorVoice = null; 
+            let speakTimeoutId = null; 
+
+            let shuffledSentenceIndices = [];
+            let currentQuestionIndexInShuffledList = 0;
+
+
+            const pastTenseSentences = [
+                { verb: "ate", sentence: "The curious squirrel quickly ate the nut it found." }, { verb: "walked", sentence: "She walked through the ancient forest with her friends." }, { verb: "saw", sentence: "From the mountaintop, we saw a breathtaking valley." }, { verb: "wrote", sentence: "He wrote a long story about his adventures abroad." }, { verb: "played", sentence: "The children played joyfully in the park until dusk." }, { verb: "ran", sentence: "The athlete ran a new personal best in the marathon." }, { verb: "slept", sentence: "After a tiring day, the old dog slept soundly by the fire." }, { verb: "drank", sentence: "They drank fresh lemonade on a hot summer afternoon." }, { verb: "spoke", sentence: "The professor spoke eloquently about historical events." }, { verb: "read", sentence: "I read an interesting article about space exploration." },  { verb: "built", sentence: "The community built a new playground for the children." }, { verb: "sang", sentence: "She sang her favorite song at the karaoke night." }, { verb: "swam", sentence: "He swam across the clear blue lake." }, { verb: "drove", sentence: "My father drove us to the beach last weekend." }, { verb: "flew", sentence: "The eagle flew high above the towering cliffs." }, { verb: "caught", sentence: "The fisherman caught a surprisingly large fish." }, { verb: "taught", sentence: "The mentor taught valuable lessons to her students." }, { verb: "thought", sentence: "She thought carefully before making a decision." }, { verb: "bought", sentence: "He bought a beautiful bouquet of flowers for her." }, { verb: "brought", sentence: "My friend brought delicious cookies to the party." }, { verb: "chose", sentence: "They chose the scenic route for their road trip." }, { verb: "came", sentence: "The guest of honor came fashionably late to the event." }, { verb: "did", sentence: "He did his homework diligently every evening." }, { verb: "drew", sentence: "The artist drew a stunning portrait of the landscape." }, { verb: "fell", sentence: "The autumn leaves fell gracefully from the trees." }, { verb: "found", sentence: "She found her lost keys under the sofa cushions." }, { verb: "gave", sentence: "He gave a generous donation to the local charity." }, { verb: "went", sentence: "We went to the museum to see the new exhibition." }, { verb: "heard", sentence: "I heard a faint melody playing in the distance." }, { verb: "knew", sentence: "She knew the answer to the difficult question." }, { verb: "left", sentence: "He left his umbrella on the bus by mistake." }, { verb: "made", sentence: "My grandmother made a delicious apple pie from scratch." }, { verb: "met", sentence: "They met their old friends at the reunion." }, { verb: "paid", sentence: "She paid the bill after enjoying a wonderful meal." }, { verb: "put", sentence: "He put the book back on the shelf after reading it." },  { verb: "quit", sentence: "She quit her job to pursue her passion for art." }, { verb: "rode", sentence: "The children rode their bicycles around the neighborhood." }, { verb: "said", sentence: "The teacher said to study hard for the upcoming exam." }, { verb: "sold", sentence: "The artist sold his most famous painting at the auction." }, { verb: "sent", sentence: "She sent a postcard from her vacation in Italy." }, { verb: "shook", sentence: "He shook his head in disbelief at the news." }, { verb: "sat", sentence: "The cat sat patiently by the window, watching birds." }, { verb: "stood", sentence: "The tall lighthouse stood firmly against the stormy sea." }, { verb: "took", sentence: "She took a photograph of the beautiful scenery." }, { verb: "told", sentence: "He told an amusing story that made everyone laugh." }, { verb: "understood", sentence: "They finally understood the complex mathematical problem." }, { verb: "woke", sentence: "The alarm clock woke him up early in the morning." }, { verb: "wore", sentence: "She wore her favorite dress to the special occasion." }, { verb: "won", sentence: "The team won the championship after a thrilling game." }, { verb: "began", sentence: "The concert began with a spectacular light show." }
+            ];
+            
+            // --- TTS Functions ---
+            function getVoiceByName(namePart) {
+                if (!voices || voices.length === 0) return null;
+                const lowerNamePart = namePart.toLowerCase();
+                return voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes(lowerNamePart));
+            }
+
+            function getVoiceForCurrentQuestionSet(questionNum) { 
+                let targetVoiceName = "";
+                const upcomingQuestionIndex = questionNum;
+
+                if (upcomingQuestionIndex < 10) targetVoiceName = "emma";
+                else if (upcomingQuestionIndex < 20) targetVoiceName = "roger";
+                else if (upcomingQuestionIndex < 30) targetVoiceName = "jenny";
+                else if (upcomingQuestionIndex < 40) targetVoiceName = "eric";
+                else if (upcomingQuestionIndex < 50) targetVoiceName = "thomas"; // Covered up to 50
+
+                if (targetVoiceName) {
+                    const foundVoice = getVoiceByName(targetVoiceName);
+                    if (foundVoice) {
+                        return foundVoice;
+                    }
+                }
+                return userSelectedVoice || (voices.length > 0 ? voices[0] : null);
+            }
+
+
+            function populateVoiceList(loadedVoices) {
+                console.log("populateVoiceList called with", loadedVoices.length, "voices");
+                voices = loadedVoices; 
+                voiceSelect.innerHTML = '';
+                const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+                
+                englishVoices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    option.setAttribute('data-name', voice.name);
+                    option.setAttribute('data-lang', voice.lang);
+                    voiceSelect.appendChild(option);
+                });
+
+                if (englishVoices.length > 0) {
+                    console.log("English voices found:", englishVoices.length);
+                    let initialDefaultVoice = getVoiceByName("emma"); 
+
+                    if (!initialDefaultVoice) { 
+                        const naturalKeywords = ["natural", "neural", "wavenet", "studio", "enhanced", "premium"];
+                        initialDefaultVoice = englishVoices.find(v => naturalKeywords.some(kw => v.name.toLowerCase().includes(kw)));
+                        if (!initialDefaultVoice) initialDefaultVoice = englishVoices.find(v => v.name === "Google US English" || v.name.toLowerCase().includes("united states"));
+                        if (!initialDefaultVoice) initialDefaultVoice = englishVoices.find(v => v.name === "Microsoft Zira Desktop - English (United States)");
+                        if (!initialDefaultVoice) initialDefaultVoice = englishVoices.find(v => v.default && v.lang.startsWith('en')); 
+                        if (!initialDefaultVoice) initialDefaultVoice = englishVoices[0]; 
+                    }
+                    
+                    userSelectedVoice = initialDefaultVoice; 
+                    currentNarratorVoice = userSelectedVoice; 
+
+                    console.log("Initial default voice (userSelectedVoice):", userSelectedVoice ? userSelectedVoice.name : "None");
+                    
+                    for (let i = 0; i < voiceSelect.options.length; i++) {
+                        if (voiceSelect.options[i].dataset.name === userSelectedVoice.name && voiceSelect.options[i].dataset.lang === userSelectedVoice.lang) {
+                            voiceSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                    initiateQuestionButton.disabled = false; 
+                } else {
+                    currentActivityDisplay.textContent = "No English voices found for Text-to-Speech. Game may not function correctly.";
+                    initiateQuestionButton.disabled = true; 
+                    console.warn("No English voices found.");
+                }
+            }
+            
+            function initSpeechSynthesis() {
+                 if ('speechSynthesis' in window) {
+                    console.log("Speech Synthesis API supported.");
+                    const tryPopulate = () => {
+                        const currentVoices = speechSynthesis.getVoices();
+                        if (currentVoices.length > 0 && (!voices || voices.length !== currentVoices.length || voiceSelect.options.length === 0)) {
+                            populateVoiceList(currentVoices);
+                        } else if (currentVoices.length === 0 && voices.length === 0){
+                             console.log("getVoices() returned empty list initially.");
+                        }
+                    };
+
+                    if (speechSynthesis.onvoiceschanged !== undefined) {
+                        speechSynthesis.onvoiceschanged = tryPopulate;
+                    }
+
+                    tryPopulate(); 
+                    setTimeout(tryPopulate, 250); 
+                    setTimeout(tryPopulate, 1000); 
+
+
+                    voiceSelect.addEventListener('change', (e) => {
+                        const selectedOption = e.target.options[e.target.selectedIndex];
+                        userSelectedVoice = voices.find(voice => voice.name === selectedOption.dataset.name && voice.lang === selectedOption.dataset.lang);
+                        console.log("User changed voice to:", userSelectedVoice ? userSelectedVoice.name : "None");
+                    });
+                } else {
+                    console.warn("Speech Synthesis not supported");
+                    if(voiceSelect.parentElement) voiceSelect.parentElement.classList.add('hidden');
+                    currentActivityDisplay.textContent = "Text-to-Speech is not supported in your browser.";
+                    initiateQuestionButton.disabled = true; 
+                }
+            }
+            initSpeechSynthesis(); 
+
+
+            function speak(text, callback) {
+                console.log("Speak request for:", text ? text.substring(0,30) + "..." : "No text provided");
+                if (!('speechSynthesis'in window) || !text) {
+                    console.warn("Speak function: TTS not supported or no text.");
+                    if (callback) setTimeout(callback, 0);
+                    return;
+                }
+
+                if (speakTimeoutId) { 
+                    clearTimeout(speakTimeoutId);
+                }
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                currentNarratorVoice = getVoiceForCurrentQuestionSet(gameData.questionsAnswered || 0);
+                utterance.voice = currentNarratorVoice || userSelectedVoice; 
+
+                if (!utterance.voice && voices && voices.length > 0) {
+                     let fallbackVoice = voices.find(v => v.default && v.lang.startsWith('en'));
+                     if (!fallbackVoice) fallbackVoice = voices.find(v => v.lang.startsWith('en'));
+                     if (!fallbackVoice && voices.length > 0) fallbackVoice = voices[0];
+                     utterance.voice = fallbackVoice;
+                     console.warn("Using absolute fallback voice for speak:", fallbackVoice ? fallbackVoice.name : "None available");
+                }
+                // console.log("Attempting to speak with voice:", utterance.voice ? utterance.voice.name : "Browser default (no specific voice object)"); // Reduced verbosity
+                
+                let hasCalledBack = false;
+                const ensureCallback = () => {
+                    if (!hasCalledBack) {
+                        hasCalledBack = true;
+                        if (callback) callback();
+                    }
+                };
+
+                utterance.onstart = () => {
+                     console.log("Speech event: onstart for:", text.substring(0,30) + "...");
+                };
+                utterance.onend = () => {
+                    console.log("Speech event: onend for:", text.substring(0,30) + "...");
+                    ensureCallback();
+                };
+                utterance.onerror = (event) => {
+                    console.error("SpeechSynthesisUtterance.onerror. Event:", event, "Specific error type:", event.error, "Utterance text:", text.substring(0,30) + "...");
+                    let errorMessage = `Audio Error (${event.error || 'Unknown TTS Error'}).`;
+                    if (event.error && event.error !== 'canceled' && event.error !== 'interrupted') {
+                        currentActivityDisplay.textContent = errorMessage + " Try another voice.";
+                    } else if (event.error === 'canceled') {
+                        console.warn("Speech was canceled. This might be intentional (e.g., new speak request or browser behavior).");
+                    }
+                    ensureCallback(); 
+                };
+
+                const doSpeak = () => {
+                    console.log("Executing speechSynthesis.speak for:", text.substring(0,30) + "...");
+                    speechSynthesis.speak(utterance);
+                };
+
+                if (speechSynthesis.speaking || speechSynthesis.pending) {
+                    console.log("Speech is speaking or pending. Canceling current speech queue...");
+                    speechSynthesis.cancel(); 
+                    speakTimeoutId = setTimeout(doSpeak, 250); 
+                } else {
+                    speakTimeoutId = setTimeout(doSpeak, 50); 
+                }
+            }
+
+            // --- Game Logic Functions ---
+            function resetGameData() {
+                gameData = {
+                    username: usernameInput.value.trim() || "Player",
+                    score: 0,
+                    questionsAnswered: 0,
+                    totalQuestions: TOTAL_QUESTIONS_PER_GAME,
+                    badges: [],
+                    correctStreak: 0,
+                    fastAnswers: 0
+                };
+                shuffledSentenceIndices = Array.from(Array(pastTenseSentences.length).keys());
+                shuffleArray(shuffledSentenceIndices); 
+                currentQuestionIndexInShuffledList = 0; 
+
+                updateGameStatsDisplay();
+                initiateQuestionButton.textContent = "Start First Question";
+                const englishVoicesExist = voices && voices.filter(v => v.lang.startsWith('en')).length > 0;
+                initiateQuestionButton.disabled = !('speechSynthesis' in window) || !englishVoicesExist;
+                currentActivityDisplay.textContent = "Click 'Start First Question' to begin!";
+                 if (initiateQuestionButton.disabled) {
+                    currentActivityDisplay.textContent = "Text-to-Speech is not available or no English voices found. Cannot start game.";
+                }
+            }
+
+            function updateGameStatsDisplay() {
+                displayUsername.textContent = gameData.username;
+                scoreDisplay.textContent = gameData.score;
+                questionsAnsweredDisplay.textContent = gameData.questionsAnswered;
+                totalQuestionsDisplay.textContent = gameData.totalQuestions; // This will now show 40
+                updateBadgesDisplay();
+            }
+            
+            function awardBadge(badgeName) {
+                if (!gameData.badges.includes(badgeName)) {
+                    gameData.badges.push(badgeName);
+                    updateBadgesDisplay();
+                    let newBadgeSpan = null;
+                    for (const span of badgesDisplay.children) {
+                        if (span.textContent === badgeName) {
+                            newBadgeSpan = span;
+                            break;
+                        }
+                    }
+                    if (newBadgeSpan) {
+                        newBadgeSpan.classList.add('animate-pulse');
+                        setTimeout(() => newBadgeSpan.classList.remove('animate-pulse'), 2000);
+                    }
+                }
+            }
+
+            function updateBadgesDisplay() {
+                 badgesDisplay.innerHTML = gameData.badges.length > 0 ? 
+                    gameData.badges.map(b => `<span class="inline-block">${b}</span>`).join(' ') : 'None';
+            }
+
+            function startGame() {
+                console.log("startGame called");
+                if (!usernameInput.value.trim()) {
+                    const nameField = document.getElementById('username');
+                    nameField.classList.add('border-red-500', 'placeholder-red-400');
+                    nameField.focus();
+                    setTimeout(() => nameField.classList.remove('border-red-500', 'placeholder-red-400'), 2000);
+                    return;
+                }
+                resetGameData();
+                startScreen.classList.add('hidden');
+                gameOverScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+            }
+            
+            function startNewQuestionRound() {
+                console.log("startNewQuestionRound called. Questions answered:", gameData.questionsAnswered, "Total Qs:", TOTAL_QUESTIONS_PER_GAME);
+                if (gameData.questionsAnswered >= TOTAL_QUESTIONS_PER_GAME) { 
+                    console.log("Ending game because all questions answered.");
+                    endGame();
+                    return;
+                }
+                initiateQuestionButton.disabled = true; 
+                currentActivityDisplay.textContent = "Listen carefully to the sentence...";
+
+                if (currentQuestionIndexInShuffledList >= shuffledSentenceIndices.length) {
+                    // This condition implies we've used all 50 unique sentences, 
+                    // but TOTAL_QUESTIONS_PER_GAME might be less.
+                    // If TOTAL_QUESTIONS_PER_GAME is > 50, this indicates an issue or need to allow repeats.
+                    // For now, assuming TOTAL_QUESTIONS_PER_GAME <= 50.
+                    console.warn("Ran out of unique sentences from shuffled list. Current index:", currentQuestionIndexInShuffledList, "List length:", shuffledSentenceIndices.length);
+                    endGame(); 
+                    return;
+                }
+
+                const actualSentenceIndex = shuffledSentenceIndices[currentQuestionIndexInShuffledList];
+                currentSentenceObject = pastTenseSentences[actualSentenceIndex];
+                
+                console.log("Preparing to speak sentence:", currentSentenceObject.sentence);
+                speak(currentSentenceObject.sentence, () => {
+                    console.log("Speak callback triggered, displaying question modal for:", currentSentenceObject.verb);
+                    displayQuestionModal(currentSentenceObject);
+                });
+            }
+            
+            function displayQuestionModal(sentenceObj) {
+                console.log("displayQuestionModal for:", sentenceObj.verb);
+                questionSentenceDisplay.textContent = `Listen to the audio... (Click "Repeat Sentence" if needed)`; 
+                questionTextDisplay.textContent = `What is the main past tense verb used in the sentence you heard?`;
+                
+                const correctAnswer = sentenceObj.verb;
+                const allVerbs = pastTenseSentences.map(s => s.verb);
+                let distractors = [];
+                const tempVerbs = allVerbs.filter(v => v !== correctAnswer);
+                while (distractors.length < 3 && tempVerbs.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * tempVerbs.length);
+                    distractors.push(tempVerbs.splice(randomIndex, 1)[0]);
+                }
+                const options = shuffleArray([correctAnswer, ...distractors]);
+
+                answerOptionsContainer.innerHTML = '';
+                options.forEach(optionText => {
+                    const choiceBtn = document.createElement('button');
+                    choiceBtn.classList.add('choice-button');
+                    choiceBtn.textContent = optionText;
+                    choiceBtn.disabled = false; 
+                    choiceBtn.addEventListener('click', () => checkAnswer(optionText, correctAnswer, choiceBtn));
+                    answerOptionsContainer.appendChild(choiceBtn);
+                });
+                
+                feedbackDisplay.textContent = '';
+                nextQuestionButtonModal.classList.add('hidden');
+                rewardGif.classList.add('hidden'); 
+                questionModal.classList.remove('hidden');
+                startQuestionTimer();
+            }
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+            
+            function startQuestionTimer() {
+                clearInterval(questionTimerInterval);
+                gameData.timeLeft = TIME_PER_QUESTION;
+                modalTimerDisplay.textContent = gameData.timeLeft;
+                questionTimerInterval = setInterval(() => {
+                    gameData.timeLeft--;
+                    modalTimerDisplay.textContent = gameData.timeLeft;
+                    if (gameData.timeLeft <= 0) {
+                        clearInterval(questionTimerInterval);
+                        feedbackDisplay.textContent = `Time's up! The verb was: ${currentSentenceObject.verb}`;
+                        feedbackDisplay.style.color = '#f59e0b'; 
+                        disableAnswerOptions(currentSentenceObject.verb);
+                        nextQuestionButtonModal.classList.remove('hidden');
+                        gameData.correctStreak = 0;
+                        
+                        gameData.questionsAnswered++; 
+                        currentQuestionIndexInShuffledList++; 
+                        questionSentenceDisplay.textContent = `Sentence was: "${currentSentenceObject.sentence}"`; 
+
+                        updateGameStatsDisplay();
+                        if (gameData.questionsAnswered >= gameData.totalQuestions) {
+                             nextQuestionButtonModal.textContent = "Show Results";
+                        }
+                    }
+                }, 1000);
+            }
+
+            function disableAnswerOptions(correctAnswer = null) {
+                Array.from(answerOptionsContainer.children).forEach(btn => {
+                    btn.disabled = true;
+                    if (correctAnswer && btn.textContent === correctAnswer && !btn.classList.contains('correct')) {
+                        btn.classList.add('correct'); 
+                    }
+                });
+            }
+
+            function checkAnswer(selectedAnswer, correctAnswer, buttonElement) {
+                clearInterval(questionTimerInterval);
+                disableAnswerOptions(correctAnswer); 
+                gameData.questionsAnswered++;
+                currentQuestionIndexInShuffledList++; 
+
+                questionSentenceDisplay.textContent = `Sentence was: "${currentSentenceObject.sentence}"`;
+
+                if (selectedAnswer === correctAnswer) {
+                    gameData.score += 10;
+                    feedbackDisplay.textContent = "Correct! Well done!";
+                    feedbackDisplay.style.color = '#10b981'; 
+                    buttonElement.classList.add('correct');
+                    gameData.correctStreak++;
+
+                    // --- IMPORTANT: Set SRC for sound and GIF here ---
+                    // e.g., correctSoundEffect.src = 'assets/correct.mp3'; 
+                    // e.g., rewardGif.src = 'assets/reward1.gif';        
+                    // --- --- --- --- --- --- --- --- --- --- --- ---
+
+                    if (correctSoundEffect.src && !correctSoundEffect.src.endsWith('/') && !correctSoundEffect.src.startsWith('blob:')) { 
+                        correctSoundEffect.currentTime = 0;
+                        correctSoundEffect.play().catch(e => console.warn("Could not play correct.mp3. Error:", e, "Current src:", correctSoundEffect.src));
+                    } else {
+                        console.log("Placeholder: Play correct.mp3 (src not set or is invalid). Current src:", correctSoundEffect.src);
+                    }
+                    
+                    if (rewardGif.src && !rewardGif.src.endsWith('/') && !rewardGif.src.startsWith('blob:') && !rewardGif.src.includes('placehold.co')) {
+                         rewardGif.classList.remove('hidden');
+                    } else { 
+                        rewardGif.src = 'https://placehold.co/120x120/a7f3d0/14532d?text=Awesome!'; 
+                        rewardGif.classList.remove('hidden');
+                        console.log("Placeholder: Show reward1.gif (src not set or is invalid, showing placeholder). Current src:", rewardGif.src);
+                    }
+                    setTimeout(() => {
+                        rewardGif.classList.add('hidden');
+                    }, 2500);
+
+
+                    if (gameData.timeLeft >= TIME_PER_QUESTION - 5) { 
+                       gameData.score += 5; 
+                       awardBadge("Speedy!");
+                       gameData.fastAnswers++;
+                    }
+                    if (gameData.correctStreak === 3) awardBadge("3-in-a-Row!");
+                    if (gameData.correctStreak === 5) awardBadge("Verb Master!");
+
+                } else {
+                    gameData.score = Math.max(0, gameData.score - 2); 
+                    feedbackDisplay.textContent = `Not quite. The verb was: ${correctAnswer}`;
+                    feedbackDisplay.style.color = '#f43f5e'; 
+                    buttonElement.classList.add('incorrect');
+                    Array.from(answerOptionsContainer.children).find(btn => btn.textContent === correctAnswer)?.classList.add('correct');
+                    gameData.correctStreak = 0;
+                }
+                
+                updateGameStatsDisplay();
+                checkBadges();
+                nextQuestionButtonModal.classList.remove('hidden');
+
+                if (gameData.questionsAnswered >= gameData.totalQuestions) {
+                    nextQuestionButtonModal.textContent = "Show Results";
+                }
+            }
+            
+            function checkBadges() {
+                if (gameData.score >= 50 && !gameData.badges.includes("Score Pro!")) awardBadge("Score Pro!");
+                if (gameData.score >= 100 && !gameData.badges.includes("Legendary!")) awardBadge("Legendary!");
+                if (gameData.questionsAnswered === gameData.totalQuestions && gameData.score > 0) awardBadge("Finished!");
+                if (gameData.fastAnswers >= 3 && !gameData.badges.includes("Quick Thinker!")) awardBadge("Quick Thinker!");
+            }
+
+            function proceedAfterModal() { 
+                questionModal.classList.add('hidden');
+                initiateQuestionButton.disabled = false; 
+                
+                if (gameData.questionsAnswered >= gameData.totalQuestions) {
+                    endGame();
+                } else {
+                   nextQuestionButtonModal.textContent = "Next Question"; 
+                   currentActivityDisplay.textContent = "Click 'Next Question' to continue.";
+                   initiateQuestionButton.textContent = "Next Question";
+                }
+            }
+            
+            function endGame() {
+                console.log("endGame called");
+                initiateQuestionButton.textContent = "Play Again?"; 
+                initiateQuestionButton.disabled = false; 
+                questionModal.classList.add('hidden'); 
+                gameOverScreen.classList.remove('hidden');
+                gameScreen.classList.add('hidden'); 
+                finalUsernameDisplay.textContent = gameData.username;
+                finalScoreDisplay.textContent = gameData.score;
+                finalBadgesDisplay.innerHTML = gameData.badges.length > 0 ? 
+                    gameData.badges.map(b => `<span class="inline-block">${b}</span>`).join(' ') : 'None';
+            }
+            
+            function quitGame() {
+                 clearInterval(questionTimerInterval);
+                 if (confirm("Are you sure you want to quit? Your progress will be lost.")) {
+                    gameScreen.classList.add('hidden');
+                    questionModal.classList.add('hidden');
+                    gameOverScreen.classList.add('hidden'); 
+                    startScreen.classList.remove('hidden');
+                    usernameInput.value = ''; 
+                 }
+            }
+
+            // --- Event Listeners ---
+            startButton.addEventListener('click', startGame);
+            playAgainButton.addEventListener('click', () => {
+                gameOverScreen.classList.add('hidden');
+                startScreen.classList.remove('hidden'); 
+                usernameInput.value = gameData.username; 
+            });
+            nextQuestionButtonModal.addEventListener('click', proceedAfterModal);
+            initiateQuestionButton.addEventListener('click', startNewQuestionRound);
+            quitButton.addEventListener('click', quitGame);
+            repeatSentenceButton.addEventListener('click', () => {
+                if (currentSentenceObject && currentSentenceObject.sentence) {
+                    speak(currentSentenceObject.sentence); 
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>
