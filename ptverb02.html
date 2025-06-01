@@ -54,7 +54,12 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .game-button { background-color: #4f46e5; }
-        .game-button:hover { background-color: #4338ca; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        .game-button:hover:not(:disabled) { background-color: #4338ca; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        .game-button:disabled {
+            background-color: #94a3b8; /* Tailwind slate-400 */
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
         
         .choice-button {
             background-color: #f59e0b; 
@@ -62,9 +67,13 @@
             display: block;
             width: 100%;
         }
-        .choice-button:hover { background-color: #d97706; transform: translateY(-2px); }
+        .choice-button:hover:not(:disabled) { background-color: #d97706; transform: translateY(-2px); }
         .choice-button.correct { background-color: #10b981; }
         .choice-button.incorrect { background-color: #f43f5e; }
+        .choice-button:disabled {
+             opacity: 0.7;
+        }
+
 
         .action-button { 
             background-color: #6366f1; 
@@ -95,7 +104,7 @@
             width: 95%;
             max-width: 550px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            position: relative; /* For positioning reward GIF */
+            position: relative; 
         }
         #feedback { font-weight: 600; margin-top: 20px; min-height: 28px; font-size: 1.1rem; }
         #badges-display span {
@@ -142,11 +151,11 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            max-width: 150px; /* Adjust size as needed */
+            max-width: 150px; 
             max-height: 150px;
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            z-index: 1001; /* Above modal content */
+            z-index: 1001; 
         }
 
         @media (max-width: 480px) { 
@@ -194,7 +203,8 @@
 
     <div id="question-modal" class="hidden">
         <div id="question-modal-content">
-            <img id="rewardGif" class="hidden" alt="Reward Animation"> <div class="flex justify-between items-center mb-2">
+            <img id="rewardGif" class="hidden" alt="Reward Animation"> 
+            <div class="flex justify-between items-center mb-2">
                 <p class="text-sm text-slate-500">Question Timer: <span id="modal-timer" class="font-bold text-base">--</span>s</p>
                 <button id="repeat-sentence-button" class="action-button">Repeat Sentence</button>
             </div>
@@ -240,8 +250,8 @@
             const feedbackDisplay = document.getElementById('feedback');
             const nextQuestionButtonModal = document.getElementById('next-question-button-modal');
             const repeatSentenceButton = document.getElementById('repeat-sentence-button');
-            const correctSoundEffect = document.getElementById('correctSoundEffect'); // Audio element
-            const rewardGif = document.getElementById('rewardGif'); // Image element
+            const correctSoundEffect = document.getElementById('correctSoundEffect'); 
+            const rewardGif = document.getElementById('rewardGif'); 
 
 
             const finalUsernameDisplay = document.getElementById('final-username');
@@ -295,8 +305,10 @@
                             break;
                         }
                     }
+                    initiateQuestionButton.disabled = false; // Enable button if voices are found
                 } else {
-                    currentActivityDisplay.textContent = "No English voices found for Text-to-Speech.";
+                    currentActivityDisplay.textContent = "No English voices found for Text-to-Speech. Game may not function correctly.";
+                    initiateQuestionButton.disabled = true; // Disable if no voices
                 }
             }
 
@@ -317,7 +329,9 @@
             }
 
             function speak(text, callback) {
+                console.log("Attempting to speak:", text);
                 if (!('speechSynthesis' in window) || !text) {
+                    console.warn("Speak function: TTS not supported or no text.");
                     if(callback) callback(); 
                     return;
                 }
@@ -325,8 +339,12 @@
                 const utterance = new SpeechSynthesisUtterance(text);
                 if (selectedVoice) {
                     utterance.voice = selectedVoice;
+                    console.log("Using voice:", selectedVoice.name);
+                } else {
+                    console.warn("No selected voice, using browser default.");
                 }
                 utterance.onend = () => {
+                    console.log("Speech finished.");
                     if(callback) callback();
                 };
                 utterance.onerror = (event) => {
@@ -354,8 +372,12 @@
 
                 updateGameStatsDisplay();
                 initiateQuestionButton.textContent = "Start First Question";
-                initiateQuestionButton.disabled = false;
+                // Ensure button is enabled only if TTS is supported and voices are loaded
+                initiateQuestionButton.disabled = !('speechSynthesis' in window) || voices.length === 0;
                 currentActivityDisplay.textContent = "Click 'Start First Question' to begin!";
+                 if (initiateQuestionButton.disabled) {
+                    currentActivityDisplay.textContent = "Text-to-Speech is not available or no voices found. Cannot start game.";
+                }
             }
 
             function updateGameStatsDisplay() {
@@ -390,6 +412,7 @@
             }
 
             function startGame() {
+                console.log("startGame called");
                 if (!usernameInput.value.trim()) {
                     const nameField = document.getElementById('username');
                     nameField.classList.add('border-red-500', 'placeholder-red-400');
@@ -404,6 +427,7 @@
             }
             
             function startNewQuestionRound() {
+                console.log("startNewQuestionRound called. Questions answered:", gameData.questionsAnswered);
                 if (gameData.questionsAnswered >= TOTAL_QUESTIONS_PER_GAME) { 
                     endGame();
                     return;
@@ -411,17 +435,26 @@
                 initiateQuestionButton.disabled = true; 
                 currentActivityDisplay.textContent = "Listen carefully to the sentence...";
 
+                if (currentQuestionIndexInShuffledList >= shuffledSentenceIndices.length) {
+                    console.warn("Ran out of unique sentences before reaching TOTAL_QUESTIONS_PER_GAME. Resetting shuffled list.");
+                    shuffledSentenceIndices = Array.from(Array(pastTenseSentences.length).keys());
+                    shuffleArray(shuffledSentenceIndices);
+                    currentQuestionIndexInShuffledList = 0;
+                    // Potentially add logic to avoid immediate repeats if desired, though less likely with 50 sentences.
+                }
+
                 const actualSentenceIndex = shuffledSentenceIndices[currentQuestionIndexInShuffledList];
                 currentSentenceObject = pastTenseSentences[actualSentenceIndex];
                 
+                console.log("Preparing to speak sentence:", currentSentenceObject.sentence);
                 speak(currentSentenceObject.sentence, () => {
-                    // This callback ensures the modal shows after speech attempts (or immediately if speech fails)
+                    console.log("Speak callback triggered, displaying question modal.");
                     displayQuestionModal(currentSentenceObject);
                 });
             }
             
             function displayQuestionModal(sentenceObj) {
-                // Instead of showing sentence here, we show a placeholder. Sentence is revealed after answer.
+                console.log("displayQuestionModal for:", sentenceObj.verb);
                 questionSentenceDisplay.textContent = `Listen to the audio... (Click "Repeat Sentence" if needed)`; 
                 questionTextDisplay.textContent = `What is the main past tense verb used in the sentence you heard?`;
                 
@@ -440,13 +473,14 @@
                     const choiceBtn = document.createElement('button');
                     choiceBtn.classList.add('choice-button');
                     choiceBtn.textContent = optionText;
+                    choiceBtn.disabled = false; // Ensure buttons are enabled
                     choiceBtn.addEventListener('click', () => checkAnswer(optionText, correctAnswer, choiceBtn));
                     answerOptionsContainer.appendChild(choiceBtn);
                 });
                 
                 feedbackDisplay.textContent = '';
                 nextQuestionButtonModal.classList.add('hidden');
-                rewardGif.classList.add('hidden'); // Ensure GIF is hidden initially
+                rewardGif.classList.add('hidden'); 
                 questionModal.classList.remove('hidden');
                 startQuestionTimer();
             }
@@ -476,7 +510,7 @@
                         
                         gameData.questionsAnswered++; 
                         currentQuestionIndexInShuffledList++; 
-                        questionSentenceDisplay.textContent = `Sentence was: "${currentSentenceObject.sentence}"`; // Reveal sentence on timeout
+                        questionSentenceDisplay.textContent = `Sentence was: "${currentSentenceObject.sentence}"`; 
 
                         updateGameStatsDisplay();
                         if (gameData.questionsAnswered >= gameData.totalQuestions) {
@@ -501,7 +535,6 @@
                 gameData.questionsAnswered++;
                 currentQuestionIndexInShuffledList++; 
 
-                // Reveal the sentence now that an answer is chosen
                 questionSentenceDisplay.textContent = `Sentence was: "${currentSentenceObject.sentence}"`;
 
                 if (selectedAnswer === correctAnswer) {
@@ -511,19 +544,30 @@
                     buttonElement.classList.add('correct');
                     gameData.correctStreak++;
 
-                    // Play correct sound - USER NEEDS TO PROVIDE 'correct.mp3' PATH
-                    // correctSoundEffect.src = 'path/to/your/correct.mp3'; 
-                    if (correctSoundEffect.src && correctSoundEffect.src !== window.location.href) { // Check if src is set and not just base URL
-                        correctSoundEffect.currentTime = 0;
-                        correctSoundEffect.play().catch(e => console.warn("Could not play correct.mp3:", e));
-                    } else {
-                        console.log("Placeholder: Play correct.mp3 (src not set)");
-                    }
+                    // --- IMPORTANT: Set SRC for sound and GIF here ---
+                    // e.g., correctSoundEffect.src = 'assets/correct.mp3'; // Make sure this path is correct
+                    // e.g., rewardGif.src = 'assets/reward1.gif';        // Make sure this path is correct
+                    // --- --- --- --- --- --- --- --- --- --- --- ---
 
-                    // Show reward GIF - USER NEEDS TO PROVIDE 'reward1.gif' PATH
-                    // rewardGif.src = 'path/to/your/reward1.gif'; 
-                    rewardGif.src = 'https://placehold.co/120x120/a7f3d0/14532d?text=Awesome!'; // Placeholder
-                    rewardGif.classList.remove('hidden');
+                    // For testing without actual files, you can comment out the .play() and .classList.remove parts
+                    // or use the console.log placeholders.
+
+                    // Check if src is a valid path and not just the base URL or blob
+                    if (correctSoundEffect.src && !correctSoundEffect.src.endsWith('/') && !correctSoundEffect.src.startsWith('blob:')) { 
+                        correctSoundEffect.currentTime = 0;
+                        correctSoundEffect.play().catch(e => console.warn("Could not play correct.mp3. Error:", e, "Current src:", correctSoundEffect.src));
+                    } else {
+                        console.log("Placeholder: Play correct.mp3 (src not set or is invalid). Current src:", correctSoundEffect.src);
+                    }
+                    
+                    // Check if src is a valid path and not just the base URL or blob or placeholder
+                    if (rewardGif.src && !rewardGif.src.endsWith('/') && !rewardGif.src.startsWith('blob:') && !rewardGif.src.includes('placehold.co')) {
+                         rewardGif.classList.remove('hidden');
+                    } else { 
+                        rewardGif.src = 'https://placehold.co/120x120/a7f3d0/14532d?text=Awesome!'; // Default placeholder
+                        rewardGif.classList.remove('hidden');
+                        console.log("Placeholder: Show reward1.gif (src not set or is invalid, showing placeholder). Current src:", rewardGif.src);
+                    }
                     setTimeout(() => {
                         rewardGif.classList.add('hidden');
                     }, 2500);
@@ -578,8 +622,7 @@
             function endGame() {
                 initiateQuestionButton.textContent = "Play Again?"; 
                 initiateQuestionButton.disabled = true; 
-                gameScreen.classList.add('hidden'); 
-                questionModal.classList.add('hidden');
+                questionModal.classList.add('hidden'); // Ensure modal is hidden
                 gameOverScreen.classList.remove('hidden');
                 finalUsernameDisplay.textContent = gameData.username;
                 finalScoreDisplay.textContent = gameData.score;
@@ -609,7 +652,7 @@
             quitButton.addEventListener('click', quitGame);
             repeatSentenceButton.addEventListener('click', () => {
                 if (currentSentenceObject && currentSentenceObject.sentence) {
-                    speak(currentSentenceObject.sentence); // No callback needed here, just repeat
+                    speak(currentSentenceObject.sentence); 
                 }
             });
 
