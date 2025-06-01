@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text-to-Speech on Hover: 50 Past Tense Sentences</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Past Tense Verb Game - Enhanced Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -12,299 +12,563 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* justify-content: center; */ /* Adjusted for scrolling */
             min-height: 100vh;
             margin: 0;
-            background-color: #f3f4f6; /* Tailwind gray-100 */
-            color: #1f2937; /* Tailwind gray-800 */
+            background-image: linear-gradient(to bottom right, #bae6fd, #c7d2fe); /* Tailwind sky-200 to indigo-200 */
+            color: #334155; /* Tailwind slate-700 */
             padding: 20px;
             text-align: center;
         }
-        .content-wrapper {
+        .hidden { display: none !important; }
+        .game-container {
+            background-color: white;
+            padding: 25px 30px; /* Increased padding */
+            border-radius: 16px; /* More rounded */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15); /* Softer, larger shadow */
             width: 100%;
-            max-width: 1000px; /* Max width for content */
-            margin-bottom: 40px; /* Space at the bottom */
-        }
-        .button-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px; /* Spacing between buttons */
-            justify-content: center;
-            margin-top: 25px;
-            padding: 10px;
-        }
-        .tts-button {
-            padding: 10px 15px;
-            font-size: 0.9rem; /* Slightly smaller font for more buttons */
-            font-weight: 500;
-            color: white;
-            background-color: #3b82f6; /* Tailwind blue-500 */
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            min-width: 120px; /* Ensure buttons have some width */
-            text-align: left;
-        }
-        .tts-button:hover {
-            background-color: #2563eb; /* Tailwind blue-600 */
-            transform: translateY(-2px);
-        }
-        .tts-button:active {
-            transform: translateY(0px);
-        }
-        .status {
+            max-width: 950px; /* Slightly wider */
             margin-top: 20px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            color: #4b5563; /* Tailwind gray-600 */
+        }
+        #start-screen input[type="text"] {
+            border: 2px solid #e2e8f0; /* Tailwind slate-200 */
+            padding: 12px 15px; /* Increased padding */
+            border-radius: 8px;
+            margin-right: 10px;
+            width: calc(100% - 140px); 
+            max-width: 320px;
+            transition: border-color 0.3s ease;
+        }
+        #start-screen input[type="text"]:focus {
+            border-color: #4f46e5; /* Tailwind indigo-600 */
+            outline: none;
+        }
+        .game-button, .choice-button {
+            padding: 12px 24px; /* Increased padding */
+            font-size: 1.05rem; /* Slightly larger font */
+            font-weight: 600; /* Bolder */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .game-button { background-color: #4f46e5; /* Tailwind indigo-600 */ }
+        .game-button:hover { background-color: #4338ca; /* Tailwind indigo-700 */ transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        
+        .choice-button {
+            background-color: #f59e0b; /* Tailwind amber-500 */
+            margin: 6px;
+            display: block;
+            width: 100%;
+        }
+        .choice-button:hover { background-color: #d97706; /* Tailwind amber-600 */ transform: translateY(-2px); }
+        .choice-button.correct { background-color: #10b981; /* Tailwind emerald-500 */ }
+        .choice-button.incorrect { background-color: #f43f5e; /* Tailwind rose-500 */ }
+
+        /* Verb Buttons (previously sentence-display-button) */
+        .verb-button {
+            padding: 12px 18px;
+            font-size: 1rem; /* Larger font for verb */
+            font-weight: 600;
+            color: white;
+            background-color: #0ea5e9; /* Tailwind sky-500 */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+            width: calc(33.333% - 10px); /* For 3 columns, adjust as needed */
+            min-width: 100px; /* Minimum width */
+            text-align: center; /* Center the verb text */
+            margin: 5px;
+        }
+        .verb-button:hover { background-color: #0284c7; /* Tailwind sky-600 */ transform: translateY(-2px); box-shadow: 0 5px 10px rgba(0,0,0,0.15); }
+        .verb-button:disabled {
+            background-color: #94a3b8; /* Tailwind slate-400 */
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        #game-stats div { margin: 6px 0; font-size: 1rem; color: #475569; /* Tailwind slate-600 */ }
+        #game-stats span.font-bold { color: #1e293b; /* Tailwind slate-800 */ }
+
+        #question-modal {
+            background-color: rgba(30, 41, 59, 0.6); /* Darker overlay - slate-800 with opacity */
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+        #question-modal-content {
+            background-color: white;
+            padding: 30px; /* Increased padding */
+            border-radius: 12px; /* More rounded */
+            width: 95%;
+            max-width: 550px; /* Slightly wider */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        #feedback { font-weight: 600; margin-top: 20px; min-height: 28px; font-size: 1.1rem; }
+        #badges-display span {
+            background-color: #fde047; /* Tailwind yellow-300 */
+            color: #713f12; /* Tailwind yellow-700 */
+            padding: 4px 10px; /* Increased padding */
+            border-radius: 12px; /* More rounded */
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin: 0 4px;
+            display: inline-block;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         .voice-selector-container {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: inline-block; /* Center the container itself */
-        }
-        .voice-selector-container label {
-            margin-right: 10px;
-            font-weight: 500;
+            margin: 20px 0; padding: 15px; background-color: #f0f9ff; /* Tailwind sky-50 */ border-radius: 10px;
+            border: 1px solid #e0f2fe; /* Tailwind sky-100 */
         }
         #voiceSelect {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #d1d5db; /* Tailwind gray-300 */
-            background-color: white;
-            min-width: 200px;
-        }
-        .sentence-group {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #ffffff;
+            padding: 10px 14px; /* Increased padding */
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid #cbd5e1; /* Tailwind slate-300 */
+            background-color: white;
+            min-width: 220px;
+            font-weight: 500;
+            transition: border-color 0.3s ease;
         }
-        .sentence-group h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #111827; /* Tailwind gray-900 */
-            margin-bottom: 20px;
+        #voiceSelect:focus {
+            border-color: #0ea5e9; /* Tailwind sky-500 */
+            outline: none;
         }
-        .verb-label {
-            font-weight: bold;
-            color: #1e40af; /* Tailwind blue-800 */
+        /* Responsive adjustments for verb buttons container */
+        #sentences-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* Consistent gap */
+            justify-content: center;
+            padding: 15px;
+            background-color: #f1f5f9; /* Tailwind slate-100 */
+            border-radius: 10px;
         }
+        @media (max-width: 768px) { /* Medium screens */
+            .verb-button {
+                width: calc(50% - 10px); /* 2 columns */
+            }
+        }
+        @media (max-width: 480px) { /* Small screens */
+            .verb-button {
+                width: calc(100% - 10px); /* 1 column */
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
+            #start-screen input[type="text"] {
+                 width: 100%; max-width: none; margin-bottom:10px; margin-right:0;
+            }
+            .game-button, .choice-button { padding: 10px 18px; font-size: 0.95rem;}
+        }
+
     </style>
 </head>
 <body>
-    <div class="content-wrapper">
-        <header class="text-center my-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Text-to-Speech: Past Tense Verbs</h1>
-            <p class="text-lg text-gray-600 mt-2">Hover over the buttons to hear the sentences.</p>
-        </header>
+
+    <div id="start-screen" class="game-container text-center">
+        <h1 class="text-4xl font-bold mb-4 text-indigo-600">Past Tense Power-Up!</h1>
+        <p class="mb-6 text-slate-600 text-lg">Enter your name and let's test your verb skills!</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center">
+            <input type="text" id="username" placeholder="Your Gamer Name">
+            <button id="start-button" class="game-button mt-3 sm:mt-0">Start Game</button>
+        </div>
+    </div>
+
+    <div id="game-screen" class="game-container hidden">
+        <div class="flex flex-wrap justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold text-indigo-600">Go, <span id="display-username"></span>!</h2>
+            <button id="quit-button" class="game-button !bg-rose-500 hover:!bg-rose-600 text-sm px-4 py-2">Quit</button>
+        </div>
+        
+        <div id="game-stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 text-slate-700">
+            <div>Score: <span id="score" class="font-bold text-xl">0</span></div>
+            <div>Questions: <span id="questions-answered" class="font-bold text-xl">0</span>/<span id="total-questions" class="text-xl">10</span></div>
+            <div>Time Left: <span id="timer" class="font-bold text-xl">--</span>s</div>
+            <div>Badges: <span id="badges-display">None</span></div>
+        </div>
 
         <div class="voice-selector-container">
-            <label for="voiceSelect">Select a Voice:</label>
+            <label for="voiceSelect" class="text-slate-700 font-semibold">Select Voice:</label>
             <select id="voiceSelect"></select>
         </div>
+        
+        <p class="text-slate-600 mb-4 text-base">Hover to hear the full sentence. Click a <strong class="text-sky-600">VERB</strong> to answer a question!</p>
+        <div id="sentences-container">
+            </div>
+    </div>
 
-        <div id="status" class="status">
-            Speech synthesis is not supported by your browser or no voices found.
-        </div>
-
-        <div class="sentence-group">
-            <h2>50 Past Tense Sentences</h2>
-            <div class="button-container" id="sentencesContainer">
+    <div id="question-modal" class="hidden">
+        <div id="question-modal-content">
+            <p class="text-sm text-slate-500 mb-2">Question Timer: <span id="modal-timer" class="font-bold text-base">--</span>s</p>
+            <p id="question-sentence-display" class="mb-4 text-slate-600 italic"></p>
+            <p id="question-text" class="mb-5 text-xl font-semibold text-slate-800"></p>
+            <div id="answer-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 </div>
+            <div id="feedback" class="mt-5"></div>
+            <button id="next-question-button" class="game-button mt-5 hidden w-full !bg-emerald-500 hover:!bg-emerald-600">Next Question</button>
         </div>
+    </div>
+    
+    <div id="game-over-screen" class="game-container hidden text-center">
+        <h2 class="text-3xl font-bold text-indigo-600 mb-5">Game Over, <span id="final-username"></span>!</h2>
+        <p class="text-2xl text-slate-700 mb-3">Final Score: <span id="final-score" class="font-bold text-indigo-600">0</span></p>
+        <p class="text-xl text-slate-600 mb-6">Badges Earned: <span id="final-badges-display">None</span></p>
+        <button id="play-again-button" class="game-button">Play Again!</button>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const statusDiv = document.getElementById('status');
+            // --- DOM Elements ---
+            const startScreen = document.getElementById('start-screen');
+            const gameScreen = document.getElementById('game-screen');
+            const gameOverScreen = document.getElementById('game-over-screen');
+            const usernameInput = document.getElementById('username');
+            const startButton = document.getElementById('start-button');
+            const quitButton = document.getElementById('quit-button');
+            const displayUsername = document.getElementById('display-username');
+            const scoreDisplay = document.getElementById('score');
+            const questionsAnsweredDisplay = document.getElementById('questions-answered');
+            const totalQuestionsDisplay = document.getElementById('total-questions');
+            // const timerDisplay = document.getElementById('timer'); // Overall game timer not implemented
+            const badgesDisplay = document.getElementById('badges-display');
+            const sentencesContainer = document.getElementById('sentences-container');
             const voiceSelect = document.getElementById('voiceSelect');
-            const sentencesContainer = document.getElementById('sentencesContainer');
+            
+            const questionModal = document.getElementById('question-modal');
+            // const questionModalContent = document.getElementById('question-modal-content'); // Not directly manipulated after init
+            const modalTimerDisplay = document.getElementById('modal-timer');
+            const questionSentenceDisplay = document.getElementById('question-sentence-display');
+            const questionTextDisplay = document.getElementById('question-text');
+            const answerOptionsContainer = document.getElementById('answer-options');
+            const feedbackDisplay = document.getElementById('feedback');
+            const nextQuestionButton = document.getElementById('next-question-button');
+
+            const finalUsernameDisplay = document.getElementById('final-username');
+            const finalScoreDisplay = document.getElementById('final-score');
+            const finalBadgesDisplay = document.getElementById('final-badges-display');
+            const playAgainButton = document.getElementById('play-again-button');
+
+            // --- Game Data & Config ---
+            const TOTAL_QUESTIONS_PER_GAME = 10;
+            const TIME_PER_QUESTION = 20; // seconds
+            let gameData = {};
+            let currentSentenceObject = null;
+            let questionTimerInterval = null;
             let voices = [];
             let selectedVoice = null;
 
-            // Array of 50 sentences, each with a unique past tense verb
             const pastTenseSentences = [
-                { verb: "ate", sentence: "The curious squirrel quickly ate the nut it found." },
-                { verb: "walked", sentence: "She walked through the ancient forest with her friends." },
-                { verb: "saw", sentence: "From the mountaintop, we saw a breathtaking valley." },
-                { verb: "wrote", sentence: "He wrote a long story about his adventures abroad." },
-                { verb: "played", sentence: "The children played joyfully in the park until dusk." },
-                { verb: "ran", sentence: "The athlete ran a new personal best in the marathon." },
-                { verb: "slept", sentence: "After a tiring day, the old dog slept soundly by the fire." },
-                { verb: "drank", sentence: "They drank fresh lemonade on a hot summer afternoon." },
-                { verb: "spoke", sentence: "The professor spoke eloquently about historical events." },
-                { verb: "read", sentence: "I read an interesting article about space exploration." }, // Pronounced "red"
-                { verb: "built", sentence: "The community built a new playground for the children." },
-                { verb: "sang", sentence: "She sang her favorite song at the karaoke night." },
-                { verb: "swam", sentence: "He swam across the clear blue lake." },
-                { verb: "drove", sentence: "My father drove us to the beach last weekend." },
-                { verb: "flew", sentence: "The eagle flew high above the towering cliffs." },
-                { verb: "caught", sentence: "The fisherman caught a surprisingly large fish." },
-                { verb: "taught", sentence: "The mentor taught valuable lessons to her students." },
-                { verb: "thought", sentence: "She thought carefully before making a decision." },
-                { verb: "bought", sentence: "He bought a beautiful bouquet of flowers for her." },
-                { verb: "brought", sentence: "My friend brought delicious cookies to the party." },
-                { verb: "chose", sentence: "They chose the scenic route for their road trip." },
-                { verb: "came", sentence: "The guest of honor came fashionably late to the event." },
-                { verb: "did", sentence: "He did his homework diligently every evening." },
-                { verb: "drew", sentence: "The artist drew a stunning portrait of the landscape." },
-                { verb: "fell", sentence: "The autumn leaves fell gracefully from the trees." },
-                { verb: "found", sentence: "She found her lost keys under the sofa cushions." },
-                { verb: "gave", sentence: "He gave a generous donation to the local charity." },
-                { verb: "went", sentence: "We went to the museum to see the new exhibition." },
-                { verb: "heard", sentence: "I heard a faint melody playing in the distance." },
-                { verb: "knew", sentence: "She knew the answer to the difficult question." },
-                { verb: "left", sentence: "He left his umbrella on the bus by mistake." },
-                { verb: "made", sentence: "My grandmother made a delicious apple pie from scratch." },
-                { verb: "met", sentence: "They met their old friends at the reunion." },
-                { verb: "paid", sentence: "She paid the bill after enjoying a wonderful meal." },
-                { verb: "put", sentence: "He put the book back on the shelf after reading it." }, // Past tense is "put"
-                { verb: "quit", sentence: "She quit her job to pursue her passion for art." }, // Past tense is "quit"
-                { verb: "rode", sentence: "The children rode their bicycles around the neighborhood." },
-                { verb: "said", sentence: "The teacher said to study hard for the upcoming exam." },
-                { verb: "sold", sentence: "The artist sold his most famous painting at the auction." },
-                { verb: "sent", sentence: "She sent a postcard from her vacation in Italy." },
-                { verb: "shook", sentence: "He shook his head in disbelief at the news." },
-                { verb: "sat", sentence: "The cat sat patiently by the window, watching birds." },
-                { verb: "stood", sentence: "The tall lighthouse stood firmly against the stormy sea." },
-                { verb: "took", sentence: "She took a photograph of the beautiful scenery." },
-                { verb: "told", sentence: "He told an amusing story that made everyone laugh." },
-                { verb: "understood", sentence: "They finally understood the complex mathematical problem." },
-                { verb: "woke", sentence: "The alarm clock woke him up early in the morning." },
-                { verb: "wore", sentence: "She wore her favorite dress to the special occasion." },
-                { verb: "won", sentence: "The team won the championship after a thrilling game." },
-                { verb: "began", sentence: "The concert began with a spectacular light show." }
+                { verb: "ate", sentence: "The curious squirrel quickly ate the nut it found." }, { verb: "walked", sentence: "She walked through the ancient forest with her friends." }, { verb: "saw", sentence: "From the mountaintop, we saw a breathtaking valley." }, { verb: "wrote", sentence: "He wrote a long story about his adventures abroad." }, { verb: "played", sentence: "The children played joyfully in the park until dusk." }, { verb: "ran", sentence: "The athlete ran a new personal best in the marathon." }, { verb: "slept", sentence: "After a tiring day, the old dog slept soundly by the fire." }, { verb: "drank", sentence: "They drank fresh lemonade on a hot summer afternoon." }, { verb: "spoke", sentence: "The professor spoke eloquently about historical events." }, { verb: "read", sentence: "I read an interesting article about space exploration." },  { verb: "built", sentence: "The community built a new playground for the children." }, { verb: "sang", sentence: "She sang her favorite song at the karaoke night." }, { verb: "swam", sentence: "He swam across the clear blue lake." }, { verb: "drove", sentence: "My father drove us to the beach last weekend." }, { verb: "flew", sentence: "The eagle flew high above the towering cliffs." }, { verb: "caught", sentence: "The fisherman caught a surprisingly large fish." }, { verb: "taught", sentence: "The mentor taught valuable lessons to her students." }, { verb: "thought", sentence: "She thought carefully before making a decision." }, { verb: "bought", sentence: "He bought a beautiful bouquet of flowers for her." }, { verb: "brought", sentence: "My friend brought delicious cookies to the party." }, { verb: "chose", sentence: "They chose the scenic route for their road trip." }, { verb: "came", sentence: "The guest of honor came fashionably late to the event." }, { verb: "did", sentence: "He did his homework diligently every evening." }, { verb: "drew", sentence: "The artist drew a stunning portrait of the landscape." }, { verb: "fell", sentence: "The autumn leaves fell gracefully from the trees." }, { verb: "found", sentence: "She found her lost keys under the sofa cushions." }, { verb: "gave", sentence: "He gave a generous donation to the local charity." }, { verb: "went", sentence: "We went to the museum to see the new exhibition." }, { verb: "heard", sentence: "I heard a faint melody playing in the distance." }, { verb: "knew", sentence: "She knew the answer to the difficult question." }, { verb: "left", sentence: "He left his umbrella on the bus by mistake." }, { verb: "made", sentence: "My grandmother made a delicious apple pie from scratch." }, { verb: "met", sentence: "They met their old friends at the reunion." }, { verb: "paid", sentence: "She paid the bill after enjoying a wonderful meal." }, { verb: "put", sentence: "He put the book back on the shelf after reading it." },  { verb: "quit", sentence: "She quit her job to pursue her passion for art." }, { verb: "rode", sentence: "The children rode their bicycles around the neighborhood." }, { verb: "said", sentence: "The teacher said to study hard for the upcoming exam." }, { verb: "sold", sentence: "The artist sold his most famous painting at the auction." }, { verb: "sent", sentence: "She sent a postcard from her vacation in Italy." }, { verb: "shook", sentence: "He shook his head in disbelief at the news." }, { verb: "sat", sentence: "The cat sat patiently by the window, watching birds." }, { verb: "stood", sentence: "The tall lighthouse stood firmly against the stormy sea." }, { verb: "took", sentence: "She took a photograph of the beautiful scenery." }, { verb: "told", sentence: "He told an amusing story that made everyone laugh." }, { verb: "understood", sentence: "They finally understood the complex mathematical problem." }, { verb: "woke", sentence: "The alarm clock woke him up early in the morning." }, { verb: "wore", sentence: "She wore her favorite dress to the special occasion." }, { verb: "won", sentence: "The team won the championship after a thrilling game." }, { verb: "began", sentence: "The concert began with a spectacular light show." }
             ];
+            // let availableSentences = []; // Not directly used in this simplified version for picking questions
 
-            // Dynamically create buttons for each sentence
-            pastTenseSentences.forEach((item, index) => {
-                const button = document.createElement('button');
-                button.classList.add('tts-button');
-                // Display sentence number and the verb for easier identification
-                button.innerHTML = `Sentence ${index + 1} (<span class="verb-label">${item.verb}</span>)`;
-                // Store the full sentence to be spoken in a data attribute
-                button.dataset.textToSpeak = item.sentence;
-                sentencesContainer.appendChild(button);
-            });
-            
-            // Get all buttons (including dynamically added ones) to attach event listeners
-            const allTtsButtons = document.querySelectorAll('.tts-button');
+            // --- TTS Functions ---
+            function populateVoiceList() {
+                voices = speechSynthesis.getVoices();
+                voiceSelect.innerHTML = '';
+                const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+                
+                englishVoices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    option.setAttribute('data-name', voice.name);
+                    option.setAttribute('data-lang', voice.lang);
+                    voiceSelect.appendChild(option);
+                });
 
-            // Check for browser support for Speech Synthesis
-            if ('speechSynthesis' in window) {
-                statusDiv.textContent = 'Hover over a button to hear the sentence.';
-
-                // Function to populate the voice selection dropdown
-                function populateVoiceList() {
-                    voices = speechSynthesis.getVoices(); // Get available voices
-                    voiceSelect.innerHTML = ''; // Clear previous options
-
-                    if (voices.length === 0) {
-                        statusDiv.textContent = 'No voices found. Speech synthesis might be loading or unavailable.';
-                        return;
-                    }
+                if (englishVoices.length > 0) {
+                    let defaultVoice = englishVoices.find(v => v.name === "Google US English" || v.name.toLowerCase().includes("united states"));
+                    if (!defaultVoice) defaultVoice = englishVoices.find(v => v.default && v.lang.startsWith('en'));
+                    if (!defaultVoice) defaultVoice = englishVoices[0];
                     
-                    // Preferred voices (common on various OS/browsers)
-                    const preferredVoices = [
-                        "Google US English", "Microsoft Zira Desktop - English (United States)", 
-                        "Samantha", "Alex", "Google UK English Female", "Google UK English Male"
-                    ];
-                    let defaultVoiceIndex = 0; // Index for the voice to be selected by default
-                    let foundPreferred = false;
-
-                    voices.forEach((voice) => {
-                        if (voice.lang.startsWith('en')) { // Filter for English voices
-                            const option = document.createElement('option');
-                            option.textContent = `${voice.name} (${voice.lang})`;
-                            if (voice.default) { // Mark if it's the browser's default voice
-                                option.textContent += ' [DEFAULT]';
-                            }
-                            // Store voice details in data attributes for easy retrieval
-                            option.setAttribute('data-lang', voice.lang);
-                            option.setAttribute('data-name', voice.name);
-                            voiceSelect.appendChild(option);
-
-                            // Logic to select a preferred default voice from our list
-                            if (!foundPreferred) {
-                                if (preferredVoices.includes(voice.name)) {
-                                    defaultVoiceIndex = voiceSelect.options.length - 1;
-                                    foundPreferred = true;
-                                } else if (voice.default && defaultVoiceIndex === 0) { // Fallback to browser default English
-                                    defaultVoiceIndex = voiceSelect.options.length - 1;
-                                }
-                            }
+                    selectedVoice = defaultVoice;
+                    // Set the select element's value to the chosen default voice
+                    for (let i = 0; i < voiceSelect.options.length; i++) {
+                        if (voiceSelect.options[i].dataset.name === selectedVoice.name && voiceSelect.options[i].dataset.lang === selectedVoice.lang) {
+                            voiceSelect.selectedIndex = i;
+                            break;
                         }
-                    });
-                    
-                    if (voiceSelect.options.length > 0) {
-                        voiceSelect.selectedIndex = defaultVoiceIndex;
-                        // Set the initially selected voice object
-                        const initialSelectedOption = voiceSelect.options[defaultVoiceIndex];
-                        selectedVoice = voices.find(v => v.name === initialSelectedOption?.dataset.name && v.lang === initialSelectedOption?.dataset.lang) || voices.find(v => v.lang.startsWith('en'));
-                    } else {
-                         statusDiv.textContent = 'No English voices found. Speech synthesis might be unavailable.';
                     }
                 }
+            }
 
-                populateVoiceList(); // Initial population
-                // Voices can load asynchronously, so repopulate if they change
+            if ('speechSynthesis' in window) {
+                populateVoiceList();
                 if (speechSynthesis.onvoiceschanged !== undefined) {
                     speechSynthesis.onvoiceschanged = populateVoiceList;
                 }
-
-                // Event listener for when the user changes the selected voice
                 voiceSelect.addEventListener('change', (e) => {
                     const selectedOption = e.target.options[e.target.selectedIndex];
                     selectedVoice = voices.find(voice => voice.name === selectedOption.dataset.name && voice.lang === selectedOption.dataset.lang);
                 });
-
-                // Add hover event listeners to all TTS buttons
-                allTtsButtons.forEach(button => {
-                    const textToSpeak = button.dataset.textToSpeak || button.textContent; // Get text from data attribute
-
-                    button.addEventListener('mouseenter', () => {
-                        speechSynthesis.cancel(); // Cancel any ongoing speech
-                        const utterance = new SpeechSynthesisUtterance(textToSpeak);
-                        
-                        // Set the selected voice for the utterance
-                        if (selectedVoice) {
-                            utterance.voice = selectedVoice;
-                        } else if (voices.length > 0) {
-                            // Fallback to the first available English voice if none is selected
-                            utterance.voice = voices.find(voice => voice.lang.startsWith('en')) || voices[0];
-                        }
-                        
-                        // Handle speech errors
-                        utterance.onerror = (event) => {
-                            console.error('SpeechSynthesisUtterance.onerror', event);
-                            statusDiv.textContent = `Error speaking: ${event.error}`;
-                        };
-                        
-                        speechSynthesis.speak(utterance); // Speak the text
-                    });
-
-                    // Optional: Cancel speech on mouseleave
-                    // For short sentences, it's often better to let them finish.
-                    // button.addEventListener('mouseleave', () => {
-                    //     speechSynthesis.cancel(); 
-                    // });
-                });
-
             } else {
-                // Handle browsers that don't support speech synthesis
-                statusDiv.textContent = 'Sorry, your browser does not support text-to-speech.';
-                console.warn('Speech Synthesis not supported.');
-                sentencesContainer.innerHTML = '<p>Text-to-speech functionality is not available in your browser.</p>';
+                console.warn("Speech Synthesis not supported");
+                if(voiceSelect.parentElement) voiceSelect.parentElement.classList.add('hidden');
             }
+
+            function speak(text) {
+                if (!('speechSynthesis' in window) || !text) return;
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
+                speechSynthesis.speak(utterance);
+            }
+
+            // --- Game Logic Functions ---
+            function resetGameData() {
+                gameData = {
+                    username: usernameInput.value.trim() || "Player",
+                    score: 0,
+                    questionsAnswered: 0,
+                    totalQuestions: TOTAL_QUESTIONS_PER_GAME,
+                    answeredSentenceIndices: [], // Keep track of indices of sentences used for questions
+                    badges: [],
+                    correctStreak: 0,
+                    fastAnswers: 0
+                };
+                updateGameStatsDisplay();
+            }
+
+            function updateGameStatsDisplay() {
+                displayUsername.textContent = gameData.username;
+                scoreDisplay.textContent = gameData.score;
+                questionsAnsweredDisplay.textContent = gameData.questionsAnswered;
+                totalQuestionsDisplay.textContent = gameData.totalQuestions;
+                // timerDisplay.textContent = '--'; // Overall game timer not implemented
+                updateBadgesDisplay();
+            }
+            
+            function awardBadge(badgeName) {
+                if (!gameData.badges.includes(badgeName)) {
+                    gameData.badges.push(badgeName);
+                    updateBadgesDisplay();
+                    // Simple visual feedback for new badge
+                    const newBadgeSpan = badgesDisplay.querySelector(`span:contains("${badgeName}")`) || badgesDisplay.lastChild;
+                    if (newBadgeSpan) {
+                        newBadgeSpan.classList.add('animate-pulse');
+                        setTimeout(() => newBadgeSpan.classList.remove('animate-pulse'), 2000);
+                    }
+                }
+            }
+
+            function updateBadgesDisplay() {
+                 badgesDisplay.innerHTML = gameData.badges.length > 0 ? 
+                    gameData.badges.map(b => `<span class="inline-block">${b}</span>`).join(' ') : 'None';
+            }
+
+            function startGame() {
+                if (!usernameInput.value.trim()) {
+                    // Using a simple alert, can be replaced with a styled message
+                    const nameField = document.getElementById('username');
+                    nameField.classList.add('border-red-500', 'placeholder-red-400');
+                    nameField.focus();
+                    setTimeout(() => nameField.classList.remove('border-red-500', 'placeholder-red-400'), 2000);
+                    return;
+                }
+                resetGameData();
+                startScreen.classList.add('hidden');
+                gameOverScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+                populateVerbButtons();
+            }
+
+            function populateVerbButtons() {
+                sentencesContainer.innerHTML = ''; // Clear previous buttons
+                pastTenseSentences.forEach((item, index) => {
+                    const button = document.createElement('button');
+                    button.classList.add('verb-button'); // New class for verb-only buttons
+                    button.textContent = item.verb; // Display only the verb
+                    button.dataset.sentenceIndex = index; // Store original index
+                    button.dataset.textToSpeak = item.sentence; // Full sentence for TTS
+
+                    // Disable button if this sentence index has been used for a question
+                    if (gameData.answeredSentenceIndices.includes(index)) {
+                        button.disabled = true;
+                    }
+
+                    button.addEventListener('mouseenter', () => speak(item.sentence));
+                    button.addEventListener('click', () => handleVerbButtonClick(item, button, index));
+                    sentencesContainer.appendChild(button);
+                });
+            }
+            
+            function handleVerbButtonClick(sentenceObj, buttonElement, sentenceIndex) {
+                if (buttonElement.disabled || gameData.questionsAnswered >= gameData.totalQuestions) return;
+
+                currentSentenceObject = sentenceObj;
+                gameData.currentSentenceIndex = sentenceIndex; 
+
+                questionSentenceDisplay.textContent = `Sentence: "${sentenceObj.sentence}"`;
+                questionTextDisplay.textContent = `What is the main past tense verb used in this sentence?`;
+                
+                const correctAnswer = sentenceObj.verb;
+                // Generate distractors from the list of all verbs, excluding the correct one
+                const allVerbs = pastTenseSentences.map(s => s.verb);
+                let distractors = [];
+                const tempVerbs = allVerbs.filter(v => v !== correctAnswer);
+                while (distractors.length < 3 && tempVerbs.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * tempVerbs.length);
+                    distractors.push(tempVerbs.splice(randomIndex, 1)[0]);
+                }
+                const options = shuffleArray([correctAnswer, ...distractors]);
+
+                answerOptionsContainer.innerHTML = '';
+                options.forEach(optionText => {
+                    const choiceBtn = document.createElement('button');
+                    choiceBtn.classList.add('choice-button');
+                    choiceBtn.textContent = optionText;
+                    choiceBtn.addEventListener('click', () => checkAnswer(optionText, correctAnswer, choiceBtn));
+                    answerOptionsContainer.appendChild(choiceBtn);
+                });
+                
+                feedbackDisplay.textContent = '';
+                nextQuestionButton.classList.add('hidden');
+                questionModal.classList.remove('hidden');
+                startQuestionTimer();
+            }
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+            
+            function startQuestionTimer() {
+                clearInterval(questionTimerInterval);
+                gameData.timeLeft = TIME_PER_QUESTION;
+                modalTimerDisplay.textContent = gameData.timeLeft;
+                questionTimerInterval = setInterval(() => {
+                    gameData.timeLeft--;
+                    modalTimerDisplay.textContent = gameData.timeLeft;
+                    if (gameData.timeLeft <= 0) {
+                        clearInterval(questionTimerInterval);
+                        feedbackDisplay.textContent = `Time's up! The verb was: ${currentSentenceObject.verb}`;
+                        feedbackDisplay.style.color = '#f59e0b'; // Tailwind amber-500
+                        disableAnswerOptions(currentSentenceObject.verb);
+                        nextQuestionButton.classList.remove('hidden');
+                        gameData.correctStreak = 0;
+                        gameData.questionsAnswered++; // Count timed-out question
+                        updateGameStatsDisplay();
+                        if (gameData.questionsAnswered >= gameData.totalQuestions) {
+                             nextQuestionButton.textContent = "Show Results";
+                        }
+                    }
+                }, 1000);
+            }
+
+            function disableAnswerOptions(correctAnswer = null) {
+                Array.from(answerOptionsContainer.children).forEach(btn => {
+                    btn.disabled = true;
+                    if (correctAnswer && btn.textContent === correctAnswer && !btn.classList.contains('correct')) {
+                        // If time ran out, highlight the correct answer if not already done
+                        btn.classList.add('correct'); 
+                    }
+                });
+            }
+
+            function checkAnswer(selectedAnswer, correctAnswer, buttonElement) {
+                clearInterval(questionTimerInterval);
+                disableAnswerOptions(correctAnswer); // Pass correct answer to highlight if needed
+                gameData.questionsAnswered++;
+
+                if (selectedAnswer === correctAnswer) {
+                    gameData.score += 10;
+                    feedbackDisplay.textContent = "Correct! Well done!";
+                    feedbackDisplay.style.color = '#10b981'; // Tailwind emerald-500
+                    buttonElement.classList.add('correct');
+                    gameData.correctStreak++;
+                    if (gameData.timeLeft >= TIME_PER_QUESTION - 5) { 
+                       gameData.score += 5; 
+                       awardBadge("Speedy!");
+                       gameData.fastAnswers++;
+                    }
+                    if (gameData.correctStreak === 3) awardBadge("3-in-a-Row!");
+                    if (gameData.correctStreak === 5) awardBadge("Verb Master!");
+
+                } else {
+                    gameData.score = Math.max(0, gameData.score - 2); // Minor penalty
+                    feedbackDisplay.textContent = `Not quite. The verb was: ${correctAnswer}`;
+                    feedbackDisplay.style.color = '#f43f5e'; // Tailwind rose-500
+                    buttonElement.classList.add('incorrect');
+                    // Ensure correct answer is highlighted
+                    Array.from(answerOptionsContainer.children).find(btn => btn.textContent === correctAnswer)?.classList.add('correct');
+                    gameData.correctStreak = 0;
+                }
+                
+                const answeredButton = sentencesContainer.querySelector(`button[data-sentence-index="${gameData.currentSentenceIndex}"]`);
+                if (answeredButton) answeredButton.disabled = true;
+                gameData.answeredSentenceIndices.push(gameData.currentSentenceIndex);
+
+                updateGameStatsDisplay();
+                checkBadges();
+                nextQuestionButton.classList.remove('hidden');
+
+                if (gameData.questionsAnswered >= gameData.totalQuestions) {
+                    nextQuestionButton.textContent = "Show Results";
+                }
+            }
+            
+            function checkBadges() {
+                if (gameData.score >= 50 && !gameData.badges.includes("Score Pro!")) awardBadge("Score Pro!");
+                if (gameData.score >= 100 && !gameData.badges.includes("Legendary!")) awardBadge("Legendary!");
+                if (gameData.questionsAnswered === gameData.totalQuestions && gameData.score > 0) awardBadge("Finished!");
+                if (gameData.fastAnswers >= 3 && !gameData.badges.includes("Quick Thinker!")) awardBadge("Quick Thinker!");
+            }
+
+            function proceedToNext() {
+                questionModal.classList.add('hidden');
+                if (gameData.questionsAnswered >= gameData.totalQuestions) {
+                    endGame();
+                } else {
+                   nextQuestionButton.textContent = "Next Question";
+                }
+            }
+            
+            function endGame() {
+                gameScreen.classList.add('hidden');
+                questionModal.classList.add('hidden');
+                gameOverScreen.classList.remove('hidden');
+                finalUsernameDisplay.textContent = gameData.username;
+                finalScoreDisplay.textContent = gameData.score;
+                finalBadgesDisplay.innerHTML = gameData.badges.length > 0 ? 
+                    gameData.badges.map(b => `<span class="inline-block">${b}</span>`).join(' ') : 'None';
+            }
+            
+            function quitGame() {
+                 clearInterval(questionTimerInterval);
+                 // Using a simpler confirm, can be replaced with a styled modal
+                 if (confirm("Are you sure you want to quit? Your progress will be lost.")) {
+                    gameScreen.classList.add('hidden');
+                    questionModal.classList.add('hidden');
+                    gameOverScreen.classList.add('hidden'); 
+                    startScreen.classList.remove('hidden');
+                    usernameInput.value = ''; 
+                 }
+            }
+
+            // --- Event Listeners ---
+            startButton.addEventListener('click', startGame);
+            playAgainButton.addEventListener('click', () => {
+                gameOverScreen.classList.add('hidden');
+                startScreen.classList.remove('hidden');
+                usernameInput.value = ''; 
+            });
+            nextQuestionButton.addEventListener('click', proceedToNext);
+            quitButton.addEventListener('click', quitGame);
+
         });
     </script>
-
 </body>
 </html>
