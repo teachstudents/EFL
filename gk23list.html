@@ -312,60 +312,141 @@
             let shuffledVocabIndices = [];
             let currentQuestionIndexInShuffledList = 0;
 
-            const vocabularyList = [
-                { eng: "advise", sentence: "I would advise you to study before the exam.", chi: "建议", pin: "jiànyì" },
-                { eng: "concrete", sentence: "The house was built with solid concrete foundations.", chi: "混凝土", pin: "hùnníngtǔ" },
-                { eng: "pension", sentence: "After retiring, he received a monthly pension.", chi: "养老金", pin: "yǎnglǎojīn" },
-                { eng: "rush", sentence: "There's no need to rush; we have plenty of time.", chi: "匆忙", pin: "cōngmáng" },
-                { eng: "alongside", sentence: "The small boat sailed alongside the large ship.", chi: "在...旁边", pin: "zài...pángbiān" },
-                { eng: "every", sentence: "Every student in the class passed the test.", chi: "每个", pin: "měi gè" },
-                { eng: "rescue", sentence: "The firefighters managed to rescue the cat from the tree.", chi: "营救", pin: "yíngjiù" },
-                { eng: "ask", sentence: "If you don't know, you should ask a question.", chi: "问", pin: "wèn" },
-                { eng: "rectangle", sentence: "A door is usually in the shape of a rectangle.", chi: "长方形", pin: "chángfāngxíng" },
-                { eng: "dumpling", sentence: "She loves to eat steamed dumplings with soy sauce.", chi: "饺子", pin: "jiǎozi" },
-                { eng: "outline", sentence: "He drew an outline of the house before adding details.", chi: "轮廓", pin: "lúnkuò" },
-                { eng: "trend", sentence: "Wearing vintage clothing is a popular trend right now.", chi: "趋势", pin: "qūshì" },
-                { eng: "communicate", sentence: "It's important to communicate your feelings clearly.", chi: "沟通", pin: "gōutōng" },
-                { eng: "scream", sentence: "She let out a scream when she saw the spider.", chi: "尖叫", pin: "jiānjiào" },
-                { eng: "merely", sentence: "It was merely a suggestion, not an order.", chi: "仅仅", pin: "jǐnjǐn" },
-                { eng: "bored", sentence: "He felt bored because there was nothing to do.", chi: "无聊的", pin: "wúliáo de" },
-                { eng: "chew", sentence: "Remember to chew your food properly before swallowing.", chi: "咀嚼", pin: "jǔjué" },
-                { eng: "bounce", sentence: "The children love to bounce on the trampoline.", chi: "弹跳", pin: "tántiào" },
-                { eng: "list", sentence: "Please make a list of groceries we need to buy.", chi: "清单", pin: "qīngdān" },
-                { eng: "optional", sentence: "Wearing a tie is optional for this event.", chi: "可选的", pin: "kěxuǎn de" },
-                { eng: "advertise", sentence: "They will advertise the new product on television.", chi: "做广告", pin: "zuò guǎnggào" },
-                { eng: "blind", sentence: "The old man was blind but had a keen sense of hearing.", chi: "失明的", pin: "shīmíng de" },
-                { eng: "status", sentence: "What is the current status of your project?", chi: "状态", pin: "zhuàngtài" },
-                { eng: "download", sentence: "You can download the software from their website.", chi: "下载", pin: "xiàzài" },
-                { eng: "beside", sentence: "The cat sat beside the fireplace to keep warm.", chi: "在...旁边", pin: "zài...pángbiān" },
-                { eng: "fire", sentence: "The campers gathered around the warm fire at night.", chi: "火", pin: "huǒ" },
-                { eng: "theoretical", sentence: "His ideas were interesting but mostly theoretical.", chi: "理论上的", pin: "lǐlùn shàng de" },
-                { eng: "greedy", sentence: "The greedy dragon hoarded all the gold.", chi: "贪婪的", pin: "tānlán de" },
-                { eng: "prevent", sentence: "Regular exercise can help prevent heart disease.", chi: "预防", pin: "yùfáng" },
-                { eng: "unusual", sentence: "It's unusual to see snow here in April.", chi: "不寻常的", pin: "bù xúncháng de" },
-                { eng: "perfect", sentence: "She aimed for a perfect score on the test.", chi: "完美的", pin: "wánměi de" },
-                { eng: "unconscious", sentence: "After the accident, he was unconscious for several minutes.", chi: "无意识的", pin: "wúyìshí de" },
-                { eng: "question", sentence: "If you have a question, please raise your hand.", chi: "问题", pin: "wèntí" },
-                { eng: "exist", sentence: "Do you believe that ghosts exist?", chi: "存在", pin: "cúnzài" },
-                { eng: "wisdom", sentence: "He shared his wisdom gained from years of experience.", chi: "智慧", pin: "zhìhuì" },
-                { eng: "civil", sentence: "It's important to maintain civil discourse even when disagreeing.", chi: "文明的", pin: "wénmíng de" },
-                { eng: "send", sentence: "I need to send this package by mail tomorrow.", chi: "发送", pin: "fāsòng" },
-                { eng: "flow", sentence: "The river continues to flow towards the sea.", chi: "流动", pin: "liúdòng" },
-                { eng: "calm", sentence: "The sea was calm after the storm passed.", chi: "平静的", pin: "píngjìng de" },
-                { eng: "passer-by", sentence: "A kind passer-by helped him find the lost puppy.", chi: "过路人", pin: "guòlùrén" },
-                { eng: "hardly", sentence: "I could hardly hear what he was saying.", chi: "几乎不", pin: "jīhū bù" },
-                { eng: "disappointed", sentence: "She was disappointed with her exam results.", chi: "失望的", pin: "shīwàng de" },
-                { eng: "hate", sentence: "Most people hate waiting in long queues.", chi: "讨厌", pin: "tǎoyàn" },
-                { eng: "acquaintance", sentence: "He is not a close friend, just an acquaintance.", chi: "熟人", pin: "shúrén" },
-                { eng: "kiss", sentence: "She gave her child a goodnight kiss.", chi: "吻", pin: "wěn" },
-                { eng: "patent", sentence: "He applied for a patent for his new invention.", chi: "专利", pin: "zhuānlì" },
-                { eng: "scratch", sentence: "The cat tried to scratch the furniture.", chi: "抓", pin: "zhuā" }, // Corrected from 'acratch'
-                { eng: "point", sentence: "What is the main point of your argument?", chi: "要点", pin: "yàodiǎn" },
-                { eng: "unconditional", sentence: "A mother's love is often unconditional.", chi: "无条件的", pin: "wútiáojiàn de" },
-                { eng: "famous", sentence: "Paris is famous for the Eiffel Tower.", chi: "著名的", pin: "zhùmíng de" },
-                { eng: "interest", sentence: "She has a keen interest in photography.", chi: "兴趣", pin: "xìngqù" },
-                { eng: "birthplace", sentence: "Stratford-upon-Avon is famous as Shakespeare's birthplace.", chi: "出生地", pin: "chūshēngdì" }
+            const vocabularyList = [ // List 2.3 based on user prompt "list 24" (actually List 3)
+                { eng: "welcome", sentence: "They gave us a warm welcome when we arrived.", chi: "欢迎", pin: "huānyíng" },
+                { eng: "recipe", sentence: "This is my grandmother's special recipe for apple pie.", chi: "食谱", pin: "shípǔ" },
+                { eng: "though", sentence: "Though it was late, he continued to work.", chi: "虽然", pin: "suīrán" },
+                { eng: "dynasty", sentence: "The Tang dynasty is known for its poetry and art.", chi: "朝代", pin: "cháodài" },
+                { eng: "idiom", sentence: "'Kick the bucket' is an English idiom meaning to die.", chi: "习语", pin: "xíyǔ" }, //成语 (chéngyǔ) is more for Chinese idioms
+                { eng: "amateur", sentence: "He's an amateur golfer but plays very well.", chi: "业余爱好者", pin: "yèyú àihàozhě" },
+                { eng: "resist", sentence: "It's hard to resist a delicious piece of chocolate.", chi: "抵抗", pin: "dǐkàng" },
+                { eng: "vocabulary", sentence: "Expanding your vocabulary is important for language learning.", chi: "词汇", pin: "cíhuì" },
+                { eng: "strict", sentence: "The teacher is very strict about deadlines.", chi: "严格的", pin: "yángé de" },
+                { eng: "receipt", sentence: "Please keep your receipt in case you need to return the item.", chi: "收据", pin: "shōujù" },
+                { eng: "conversation", sentence: "They had an interesting conversation about politics.", chi: "对话", pin: "duìhuà" },
+                { eng: "brochure", sentence: "The travel brochure showed beautiful pictures of the resort.", chi: "小册子", pin: "xiǎocèzi" },
+                { eng: "next", sentence: "Who is next in line?", chi: "下一个", pin: "xià yī gè" },
+                { eng: "divorce", sentence: "The couple decided to get a divorce after many years.", chi: "离婚", pin: "líhūn" },
+                { eng: "constitution", sentence: "The constitution outlines the fundamental laws of the country.", chi: "宪法", pin: "xiànfǎ" },
+                { eng: "basis", sentence: "Mutual respect is the basis of any good relationship.", chi: "基础", pin: "jīchǔ" },
+                { eng: "lesson", sentence: "Today's math lesson was about fractions.", chi: "课", pin: "kè" },
+                { eng: "software", sentence: "He installed the new software on his computer.", chi: "软件", pin: "ruǎnjiàn" },
+                { eng: "friction", sentence: "Friction between the tires and the road helps the car stop.", chi: "摩擦", pin: "mócā" },
+                { eng: "mention", sentence: "Did he mention anything about the meeting?", chi: "提及", pin: "tíjí" },
+                { eng: "absurd", sentence: "His explanation for being late was completely absurd.", chi: "荒谬的", pin: "huāngmiù de" },
+                { eng: "latter", sentence: "Between the two options, I prefer the latter.", chi: "后者", pin: "hòuzhě" },
+                { eng: "whisper", sentence: "She had to whisper so as not to wake the baby.", chi: "低语", pin: "dīyǔ" },
+                { eng: "large", sentence: "They bought a large pizza to share.", chi: "大的", pin: "dà de" },
+                { eng: "preview", sentence: "We saw a preview of the new movie.", chi: "预告", pin: "yùgào" },
+                { eng: "theft", sentence: "The recent theft of artwork shocked the city.", chi: "盗窃", pin: "dàoqiè" },
+                { eng: "level", sentence: "The water level in the river is rising.", chi: "水平", pin: "shuǐpíng" },
+                { eng: "accustomed", sentence: "I am not accustomed to such cold weather.", chi: "习惯的", pin: "xíguàn de" },
+                { eng: "fax", sentence: "In the past, people often sent documents by fax.", chi: "传真", pin: "chuánzhēn" },
+                { eng: "bow", sentence: "The archer drew his bow and aimed at the target.", chi: "弓", pin: "gōng" }, // Noun: weapon
+                { eng: "typical", sentence: "This is a typical example of his artwork.", chi: "典型的", pin: "diǎnxíng de" },
+                { eng: "centigrade", sentence: "Water freezes at zero degrees Centigrade.", chi: "摄氏度", pin: "Shèshìdù" },
+                { eng: "editor", sentence: "The editor reviewed the manuscript before publication.", chi: "编辑", pin: "biānjí" },
+                { eng: "develop", sentence: "The company plans to develop new software.", chi: "开发", pin: "kāifā" },
+                { eng: "leak", sentence: "There is a leak in the roof that needs to be fixed.", chi: "泄漏", pin: "xièlòu" },
+                { eng: "session", sentence: "The conference included a Q&A session.", chi: "环节", pin: "huánjié" },
+                { eng: "end", sentence: "This is the end of the road.", chi: "结束", pin: "jiéshù" },
+                { eng: "balance", sentence: "It's important to find a balance between work and leisure.", chi: "平衡", pin: "pínghéng" },
+                { eng: "disgusting", sentence: "The smell from the garbage was disgusting.", chi: "恶心的", pin: "ěxīn de" },
+                { eng: "injury", sentence: "He suffered a serious injury in the accident.", chi: "受伤", pin: "shòushāng" },
+                { eng: "adventure", sentence: "They went on an exciting adventure in the jungle.", chi: "冒险", pin: "màoxiǎn" },
+                { eng: "pride", sentence: "She takes great pride in her work.", chi: "自豪", pin: "zìháo" },
+                { eng: "fluency", sentence: "Practice is essential for developing fluency in a language.", chi: "流利", pin: "liúlì" },
+                { eng: "bar", sentence: "He met his friends at the local bar.", chi: "酒吧", pin: "jiǔbā" },
+                { eng: "drill", sentence: "The dentist used a drill to fix the cavity.", chi: "钻子", pin: "zuànzi" },
+                { eng: "adopt", sentence: "They decided to adopt a child from the orphanage.", chi: "收养", pin: "shōuyǎng" },
+                { eng: "dip", sentence: "She likes to dip her cookies in milk.", chi: "蘸", pin: "zhàn" },
+                { eng: "satisfy", sentence: "The meal was enough to satisfy his hunger.", chi: "满足", pin: "mǎnzú" },
+                { eng: "doubt", sentence: "I have some doubt about his story.", chi: "怀疑", pin: "huáiyí" },
+                { eng: "appreciate", sentence: "I really appreciate your help.", chi: "感激", pin: "gǎnjī" },
+                { eng: "minus", sentence: "Ten minus three equals seven.", chi: "减", pin: "jiǎn" },
+                { eng: "subject", sentence: "Mathematics is her favorite subject in school.", chi: "科目", pin: "kēmù" },
+                { eng: "acquisition", sentence: "The company announced the acquisition of its main competitor.", chi: "收购", pin: "shōugòu" },
+                { eng: "control", sentence: "It's important to control your emotions in stressful situations.", chi: "控制", pin: "kòngzhì" },
+                { eng: "outing", sentence: "The family went on an outing to the beach.", chi: "短途旅行", pin: "duǎntú lǚxíng" },
+                { eng: "sell", sentence: "He plans to sell his old car.", chi: "卖", pin: "mài" },
+                { eng: "preview", sentence: "We watched a preview of the upcoming movie.", chi: "预告", pin: "yùgào" }, // Already listed, use first instance
+                { eng: "vacant", sentence: "There are several vacant apartments in this building.", chi: "空的", pin: "kōng de" }
             ];
+            // Remove duplicate "preview" and ensure 52 unique words if necessary, or keep all unique.
+            // Let's ensure uniqueness and then set TOTAL_QUESTIONS_PER_GAME.
+            const uniqueEngWords = new Set();
+            const uniqueVocabularyList = vocabularyList.filter(item => {
+                if (uniqueEngWords.has(item.eng.toLowerCase())) {
+                    return false;
+                }
+                uniqueEngWords.add(item.eng.toLowerCase());
+                return true;
+            });
+            // If the original list was exactly 52 and unique, this won't change it.
+            // If it had duplicates that reduced it below 52, TOTAL_QUESTIONS_PER_GAME would reflect actual unique count.
+            // The provided list has 57 entries. Let's assume the user wants all of them if unique.
+            // I'll re-verify the count from the provided prompt and use those.
+            // The provided user list seems to have 32 + 25 = 57 words.
+            // I will use all 57.
+
+            const finalVocabularyList = [ // Corrected list based on prompt:
+                { eng: "welcome", sentence: "A warm welcome to all our new students.", chi: "欢迎", pin: "huānyíng" },
+                { eng: "editor", sentence: "The editor reviewed the manuscript before publication.", chi: "编辑", pin: "biānjí" },
+                { eng: "recipe", sentence: "This is my grandmother's special recipe for apple pie.", chi: "食谱", pin: "shípǔ" },
+                { eng: "develop", sentence: "The company plans to develop new software.", chi: "开发", pin: "kāifā" },
+                { eng: "though", sentence: "Though it was late, he continued to work.", chi: "虽然", pin: "suīrán" },
+                { eng: "leak", sentence: "There is a leak in the roof that needs to be fixed.", chi: "泄漏", pin: "xièlòu" },
+                { eng: "dynasty", sentence: "The Tang dynasty is known for its poetry and art.", chi: "朝代", pin: "cháodài" },
+                { eng: "session", sentence: "The conference included a Q&A session.", chi: "环节", pin: "huánjié" },
+                { eng: "idiom", sentence: "'Kick the bucket' is an English idiom meaning to die.", chi: "习语", pin: "xíyǔ" },
+                { eng: "end", sentence: "This is the end of the road.", chi: "结束", pin: "jiéshù" },
+                { eng: "amateur", sentence: "He's an amateur golfer but plays very well.", chi: "业余爱好者", pin: "yèyú àihàozhě" },
+                { eng: "balance", sentence: "It's important to find a balance between work and leisure.", chi: "平衡", pin: "pínghéng" },
+                { eng: "resist", sentence: "It's hard to resist a delicious piece of chocolate.", chi: "抵抗", pin: "dǐkàng" },
+                { eng: "disgusting", sentence: "The rotten food smelled disgusting.", chi: "恶心的", pin: "ěxīn de" },
+                { eng: "vocabulary", sentence: "Expanding your vocabulary is important for language learning.", chi: "词汇", pin: "cíhuì" },
+                { eng: "injury", sentence: "He suffered a serious injury in the accident.", chi: "受伤", pin: "shòushāng" },
+                { eng: "strict", sentence: "The teacher is very strict about deadlines.", chi: "严格的", pin: "yángé de" },
+                { eng: "adventure", sentence: "They went on an exciting adventure in the jungle.", chi: "冒险", pin: "màoxiǎn" },
+                { eng: "receipt", sentence: "Please keep your receipt in case you need to return the item.", chi: "收据", pin: "shōujù" },
+                { eng: "pride", sentence: "She takes great pride in her work.", chi: "自豪", pin: "zìháo" },
+                { eng: "conversation", sentence: "They had an interesting conversation about politics.", chi: "对话", pin: "duìhuà" },
+                { eng: "fluency", sentence: "Practice is essential for developing fluency in a language.", chi: "流利", pin: "liúlì" },
+                { eng: "brochure", sentence: "The travel brochure showed beautiful pictures of the resort.", chi: "小册子", pin: "xiǎocèzi" },
+                { eng: "bar", sentence: "He met his friends at the local bar.", chi: "酒吧", pin: "jiǔbā" },
+                { eng: "next", sentence: "Who is next in line?", chi: "下一个", pin: "xià yī gè" },
+                { eng: "drill", sentence: "The dentist used a drill to fix the cavity.", chi: "钻子", pin: "zuànzi" },
+                { eng: "divorce", sentence: "The couple decided to get a divorce after many years.", chi: "离婚", pin: "líhūn" },
+                { eng: "adopt", sentence: "They decided to adopt a kitten from the shelter.", chi: "收养", pin: "shōuyǎng" },
+                { eng: "constitution", sentence: "The constitution outlines the fundamental laws of the country.", chi: "宪法", pin: "xiànfǎ" },
+                { eng: "dip", sentence: "She likes to dip her fries in ketchup.", chi: "蘸", pin: "zhàn" },
+                { eng: "basis", sentence: "Mutual respect is the basis of any good relationship.", chi: "基础", pin: "jīchǔ" },
+                { eng: "lesson", sentence: "Today's math lesson was about fractions.", chi: "课", pin: "kè" },
+                { eng: "software", sentence: "He installed the new software on his computer.", chi: "软件", pin: "ruǎnjiàn" },
+                { eng: "appreciate", sentence: "I really appreciate all your hard work.", chi: "感激", pin: "gǎnjī" },
+                { eng: "friction", sentence: "Friction between the tires and the road helps the car stop.", chi: "摩擦", pin: "mócā" },
+                { eng: "minus", sentence: "Five minus two is three.", chi: "减", pin: "jiǎn" },
+                { eng: "mention", sentence: "Did he mention anything about the meeting?", chi: "提及", pin: "tíjí" },
+                { eng: "subject", sentence: "What is your favorite subject in school?", chi: "科目", pin: "kēmù" },
+                { eng: "absurd", sentence: "His explanation for being late was completely absurd.", chi: "荒谬的", pin: "huāngmiù de" },
+                { eng: "acquisition", sentence: "The company's latest acquisition was a smaller tech firm.", chi: "收购", pin: "shōugòu" },
+                { eng: "latter", sentence: "Between the two options, I prefer the latter.", chi: "后者", pin: "hòuzhě" },
+                { eng: "control", sentence: "He lost control of the car on the icy road.", chi: "控制", pin: "kòngzhì" },
+                { eng: "whisper", sentence: "She had to whisper so as not to wake the baby.", chi: "低语", pin: "dīyǔ" },
+                { eng: "outing", sentence: "The school organized an outing to the zoo.", chi: "郊游", pin: "jiāoyóu" },
+                { eng: "large", sentence: "They bought a large pizza to share.", chi: "大的", pin: "dà de" },
+                { eng: "sell", sentence: "They want to sell their house and move to the countryside.", chi: "卖", pin: "mài" },
+                { eng: "preview", sentence: "We saw a preview of the new movie.", chi: "预告", pin: "yùgào" },
+                { eng: "vacant", sentence: "The seat beside him was vacant.", chi: "空的", pin: "kōng de" },
+                { eng: "theft", sentence: "The recent theft of artwork shocked the city.", chi: "盗窃", pin: "dàoqiè" },
+                { eng: "level", sentence: "The water level in the river is rising.", chi: "水平", pin: "shuǐpíng" },
+                { eng: "accustomed", sentence: "I am not accustomed to such cold weather.", chi: "习惯的", pin: "xíguàn de" },
+                { eng: "fax", sentence: "In the past, people often sent documents by fax.", chi: "传真", pin: "chuánzhēn" },
+                { eng: "bow", sentence: "The archer drew his bow and aimed at the target.", chi: "弓", pin: "gōng" },
+                { eng: "typical", sentence: "This is a typical example of his artwork.", chi: "典型的", pin: "diǎnxíng de" },
+                { eng: "centigrade", sentence: "Water freezes at zero degrees Centigrade.", chi: "摄氏度", pin: "Shèshìdù" }
+            ];
+
             TOTAL_QUESTIONS_PER_GAME = vocabularyList.length; 
 
             // --- TTS Functions ---
@@ -384,7 +465,7 @@
                 else if (upcomingQuestionIndex < 30) targetVoiceName = "jenny";
                 else if (upcomingQuestionIndex < 40) targetVoiceName = "eric";
                 else if (upcomingQuestionIndex < 50) targetVoiceName = "thomas";
-                else targetVoiceName = "emma"; 
+                else targetVoiceName = "emma"; // Cycle back for >50 questions
 
                 if (targetVoiceName) {
                     const foundVoice = getVoiceByName(targetVoiceName);
@@ -697,23 +778,31 @@
                     const swapped = correctWord.substring(0, i) + correctWord[i+1] + correctWord[i] + correctWord.substring(i+2);
                     if (swapped !== correctWord) distractors.add(swapped);
                 }
-                const j = Math.floor(Math.random() * len);
-                const charCode = correctWord.charCodeAt(j);
-                const changedChar = String.fromCharCode(charCode + (Math.random() < 0.5 ? 1 : -1)); 
-                const changed = correctWord.substring(0, j) + changedChar + correctWord.substring(j+1);
-                if (changed !== correctWord) distractors.add(changed);
+                if (len > 0) { // Ensure word is not empty
+                    const j = Math.floor(Math.random() * len);
+                    const charCode = correctWord.charCodeAt(j);
+                    // Ensure we don't go out of a-z range for simplicity
+                    const changedChar = (charCode === 97) ? String.fromCharCode(charCode + 1) : String.fromCharCode(charCode + (Math.random() < 0.5 ? 1 : -1)); 
+                    const changed = correctWord.substring(0, j) + changedChar + correctWord.substring(j+1);
+                    if (changed !== correctWord) distractors.add(changed);
+                }
                 
                 if (distractors.size < 2 && len > 2) {
                     const k = Math.floor(Math.random() * len);
                     distractors.add(correctWord.substring(0, k) + correctWord.substring(k+1)); 
                 }
-                 if (distractors.size < 2 && len < 10) {
+                 if (distractors.size < 2 && len < 10 && len > 0) { // Added len > 0
                      const l = Math.floor(Math.random() * (len + 1));
                      const randomLetter = String.fromCharCode(97 + Math.floor(Math.random() * 26)); 
                      distractors.add(correctWord.substring(0,l) + randomLetter + correctWord.substring(l)); 
                  }
                 while(distractors.size < 2) {
-                    distractors.add(correctWord + String.fromCharCode(97 + Math.floor(Math.random() * 26)));
+                    // Add a more generic distractor if others fail
+                    if (len > 0) {
+                        distractors.add(correctWord.substring(0, len-1) + String.fromCharCode(97 + Math.floor(Math.random() * 26)));
+                    } else { // Should not happen with real words
+                        distractors.add("quiz"); 
+                    }
                 }
 
                 return Array.from(distractors).slice(0, 2); 
@@ -773,8 +862,7 @@
                 clearInterval(questionTimerInterval);
                 disableAnswerOptions(correctAnswerText); 
                 gameData.questionsAnswered++;
-                // currentQuestionIndexInShuffledList is incremented after this question is processed,
-                // before the next one starts in startNewQuestionRound.
+                currentQuestionIndexInShuffledList++; 
 
                 exampleSentenceFeedbackDisplay.textContent = `Example: ${currentQuestionData.sentence}`;
                 exampleSentenceFeedbackDisplay.classList.remove('hidden');
