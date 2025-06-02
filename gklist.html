@@ -11,24 +11,19 @@
             font-family: 'Inter', sans-serif; /* Inter is a common choice with Tailwind */
         }
         /* No custom button gradient needed anymore */
-    </style>a
+    </style>
 </head>
 <body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4 sm:p-6">
 
     <main class="w-full max-w-5xl flex flex-col items-center">
 
-        <div class="relative w-full max-w-3xl my-8"> <img src="https://placehold.co/80x300/DDDDDD/6B6B6B?text=Side+Art"
-                 alt="Left decorative element"
-                 class="absolute top-1/2 -translate-y-1/2 -left-12 sm:-left-20 md:-left-28 w-16 sm:w-20 h-auto rounded shadow-sm hidden md:block">
-                 <img src="https://placehold.co/80x300/DDDDDD/6B6B6B?text=Side+Art"
-                 alt="Right decorative element"
-                 class="absolute top-1/2 -translate-y-1/2 -right-12 sm:-right-20 md:-right-28 w-16 sm:w-20 h-auto rounded shadow-sm hidden md:block">
-                 <div id="buttonContainer"
+        <div class="relative w-full max-w-3xl my-8">
+            <div id="buttonContainer"
                  class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl shadow-lg">
                 </div>
         </div>
 
-        </main>
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -89,9 +84,13 @@
             buttonContainer.addEventListener('click', function(event) {
                 const targetButton = event.target.closest('button');
                 if (targetButton && targetButton.dataset.url) {
-                    console.log(`Navigating to: ${targetButton.dataset.url}`);
-                    // window.location.href = targetButton.dataset.url;
+                    // Navigate to the button's URL
+                    window.location.href = targetButton.dataset.url;
 
+                    // The temporary message box logic below is no longer needed for actual navigation
+                    // but can be kept for debugging if navigation is blocked in certain environments.
+                    // For production, it's best to remove it.
+                    /*
                     let tempMsgBox = document.getElementById('temp-message-box');
                     if (!tempMsgBox) {
                         tempMsgBox = document.createElement('div');
@@ -99,10 +98,11 @@
                         tempMsgBox.className = 'fixed top-5 right-5 bg-blue-600 text-white p-3 rounded-md shadow-lg z-50';
                         document.body.appendChild(tempMsgBox);
                     }
-                    tempMsgBox.textContent = `Action: Navigate to module ${targetButton.textContent}`;
+                    tempMsgBox.textContent = `Navigating to: ${targetButton.dataset.url}`;
                     setTimeout(() => {
                         if (tempMsgBox) tempMsgBox.remove();
                     }, 3000);
+                    */
                 }
             });
         });
