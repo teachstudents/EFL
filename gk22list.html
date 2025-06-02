@@ -308,11 +308,13 @@
             let currentNarratorVoice = null; 
             let speakTimeoutId = null; 
             let voicesPopulated = false;
+            let currentUtterance = null; // To manage the current speech utterance
+            let currentUtteranceCallback = null; // Callback for the current utterance
 
             let shuffledVocabIndices = [];
             let currentQuestionIndexInShuffledList = 0;
 
-            const vocabularyList = [
+            const vocabularyList = [ // List 22
                 { eng: "angry", sentence: "He felt angry when his flight was canceled.", chi: "生气", pin: "shēngqì" },
                 { eng: "wipe", sentence: "Please wipe the table after you finish eating.", chi: "擦拭", pin: "cāshì" },
                 { eng: "bonus", sentence: "Employees received a bonus for their hard work.", chi: "奖金", pin: "jiǎngjīn" },
@@ -401,7 +403,7 @@
             }
 
             function populateVoiceList(loadedVoices) {
-                if (voicesPopulated && loadedVoices.length === voices.length) return;
+                if (voicesPopulated && loadedVoices.length === voices.length && voiceSelect.options.length === loadedVoices.filter(v => v.lang.startsWith('en')).length) return;
                 console.log("populateVoiceList called with", loadedVoices.length, "voices");
                 
                 voices = loadedVoices; 
@@ -492,50 +494,65 @@
                 }
 
                 if (speakTimeoutId) clearTimeout(speakTimeoutId);
+                
+                // If there's an existing utterance, clear its specific event handlers
+                // to prevent its callback from firing if it gets canceled by the new speech.
+                if (currentUtterance) {
+                    currentUtterance.onend = null;
+                    currentUtterance.onerror = null;
+                    currentUtterance.onstart = null;
+                }
 
-                const utterance = new SpeechSynthesisUtterance(text);
+                currentUtterance = new SpeechSynthesisUtterance(text);
+                currentUtteranceCallback = callback; // Store the callback for THIS utterance
+
                 currentNarratorVoice = getVoiceForCurrentQuestionSet(gameData.questionsAnswered || 0);
-                utterance.voice = currentNarratorVoice || userSelectedVoice; 
+                currentUtterance.voice = currentNarratorVoice || userSelectedVoice; 
 
-                if (!utterance.voice && voices && voices.length > 0) {
+                if (!currentUtterance.voice && voices && voices.length > 0) {
                      let fallbackVoice = voices.find(v => v.default && v.lang.startsWith('en'));
                      if (!fallbackVoice) fallbackVoice = voices.find(v => v.lang.startsWith('en'));
                      if (!fallbackVoice && voices.length > 0) fallbackVoice = voices[0];
-                     utterance.voice = fallbackVoice;
+                     currentUtterance.voice = fallbackVoice;
                 }
                 
-                let hasCalledBack = false;
-                const ensureCallback = (origin) => {
-                    if (!hasCalledBack) {
-                        console.log(`Speak: ensureCallback called from ${origin}`);
-                        hasCalledBack = true;
-                        if (callback) callback();
-                    }
+                currentUtterance.onstart = () => {
+                     console.log("Speech event: onstart for current utterance:", text.substring(0,15) + "...");
                 };
 
-                utterance.onstart = () => console.log("Speech event: onstart for", text.substring(0,15) + "...");
-                utterance.onend = () => { console.log("Speech event: onend for", text.substring(0,15) + "..."); ensureCallback('onend'); };
-                utterance.onerror = (event) => {
-                    console.error("SpeechSynthesisUtterance.onerror. Event:", event, "Error type:", event.error, "Utterance text:", text.substring(0,30) + "...");
+                currentUtterance.onend = () => {
+                    console.log("Speech event: onend for current utterance:", text.substring(0,15) + "...");
+                    if (currentUtteranceCallback) { // Check if it's the callback for THIS utterance
+                        const cb = currentUtteranceCallback;
+                        currentUtteranceCallback = null; 
+                        cb();
+                    }
+                };
+                currentUtterance.onerror = (event) => {
+                    console.error("SpeechSynthesisUtterance.onerror for current utterance. Event:", event, "Error type:", event.error, "Text:", text.substring(0,30) + "...");
                     if (event.error && event.error !== 'canceled' && event.error !== 'interrupted') { 
                         currentActivityDisplay.textContent = `Audio Error (${event.error}). Try another voice.`;
                     } else if (event.error === 'canceled') {
-                        console.warn("Speech was CANCELED. This might be intentional or a browser quirk when rapidly queuing.");
+                        console.warn("Current utterance speech was CANCELED.");
                     } else if (event.error === 'interrupted') {
-                        console.warn("Speech was INTERRUPTED. This might be a browser issue or rapid interaction.");
+                        console.warn("Current utterance speech was INTERRUPTED.");
                     }
-                    ensureCallback('onerror'); 
+                    if (currentUtteranceCallback) { // Check if it's the callback for THIS utterance
+                        const cb = currentUtteranceCallback;
+                        currentUtteranceCallback = null; 
+                        cb();
+                    }
                 };
-
+                
                 const doSpeak = () => {
                     console.log("Executing speechSynthesis.speak for:", text.substring(0,30) + "...");
-                    speechSynthesis.speak(utterance);
+                    speechSynthesis.speak(currentUtterance);
                 };
 
                 if (speechSynthesis.speaking || speechSynthesis.pending) {
                     console.log("Speech is speaking or pending. Canceling...");
                     speechSynthesis.cancel(); 
-                    speakTimeoutId = setTimeout(doSpeak, 250); 
+                    speakTimeoutId = setTimeout(doSpeak, 300); 
                 } else {
                     speakTimeoutId = setTimeout(doSpeak, 50); 
                 }
@@ -704,23 +721,29 @@
                     const swapped = correctWord.substring(0, i) + correctWord[i+1] + correctWord[i] + correctWord.substring(i+2);
                     if (swapped !== correctWord) distractors.add(swapped);
                 }
-                const j = Math.floor(Math.random() * len);
-                const charCode = correctWord.charCodeAt(j);
-                const changedChar = String.fromCharCode(charCode + (Math.random() < 0.5 ? 1 : -1)); 
-                const changed = correctWord.substring(0, j) + changedChar + correctWord.substring(j+1);
-                if (changed !== correctWord) distractors.add(changed);
+                if (len > 0) { 
+                    const j = Math.floor(Math.random() * len);
+                    const charCode = correctWord.charCodeAt(j);
+                    const changedChar = (charCode === 97) ? String.fromCharCode(charCode + 1) : String.fromCharCode(charCode + (Math.random() < 0.5 ? 1 : -1)); 
+                    const changed = correctWord.substring(0, j) + changedChar + correctWord.substring(j+1);
+                    if (changed !== correctWord) distractors.add(changed);
+                }
                 
                 if (distractors.size < 2 && len > 2) {
                     const k = Math.floor(Math.random() * len);
                     distractors.add(correctWord.substring(0, k) + correctWord.substring(k+1)); 
                 }
-                 if (distractors.size < 2 && len < 10) {
+                 if (distractors.size < 2 && len < 10 && len > 0) { 
                      const l = Math.floor(Math.random() * (len + 1));
                      const randomLetter = String.fromCharCode(97 + Math.floor(Math.random() * 26)); 
                      distractors.add(correctWord.substring(0,l) + randomLetter + correctWord.substring(l)); 
                  }
                 while(distractors.size < 2) {
-                    distractors.add(correctWord + String.fromCharCode(97 + Math.floor(Math.random() * 26)));
+                    if (len > 0) {
+                        distractors.add(correctWord.substring(0, len-1) + String.fromCharCode(97 + Math.floor(Math.random() * 26)));
+                    } else { 
+                        distractors.add("quiz"); 
+                    }
                 }
 
                 return Array.from(distractors).slice(0, 2); 
@@ -780,7 +803,7 @@
                 clearInterval(questionTimerInterval);
                 disableAnswerOptions(correctAnswerText); 
                 gameData.questionsAnswered++;
-                // currentQuestionIndexInShuffledList is incremented in startNewQuestionRound for the *next* question
+                currentQuestionIndexInShuffledList++; 
 
                 exampleSentenceFeedbackDisplay.textContent = `Example: ${currentQuestionData.sentence}`;
                 exampleSentenceFeedbackDisplay.classList.remove('hidden');
