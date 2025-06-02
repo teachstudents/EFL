@@ -447,7 +447,7 @@
                     const tryPopulate = () => {
                         const currentVoices = speechSynthesis.getVoices();
                         if (currentVoices.length > 0 ) {
-                             if (!voicesPopulated || voices.length !== currentVoices.length) {
+                             if (!voicesPopulated || voices.length !== currentVoices.length || voiceSelect.options.length === 0) {
                                 populateVoiceList(currentVoices);
                              }
                         } else if (currentVoices.length === 0 && !voicesPopulated){
@@ -498,19 +498,28 @@
                 }
                 
                 let hasCalledBack = false;
-                const ensureCallback = () => {
+                const ensureCallback = (origin) => {
                     if (!hasCalledBack) {
+                        console.log(`Speak: ensureCallback called from ${origin}`);
                         hasCalledBack = true;
                         if (callback) callback();
+                    } else {
+                        // console.log(`Speak: ensureCallback already called (origin: ${origin})`); // Can be too verbose
                     }
                 };
 
-                utterance.onstart = () => console.log("Speech event: onstart");
-                utterance.onend = () => { console.log("Speech event: onend"); ensureCallback(); };
+                utterance.onstart = () => console.log("Speech event: onstart for", text.substring(0,15) + "...");
+                utterance.onend = () => { console.log("Speech event: onend for", text.substring(0,15) + "..."); ensureCallback('onend'); };
                 utterance.onerror = (event) => {
-                    console.error("SpeechSynthesisUtterance.onerror. Event:", event, "Error type:", event.error);
-                    if (event.error !== 'canceled') currentActivityDisplay.textContent = `Audio Error (${event.error}). Try another voice.`;
-                    ensureCallback(); 
+                    console.error("SpeechSynthesisUtterance.onerror. Event:", event, "Error type:", event.error, "Utterance text:", text.substring(0,30) + "...");
+                    if (event.error && event.error !== 'canceled' && event.error !== 'interrupted') { // Only show UI error for critical issues
+                        currentActivityDisplay.textContent = `Audio Error (${event.error}). Try another voice.`;
+                    } else if (event.error === 'canceled') {
+                        console.warn("Speech was CANCELED. This might be intentional or a browser quirk when rapidly queuing.");
+                    } else if (event.error === 'interrupted') {
+                        console.warn("Speech was INTERRUPTED. This might be a browser issue or rapid interaction.");
+                    }
+                    ensureCallback('onerror'); 
                 };
 
                 const doSpeak = () => {
