@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Continuous Conversation Listening Test (100 Qs)</title>
+    <title>Continuous Conversation Listening Test (97 Qs)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -71,7 +71,7 @@
             background-color: #f8fafc; /* slate-50 */
             color: #1e293b;
             border: 1px solid #e2e8f0; /* slate-200 */
-            margin: 6px;
+            margin: 6px 0;
             display: block;
             width: 100%;
             text-align: left;
@@ -198,13 +198,16 @@
             margin-top: 10px;
         }
         .settings-modal-content label {
-            display: block;
+            display: flex;
+            align-items: center;
             margin-bottom: 10px;
             font-weight: 500;
             color: #374151;
         }
          .settings-modal-content input[type="checkbox"] {
             margin-right: 8px;
+            height: 1.25rem;
+            width: 1.25rem;
             accent-color: #0e7490;
         }
 
@@ -224,7 +227,7 @@
     <div id="badge-alert" class="hidden">Badge Unlocked!</div>
 
     <div id="start-screen" class="game-container text-center">
-        <h1 class="text-4xl font-bold mb-4 text-cyan-800">Continuous Conversation Listening Test (100 Qs)</h1>
+        <h1 class="text-4xl font-bold mb-4 text-cyan-800">Continuous Conversation Listening Test (97 Qs)</h1>
         <p class="mb-6 text-slate-600 text-lg">Enter your name and test your conversation skills!</p>
         <div class="flex flex-col sm:flex-row items-center justify-center">
             <input type="text" id="username" placeholder="Your Gamer Name">
@@ -312,7 +315,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM Fully Loaded and Parsed - Continuous Conversation Listening Test (100 Qs)");
+            console.log("DOM Fully Loaded and Parsed - Continuous Conversation Listening Test (97 Qs)");
             // --- DOM Elements ---
             const startScreen = document.getElementById('start-screen');
             const gameScreen = document.getElementById('game-screen');
@@ -359,7 +362,7 @@
 
             // --- Game Data & Config ---
             let TOTAL_QUESTIONS_PER_GAME; 
-            const POINTS_PER_CORRECT_ANSWER = 1; 
+            const POINTS_PER_CORRECT_ANSWER = 2; 
             const TIME_PER_QUESTION = 20; 
             let gameData = {};
             let currentQuestionData = {}; 
@@ -422,54 +425,54 @@
                  { id: 38, speaker: "Jamie", dialogue: "What’s your favorite place to visit?", options: ["I love going to the mountains.", "I’m ten years old.", "I like music."], correctOptionIndex: 0 },
                  { id: 39, speaker: "Alex", dialogue: "Do you like watching movies?", options: ["I’m a student.", "Yes, I watch them every weekend.", "I like pizza."], correctOptionIndex: 1 },
                  { id: 40, speaker: "Jamie", dialogue: "What’s something new you learned recently?", options: ["I’m from Canada.", "I like red.", "I learned how to skateboard."], correctOptionIndex: 2 },
-                 { id: 41, speaker: "Alex", dialogue: "What do you usually eat for breakfast?", options: ["I’m from Canada.", "I like blue.", "I usually eat eggs and toast."], correctOptionIndex: 2 },
-                 { id: 42, speaker: "Jamie", dialogue: "Have you ever seen snow?", options: ["Yes, it snowed last winter.", "I like pizza.", "I’m going to school."], correctOptionIndex: 0 },
-                 { id: 43, speaker: "Alex", dialogue: "What do you do when you’re bored?", options: ["I’m ten years old.", "I draw or listen to music.", "I’m from Italy."], correctOptionIndex: 1 },
-                 { id: 44, speaker: "Jamie", dialogue: "What’s your favorite thing to do in summer?", options: ["I like red.", "I’m a student.", "I love swimming in the pool."], correctOptionIndex: 2 },
-                 { id: 45, speaker: "Alex", dialogue: "Do you like video games?", options: ["Yes, I play them with my friends.", "I’m going to the store.", "I like green."], correctOptionIndex: 0 },
-                 { id: 46, speaker: "Jamie", dialogue: "What’s something you’re good at?", options: ["I’m from France.", "I’m good at drawing.", "I like dogs."], correctOptionIndex: 1 },
-                 { id: 47, speaker: "Alex", dialogue: "What do you want for your birthday?", options: ["I’m ten years old.", "I like apples.", "I want a new bike."], correctOptionIndex: 2 },
-                 { id: 48, speaker: "Jamie", dialogue: "Have you ever been to a zoo?", options: ["Yes, I saw lions and monkeys.", "I’m from Spain.", "I like music."], correctOptionIndex: 0 },
-                 { id: 49, speaker: "Alex", dialogue: "What do you do before bed?", options: ["I’m a teacher.", "I brush my teeth and read.", "I like red."], correctOptionIndex: 1 },
-                 { id: 50, speaker: "Jamie", dialogue: "What’s your favorite ice cream flavor?", options: ["I’m going to school.", "I like dogs.", "I love chocolate ice cream."], correctOptionIndex: 2 },
-                 { id: 51, speaker: "Alex", dialogue: "What do you usually do on your birthday?", options: ["I have a party with my friends.", "I’m from Canada.", "I like red."], correctOptionIndex: 0 },
-                 { id: 52, speaker: "Jamie", dialogue: "What’s your favorite thing to do at school?", options: ["I like pizza.", "I enjoy science experiments.", "I’m ten years old."], correctOptionIndex: 1 },
-                 { id: 53, speaker: "Alex", dialogue: "Do you like going to the library?", options: ["I’m from Italy.", "I like green.", "Yes, I love reading books there."], correctOptionIndex: 2 },
-                 { id: 54, speaker: "Jamie", dialogue: "What do you eat for lunch at school?", options: ["I usually have rice and vegetables.", "I’m going to the store.", "I like dogs."], correctOptionIndex: 0 },
-                 { id: 55, speaker: "Alex", dialogue: "What do you wear when it’s cold?", options: ["I’m a student.", "I wear a jacket and scarf.", "I like music."], correctOptionIndex: 1 },
-                 { id: 56, speaker: "Jamie", dialogue: "What’s your favorite thing to do outside?", options: ["I’m from France.", "I like red.", "I love riding my bike."], correctOptionIndex: 2 },
-                 { id: 57, speaker: "Alex", dialogue: "What do you do when it rains?", options: ["I stay inside and watch movies.", "I’m ten years old.", "I like green."], correctOptionIndex: 0 },
-                 { id: 58, speaker: "Jamie", dialogue: "What’s your favorite fruit?", options: ["I’m from Spain.", "I love strawberries.", "I like dogs."], correctOptionIndex: 1 },
-                 { id: 59, speaker: "Alex", dialogue: "What do you do in the morning?", options: ["I’m a teacher.", "I brush my teeth and eat breakfast.", "I like music."], correctOptionIndex: 1 },
-                 { id: 60, speaker: "Jamie", dialogue: "What do you do when you’re sick?", options: ["I’m going to school.", "I like red.", "I rest and drink water."], correctOptionIndex: 2 },
-                 { id: 61, speaker: "Alex", dialogue: "What’s your favorite thing to do with your family?", options: ["I like going on trips with them.", "I’m from Canada.", "I like pizza."], correctOptionIndex: 0 },
-                 { id: 62, speaker: "Jamie", dialogue: "What do you do on holidays?", options: ["I’m ten years old.", "I visit my grandparents.", "I like green."], correctOptionIndex: 1 },
-                 { id: 63, speaker: "Alex", dialogue: "What’s your favorite thing to draw?", options: ["I’m from Italy.", "I like dogs.", "I love drawing animals."], correctOptionIndex: 2 },
-                 { id: 64, speaker: "Jamie", dialogue: "What do you do when you’re tired?", options: ["I take a nap.", "I’m a student.", "I like music."], correctOptionIndex: 0 },
-                 { id: 65, speaker: "Alex", dialogue: "What do you do on your birthday?", options: ["I’m going to the store.", "I eat cake and open presents.", "I like red."], correctOptionIndex: 1 },
-                 { id: 66, speaker: "Jamie", dialogue: "What’s your favorite kind of weather?", options: ["I’m from France.", "I like green.", "I love sunny days."], correctOptionIndex: 2 },
-                 { id: 67, speaker: "Alex", dialogue: "What do you do when you’re happy?", options: ["I smile and laugh.", "I’m ten years old.", "I like dogs."], correctOptionIndex: 0 },
-                 { id: 68, speaker: "Jamie", dialogue: "What do you do when you’re sad?", options: ["I’m from Spain.", "I talk to my mom.", "I like music."], correctOptionIndex: 1 },
-                 { id: 69, speaker: "Alex", dialogue: "What do you do when you’re angry?", options: ["I’m a teacher.", "I like red.", "I take deep breaths."], correctOptionIndex: 2 },
-                 { id: 70, speaker: "Jamie", dialogue: "What’s your favorite thing to do at home?", options: ["I like playing board games.", "I’m going to school.", "I like green."], correctOptionIndex: 0 },
-                 { id: 71, speaker: "Alex", dialogue: "What do you do when you’re cold?", options: ["I’m from Canada.", "I wear a sweater.", "I like pizza."], correctOptionIndex: 1 },
-                 { id: 72, speaker: "Jamie", dialogue: "What’s your favorite thing to do in winter?", options: ["I’m ten years old.", "I like dogs.", "I love building snowmen."], correctOptionIndex: 2 },
-                 { id: 73, speaker: "Alex", dialogue: "What do you do when you’re hot?", options: ["I drink cold water.", "I’m a student.", "I like music."], correctOptionIndex: 0 },
-                 { id: 74, speaker: "Jamie", dialogue: "What do you do when you’re bored at school?", options: ["I’m from Italy.", "I draw in my notebook.", "I like red."], correctOptionIndex: 1 },
-                 { id: 75, speaker: "Alex", dialogue: "What’s your favorite thing to do on the weekend?", options: ["I’m going to the store.", "I like green.", "I go to the park with my friends."], correctOptionIndex: 2 },
-                 { id: 76, speaker: "Jamie", dialogue: "What do you do when you’re nervous?", options: ["I take deep breaths and relax.", "I’m from France.", "I like dogs."], correctOptionIndex: 0 },
-                 { id: 77, speaker: "Alex", dialogue: "What’s your favorite thing to do in the evening?", options: ["I’m ten years old.", "I watch TV with my family.", "I like music."], correctOptionIndex: 1 },
-                 { id: 78, speaker: "Jamie", dialogue: "What do you do when you’re excited?", options: ["I’m a teacher.", "I like red.", "I jump up and down!"], correctOptionIndex: 2 },
-                 { id: 79, speaker: "Alex", dialogue: "What’s your favorite thing to do in spring?", options: ["I like picking flowers.", "I’m going to school.", "I like green."], correctOptionIndex: 0 },
-                 { id: 80, speaker: "Jamie", dialogue: "What do you do when you’re scared?", options: ["I’m from Canada.", "I hold someone’s hand.", "I like pizza."], correctOptionIndex: 1 },
-                 { id: 81, speaker: "Alex", dialogue: "What’s your favorite thing to do at the beach?", options: ["I’m ten years old.", "I like dogs.", "I love building sandcastles."], correctOptionIndex: 2 },
-                 { id: 82, speaker: "Jamie", dialogue: "What do you do when you’re feeling sick?", options: ["I stay in bed and rest.", "I’m a student.", "I like music."], correctOptionIndex: 0 },
-                 { id: 83, speaker: "Alex", dialogue: "What’s your favorite thing to do in autumn?", options: ["I’m from Italy.", "I like jumping in leaves.", "I like red."], correctOptionIndex: 1 },
-                 { id: 84, speaker: "Jamie", dialogue: "What do you do when you’re feeling shy?", options: ["I’m going to the store.", "I like green.", "I stay quiet and listen."], correctOptionIndex: 2 },
-                 { id: 85, speaker: "Alex", dialogue: "What’s your favorite thing to do in the snow?", options: ["I like making snow angels.", "I’m from France.", "I like dogs."], correctOptionIndex: 0 },
-                 { id: 86, speaker: "Jamie", dialogue: "What do you do when you’re feeling proud?", options: ["I’m ten years old.", "I smile and tell someone.", "I like music."], correctOptionIndex: 1 },
-                 { id: 87, speaker: "Alex", dialogue: "What’s your favorite thing to do in the rain?", options: ["I make funny faces.", "I’m going to school.", "I like green."], correctOptionIndex: 0 },
-                 { id: 88, speaker: "Jamie", dialogue: "What do you do when you’re feeling silly?", options: ["I make funny faces.", "I’m going to school.", "I like green."], correctOptionIndex: 0 }, // Corrected as C is duplicate
+                 { id: 41, speaker: "Emma", dialogue: "What do you usually eat for breakfast?", options: ["I’m from Canada.", "I like blue.", "I usually eat eggs and toast."], correctOptionIndex: 2 },
+                 { id: 42, speaker: "David", dialogue: "Have you ever seen snow?", options: ["Yes, it snowed last winter.", "I like pizza.", "I’m going to school."], correctOptionIndex: 0 },
+                 { id: 43, speaker: "Nina", dialogue: "What do you do when you’re bored?", options: ["I’m ten years old.", "I draw or listen to music.", "I’m from Italy."], correctOptionIndex: 1 },
+                 { id: 44, speaker: "Leo", dialogue: "What’s your favorite thing to do in summer?", options: ["I like red.", "I’m a student.", "I love swimming in the pool."], correctOptionIndex: 2 },
+                 { id: 45, speaker: "Sophie", dialogue: "Do you like video games?", options: ["Yes, I play them with my friends.", "I’m going to the store.", "I like green."], correctOptionIndex: 0 },
+                 { id: 46, speaker: "Jake", dialogue: "What’s something you’re good at?", options: ["I’m from France.", "I’m good at drawing.", "I like dogs."], correctOptionIndex: 1 },
+                 { id: 47, speaker: "Ella", dialogue: "What do you want for your birthday?", options: ["I’m ten years old.", "I like apples.", "I want a new bike."], correctOptionIndex: 2 },
+                 { id: 48, speaker: "Tom", dialogue: "Have you ever been to a zoo?", options: ["Yes, I saw lions and monkeys.", "I’m from Spain.", "I like music."], correctOptionIndex: 0 },
+                 { id: 49, speaker: "Sarah", dialogue: "What do you do before bed?", options: ["I’m a teacher.", "I brush my teeth and read.", "I like red."], correctOptionIndex: 1 },
+                 { id: 50, speaker: "Ben", dialogue: "What’s your favorite ice cream flavor?", options: ["I’m going to school.", "I like dogs.", "I love chocolate ice cream."], correctOptionIndex: 2 },
+                 { id: 51, speaker: "Emma", dialogue: "What do you usually do on your birthday?", options: ["I have a party with my friends.", "I’m from Canada.", "I like red."], correctOptionIndex: 0 },
+                 { id: 52, speaker: "David", dialogue: "What’s your favorite thing to do at school?", options: ["I like pizza.", "I enjoy science experiments.", "I’m ten years old."], correctOptionIndex: 1 },
+                 { id: 53, speaker: "Nina", dialogue: "Do you like going to the library?", options: ["I’m from Italy.", "I like green.", "Yes, I love reading books there."], correctOptionIndex: 2 },
+                 { id: 54, speaker: "Leo", dialogue: "What do you eat for lunch at school?", options: ["I usually have rice and vegetables.", "I’m going to the store.", "I like dogs."], correctOptionIndex: 0 },
+                 { id: 55, speaker: "Sophie", dialogue: "What do you wear when it’s cold?", options: ["I’m a student.", "I wear a jacket and scarf.", "I like music."], correctOptionIndex: 1 },
+                 { id: 56, speaker: "Jake", dialogue: "What’s your favorite thing to do outside?", options: ["I’m from France.", "I like red.", "I love riding my bike."], correctOptionIndex: 2 },
+                 { id: 57, speaker: "Ella", dialogue: "What do you do when it rains?", options: ["I stay inside and watch movies.", "I’m ten years old.", "I like green."], correctOptionIndex: 0 },
+                 { id: 58, speaker: "Tom", dialogue: "What’s your favorite fruit?", options: ["I’m from Spain.", "I love strawberries.", "I like dogs."], correctOptionIndex: 1 },
+                 { id: 59, speaker: "Sarah", dialogue: "What do you do in the morning?", options: ["I’m a teacher.", "I brush my teeth and eat breakfast.", "I like music."], correctOptionIndex: 1 },
+                 { id: 60, speaker: "Ben", dialogue: "What do you do when you’re sick?", options: ["I’m going to school.", "I like red.", "I rest and drink water."], correctOptionIndex: 2 },
+                 { id: 61, speaker: "Anna", dialogue: "What’s your favorite thing to do with your family?", options: ["I like going on trips with them.", "I’m from Canada.", "I like pizza."], correctOptionIndex: 0 },
+                 { id: 62, speaker: "Mike", dialogue: "What do you do on holidays?", options: ["I’m ten years old.", "I visit my grandparents.", "I like green."], correctOptionIndex: 1 },
+                 { id: 63, speaker: "Lucy", dialogue: "What’s your favorite thing to draw?", options: ["I’m from Italy.", "I like dogs.", "I love drawing animals."], correctOptionIndex: 2 },
+                 { id: 64, speaker: "John", dialogue: "What do you do when you’re tired?", options: ["I take a nap.", "I’m a student.", "I like music."], correctOptionIndex: 0 },
+                 { id: 65, speaker: "Emma", dialogue: "What do you do on your birthday?", options: ["I’m going to the store.", "I eat cake and open presents.", "I like red."], correctOptionIndex: 1 },
+                 { id: 66, speaker: "David", dialogue: "What’s your favorite kind of weather?", options: ["I’m from France.", "I like green.", "I love sunny days."], correctOptionIndex: 2 },
+                 { id: 67, speaker: "Nina", dialogue: "What do you do when you’re happy?", options: ["I smile and laugh.", "I’m ten years old.", "I like dogs."], correctOptionIndex: 0 },
+                 { id: 68, speaker: "Leo", dialogue: "What do you do when you’re sad?", options: ["I’m from Spain.", "I talk to my mom.", "I like music."], correctOptionIndex: 1 },
+                 { id: 69, speaker: "Sophie", dialogue: "What do you do when you’re angry?", options: ["I’m a teacher.", "I like red.", "I take deep breaths."], correctOptionIndex: 2 },
+                 { id: 70, speaker: "Jake", dialogue: "What’s your favorite thing to do at home?", options: ["I like playing board games.", "I’m going to school.", "I like green."], correctOptionIndex: 0 },
+                 { id: 71, speaker: "Ella", dialogue: "What do you do when you’re cold?", options: ["I’m from Canada.", "I wear a sweater.", "I like pizza."], correctOptionIndex: 1 },
+                 { id: 72, speaker: "Tom", dialogue: "What’s your favorite thing to do in winter?", options: ["I’m ten years old.", "I like dogs.", "I love building snowmen."], correctOptionIndex: 2 },
+                 { id: 73, speaker: "Sarah", dialogue: "What do you do when you’re hot?", options: ["I drink cold water.", "I’m a student.", "I like music."], correctOptionIndex: 0 },
+                 { id: 74, speaker: "Ben", dialogue: "What do you do when you’re bored at school?", options: ["I’m from Italy.", "I draw in my notebook.", "I like red."], correctOptionIndex: 1 },
+                 { id: 75, speaker: "Anna", dialogue: "What’s your favorite thing to do on the weekend?", options: ["I’m going to the store.", "I like green.", "I go to the park with my friends."], correctOptionIndex: 2 },
+                 { id: 76, speaker: "Mike", dialogue: "What do you do when you’re nervous?", options: ["I take deep breaths and relax.", "I’m from France.", "I like dogs."], correctOptionIndex: 0 },
+                 { id: 77, speaker: "Lucy", dialogue: "What’s your favorite thing to do in the evening?", options: ["I’m ten years old.", "I watch TV with my family.", "I like music."], correctOptionIndex: 1 },
+                 { id: 78, speaker: "John", dialogue: "What do you do when you’re excited?", options: ["I’m a teacher.", "I like red.", "I jump up and down!"], correctOptionIndex: 2 },
+                 { id: 79, speaker: "Emma", dialogue: "What’s your favorite thing to do in spring?", options: ["I like picking flowers.", "I’m going to school.", "I like green."], correctOptionIndex: 0 },
+                 { id: 80, speaker: "David", dialogue: "What do you do when you’re scared?", options: ["I’m from Canada.", "I hold someone’s hand.", "I like pizza."], correctOptionIndex: 1 },
+                 { id: 81, speaker: "Nina", dialogue: "What’s your favorite thing to do at the beach?", options: ["I’m ten years old.", "I like dogs.", "I love building sandcastles."], correctOptionIndex: 2 },
+                 { id: 82, speaker: "Leo", dialogue: "What do you do when you’re feeling sick?", options: ["I stay in bed and rest.", "I’m a student.", "I like music."], correctOptionIndex: 0 },
+                 { id: 83, speaker: "Sophie", dialogue: "What’s your favorite thing to do in autumn?", options: ["I’m from Italy.", "I like jumping in leaves.", "I like red."], correctOptionIndex: 1 },
+                 { id: 84, speaker: "Jake", dialogue: "What do you do when you’re feeling shy?", options: ["I’m going to the store.", "I like green.", "I stay quiet and listen."], correctOptionIndex: 2 },
+                 { id: 85, speaker: "Ella", dialogue: "What’s your favorite thing to do in the snow?", options: ["I like making snow angels.", "I’m from France.", "I like dogs."], correctOptionIndex: 0 },
+                 { id: 86, speaker: "Tom", dialogue: "What do you do when you’re feeling proud?", options: ["I’m ten years old.", "I smile and tell someone.", "I like music."], correctOptionIndex: 1 },
+                 { id: 87, speaker: "Sarah", dialogue: "What do you do when you’re feeling silly?", options: ["I make funny faces.", "I’m going to school.", "I like green."], correctOptionIndex: 0 },
+                 { id: 88, speaker: "Jamie", dialogue: "What do you do when you’re feeling silly?", options: ["I make funny faces.", "I’m going to school.", "I like green."], correctOptionIndex: 0 }, 
                  { id: 89, speaker: "Alex", dialogue: "What’s your favorite thing to do at night?", options: ["I’m from Canada.", "I read a book in bed.", "I like pizza."], correctOptionIndex: 1 },
                  { id: 90, speaker: "Jamie", dialogue: "What do you do when you’re feeling calm?", options: ["I’m ten years old.", "I like dogs.", "I sit quietly and breathe."], correctOptionIndex: 2 },
                  { id: 91, speaker: "Alex", dialogue: "What’s your favorite thing to do with your best friend?", options: ["I like playing games together.", "I’m a student.", "I like music."], correctOptionIndex: 0 },
@@ -481,6 +484,52 @@
                  { id: 97, speaker: "Alex", dialogue: "What is your favorite type of story?", options: ["I like music.", "I like green.", "I enjoy reading fantasy stories."], correctOptionIndex: 2 }
             ];
             TOTAL_QUESTIONS_PER_GAME = conversationQuestions.length; 
+
+            // --- Load Settings ---
+            function loadSettings() {
+                const savedSettings = localStorage.getItem('listeningGameSettings');
+                if (savedSettings) {
+                    settings = JSON.parse(savedSettings);
+                }
+                toggleTtsCheckbox.checked = settings.isTtsEnabled;
+                toggleSfxCheckbox.checked = settings.areSoundEffectsEnabled;
+            }
+
+            // --- Save Settings ---
+            function saveSettings() {
+                localStorage.setItem('listeningGameSettings', JSON.stringify(settings));
+            }
+            
+            // --- High Score Logic ---
+            const MAX_HIGH_SCORES = 5;
+            function getHighScores() {
+                const scores = localStorage.getItem('listeningGameHighScores');
+                return scores ? JSON.parse(scores) : [];
+            }
+
+            function saveHighScore(score, username) {
+                const highScores = getHighScores();
+                const newScore = { score, username, date: new Date().toLocaleDateString() };
+                highScores.push(newScore);
+                highScores.sort((a, b) => b.score - a.score); // Sort descending
+                highScores.splice(MAX_HIGH_SCORES); // Keep only top N scores
+                localStorage.setItem('listeningGameHighScores', JSON.stringify(highScores));
+            }
+
+            function displayHighScores() {
+                const highScores = getHighScores();
+                highScoresList.innerHTML = ''; // Clear previous scores
+                if (highScores.length === 0) {
+                    highScoresList.innerHTML = '<li class="text-slate-500">No high scores yet!</li>';
+                    return;
+                }
+                highScores.forEach(scoreItem => {
+                    const li = document.createElement('li');
+                    li.textContent = `${scoreItem.username}: ${scoreItem.score} (on ${scoreItem.date})`;
+                    highScoresList.appendChild(li);
+                });
+            }
+
 
             // --- TTS Functions ---
             function getVoiceByName(namePart) {
