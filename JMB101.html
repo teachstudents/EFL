@@ -1,436 +1,416 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Vocabulary Practice (B1 Level)</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f5f5f5;
-    }
-    .quiz-container {
-      max-width: 750px;
-      margin: auto;
-      background-color: #fff;
-      padding: 25px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    h2, h3 {
-      text-align: center;
-    }
-    #start-screen, #quiz-screen, #result-screen {
-      margin-bottom: 20px;
-    }
-    #quiz-screen, #result-screen {
-      display: none;
-    }
-    #timer {
-      font-size: 1.2em;
-      text-align: right;
-      margin-bottom: 10px;
-    }
-    #score-display {
-      font-size: 1.1em;
-      margin-bottom: 20px;
-      text-align: right;
-    }
-    .question {
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
-    .option {
-      background-color: #f9f9f9;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 10px;
-      margin-bottom: 8px;
-      cursor: pointer;
-    }
-    .option:hover {
-      background-color: #eee;
-    }
-    .option.correct {
-      background-color: #d4edda;
-      border-color: #c3e6cb;
-      color: #155724;
-    }
-    .option.incorrect {
-      background-color: #f8d7da;
-      border-color: #f5c6cb;
-      color: #721c24;
-    }
-    .disabled {
-      pointer-events: none;
-      opacity: 0.7;
-    }
-    #feedback {
-      margin-top: 10px;
-      font-style: italic;
-    }
-    #next-btn {
-      margin-top: 20px;
-      display: none;
-      width: 100%;
-      padding: 10px;
-      font-size: 1em;
-    }
-    .error-item {
-      margin-bottom: 10px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Vocabulary Adventure Game!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --primary-color: #4a90e2;
+            --correct-color: #50e3c2;
+            --incorrect-color: #e35050;
+            --neutral-bg: #fff;
+            --dark-text: #333;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(45deg, #fbc2eb, #a6c1ee, #84fab0, #8fd3f4);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .quiz-container {
+            max-width: 800px;
+            width: 100%;
+            margin: auto;
+            background-color: var(--neutral-bg);
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border: 3px solid #fff;
+            text-align: center;
+        }
+        
+        h2 { text-align: center; color: var(--primary-color); font-size: 2.5em; margin-bottom: 20px;}
+        h3 { text-align: center; color: var(--primary-color); font-size: 2em; margin-bottom: 10px; }
+
+        #start-screen, #quiz-screen, #result-screen { display: none; }
+        #start-screen { display: block; }
+        
+        #username { width: 60%; padding: 12px; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 20px; font-size: 1.1em; }
+        
+        .game-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+        }
+        .game-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        #quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        #score-display, #question-timer {
+            background-color: #f0f0f0;
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        #progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        #progress-bar {
+            width: 0%;
+            height: 15px;
+            background-color: var(--primary-color);
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        #question-container { animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .question {
+            font-weight: bold;
+            font-size: 1.4em;
+            margin-bottom: 25px;
+            color: var(--dark-text);
+        }
+        
+        #options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option {
+            background-color: #f9f9f9;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.1em;
+        }
+        .option:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-color);
+        }
+        .option.correct {
+            background-color: var(--correct-color);
+            border-color: var(--correct-color);
+            color: white;
+            animation: pulse 0.5s;
+        }
+        .option.incorrect {
+            background-color: var(--incorrect-color);
+            border-color: var(--incorrect-color);
+            color: white;
+            animation: shake 0.5s;
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+
+        .disabled { pointer-events: none; opacity: 0.8; }
+        
+        #feedback { margin-top: 20px; font-size: 1.1em; font-style: italic; min-height: 50px; }
+        
+        #next-btn { margin-top: 20px; display: none; }
+        
+        #result-screen h3 { margin-bottom: 20px; }
+        #final-score { font-size: 1.5em; margin-bottom: 20px; font-weight: 600; }
+        
+        #badges-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .badge {
+            text-align: center;
+            opacity: 0.3;
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .badge.earned { opacity: 1; transform: scale(1.1) rotate(-5deg); }
+        .badge img { width: 100px; height: 100px; }
+        .badge p { margin-top: 5px; font-weight: 600; color: var(--primary-color); }
+        
+        #error-report { text-align: left; }
+        .error-item { margin-bottom: 15px; border-left: 4px solid var(--incorrect-color); padding-left: 15px; }
+
+    </style>
 </head>
 <body>
-  <div class="quiz-container">
-    <h2>Vocabulary Practice (B1 Level)</h2>
+    <audio id="correct-sound" src="https://actions.google.com/sounds/v1/positive_tones/character_quest_reward.ogg" preload="auto"></audio>
+    <audio id="incorrect-sound" src="https://actions.google.com/sounds/v1/impacts/negative_impact_for_ui.ogg" preload="auto"></audio>
+    <audio id="finish-sound" src="https://actions.google.com/sounds/v1/human_voices/human_male_perfect.ogg" preload="auto"></audio>
 
-    <!-- Start Screen -->
-    <div id="start-screen">
-      <label for="username">Enter your name:</label>
-      <input type="text" id="username" required>
-      <button id="start-btn">Start Quiz</button>
+    <div class="quiz-container">
+        <div id="start-screen">
+            <h2>Vocabulary Adventure!</h2>
+            <p style="margin-bottom: 30px;">Enter your name and get ready for an exciting challenge!</p>
+            <input type="text" id="username" placeholder="Hero's Name" required>
+            <button id="start-btn" class="game-button">Start Adventure</button>
+        </div>
+
+        <div id="quiz-screen">
+            <div id="quiz-header">
+                <div id="score-display">Score: 0</div>
+                <div id="question-timer">Time: 15s</div>
+            </div>
+            <div id="progress-bar-container">
+                <div id="progress-bar"></div>
+            </div>
+            <div id="question-container"></div>
+            <div id="feedback"></div>
+            <button id="next-btn" class="game-button">Next Question</button>
+        </div>
+
+        <div id="result-screen">
+            <h3>Adventure Complete!</h3>
+            <div id="final-score"></div>
+            <div id="badges-container">
+                <div id="badge-virtuoso" class="badge">
+                    <img src="https://i.imgur.com/sZ4wV2a.png" alt="Virtuoso Badge">
+                    <p>Virtuoso</p>
+                </div>
+                <div id="badge-perfect" class="badge">
+                    <img src="https://i.imgur.com/K1jUaOr.png" alt="Perfect Score Badge">
+                    <p>Perfectionist</p>
+                </div>
+                <div id="badge-speed" class="badge">
+                    <img src="https://i.imgur.com/Y3Y5nCj.png" alt="Speed Demon Badge">
+                    <p>Speed Demon</p>
+                </div>
+            </div>
+            <div id="error-report"></div>
+            <button onclick="location.reload()" class="game-button">Play Again!</button>
+        </div>
     </div>
 
-    <!-- Quiz Screen -->
-    <div id="quiz-screen">
-      <div id="timer">Time Left: 10:00</div>
-      <div id="score-display">Score: 100%</div>
-      <div id="question-container"></div>
-      <div id="feedback"></div>
-      <button id="next-btn">Next Question</button>
-    </div>
+    <script>
+        const questions = [
+             { question: "After hearing that she was accepted into university, she felt a rush of joy; she was very ______.", options: ["happy", "sad", "angry", "tired"], correct: 0, explanation: "Happy means feeling good and excited.", detailedExplanation: "Her smile and cheer show that the good news made her feel joyful. 'Happy' is the best word to express this positive emotion." }, { question: "Before the exam, the teacher reminded us to ______ the book carefully and learn the story.", options: ["read", "write", "forget", "break"], correct: 0, explanation: "Read means to look at and understand the words.", detailedExplanation: "Reading helps you learn the story word by word. Even though you might write or speak about a book, here 'read' fits best to understand the text." }, { question: "Every day after school, he makes sure to finish his work; he always ______ his homework on time.", options: ["does", "avoids", "ignores", "breaks"], correct: 0, explanation: "Does means to complete or finish work.", detailedExplanation: "He completes his homework properly. Although one could ignore or avoid work, 'does' clearly means he finishes it." }, { question: "On Saturday morning, they visited a busy place to buy fresh fruits; they went to the ______.", options: ["market", "park", "library", "beach"], correct: 0, explanation: "Market means a place where food is sold.", detailedExplanation: "A market is full of fruit vendors and fresh produce, making it the best spot for buying fruits." }, { question: "During a rainy day, the family pet found a cozy spot; the cat is sleeping in the ______ that is soft and warm.", options: ["bed", "box", "tree", "car"], correct: 0, explanation: "Bed means a comfortable place to sleep.", detailedExplanation: "Though a cat may sleep in different spots, a bed is especially known for comfort and warmth, which fits the context best." }, { question: "When you leave your home, you must secure it properly; I need to ______ the door as I go out.", options: ["lock", "open", "break", "paint"], correct: 0, explanation: "Lock means to secure the door so others cannot enter.", detailedExplanation: "Locking the door makes the house safe when you are away, unlike opening or painting which do not stop intruders." }, { question: "After a long day, he enjoys a calm exercise outdoors; he likes to ______ slowly in the park during the evening.", options: ["walk", "run", "sleep", "climb"], correct: 0, explanation: "Walk means to move at a slow pace on foot.", detailedExplanation: "A slow walk is relaxing and fits the peaceful evening setting better than running or climbing." }, { question: "On a sunny, hot day, many people jump into the pool because the water is very ______ and refreshing.", options: ["cold", "hot", "fast", "deep"], correct: 0, explanation: "Cold means not warm and gives a cooling effect.", detailedExplanation: "Cold water helps lower the body temperature on a hot day. The other words do not provide the needed cooling quality." }, { question: "To stay strong and healthy, you should have good meals; it is important to ______ healthy food every day.", options: ["eat", "sleep", "run", "talk"], correct: 0, explanation: "Eat means to take food into your body.", detailedExplanation: "Eating provides energy and nutrition, while the other actions do not supply your body with food." }, { question: "Every weekend, she cleans her clothes so they look fresh; she likes to ______ her clothes regularly.", options: ["wash", "break", "read", "fix"], correct: 0, explanation: "Wash means to clean using water and soap.", detailedExplanation: "Washing removes dirt and makes clothes look neat. The other options do not mean cleaning." }, { question: "At school, everyone says that the boy is friendly and caring; he is very ______, always smiling and sharing.", options: ["kind", "mean", "loud", "small"], correct: 0, explanation: "Kind means friendly and caring.", detailedExplanation: "His behavior of sharing and smiling shows kindness, a quality that the other words do not describe." }, { question: "Before every meal, it is important to keep your body healthy; we must ______ our hands to remove germs.", options: ["wash", "dry", "touch", "forget"], correct: 0, explanation: "Wash means to clean with water and soap.", detailedExplanation: "Cleaning your hands through washing removes germs and prevents sickness, unlike drying or touching." }, { question: "For writing a quick note, she picked up a tool that puts ink on paper; she used a ______ to write her letter.", options: ["pen", "pencil", "knife", "spoon"], correct: 0, explanation: "Pen means an instrument used for writing with ink.", detailedExplanation: "A pen is best for smooth writing with ink. Though a pencil also writes, in this context a pen is the expected tool." }, { question: "The family has a cozy home close to nature; they live in a small ______ near the lake.", options: ["house", "car", "store", "tree"], correct: 0, explanation: "House means a building where people live.", detailedExplanation: "A house is made for living and comfort. The other options do not serve as a proper home." }, { question: "At the shop, he is friendly and assists everyone with a smile; his job is to ______ the customers.", options: ["help", "ignore", "call", "break"], correct: 0, explanation: "Help means to assist and support.", detailedExplanation: "By helping, he meets the customers’ needs, unlike ignoring or calling which would not provide support." }, { question: "When he has free time, the child enjoys spending time with his toys; he likes to ______ with them.", options: ["play", "eat", "sleep", "read"], correct: 0, explanation: "Play means to enjoy your time with fun activities.", detailedExplanation: "Playing with toys is a fun and creative activity for children, which fits the context better than the other actions." }, { question: "It is very cold in the room, and the draft makes you shiver; please ______ the window to keep out the cold air.", options: ["close", "open", "break", "sing"], correct: 0, explanation: "Close means to shut something.", detailedExplanation: "When you close the window, the cold air is kept out. Opening or breaking the window would not stop the cold." }, { question: "After waking up, I enjoy a quiet moment with a warm cup of tea; I like to ______ in the morning and relax.", options: ["sit", "run", "swim", "climb"], correct: 0, explanation: "Sit means to rest or take a seat.", detailedExplanation: "Sitting gives you a chance to relax. The other actions are too active for a calm morning routine." }, { question: "In class, the teacher listens and treats everyone well with smiles; she is very ______ with all the students.", options: ["nice", "strict", "mean", "bored"], correct: 0, explanation: "Nice means friendly and kind.", detailedExplanation: "A nice teacher makes the class pleasant by being friendly and caring, unlike a strict or mean approach." }, { question: "Tomorrow, I plan to share my news and thoughts; I will ______ a letter to my friend.", options: ["write", "read", "open", "break"], correct: 0, explanation: "Write means to put words on paper.", detailedExplanation: "Writing a letter shows you are communicating your thoughts. The other options do not involve forming written words." }, { question: "At the party, there was laughter, dancing, and fun; they all had a ______ time together.", options: ["good", "bad", "long", "short"], correct: 0, explanation: "Good means enjoyable and pleasant.", detailedExplanation: "The party was fun and happy, so 'good' is the best word to describe the experience." }, { question: "At the park, once the dog was free, it moved around playing; the dog ran ______ the park.", options: ["in", "on", "under", "above"], correct: 0, explanation: "In means inside or within.", detailedExplanation: "The dog was running inside the park boundaries rather than on or under something, so 'in' fits best." }, { question: "Before stepping outside in the morning, the girl quickly put on her ______ to go to school.", options: ["shoes", "hat", "pants", "mask"], correct: 0, explanation: "Shoes are worn on your feet.", detailedExplanation: "Putting on shoes protects your feet when you go out. The context of leaving for school makes 'shoes' the clear choice." }, { question: "With his camera, he enjoys capturing scenes and memories; he likes to ______ pictures during his free time.", options: ["take", "make", "draw", "throw"], correct: 0, explanation: "Take means to capture a photo.", detailedExplanation: "Using a camera to record an image is described as taking a picture, which is why 'take' is correct." }, { question: "Every morning, I travel quickly on two wheels; I need to ______ my bicycle to school each day.", options: ["ride", "fix", "drive", "sell"], correct: 0, explanation: "Ride means to travel on a bicycle.", detailedExplanation: "When you ride a bicycle, you pedal and move along. This is the normal action for using a bicycle rather than fixing or driving one." }
+        ];
 
-    <!-- Result Screen -->
-    <div id="result-screen">
-      <h3>Quiz Report</h3>
-      <div id="final-score"></div>
-      <div id="error-report"></div>
-    </div>
-  </div>
+        let currentQuestionIndex = 0;
+        let score = 0;
+        const TIME_PER_QUESTION = 15;
+        let questionTimerValue = TIME_PER_QUESTION;
+        let questionTimerInterval;
+        let totalTime = 0;
+        let totalTimeInterval;
+        const incorrectAnswers = [];
+        let username = "";
+        let currentShuffledOptions = [];
+        let currentCorrectIndex = -1;
 
-  <script>
-    const questions = [
-      {
-        question: "After hearing that she was accepted into university, she felt a rush of joy; she was very ______.",
-        options: ["happy", "sad", "angry", "tired"],
-        correct: 0,
-        explanation: "Happy means feeling good and excited.",
-        detailedExplanation: "Her smile and cheer show that the good news made her feel joyful. 'Happy' is the best word to express this positive emotion."
-      },
-      {
-        question: "Before the exam, the teacher reminded us to ______ the book carefully and learn the story.",
-        options: ["read", "write", "forget", "break"],
-        correct: 0,
-        explanation: "Read means to look at and understand the words.",
-        detailedExplanation: "Reading helps you learn the story word by word. Even though you might write or speak about a book, here 'read' fits best to understand the text."
-      },
-      {
-        question: "Every day after school, he makes sure to finish his work; he always ______ his homework on time.",
-        options: ["does", "avoids", "ignores", "breaks"],
-        correct: 0,
-        explanation: "Does means to complete or finish work.",
-        detailedExplanation: "He completes his homework properly. Although one could ignore or avoid work, 'does' clearly means he finishes it."
-      },
-      {
-        question: "On Saturday morning, they visited a busy place to buy fresh fruits; they went to the ______.",
-        options: ["market", "park", "library", "beach"],
-        correct: 0,
-        explanation: "Market means a place where food is sold.",
-        detailedExplanation: "A market is full of fruit vendors and fresh produce, making it the best spot for buying fruits."
-      },
-      {
-        question: "During a rainy day, the family pet found a cozy spot; the cat is sleeping in the ______ that is soft and warm.",
-        options: ["bed", "box", "tree", "car"],
-        correct: 0,
-        explanation: "Bed means a comfortable place to sleep.",
-        detailedExplanation: "Though a cat may sleep in different spots, a bed is especially known for comfort and warmth, which fits the context best."
-      },
-      {
-        question: "When you leave your home, you must secure it properly; I need to ______ the door as I go out.",
-        options: ["lock", "open", "break", "paint"],
-        correct: 0,
-        explanation: "Lock means to secure the door so others cannot enter.",
-        detailedExplanation: "Locking the door makes the house safe when you are away, unlike opening or painting which do not stop intruders."
-      },
-      {
-        question: "After a long day, he enjoys a calm exercise outdoors; he likes to ______ slowly in the park during the evening.",
-        options: ["walk", "run", "sleep", "climb"],
-        correct: 0,
-        explanation: "Walk means to move at a slow pace on foot.",
-        detailedExplanation: "A slow walk is relaxing and fits the peaceful evening setting better than running or climbing."
-      },
-      {
-        question: "On a sunny, hot day, many people jump into the pool because the water is very ______ and refreshing.",
-        options: ["cold", "hot", "fast", "deep"],
-        correct: 0,
-        explanation: "Cold means not warm and gives a cooling effect.",
-        detailedExplanation: "Cold water helps lower the body temperature on a hot day. The other words do not provide the needed cooling quality."
-      },
-      {
-        question: "To stay strong and healthy, you should have good meals; it is important to ______ healthy food every day.",
-        options: ["eat", "sleep", "run", "talk"],
-        correct: 0,
-        explanation: "Eat means to take food into your body.",
-        detailedExplanation: "Eating provides energy and nutrition, while the other actions do not supply your body with food."
-      },
-      {
-        question: "Every weekend, she cleans her clothes so they look fresh; she likes to ______ her clothes regularly.",
-        options: ["wash", "break", "read", "fix"],
-        correct: 0,
-        explanation: "Wash means to clean using water and soap.",
-        detailedExplanation: "Washing removes dirt and makes clothes look neat. The other options do not mean cleaning."
-      },
-      {
-        question: "At school, everyone says that the boy is friendly and caring; he is very ______, always smiling and sharing.",
-        options: ["kind", "mean", "loud", "small"],
-        correct: 0,
-        explanation: "Kind means friendly and caring.",
-        detailedExplanation: "His behavior of sharing and smiling shows kindness, a quality that the other words do not describe."
-      },
-      {
-        question: "Before every meal, it is important to keep your body healthy; we must ______ our hands to remove germs.",
-        options: ["wash", "dry", "touch", "forget"],
-        correct: 0,
-        explanation: "Wash means to clean with water and soap.",
-        detailedExplanation: "Cleaning your hands through washing removes germs and prevents sickness, unlike drying or touching."
-      },
-      {
-        question: "For writing a quick note, she picked up a tool that puts ink on paper; she used a ______ to write her letter.",
-        options: ["pen", "pencil", "knife", "spoon"],
-        correct: 0,
-        explanation: "Pen means an instrument used for writing with ink.",
-        detailedExplanation: "A pen is best for smooth writing with ink. Though a pencil also writes, in this context a pen is the expected tool."
-      },
-      {
-        question: "The family has a cozy home close to nature; they live in a small ______ near the lake.",
-        options: ["house", "car", "store", "tree"],
-        correct: 0,
-        explanation: "House means a building where people live.",
-        detailedExplanation: "A house is made for living and comfort. The other options do not serve as a proper home."
-      },
-      {
-        question: "At the shop, he is friendly and assists everyone with a smile; his job is to ______ the customers.",
-        options: ["help", "ignore", "call", "break"],
-        correct: 0,
-        explanation: "Help means to assist and support.",
-        detailedExplanation: "By helping, he meets the customers’ needs, unlike ignoring or calling which would not provide support."
-      },
-      {
-        question: "When he has free time, the child enjoys spending time with his toys; he likes to ______ with them.",
-        options: ["play", "eat", "sleep", "read"],
-        correct: 0,
-        explanation: "Play means to enjoy your time with fun activities.",
-        detailedExplanation: "Playing with toys is a fun and creative activity for children, which fits the context better than the other actions."
-      },
-      {
-        question: "It is very cold in the room, and the draft makes you shiver; please ______ the window to keep out the cold air.",
-        options: ["close", "open", "break", "sing"],
-        correct: 0,
-        explanation: "Close means to shut something.",
-        detailedExplanation: "When you close the window, the cold air is kept out. Opening or breaking the window would not stop the cold."
-      },
-      {
-        question: "After waking up, I enjoy a quiet moment with a warm cup of tea; I like to ______ in the morning and relax.",
-        options: ["sit", "run", "swim", "climb"],
-        correct: 0,
-        explanation: "Sit means to rest or take a seat.",
-        detailedExplanation: "Sitting gives you a chance to relax. The other actions are too active for a calm morning routine."
-      },
-      {
-        question: "In class, the teacher listens and treats everyone well with smiles; she is very ______ with all the students.",
-        options: ["nice", "strict", "mean", "bored"],
-        correct: 0,
-        explanation: "Nice means friendly and kind.",
-        detailedExplanation: "A nice teacher makes the class pleasant by being friendly and caring, unlike a strict or mean approach."
-      },
-      {
-        question: "Tomorrow, I plan to share my news and thoughts; I will ______ a letter to my friend.",
-        options: ["write", "read", "open", "break"],
-        correct: 0,
-        explanation: "Write means to put words on paper.",
-        detailedExplanation: "Writing a letter shows you are communicating your thoughts. The other options do not involve forming written words."
-      },
-      {
-        question: "At the party, there was laughter, dancing, and fun; they all had a ______ time together.",
-        options: ["good", "bad", "long", "short"],
-        correct: 0,
-        explanation: "Good means enjoyable and pleasant.",
-        detailedExplanation: "The party was fun and happy, so 'good' is the best word to describe the experience."
-      },
-      {
-        question: "At the park, once the dog was free, it moved around playing; the dog ran ______ the park.",
-        options: ["in", "on", "under", "above"],
-        correct: 0,
-        explanation: "In means inside or within.",
-        detailedExplanation: "The dog was running inside the park boundaries rather than on or under something, so 'in' fits best."
-      },
-      {
-        question: "Before stepping outside in the morning, the girl quickly put on her ______ to go to school.",
-        options: ["shoes", "hat", "pants", "mask"],
-        correct: 0,
-        explanation: "Shoes are worn on your feet.",
-        detailedExplanation: "Putting on shoes protects your feet when you go out. The context of leaving for school makes 'shoes' the clear choice."
-      },
-      {
-        question: "With his camera, he enjoys capturing scenes and memories; he likes to ______ pictures during his free time.",
-        options: ["take", "make", "draw", "throw"],
-        correct: 0,
-        explanation: "Take means to capture a photo.",
-        detailedExplanation: "Using a camera to record an image is described as taking a picture, which is why 'take' is correct."
-      },
-      {
-        question: "Every morning, I travel quickly on two wheels; I need to ______ my bicycle to school each day.",
-        options: ["ride", "fix", "drive", "sell"],
-        correct: 0,
-        explanation: "Ride means to travel on a bicycle.",
-        detailedExplanation: "When you ride a bicycle, you pedal and move along. This is the normal action for using a bicycle rather than fixing or driving one."
-      }
-    ];
+        // Sound elements
+        const correctSound = document.getElementById("correct-sound");
+        const incorrectSound = document.getElementById("incorrect-sound");
+        const finishSound = document.getElementById("finish-sound");
 
-    let currentQuestionIndex = 0;
-    let score = 100;
-    const penalty = 100 / questions.length;
-    let timerValue = 10 * 60;
-    let timerInterval;
-    const incorrectAnswers = [];
-    let username = "";
-    let currentShuffledOptions = [];
-    let currentCorrectIndex = -1;
+        // DOM Elements
+        const startScreen = document.getElementById("start-screen");
+        const quizScreen = document.getElementById("quiz-screen");
+        const resultScreen = document.getElementById("result-screen");
+        const startBtn = document.getElementById("start-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const questionContainer = document.getElementById("question-container");
+        const feedbackDiv = document.getElementById("feedback");
+        const scoreDisplay = document.getElementById("score-display");
+        const questionTimerDisplay = document.getElementById("question-timer");
+        const finalScoreDiv = document.getElementById("final-score");
+        const errorReportDiv = document.getElementById("error-report");
+        const progressBar = document.getElementById("progress-bar");
 
-    const startScreen = document.getElementById("start-screen");
-    const quizScreen = document.getElementById("quiz-screen");
-    const resultScreen = document.getElementById("result-screen");
-    const startBtn = document.getElementById("start-btn");
-    const nextBtn = document.getElementById("next-btn");
-    const questionContainer = document.getElementById("question-container");
-    const feedbackDiv = document.getElementById("feedback");
-    const scoreDisplay = document.getElementById("score-display");
-    const timerDisplay = document.getElementById("timer");
-    const finalScoreDiv = document.getElementById("final-score");
-    const errorReportDiv = document.getElementById("error-report");
+        startBtn.addEventListener("click", startQuiz);
+        nextBtn.addEventListener("click", nextQuestion);
 
-    startBtn.addEventListener("click", startQuiz);
-    nextBtn.addEventListener("click", nextQuestion);
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
+        function startQuiz() {
+            username = document.getElementById("username").value.trim() || "Hero";
+            startScreen.style.display = "none";
+            quizScreen.style.display = "block";
+            totalTimeInterval = setInterval(() => totalTime++, 1000);
+            displayQuestion();
+        }
 
-    function startQuiz() {
-      username = document.getElementById("username").value.trim() || "Student";
-      startScreen.style.display = "none";
-      quizScreen.style.display = "block";
-      timerInterval = setInterval(updateTimer, 1000);
-      displayQuestion();
-    }
+        function updateQuestionTimer() {
+            questionTimerDisplay.innerText = `Time: ${questionTimerValue}s`;
+            if (questionTimerValue <= 0) {
+                clearInterval(questionTimerInterval);
+                handleTimeUp();
+            } else {
+                questionTimerValue--;
+            }
+        }
+        
+        function handleTimeUp() {
+            incorrectSound.play();
+            const currentQ = questions[currentQuestionIndex];
+            feedbackDiv.innerHTML = "<strong>Time's up!</strong> " + currentQ.explanation;
+            incorrectAnswers.push({
+                question: currentQ.question, chosen: "No answer", correct: currentQ.options[currentQ.correct],
+                explanation: currentQ.explanation, detailedExplanation: currentQ.detailedExplanation
+            });
+            const optionEls = document.querySelectorAll(".option");
+            optionEls.forEach(el => el.classList.add("disabled"));
+            optionEls[currentCorrectIndex].classList.add("correct");
+            nextBtn.style.display = "block";
+        }
 
-    function updateTimer() {
-      let minutes = Math.floor(timerValue / 60);
-      let seconds = timerValue % 60;
-      timerDisplay.innerText = `Time Left: ${minutes < 10 ? "0" + minutes : minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
-      if (timerValue <= 0) {
-        clearInterval(timerInterval);
-        finishQuiz();
-      } else {
-        timerValue--;
-      }
-    }
+        function displayQuestion() {
+            resetState();
+            const currentQ = questions[currentQuestionIndex];
+            
+            let optionsArray = currentQ.options.map((text, idx) => ({ text, origIndex: idx }));
+            currentShuffledOptions = shuffleArray(optionsArray);
+            currentCorrectIndex = currentShuffledOptions.findIndex(option => option.origIndex === currentQ.correct);
 
-    function displayQuestion() {
-      feedbackDiv.innerText = "";
-      nextBtn.style.display = "none";
-      questionContainer.innerHTML = "";
+            const questionEl = document.createElement("div");
+            questionEl.className = "question";
+            questionEl.innerText = `Q${currentQuestionIndex + 1}: ${currentQ.question}`;
+            
+            const optionsContainer = document.createElement("div");
+            optionsContainer.id = "options-container";
 
-      const currentQ = questions[currentQuestionIndex];
-      let optionsArray = currentQ.options.map((text, idx) => ({ text, origIndex: idx }));
-      currentShuffledOptions = shuffleArray(optionsArray);
-      currentCorrectIndex = currentShuffledOptions.findIndex(option => option.origIndex === currentQ.correct);
+            currentShuffledOptions.forEach((optionObj, index) => {
+                const optionEl = document.createElement("div");
+                optionEl.className = "option";
+                optionEl.innerText = optionObj.text;
+                optionEl.addEventListener("click", () => selectOption(optionEl, index));
+                optionsContainer.appendChild(optionEl);
+            });
+            
+            questionContainer.appendChild(questionEl);
+            questionContainer.appendChild(optionsContainer);
+            
+            progressBar.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+            
+            questionTimerValue = TIME_PER_QUESTION;
+            questionTimerDisplay.innerText = `Time: ${questionTimerValue}s`;
+            questionTimerInterval = setInterval(updateQuestionTimer, 1000);
+        }
 
-      const questionEl = document.createElement("div");
-      questionEl.className = "question";
-      questionEl.innerText = `Q${currentQuestionIndex + 1}: ${currentQ.question}`;
-      questionContainer.appendChild(questionEl);
+        function resetState() {
+            feedbackDiv.innerHTML = "";
+            nextBtn.style.display = "none";
+            questionContainer.innerHTML = "";
+            clearInterval(questionTimerInterval);
+        }
 
-      currentShuffledOptions.forEach((optionObj, index) => {
-        const optionEl = document.createElement("div");
-        optionEl.className = "option";
-        optionEl.innerText = optionObj.text;
-        optionEl.addEventListener("click", () => selectOption(optionEl, index));
-        questionContainer.appendChild(optionEl);
-      });
-    }
+        function selectOption(selectedEl, selectedIndex) {
+            clearInterval(questionTimerInterval);
+            const currentQ = questions[currentQuestionIndex];
+            const optionEls = document.querySelectorAll(".option");
+            optionEls.forEach(el => el.classList.add("disabled"));
 
-    function selectOption(selectedEl, selectedIndex) {
-      const currentQ = questions[currentQuestionIndex];
-      const optionEls = document.querySelectorAll(".option");
-      optionEls.forEach(el => el.classList.add("disabled"));
+            if (selectedIndex === currentCorrectIndex) {
+                correctSound.play();
+                const points = 100 + (questionTimerValue * 10); // Base 100 points + bonus for speed
+                score += points;
+                selectedEl.classList.add("correct");
+                feedbackDiv.innerHTML = `<strong>Correct! +${points} points!</strong>`;
+            } else {
+                incorrectSound.play();
+                selectedEl.classList.add("incorrect");
+                feedbackDiv.innerHTML = `<strong>Incorrect.</strong> ${currentQ.explanation}<br><br>${currentQ.detailedExplanation}`;
+                incorrectAnswers.push({
+                    question: currentQ.question,
+                    chosen: currentShuffledOptions[selectedIndex].text,
+                    correct: currentQ.options[currentQ.correct],
+                    explanation: currentQ.explanation,
+                    detailedExplanation: currentQ.detailedExplanation
+                });
+                optionEls[currentCorrectIndex].classList.add("correct");
+            }
+            
+            scoreDisplay.innerText = `Score: ${score}`;
+            nextBtn.style.display = "block";
+        }
 
-      if (selectedIndex === currentCorrectIndex) {
-        selectedEl.classList.add("correct");
-        feedbackDiv.innerHTML = "<strong>Correct!</strong>";
-      } else {
-        selectedEl.classList.add("incorrect");
-        feedbackDiv.innerHTML = "<strong>Incorrect.</strong> " + currentQ.explanation +
-                                  "<br><br>" + currentQ.detailedExplanation;
-        score -= penalty;
-        incorrectAnswers.push({
-          question: currentQ.question,
-          chosen: currentShuffledOptions[selectedIndex].text,
-          correct: currentQ.options[currentQ.correct],
-          explanation: currentQ.explanation,
-          detailedExplanation: currentQ.detailedExplanation
-        });
-        // Highlight the correct option
-        optionEls.forEach(el => {
-          if (el.innerText === currentQ.options[currentQ.correct]) {
-            el.classList.add("correct");
-          }
-        });
-      }
-      
-      score = Math.max(score, 0);
-      scoreDisplay.innerText = `Score: ${Math.round(score)}%`;
-      nextBtn.style.display = "block";
-    }
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
 
-    function nextQuestion() {
-      currentQuestionIndex++;
-      if (currentQuestionIndex < questions.length) {
-        displayQuestion();
-      } else {
-        finishQuiz();
-      }
-    }
-
-    function finishQuiz() {
-      clearInterval(timerInterval);
-      quizScreen.style.display = "none";
-      resultScreen.style.display = "block";
-      finalScoreDiv.innerText = `${username}, your final score is ${Math.round(score)}%`;
-      
-      if (incorrectAnswers.length > 0) {
-        let errorHtml = "<h4>Review your incorrect answers:</h4>";
-        incorrectAnswers.forEach(item => {
-          errorHtml += `<div class="error-item">
-                          <strong>Question:</strong> ${item.question}<br>
-                          <strong>Your answer:</strong> ${item.chosen}<br>
-                          <strong>Correct answer:</strong> ${item.correct}<br>
-                          <strong>Short note:</strong> ${item.explanation}<br>
-                          <strong>More details:</strong> ${item.detailedExplanation}
-                        </div>`;
-        });
-        errorReportDiv.innerHTML = errorHtml;
-      } else {
-        errorReportDiv.innerHTML = "<h4>Great job! You answered all questions correctly.</h4>";
-      }
-    }
-  </script>
+        function finishQuiz() {
+            finishSound.play();
+            clearInterval(questionTimerInterval);
+            clearInterval(totalTimeInterval);
+            quizScreen.style.display = "none";
+            resultScreen.style.display = "block";
+            finalScoreDiv.innerText = `${username}, your final score is ${score}!`;
+            
+            // Award Badges
+            document.getElementById('badge-virtuoso').classList.add('earned'); // Everyone's a virtuoso!
+            if (incorrectAnswers.length === 0) {
+                document.getElementById('badge-perfect').classList.add('earned');
+            }
+            if (totalTime < questions.length * 7) { // Average less than 7 seconds per question
+                document.getElementById('badge-speed').classList.add('earned');
+            }
+            
+            // Display Error Report
+            if (incorrectAnswers.length > 0) {
+                let errorHtml = "<h4>Review your incorrect answers:</h4>";
+                incorrectAnswers.forEach(item => {
+                    errorHtml += `<div class="error-item">
+                        <strong>Question:</strong> ${item.question}<br>
+                        <strong>Your answer:</strong> <span style="color:var(--incorrect-color);">${item.chosen}</span><br>
+                        <strong>Correct answer:</strong> <span style="color:var(--correct-color);">${item.correct}</span><br>
+                        <strong>Details:</strong> ${item.detailedExplanation}
+                    </div>`;
+                });
+                errorReportDiv.innerHTML = errorHtml;
+            } else {
+                errorReportDiv.innerHTML = "<h4>Great job! You are a true Vocabulary Master!</h4>";
+            }
+        }
+    </script>
 </body>
 </html>
