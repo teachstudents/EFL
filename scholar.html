@@ -120,7 +120,6 @@
             
             const { title, authors, abstract, url, csl } = paperData;
 
-            // The Cite variable is now available globally within the script's scope
             const apaCitation = new Cite(csl).format('bibliography', {
                 format: 'html',
                 template: 'apa',
@@ -346,8 +345,8 @@
         function initializeApp() {
             // Poll to check if the citation library is loaded
             if (typeof window.citation_js !== 'undefined') {
-                // Library is loaded, assign it and set up the app
-                Cite = window.citation_js;
+                // Library is loaded, assign its Cite constructor and set up the app
+                Cite = window.citation_js.Cite;
 
                 resultsArea.addEventListener('click', function(event) {
                     if (event.target.classList.contains('copy-btn')) {
