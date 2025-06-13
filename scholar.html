@@ -2,219 +2,198 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Tri-Finder: arXiv • Crossref • OpenAlex</title>
-<script src="https://cdn.jsdelivr.net/npm/citation-js/build/citation.js"></script>
+<title>Tri-Finder 2.0 · arXiv × Crossref × OpenAlex</title>
 <style>
-  /* --- aesthetics --------------------------------------------------------- */
-  :root { 
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; 
-    color-scheme: light dark; 
-    --clr-arxiv: #d73c3c;
-    --clr-crossref: #5c76f3;
-    --clr-openalex: #38a169;
-    --clr-border: #e2e8f0;
-  }
-  body    { margin: 2rem auto; max-width: 1200px; line-height: 1.5; padding: 0 1rem; }
-  h1      { text-align: center; margin-bottom: 1.2rem; font-size: 2.5rem; letter-spacing: -0.05em; }
-  #q      { width: 100%; padding: .8rem 1rem; font-size: 1.1rem; box-sizing: border-box; border-radius: 8px; border: 1px solid var(--clr-border); }
-  button { padding: .8rem 1.2rem; margin-top: .8rem; font-size: 1.1rem; cursor: pointer; border-radius: 8px; border: none; background-color: #3b82f6; color: white; font-weight: 500;}
-  #results-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2.5rem; }
-  .src    { border: 1px solid var(--clr-border); border-radius: 12px; padding: 1.5rem; background-color: var(--bg-color, #fff); }
-  .src h2 { margin-top: 0; border-bottom: 2px solid var(--clr); padding-bottom: 0.5rem; }
-  .item   { margin: .5rem 0; padding: .5rem .8rem; border-left: 4px solid var(--clr); background-color: #f8fafc; border-radius: 4px;}
-  .item a { text-decoration: none; color: inherit; font-weight: 500; }
-  .item a:hover { text-decoration: underline; }
-  .src[data-src="arXiv"]    { --clr: var(--clr-arxiv); --bg-color: #fff5f5; }
-  .src[data-src="Crossref"] { --clr: var(--clr-crossref); --bg-color: #f7f9ff; }
-  .src[data-src="OpenAlex"] { --clr: var(--clr-openalex); --bg-color: #f3faf7; }
-  .spinner { display:inline-block; width:1rem; height:1rem; border:3px solid currentColor;
-            border-right-color:transparent; border-radius:50%; animation:spin 1s linear infinite; }
-  #references-section { margin-top: 3rem; border-top: 1px solid var(--clr-border); padding-top: 2rem; }
-  #references-section h2 { font-size: 1.8rem; }
-  #references-list .csl-entry { padding-left: 2em; text-indent: -2em; line-height: 1.6; margin-bottom: 1em; }
-  @media (prefers-color-scheme: dark) {
+/* ------------ layout & typography ------------------------------------ */
+:root {
+  font-family: system-ui, sans-serif;
+  color-scheme: light dark;
+  --clr-arxiv:     #e4572e;
+  --clr-crossref:  #4f6df5;
+  --clr-openalex:  #2faa5a;
+  --gap: 1rem;
+}
+body      { margin: 2rem auto; max-width: 950px; line-height: 1.55; padding: 0 1rem; }
+h1        { text-align: center; margin-bottom: 1.2rem; }
+#bar      { display: flex; gap: var(--gap); flex-wrap: wrap; align-items: center; }
+#q        { flex: 1 1 300px; padding: .6rem .8rem; font-size: 1.1rem; box-sizing: border-box; }
+#nLabel   { white-space: nowrap; }
+button,
+input[type=range]{ cursor: pointer; }
+section   { margin-top: 2rem; }
+.src      { margin-bottom: 2rem; }
+.src h2   { margin-bottom: .6rem; }
+.item     { margin: .35rem 0; padding: .35rem .6rem; border-left: 4px solid var(--clr,#999); }
+.item a   { font-weight: 600; text-decoration: none; color: inherit; }
+.item a:hover { text-decoration: underline; }
+.meta     { font-size: .9em; opacity: .75; }
+.spinner  { display:inline-block; width:1rem; height:1rem;
+            border:3px solid currentColor; border-right-color:transparent;
+            border-radius:50%; animation:spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.hist-tag { display: inline-block; background:#7773; padding:.25rem .55rem; border-radius:.4rem;
+            margin: .2rem .3rem; cursor:pointer; font-size:.85em; }
+#history  { margin-top: 1.5rem; }
+#foot     { margin-top:4rem; font-size: .75rem; text-align:center; opacity:.7; }
+
+@media (prefers-color-scheme: dark) {
     body { background-color: #1a1a1a; color: #f0f0f0; }
-    #q { background-color: #2a2a2a; border-color: #444; }
-    .src { background-color: #252525; border-color: #444; }
-    .item { background-color: #333; }
-    #references-section { border-top-color: #444; }
-  }
-  @keyframes spin{to{transform:rotate(360deg)}}
+    #q, button, input { background-color: #2a2a2a; border-color: #444; color: #f0f0f0; }
+    .hist-tag { background: #555; }
+}
 </style>
 </head>
 <body>
-<h1>Education &amp; Beyond: Quick Scholar Search</h1>
+<h1>Tri-Finder 2.0 — Rapid Scholarly Search</h1>
 
-<input id="q" placeholder="Try: project-based learning" autofocus />
-<button id="go">Search</button>
+<div id="bar">
+  <input id="q" placeholder="Search term…" autofocus />
+  <label id="nLabel">Hits per API (<span id="nShow">10</span>)
+    <input id="n" type="range" min="5" max="30" step="5" value="10">
+  </label>
+  <button id="go">Search</button>
+</div>
 
-<section id="results-container"></section>
-<section id="references-section">
-  <h2>Consolidated References (APA 7)</h2>
-  <div id="references-list">
-      <p>Your alphabetized reference list will appear here after a search.</p>
-  </div>
-</section>
+<div id="history"></div>
+<section id="results"></section>
+<footer id="foot">All client-side · no keys required · built with ♥ and fetch()</footer>
 
 <script>
-    // This function holds the entire application logic.
-    function mainApp() {
-        /* --------------------------- helpers ---------------------------------- */
-        const $ = (sel, el = document) => el.querySelector(sel);
-        const create = (tag, props = {}) => Object.assign(document.createElement(tag), props);
-        const Cite = window.citation_js.Cite;
+document.addEventListener('DOMContentLoaded', () => {
+    /* ---------- tiny helpers --------------------------------------------- */
+    const $   = (sel, el=document) => el.querySelector(sel);
+    const $$  = (sel, el=document) => [...el.querySelectorAll(sel)];
+    const tag = (k, o={}) => Object.assign(document.createElement(k), o);
 
-        /* --------------------- endpoint-specific fetchers ---------------------- */
-        async function fetchArxiv(term, max = 5) {
-          const url = `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(term)}&max_results=${max}`;
-          const txt = await (await fetch(url)).text();
-          const xml = new DOMParser().parseFromString(txt, "application/xml");
-          return [...xml.getElementsByTagName("entry")].map(e => {
-            const authors = [...e.querySelectorAll("author > name")].map(a => a.textContent);
-            return {
-              title:  e.querySelector("title")?.textContent.trim().replace(/\s+/g, ' '),
-              link:   e.querySelector("id")?.textContent.trim(),
-              csl: {
-                type: 'article',
-                title: e.querySelector("title")?.textContent.trim(),
-                author: authors.map(name => ({ literal: name })),
-                issued: { 'date-parts': [[new Date(e.querySelector('published').textContent).getFullYear()]] },
-                URL: e.querySelector("id")?.textContent.trim(),
-                'container-title': 'arXiv'
-              }
-            };
-          });
-        }
-
-        async function fetchCrossref(term, rows = 5) {
-          const url = `https://api.crossref.org/works?query=${encodeURIComponent(term)}&rows=${rows}&mailto=sample@email.com`;
-          const js  = await (await fetch(url)).json();
-          return js.message.items.map(it => ({
-              title: it.title?.[0],
-              link:  it.URL,
-              csl: {
-                type: 'article-journal',
-                title: it.title?.[0],
-                author: it.author || [],
-                issued: it.issued ? { 'date-parts': [it.issued['date-parts'][0]] } : null,
-                'container-title': it['container-title']?.[0],
-                URL: it.URL,
-                DOI: it.DOI
-              }
-          }));
-        }
-
-        async function fetchOpenAlex(term, rows = 5) {
-          const url = `https://api.openalex.org/works?search=${encodeURIComponent(term)}&per_page=${rows}`;
-          const js  = await (await fetch(url)).json();
-          return js.results.map(it => ({
-              title: it.display_name,
-              link:  it.doi ? `https://doi.org/${it.doi.replace('https://doi.org/', '')}` : it.id,
-              csl: {
-                type: 'article-journal',
-                title: it.display_name,
-                author: it.authorships.map(a => ({
-                    family: a.author.display_name.split(' ').pop(),
-                    given: a.author.display_name.split(' ').slice(0, -1).join(' ')
-                })),
-                issued: { 'date-parts': [[it.publication_year]] },
-                'container-title': it.host_venue?.display_name,
-                URL: it.doi ? `https://doi.org/${it.doi.replace('https://doi.org/', '')}` : it.id,
-                DOI: it.doi?.replace('https://doi.org/', '')
-              }
-          }));
-        }
-
-        /* ------------------------------- UI ----------------------------------- */
-        async function runSearch() {
-          const term = $("#q").value.trim();
-          if (!term) return;
-          const resContainer = $("#results-container");
-          const refsList = $("#references-list");
-          resContainer.innerHTML = "";
-          refsList.innerHTML = "";
-
-          const makePanel = (name) => {
-            const wrap = create("div", { className:"src", "data-src":name });
-            wrap.appendChild(create("h2", { textContent: name }));
-            wrap.appendChild(create("span", { className:"spinner" }));
-            resContainer.appendChild(wrap);
-            return wrap;
-          };
-
-          const panels = {
-            arXiv:     makePanel("arXiv"),
-            Crossref:  makePanel("Crossref"),
-            OpenAlex:  makePanel("OpenAlex")
-          };
-          
-          let allCslData = [];
-
-          // perform all three queries in parallel
-          const [a,c,o] = await Promise.allSettled([
-              fetchArxiv(term), fetchCrossref(term), fetchOpenAlex(term)
-          ]);
-
-          const fill = (panel, result) => {
-            panel.querySelector(".spinner")?.remove();
-            if (!result.length) {
-              panel.appendChild(create("p", { textContent:"— no hits —" }));
-              return;
-            }
-            result.forEach(d => {
-              panel.appendChild(
-                create("div", {className:"item"}).appendChild(
-                  create("a",{href:d.link,target:"_blank",rel:"noopener noreferrer",textContent:d.title || "(untitled)"})
-                )
-              );
-              if (d.csl) allCslData.push(d.csl);
-            });
-          };
-
-          if (a.status==="fulfilled") fill(panels.arXiv, a.value);
-          else { console.error("arXiv Error:", a.reason); panels.arXiv.innerHTML = "<h2>arXiv</h2><p>Error loading results.</p>"; }
-
-          if (c.status==="fulfilled") fill(panels.Crossref, c.value);
-          else { console.error("Crossref Error:", c.reason); panels.Crossref.innerHTML = "<h2>Crossref</h2><p>Error loading results.</p>"; }
-
-          if (o.status==="fulfilled") fill(panels.OpenAlex, o.value);
-          else { console.error("OpenAlex Error:", o.reason); panels.OpenAlex.innerHTML = "<h2>OpenAlex</h2><p>Error loading results.</p>"; }
-          
-          // Generate and display consolidated references
-          if (allCslData.length > 0) {
-              try {
-                  const bibliography = new Cite(allCslData).sort().format('bibliography', {
-                      format: 'html',
-                      template: 'apa',
-                      lang: 'en-US'
-                  });
-                  refsList.innerHTML = bibliography;
-              } catch (e) {
-                  console.error("Citation generation error:", e);
-                  refsList.innerHTML = "<p>Could not generate references.</p>";
-              }
-          } else {
-              refsList.innerHTML = "<p>No citable results found.</p>";
-          }
-        }
-
-        /* --- wire up --- */
-        $("#go").addEventListener("click", runSearch);
-        $("#q").addEventListener("keydown", e => { if (e.key==="Enter") runSearch(); });
+    /* ---------- search history (localStorage) ----------------------------- */
+    const HKEY = 'trifinder_history';
+    function saveHist(term){
+      let h = JSON.parse(localStorage.getItem(HKEY)||'[]');
+      h = [term, ...h.filter(x=>x!==term)].slice(0,8);
+      localStorage.setItem(HKEY, JSON.stringify(h));
+      renderHist();
+    }
+    function renderHist(){
+      const box = $('#history'); box.innerHTML='';
+      JSON.parse(localStorage.getItem(HKEY)||'[]')
+        .forEach(t => box.appendChild(
+          tag('span',{className:'hist-tag',textContent:t,onclick:()=>{ $('#q').value=t; runSearch(); }})));
     }
     
-    // Poll for the citation-js library to be loaded before starting the app.
-    function initializeApp() {
-        if (window.citation_js) {
-            mainApp();
-        } else {
-            setTimeout(initializeApp, 100);
-        }
+    /* ---------- API fetchers ---------------------------------------------- */
+    async function fetchArxiv(term, start=0, rows=10){
+      const url = `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(term)}&start=${start}&max_results=${rows}`;
+      const xml = new DOMParser().parseFromString(await (await fetch(url)).text(), 'application/xml');
+      return [...xml.getElementsByTagName('entry')].map(e=>({
+          title: e.querySelector('title')?.textContent.trim(),
+          link : e.querySelector('id')?.textContent.trim(),
+          year : e.querySelector('published')?.textContent.slice(0,4),
+          authors:[...e.getElementsByTagName('author')].map(a=>a.textContent.trim()).slice(0,3).join(', ')
+      }));
     }
-    
-    // Start the initialization process once the initial DOM is ready.
-    document.addEventListener('DOMContentLoaded', initializeApp);
+    async function fetchCrossref(term, offset=0, rows=10){
+      const url = `https://api.crossref.org/works?query=${encodeURIComponent(term)}&rows=${rows}&offset=${offset}&mailto=sample@email.com`;
+      const js  = await (await fetch(url)).json();
+      return js.message.items.map(it=>({
+          title: it.title?.[0],
+          link : it.URL,
+          year : it['published-print']?.['date-parts']?.[0]?.[0] ||
+                 it['published-online']?.['date-parts']?.[0]?.[0] || '—',
+          authors: (it.author||[]).slice(0,3).map(a=>a.family).join(', ')
+      }));
+    }
+    async function fetchOpenAlex(term, page=1, rows=10){
+      const url = `https://api.openalex.org/works?search=${encodeURIComponent(term)}&per_page=${rows}&page=${page}`;
+      const js  = await (await fetch(url)).json();
+      return js.results.map(it=>({
+          title: it.display_name,
+          link : it.doi ? `https://doi.org/${it.doi.replace('https://doi.org/','')}` : it.id,
+          year : it.publication_year,
+          authors: (it.authorships||[]).slice(0,3).map(a=>a.author.display_name).join(', ')
+      }));
+    }
 
+    /* ---------- UI glue ---------------------------------------------------- */
+    function spinner(){ return tag('span',{className:'spinner'}); }
+
+    function makePanel(name,color){
+      const wrap = tag('div',{className:'src','data-src':name});
+      wrap.style.setProperty('--clr',color);
+      wrap.appendChild(tag('h2',{textContent:name}));
+      wrap.appendChild(spinner());
+      $('#results').appendChild(wrap);
+      return wrap;
+    }
+
+    async function runSearch(loadMore=false){
+      const term = $('#q').value.trim();
+      const hits = +$('#n').value;
+      if(!term) return;
+      
+      const resultsEl = $('#results');
+      if(!loadMore){
+        resultsEl.innerHTML='';
+        pageState = {arxiv:0, crossref:0, openalex:0, term, hits};
+        saveHist(term);
+      }
+      const {arxiv,crossref,openalex} = pageState;
+
+      const pArxiv    = fetchArxiv(term, arxiv, hits);
+      const pCross    = fetchCrossref(term, crossref, hits);
+      const pOpen     = fetchOpenAlex(term, openalex/hits+1, hits);
+
+      const panA = loadMore ? $('.src[data-src="arXiv"]') : makePanel('arXiv',    'var(--clr-arxiv)');
+      const panC = loadMore ? $('.src[data-src="Crossref"]') : makePanel('Crossref',  'var(--clr-crossref)');
+      const panO = loadMore ? $('.src[data-src="OpenAlex"]') : makePanel('OpenAlex',  'var(--clr-openalex)');
+      
+      if (loadMore) {
+        if(panA) panA.appendChild(spinner());
+        if(panC) panC.appendChild(spinner());
+        if(panO) panO.appendChild(spinner());
+      }
+
+      const [ra,rc,ro]=await Promise.allSettled([pArxiv,pCross,pOpen]);
+
+      const fill=(panel,data)=>{
+        if(!panel) return;
+        panel.querySelector('.spinner')?.remove();
+        if(!data.length){panel.appendChild(tag('p',{textContent:'— no more hits —'}));return;}
+        data.forEach(d=>{
+          const div=tag('div',{className:'item'});
+          div.innerHTML=`<a href="${d.link}" target="_blank" rel="noopener noreferrer">${d.title||'(untitled)'}</a>
+                           <div class="meta">${d.authors||''} ${d.year?`· ${d.year}`:''}</div>`;
+          panel.appendChild(div);
+        });
+      };
+      
+      if(ra.status==='fulfilled'){ fill(panA, ra.value); pageState.arxiv    += ra.value.length; }
+      else { if(panA) { panA.querySelector('.spinner')?.remove(); panA.innerHTML+='<p>Error loading.</p>'; } console.error(ra.reason); }
+      if(rc.status==='fulfilled'){ fill(panC, rc.value); pageState.crossref += rc.value.length; }
+      else { if(panC) { panC.querySelector('.spinner')?.remove(); panC.innerHTML+='<p>Error loading.</p>'; } console.error(rc.reason); }
+      if(ro.status==='fulfilled'){ fill(panO, ro.value); pageState.openalex += ro.value.length; }
+      else { if(panO) { panO.querySelector('.spinner')?.remove(); panO.innerHTML+='<p>Error loading.</p>'; } console.error(ro.reason); }
+
+      // load-more button
+      let more=$('#more');
+      if(!more){
+          more=tag('button',{id:'more',textContent:'Load more',style:'display:block; margin: 2rem auto;', onclick:()=>runSearch(true)});
+          $('body').appendChild(more);
+      }
+      const hasResults = pageState.arxiv + pageState.crossref + pageState.openalex > 0;
+      more.style.display = hasResults ? 'block' : 'none';
+    }
+
+    /* ---------- state object for pagination ------------------------------- */
+    let pageState = {arxiv:0,crossref:0,openalex:0,term:'',hits:10};
+
+    /* ---------- wire events ----------------------------------------------- */
+    $('#go').addEventListener("click", () => runSearch(false));
+    $('#q').addEventListener("keydown", e => { if(e.key==='Enter') runSearch(false); });
+    $('#n').addEventListener("input", e => $('#nShow').textContent=e.target.value);
+    
+    // Initial render of history
+    renderHist();
+});
 </script>
 </body>
 </html>
