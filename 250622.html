@@ -1,1 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Root Stand Challenge</title>
+    
+    <style>
+        /* --- CSS STYLES --- */
+        /* Basic body and font styling */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f8ff;
+            color: #333;
+            margin: 0;
+        }
 
+        #game-container {
+            width: 800px;
+            height: 600px;
+            border: 2px solid #005a9c;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Heads-Up Display for Timer and Score */
+        #hud {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            background-color: #e6f7ff;
+            border-bottom: 2px solid #005a9c;
+        }
+
+        /* Screen Management */
+        .screen {
+            position: absolute;
+            width: 100%;
+            height: calc(100% - 52px); /* Adjust for HUD */
+            top: 52px;
+            left: 0;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .screen.active {
+            display: flex; /* Show the active screen */
+        }
+
+        /* Sorting Game Styles */
+        .drop-zones {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .zone {
+            width: 45%;
+            height: 150px;
+            border: 3px dashed #ccc;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        #family-zone { background-color: #e8f5e9; }
+        #imposter-zone { background-color: #ffebee; }
+
+        #word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            height: 150px;
+        }
+
+        .word {
+            background-color: #007acc;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: grab;
+            font-size: 1.3em;
+            margin: 10px;
+            user-select: none;
+        }
+
+        /* Buttons and other elements */
+        button {
+            background-color: #007acc;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #005a9c;
+        }
+        
+        .root-display { font-size: 2em; font-weight: bold; color: #005a9c; }
+        .root-meaning { font-size: 1.2em; }
+        #error-list { list-style-type: none; padding: 0; }
+        #error-list li { background-color: #fff3e0; padding: 5px; margin: 5px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="hud">
+            <div id="timer">Time: 10:00</div>
+            <div id="score">Score: 0</div>
+        </div>
+
+        <div id="start-screen" class="screen active">
+            <h1>Root Stand</h1>
+            <p>The Word Detective Game</p>
+            <button onclick="startGame()">Start Game</button>
+        </div>
+
+        <div id="intro-screen" class="screen">
+            <h2>Meet the Root!</h2>
+            <p class="root-display">stare / sistere / statum</p>
+            <p class="root-meaning">Core Meaning: "to stand, to place, to be firm"</p>
+            <p>Get ready to sort the words!</p>
+        </div>
+
+        <div id="sorting-screen" class="screen">
+            <div class="drop-zones">
+                <div id="family-zone" class="zone">🌳 Belongs to the "STAND" Family</div>
+                <div id="imposter-zone" class="zone">❌ Imposter Word</div>
+            </div>
+            <div id="word-bank">
+                </div>
+        </div>
+
+        <div id="end-screen" class="screen">
+            <h1>Game Over!</h1>
+            <h2 id="final-score">Your Score: 0</h2>
+            <h3>Words to Review:</h3>
+            <ul id="error-list"></ul>
+            <button onclick="startGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // --- JAVASCRIPT ENGINE ---
+        
+        // --- GAME DATA ---
+        const wordData = [
+            // Words belonging to the "STAND" family
+            { word: 'obstacle', family: 'stand' },
+            { word: 'consistently', family: 'stand' },
+            { word: 'resistance', family: 'stand' },
+            { word: 'stability', family: 'stand' },
+            { word: 'persistent', family: 'stand' },
+            { word: 'stance', family: 'stand' },
+            // Imposter words (do not belong to the family)
+            { word: 'banana', family: 'imposter' },
+            { word: 'create', family: 'imposter' },
+            { word: 'ocean', family: 'imposter' },
+            { word: 'computer', family: 'imposter' },
+            { word: 'music', family: 'imposter' },
+            { word: 'happy', family: 'imposter' }
+        ];
+
+        // --- GAME STATE VARIABLES ---
+        let score = 0;
+        let gameTimer;
+        let timeLeft = 600; // 10 minutes in seconds
+        let errors = [];
+
+        // --- DOM ELEMENTS ---
+        const screens = document.querySelectorAll('.screen');
+        const timerDisplay = document.getElementById('timer');
+        const scoreDisplay = document.getElementById('score');
+        const wordBank = document.getElementById('word-bank');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const errorList = document.getElementById('error-list');
+
+        /**
+         * Main function to start the game
+         */
+        function startGame() {
+            score = 0;
+            timeLeft = 600;
+            errors = [];
+            updateHUD();
+            
+            showScreen('intro-screen');
+
+            setTimeout(() => {
+                startSortingRound();
+                startTimer();
+            }, 4000); 
+        }
+
+        /**
+         * Manages the main game timer
+         */
+        function startTimer() {
+            clearInterval(gameTimer); 
+            gameTimer = setInterval(() => {
+                timeLeft--;
+                updateHUD();
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        /**
+         * Updates the score and timer display
+         */
+        function updateHUD() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            scoreDisplay.textContent = `Score: ${score}`;
+        }
+
+        /**
+         * Sets up and shows the sorting challenge
+         */
+        function startSortingRound() {
+            showScreen('sorting-screen');
+            wordBank.innerHTML = ''; // Clear the word bank
+            
+            // For this prototype, we'll just show one word.
+            // A full implementation would shuffle and present words one by one.
+            const wordDiv = document.createElement('div');
+            wordDiv.textContent = 'obstacle';
+            wordDiv.className = 'word';
+            wordBank.appendChild(wordDiv);
+            
+            console.log("Sorting round begins! A full game would implement drag-and-drop here.");
+        }
+        
+        /**
+         * Placeholder for checking answers. This would be connected to drag-and-drop events.
+         */
+        function checkAnswer(word, droppedZone) {
+            // This is where the complex drag-and-drop logic would go.
+            // It would find the word in wordData, check its family,
+            // and compare it to the droppedZone.
+            console.log(`Checking answer for ${word} in ${droppedZone}`);
+        }
+
+        /**
+         * Ends the game and shows the final score
+         */
+        function endGame() {
+            clearInterval(gameTimer);
+            showScreen('end-screen');
+            finalScoreDisplay.textContent = `Your Score: ${score}`;
+            
+            errorList.innerHTML = ''; // Clear previous errors
+            
+            // For demonstration, let's pretend there was an error
+            if (errors.length === 0) errors.push('Example Error Word'); 
+            
+            errors.forEach(word => {
+                const li = document.createElement('li');
+                li.textContent = word;
+                errorList.appendChild(li);
+            });
+            console.log("Game Over!");
+        }
+
+        /**
+         * Helper function to switch between game screens
+         */
+        function showScreen(screenId) {
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+                if (screen.id === screenId) {
+                    screen.classList.add('active');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
