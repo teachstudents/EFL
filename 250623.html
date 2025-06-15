@@ -6,18 +6,18 @@
     <title>Parts of Speech Sort - Rebuilt</title>
     
     <style>
-        /* --- CSS STYLES (New "Synthwave" Theme) --- */
+        /* --- CSS STYLES (New "Royal" Theme) --- */
         :root {
-            --bg-main: #23212c;
-            --bg-container: #2c2a3b;
-            --primary-color: #ff79c6; /* Pink */
-            --primary-dark: #e06ab0;
-            --text-light: #f8f8f2;
-            --text-dark: #6272a4;
-            --border-color: #44475a;
-            --correct-color: #50fa7b;  /* Bright Green */
-            --incorrect-color: #ff5555; /* Bright Red */
-            --gold-color: #f1fa8c;     /* Bright Yellow */
+            --bg-main: #0d2148;        /* Deep Navy */
+            --bg-container: #1b3a6b;   /* Royal Blue */
+            --primary-color: #e3d095;  /* Gold */
+            --primary-dark: #c1b07e;
+            --text-light: #f0f2f5;     /* Ivory White */
+            --text-dark: #a0aec0;
+            --border-color: #334e7c;
+            --correct-color: #50fa7b;
+            --incorrect-color: #ff5555;
+            --gold-color: #e3d095;
             --accent-cyan: #8be9fd;
         }
 
@@ -89,7 +89,7 @@
         .zone.drag-over { border-color: var(--primary-color); color: var(--text-light); transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         
         button {
-            background-color: var(--primary-color); color: #23212c; border: none;
+            background-color: var(--primary-color); color: var(--bg-main); border: none;
             padding: 1em 2em; font-size: 1.1em; border-radius: 8px; font-weight: bold;
             cursor: pointer; transition: all 0.2s ease; margin: 5px;
         }
@@ -118,7 +118,7 @@
             border: 2px solid var(--border-color); border-radius: 10px; padding: 15px; opacity: 0.5;
             background-color: var(--bg-main);
         }
-        .reward-card.unlocked { opacity: 1; border-color: var(--gold-color); background-color: #44475a; }
+        .reward-card.unlocked { opacity: 1; border-color: var(--gold-color); background-color: #334e7c; }
         .reward-card h3 { margin: 0 0 5px 0; font-size: 1.1em; color: var(--gold-color) }
         .reward-card p { margin: 0; font-size: 0.9em; }
 
@@ -177,10 +177,8 @@
     <div id="achievement-toast"></div>
     
     <script>
-    // --- ROBUST JAVASCRIPT ENGINE (FULLY REBUILT & STABLE) ---
     document.addEventListener('DOMContentLoaded', () => {
 
-        // --- DATA & CONFIGURATION ---
         const fullWordList = [
             {word:"absorb",pos:["verb"]},{word:"abstract",pos:["adjective"]},{word:"accent",pos:["noun"]},
             {word:"accidentally",pos:["adverb"]},{word:"accommodate",pos:["verb"]},{word:"accomplish",pos:["verb"]},
@@ -418,7 +416,6 @@
         ];
 
         const Game = {
-            // --- Game Data & Configuration ---
             partsOfSpeech: ["noun", "verb", "adjective", "adverb"],
             masterWordList: [],
             gameConfig: { wordsPerRound: 20, timePerRound: 240 },
@@ -429,19 +426,13 @@
                 perfectionist: { title: 'Linguistic Legend', description: 'Complete the entire game with no mistakes.', unlocked: false },
                 firstVictory: { title: 'Word Sorter', description: 'Complete the game for the first time.', unlocked: false }
             },
-
-            // --- Game State (resets every game) ---
             state: {},
-            
-            // --- DOM Element Cache ---
             dom: {},
 
-            // --- INITIALIZATION: Runs once when the page loads ---
             init() {
                 this.cacheDom();
                 this.bindEvents();
                 this.filterWordList();
-                console.log("Game Engine Initialized and Ready.");
             },
 
             cacheDom() {
@@ -477,7 +468,6 @@
                 );
             },
 
-            // --- CORE GAME FLOW ---
             startGame() {
                 this.state = {
                     score: 0,
@@ -498,14 +488,10 @@
 
             startNewRound() {
                 if (this.state.currentRound > 0 && this.state.roundErrors === 0) this.unlockAchievement('perfectRound');
-
+                
                 this.state.currentRound++;
-                if (this.state.wordIndex >= this.state.wordListWithIDs.length) {
-                    this.endGame(true);
-                    return;
-                }
-
                 this.state.roundErrors = 0;
+                
                 const roundMessage = this.state.currentRound > 1 ? `Current Score: ${this.state.score}` : 'The first round begins now!';
                 document.getElementById('round-interstitial-title').textContent = `Round ${this.state.currentRound} of ${this.state.totalRounds}`;
                 document.getElementById('round-interstitial-message').textContent = roundMessage;
@@ -518,6 +504,16 @@
                     this.presentNextWord();
                     this.showScreen('sorting-screen');
                 }, 2500);
+            },
+            
+            processNextAction() {
+                if (this.state.wordIndex >= this.state.wordListWithIDs.length) {
+                    this.endGame(true);
+                } else if (this.state.wordIndex % this.gameConfig.wordsPerRound === 0) {
+                    this.startNewRound();
+                } else {
+                    this.presentNextWord();
+                }
             },
 
             endGame(completed) {
@@ -548,18 +544,7 @@
                 this.showScreen('end-screen');
             },
             
-            // --- WORD & UI MANAGEMENT ---
             presentNextWord() {
-                if (this.state.wordIndex > 0 && (this.state.wordIndex % this.gameConfig.wordsPerRound === 0)) {
-                    this.startNewRound();
-                    return;
-                }
-                
-                if (this.state.wordIndex >= this.state.wordListWithIDs.length) {
-                    this.endGame(true);
-                    return;
-                }
-                
                 const wordObj = this.state.wordListWithIDs[this.state.wordIndex];
                 
                 const wordDiv = document.createElement('div');
@@ -572,8 +557,6 @@
                 
                 this.dom.hud.wordBank.innerHTML = '';
                 this.dom.hud.wordBank.appendChild(wordDiv);
-
-                this.state.wordIndex++;
             },
             
             createDropZones() {
@@ -604,7 +587,6 @@
                 this.dom.screens.forEach(s => s.classList.toggle('active', s.id === screenId));
             },
 
-            // --- EVENT HANDLERS ---
             handleGuess(isCorrect, wordInfo) {
                 this.dom.hud.wordBank.innerHTML = ''; 
                 const feedback = document.createElement('div');
@@ -629,7 +611,11 @@
                 }
                 this.dom.hud.wordBank.appendChild(feedback);
                 this.updateHUD();
-                setTimeout(() => this.presentNextWord(), 800); 
+                
+                // Increment word index *after* processing the guess
+                this.state.wordIndex++; 
+
+                setTimeout(() => this.processNextAction(), 800); 
             },
 
             handleDrop(e) {
@@ -645,7 +631,7 @@
 
                 if (!wordInfo) {
                     console.error("Critical Error: Dropped word not found in list:", droppedWordUniqueID);
-                    this.presentNextWord();
+                    this.processNextAction();
                     return;
                 }
 
@@ -667,7 +653,6 @@
             handleDragEnter(e) { if (e.target.classList.contains('zone')) e.target.classList.add('drag-over'); },
             handleDragLeave(e) { if (e.target.classList.contains('zone')) e.target.classList.remove('drag-over'); },
 
-            // --- ACHIEVEMENT & OTHER UTILITIES ---
             unlockAchievement(id) {
                 if (!this.state.achievements[id] || this.state.achievements[id].unlocked) return;
                 this.state.achievements[id].unlocked = true;
