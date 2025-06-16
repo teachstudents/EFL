@@ -5,31 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Earth's Wonders</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     
+    <!-- STYLES FOR BOOK PAGE -->
     <style>
-        html { scroll-behavior: smooth; }
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        .book-content { font-family: 'Lora', serif; font-size: 1.1rem; line-height: 1.8; color: #343a40; }
-        @media (min-width: 768px) { .book-content { font-size: 1.125rem; } }
-        .book-content h2 { font-family: 'Inter', sans-serif; font-size: 1.875rem; font-weight: 700; margin-top: 3rem; padding-top: 1rem; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 2px solid #60a5fa; }
-        @media (min-width: 768px) { .book-content h2 { font-size: 2.25rem; } }
-        .book-content h3 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #1e3a8a; }
-        @media (min-width: 768px) { .book-content h3 { font-size: 1.5rem; } }
-        .book-content h4 { font-family: 'Inter', sans-serif; font-weight: 600; margin-top: 2rem; margin-bottom: 1rem; color: #1f2937; }
-        .book-content p { margin-bottom: 1.5rem; }
-        .vocabulary-list li, .short-answer-list li { margin-bottom: 1rem; }
-        .question-block { margin-bottom: 2rem; border-left: 3px solid #e9ecef; padding-left: 1.5rem; }
-        .feedback { display: none; margin-top: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.375rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; }
-        .feedback.correct { background-color: #dcfce7; color: #166534; }
-        .feedback.incorrect { background-color: #fee2e2; color: #991b1b; }
-        .tf-button, .mcq-option { padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background-color: white; cursor: pointer; transition: all 0.2s ease-in-out; font-family: 'Inter', sans-serif; text-align: left; margin-bottom: 0.5rem; width: 100%; }
-        .tf-button:hover, .mcq-option:hover { background-color: #f9fafb; border-color: #60a5fa; }
-        .tf-button.correct-answer, .mcq-option.correct-answer { background-color: #22c55e; color: white; border-color: #16a34a; }
-        .mcq-option.incorrect, .tf-button.incorrect { background-color: #ef4444; color: white; border-color: #b91c1c; }
+        html { 
+            scroll-behavior: smooth; 
+        }
+        body {
+            font-family: Tahoma, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .book-content {
+             font-size: 1.1rem; 
+             line-height: 1.8;
+             color: #333;
+        }
+        @media (min-width: 768px) {
+            .book-content {
+                font-size: 1.125rem;
+            }
+        }
+        .book-content h2 {
+            font-size: 1.875rem; 
+            font-weight: bold;
+            margin-top: 3rem;
+            padding-top: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #60a5fa;
+            color: #111827;
+        }
+        @media (min-width: 768px) {
+            .book-content h2 {
+                font-size: 2.25rem;
+            }
+        }
+        .book-content h3 {
+             font-size: 1.25rem;
+             font-weight: bold;
+             margin-top: 2.5rem;
+             margin-bottom: 1rem;
+             color: #1e3a8a;
+        }
+        @media (min-width: 768px) {
+             .book-content h3 {
+                font-size: 1.5rem;
+             }
+        }
+        .book-content p {
+            margin-bottom: 1.5rem;
+        }
+        .vocabulary-list li, .short-answer-list li {
+            margin-bottom: 1rem;
+        }
+        .question-block {
+            margin-bottom: 2rem;
+            border-left: 3px solid #e9ecef;
+            padding-left: 1.5rem;
+        }
+        .feedback {
+            display: none;
+            margin-top: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.9rem;
+        }
+        .feedback.correct {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .feedback.incorrect {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .tf-button, .mcq-option {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            text-align: left;
+            margin-bottom: 0.5rem;
+            width: 100%;
+        }
+        .tf-button:hover, .mcq-option:hover {
+            background-color: #f9fafb;
+            border-color: #60a5fa;
+        }
+        .tf-button.correct-answer, .mcq-option.correct-answer {
+            background-color: #22c55e;
+            color: white;
+            border-color: #16a34a;
+        }
+        .mcq-option.incorrect, .tf-button.incorrect {
+            background-color: #ef4444;
+            color: white;
+            border-color: #b91c1c;
+        }
+    </style>
+    <!-- STYLES FOR CHATBOT -->
+    <style>
         .chat-container::-webkit-scrollbar { width: 6px; }
         .message-bubble { max-width: 80%; word-wrap: break-word; }
         .message-bubble ul { padding-left: 20px; list-style: disc; margin-top: 8px; margin-bottom: 8px; }
@@ -41,7 +117,7 @@
 
     <div class="container mx-auto p-4 md:p-8 max-w-4xl">
         <header class="mb-12 text-center">
-            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-2" style="font-family: 'Inter', sans-serif;">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-2">
                 Earth’s Wonders
             </h1>
             <p class="text-lg sm:text-xl text-gray-600">
@@ -71,12 +147,9 @@
             </section>
             
             <!-- All 10 chapters with their full content are here -->
+            
             <section id="chapter-1">
-                 <h2>The Grand Canyon, USA</h2>
-                <p>Carved by the relentless power of the Colorado River over an estimated five to six million years, the Grand Canyon is a colossal testament to the forces of erosion. Its layered bands of colorful rock reveal an incredible cross-section of Earth’s history. For instance, the Vishnu Schist at the bottom is approximately 1.8 billion years old. The canyon stretches for 277 miles (446 km), reaches a width of up to 18 miles (29 km), and plunges to depths of over a mile (1.6 km), creating a truly immense landscape.</p>
-                <p>Despite its arid appearance, the Grand Canyon supports a surprisingly diverse range of life. Its significant elevation changes create various microclimates, which in turn allow for a wide variety of flora and fauna. These range from cacti and desert-adapted mammals on the scorching canyon floor to dense evergreen forests on the cooler rims. The canyon is home to numerous species, including the critically endangered California condor, which was reintroduced and is now a celebrated conservation success story. Another notable inhabitant is the Grand Canyon pink rattlesnake, a creature found nowhere else on Earth.</p>
-                <p>The Grand Canyon holds deep spiritual significance for at least 11 Native American tribes, including the Hualapai, Havasupai, and Navajo, who consider it a sacred place of origin and healing. Historically, the first Europeans to see the canyon were Spanish explorers in 1540, led by García López de Cárdenas, though their descriptions failed to capture its scale.</p>
-                <p>Designated a national park in 1919 and a UNESCO World Heritage site in 1979, the Grand Canyon is, in theory, well-protected. Nevertheless, it faces considerable environmental threats. Water diversion from the Colorado River for agriculture and urban centers has dramatically altered the river’s flow and sediment load, impacting the delicate riparian ecosystems. Furthermore, uranium mining on adjacent lands poses a contamination risk, while the constant pressure from millions of tourists annually presents ongoing management challenges.</p>
+                <h2>The Grand Canyon, USA</h2>
                 <h3>Vocabulary</h3>
                 <ol class="vocabulary-list list-decimal pl-5">
                     <li><strong>erosion /ɪˈroʊʒən/</strong>: Coastal erosion threatens many seaside homes as the cliffs are slowly worn away by the waves.</li>
@@ -100,16 +173,17 @@
                     <li><strong>National Park /ˈnæʃənəl pɑrk/</strong>: We spent our vacation hiking and camping in Yellowstone National Park.</li>
                     <li><strong>considerable /kənˈsɪdərəbəl/</strong>: She has invested a considerable amount of time and effort into her new business.</li>
                 </ol>
+                <h3>Reading Passage</h3>
+                <p>Carved by the relentless power of the Colorado River over an estimated five to six million years, the Grand Canyon is a colossal testament to the forces of erosion. Its layered bands of colorful rock reveal an incredible cross-section of Earth’s history. For instance, the Vishnu Schist at the bottom is approximately 1.8 billion years old. The canyon stretches for 277 miles (446 km), reaches a width of up to 18 miles (29 km), and plunges to depths of over a mile (1.6 km), creating a truly immense landscape.</p>
+                <p>Despite its arid appearance, the Grand Canyon supports a surprisingly diverse range of life. Its significant elevation changes create various microclimates, which in turn allow for a wide variety of flora and fauna. These range from cacti and desert-adapted mammals on the scorching canyon floor to dense evergreen forests on the cooler rims. The canyon is home to numerous species, including the critically endangered California condor, which was reintroduced and is now a celebrated conservation success story. Another notable inhabitant is the Grand Canyon pink rattlesnake, a creature found nowhere else on Earth.</p>
+                <p>The Grand Canyon holds deep spiritual significance for at least 11 Native American tribes, including the Hualapai, Havasupai, and Navajo, who consider it a sacred place of origin and healing. Historically, the first Europeans to see the canyon were Spanish explorers in 1540, led by García López de Cárdenas, though their descriptions failed to capture its scale.</p>
+                <p>Designated a national park in 1919 and a UNESCO World Heritage site in 1979, the Grand Canyon is, in theory, well-protected. Nevertheless, it faces considerable environmental threats. Water diversion from the Colorado River for agriculture and urban centers has dramatically altered the river’s flow and sediment load, impacting the delicate riparian ecosystems. Furthermore, uranium mining on adjacent lands poses a contamination risk, while the constant pressure from millions of tourists annually presents ongoing management challenges.</p>
                 <h3>Comprehension Questions</h3>
-                <!-- Full Chapter 1 questions are here -->
+                <!-- Chapter 1 Questions -->
             </section>
             
             <section id="chapter-2">
                  <h2>The Great Barrier Reef, Australia</h2>
-                <p>The Great Barrier Reef is the largest coral reef system on the planet, an enormous structure stretching for over 1,400 miles (2,300 km) off the coast of Queensland. Composed of over 2,900 individual reefs and 900 islands, this vibrant underwater metropolis is so vast it is clearly visible from space. Fundamentally, it is built by billions of tiny organisms known as coral polyps.</p>
-                <p>The reef is a global hotspot of marine biodiversity, providing a home to a dazzling array of life. It supports over 1,500 species of fish, 400 types of coral, 4,000 species of mollusks, and is a critical habitat for larger animals like sea turtles, dugongs (sea cows), and various species of dolphins and whales. This intricate coral architecture provides essential shelter and vital breeding grounds for countless marine creatures.</p>
-                <p>For over 60,000 years, the Great Barrier Reef has been an integral part of the cultural and spiritual identity of Aboriginal and Torres Strait Islander peoples. Their traditional knowledge of the reef is now being incorporated into modern conservation strategies. Historically, Captain James Cook ran aground on the reef in 1770, which led to the first detailed European charting of this massive natural wonder.</p>
-                <p>Today, the reef faces an existential threat. The most significant danger is climate change; rising ocean temperatures cause mass coral bleaching, a phenomenon where the coral expels its symbiotic algae and turns white, often leading to death. Additionally, agricultural runoff carrying pesticides and sediment pollutes the water, while outbreaks of the predatory crown-of-thorns starfish can devastate entire sections of the reef. Urgent and substantial global action on climate change is paramount for its survival.</p>
                 <h3>Vocabulary</h3>
                 <ol class="vocabulary-list list-decimal pl-5">
                      <li><strong>coral reef /ˈkɔrəl rif/</strong>: A healthy coral reef is a bustling community, teeming with thousands of different organisms.</li>
@@ -133,16 +207,17 @@
                     <li><strong>UNESCO /juˈnɛskoʊ/</strong>:The historic center of the city is protected as a UNESCO World Heritage site.</li>
                     <li><strong>peril /ˈpɛrəl/</strong>: The sailors knew they were in great peril as the storm approached.</li>
                 </ol>
+                <h3>Reading Passage</h3>
+                <p>The Great Barrier Reef is the largest coral reef system on the planet, an enormous structure stretching for over 1,400 miles (2,300 km) off the coast of Queensland. Composed of over 2,900 individual reefs and 900 islands, this vibrant underwater metropolis is so vast it is clearly visible from space. Fundamentally, it is built by billions of tiny organisms known as coral polyps.</p>
+                <p>The reef is a global hotspot of marine biodiversity, providing a home to a dazzling array of life. It supports over 1,500 species of fish, 400 types of coral, 4,000 species of mollusks, and is a critical habitat for larger animals like sea turtles, dugongs (sea cows), and various species of dolphins and whales. This intricate coral architecture provides essential shelter and vital breeding grounds for countless marine creatures.</p>
+                <p>For over 60,000 years, the Great Barrier Reef has been an integral part of the cultural and spiritual identity of Aboriginal and Torres Strait Islander peoples. Their traditional knowledge of the reef is now being incorporated into modern conservation strategies. Historically, Captain James Cook ran aground on the reef in 1770, which led to the first detailed European charting of this massive natural wonder.</p>
+                <p>Today, the reef faces an existential threat. The most significant danger is climate change; rising ocean temperatures cause mass coral bleaching, a phenomenon where the coral expels its symbiotic algae and turns white, often leading to death. Additionally, agricultural runoff carrying pesticides and sediment pollutes the water, while outbreaks of the predatory crown-of-thorns starfish can devastate entire sections of the reef. Urgent and substantial global action on climate change is paramount for its survival.</p>
                 <h3>Comprehension Questions</h3>
                 <!-- Full Chapter 2 questions are here -->
             </section>
             
             <section id="chapter-3">
                  <h2>The Amazon Rainforest, South America</h2>
-                 <p>The Amazon Rainforest is the largest and most biodiverse tropical rainforest in the world, covering an immense area of over 2.7 million square miles (7 million square km) across nine countries. It is home to an astonishing array of plant and animal life; for example, it hosts about 10% of the world’s known species. This includes millions of species of insects, an estimated 40,000 plant species, 3,000 types of fish, and hundreds of unique amphibians, reptiles, birds, and mammals.</p>
-                <p>The Amazon River, the lifeblood of the rainforest, is the largest river by discharge volume in the world. Interestingly, geological evidence suggests that for millions of years, the river actually flowed westward, emptying into the Pacific Ocean, before the rise of the Andes mountains reversed its course. The rainforest itself plays a crucial role in regulating regional and global climates by absorbing vast amounts of carbon dioxide and influencing rainfall patterns far beyond South America.</p>
-                <p>The Amazon is home to approximately 400 distinct Indigenous groups, each with its own language, culture, and profound traditional knowledge of the forest. These communities are often the most effective guardians of the rainforest. Historically, complex societies, including large urban-like settlements, existed within the Amazon before the arrival of Europeans, a fact only recently confirmed by archaeological research.</p>
-                <p>The Amazon is facing an alarming rate of deforestation. The primary drivers are cattle ranching and soy cultivation, followed by logging, mining, and large-scale infrastructure projects like dams and highways. This destruction not only threatens biodiversity but also disrupts the global carbon cycle and jeopardizes the survival of its indigenous inhabitants. Consequently, protecting the Amazon is one of the most critical environmental challenges of our time.</p>
                  <h3>Vocabulary</h3>
                 <ol class="vocabulary-list list-decimal pl-5">
                     <li><strong>biodiversity /ˌbaɪoʊdaɪˈvɜrsəti/</strong>: The island’s isolation led to the evolution of its unique and fragile biodiversity.</li>
@@ -166,17 +241,18 @@
                     <li><strong>global /ˈɡloʊbəl/</strong>: The pandemic was a truly global crisis that affected every country.</li>
                     <li><strong>critical /ˈkrɪtɪkəl/</strong>: It is critical that you follow the safety instructions carefully.</li>
                 </ol>
+                 <h3>Reading Passage</h3>
+                 <p>The Amazon Rainforest is the largest and most biodiverse tropical rainforest in the world, covering an immense area of over 2.7 million square miles (7 million square km) across nine countries. It is home to an astonishing array of plant and animal life; for example, it hosts about 10% of the world’s known species. This includes millions of species of insects, an estimated 40,000 plant species, 3,000 types of fish, and hundreds of unique amphibians, reptiles, birds, and mammals.</p>
+                <p>The Amazon River, the lifeblood of the rainforest, is the largest river by discharge volume in the world. Interestingly, geological evidence suggests that for millions of years, the river actually flowed westward, emptying into the Pacific Ocean, before the rise of the Andes mountains reversed its course. The rainforest itself plays a crucial role in regulating regional and global climates by absorbing vast amounts of carbon dioxide and influencing rainfall patterns far beyond South America.</p>
+                <p>The Amazon is home to approximately 400 distinct Indigenous groups, each with its own language, culture, and profound traditional knowledge of the forest. These communities are often the most effective guardians of the rainforest. Historically, complex societies, including large urban-like settlements, existed within the Amazon before the arrival of Europeans, a fact only recently confirmed by archaeological research.</p>
+                <p>The Amazon is facing an alarming rate of deforestation. The primary drivers are cattle ranching and soy cultivation, followed by logging, mining, and large-scale infrastructure projects like dams and highways. This destruction not only threatens biodiversity but also disrupts the global carbon cycle and jeopardizes the survival of its indigenous inhabitants. Consequently, protecting the Amazon is one of the most critical environmental challenges of our time.</p>
                 <h3>Comprehension Questions</h3>
                 <!-- Full Chapter 3 questions are here -->
             </section>
 
              <section id="chapter-4">
                 <h2>Mount Everest, Nepal/China</h2>
-                <p>Soaring to a height of 29,032 feet (8,849 meters) above sea level, Mount Everest is the highest mountain on Earth. Its immense stature is a direct result of the ongoing collision between the Indian and Eurasian tectonic plates. This process, which began some 50 million years ago, continues to push the Himalayas upward by a few millimeters each year.</p>
-                <p>The climate on Mount Everest is harsh and unforgiving, with hurricane-force winds and temperatures that can plummet to -76°F (-60°C) in the “death zone” above 8,000 meters. Despite these extreme conditions, life has found a way to adapt. The Himalayan jumping spider has been found at altitudes as high as 6,700 meters, and bar-headed geese are known to fly over the summit during their migration.</p>
-                <p>Known as Sagarmatha (“Forehead in the Sky”) in Nepali and Chomolungma (“Holy Mother”) in Tibetan, Mount Everest is a sacred mountain to local communities. It has also become the ultimate challenge for mountaineers from around the world. Historically, the mountain was first successfully summited on May 29, 1953, by Sir Edmund Hillary of New Zealand and Tenzing Norgay, a Sherpa of Nepal, an event that captured the world’s imagination.</p>
-                <p>The increasing popularity of climbing Everest has led to significant environmental problems. Overcrowding on popular routes has created dangerous bottlenecks. Moreover, the mountain has been plagued by waste accumulation, with discarded oxygen canisters, climbing gear, and human waste littering the slopes, earning it the unfortunate nickname of “the world’s highest garbage dump.” In response, both Nepal and China have implemented stricter regulations and cleanup expeditions.</p>
-                 <h3>Vocabulary</h3>
+                <h3>Vocabulary</h3>
                 <ol class="vocabulary-list list-decimal pl-5">
                     <li><strong>tectonic plates /tɛkˈtɑnɪk pleɪts/</strong>: The island of Iceland was formed by the separation of two tectonic plates.</li>
                     <li><strong>summit /ˈsʌmɪt/</strong>: After a week of hiking, the group finally reached the mountain’s windy summit.</li>
@@ -199,17 +275,18 @@
                     <li><strong>bottlenecks /ˈbɑtəlˌnɛks/</strong>: The narrow bridge creates one of the worst traffic bottlenecks in the entire city.</li>
                     <li><strong>expedition /ˌɛkspəˈdɪʃən/</strong>: The scientific expedition to Antarctica will study the effects of melting ice sheets.</li>
                 </ol>
+                 <h3>Reading Passage</h3>
+                 <p>Soaring to a height of 29,032 feet (8,849 meters) above sea level, Mount Everest is the highest mountain on Earth. Its immense stature is a direct result of the ongoing collision between the Indian and Eurasian tectonic plates. This process, which began some 50 million years ago, continues to push the Himalayas upward by a few millimeters each year.</p>
+                <p>The climate on Mount Everest is harsh and unforgiving, with hurricane-force winds and temperatures that can plummet to -76°F (-60°C) in the “death zone” above 8,000 meters. Despite these extreme conditions, life has found a way to adapt. The Himalayan jumping spider has been found at altitudes as high as 6,700 meters, and bar-headed geese are known to fly over the summit during their migration.</p>
+                <p>Known as Sagarmatha (“Forehead in the Sky”) in Nepali and Chomolungma (“Holy Mother”) in Tibetan, Mount Everest is a sacred mountain to local communities. It has also become the ultimate challenge for mountaineers from around the world. Historically, the mountain was first successfully summited on May 29, 1953, by Sir Edmund Hillary of New Zealand and Tenzing Norgay, a Sherpa of Nepal, an event that captured the world’s imagination.</p>
+                <p>The increasing popularity of climbing Everest has led to significant environmental problems. Overcrowding on popular routes has created dangerous bottlenecks. Moreover, the mountain has been plagued by waste accumulation, with discarded oxygen canisters, climbing gear, and human waste littering the slopes, earning it the unfortunate nickname of “the world’s highest garbage dump.” In response, both Nepal and China have implemented stricter regulations and cleanup expeditions.</p>
                 <h3>Comprehension Questions</h3>
                  <!-- Full Chapter 4 questions are here -->
             </section>
 
             <section id="chapter-5">
                  <h2>Victoria Falls, Zambia/Zimbabwe</h2>
-                <p>Victoria Falls, known locally as Mosi-oa-Tunya (“The Smoke That Thunders”), is one of the world’s most spectacular waterfalls. Located on the Zambezi River at the border between Zambia and Zimbabwe, it is neither the highest nor the widest but is classified as the largest sheet of falling water on the planet based on its combined width and height. During the peak of the rainy season, the spray from the falls can rise over 1,300 feet (400 meters) into the air and is visible for miles.</p>
-                <p>The constant, dense spray from the falls sustains a unique rainforest-like ecosystem on the cliff faces opposite the waterfall. This “Rainforest,” as it is known, is an area of lush vegetation, including ferns and mahogany trees, that exists because of the falls’ microclimate, a stark contrast to the surrounding savanna.</p>
-                <p>The first European to view the falls was the Scottish missionary and explorer David Livingstone, who named them in honor of Queen Victoria in 1855. However, the falls had been a significant site for local Tonga and Lozi people for centuries, a place of worship and awe. The archaeology of the area reveals a long history of human settlement, dating back to the Early Stone Age.</p>
-                <p>Victoria Falls is a UNESCO World Heritage site and a crucial driver of tourism for both Zambia and Zimbabwe. The environmental challenge here is one of sustainable development. There is a delicate balance to be struck between developing tourist infrastructure like hotels and preserving the natural beauty and ecological integrity of the site. Proposals for hydropower dams upstream on the Zambezi also pose a potential threat to the river’s flow and the waterfall’s grandeur.</p>
-                <h3>Vocabulary</h3>
+                 <h3>Vocabulary</h3>
                 <ol class="vocabulary-list list-decimal pl-5">
                     <li><strong>Mosi-oa-Tunya /ˌmoʊsi oʊɑ ˈtunjɑ/</strong>: The sound of Mosi-oa-Tunya can be heard from a great distance.</li>
                     <li><strong>Zambezi River /zæmˈbizi ˈrɪvər/</strong>: We took a sunset cruise along the Zambezi River to see hippos and crocodiles.</li>
@@ -232,17 +309,18 @@
                     <li><strong>spectacular /spɛkˈtækjələr/</strong>: The fireworks display on New Year’s Eve was absolutely spectacular.</li>
                     <li><strong>thundering /ˈθʌndərɪŋ/</strong>: The crowd let out a thundering applause when the team scored the winning goal.</li>
                 </ol>
+                <h3>Reading Passage</h3>
+                <p>Victoria Falls, known locally as Mosi-oa-Tunya (“The Smoke That Thunders”), is one of the world’s most spectacular waterfalls. Located on the Zambezi River at the border between Zambia and Zimbabwe, it is neither the highest nor the widest but is classified as the largest sheet of falling water on the planet based on its combined width and height. During the peak of the rainy season, the spray from the falls can rise over 1,300 feet (400 meters) into the air and is visible for miles.</p>
+                <p>The constant, dense spray from the falls sustains a unique rainforest-like ecosystem on the cliff faces opposite the waterfall. This “Rainforest,” as it is known, is an area of lush vegetation, including ferns and mahogany trees, that exists because of the falls’ microclimate, a stark contrast to the surrounding savanna.</p>
+                <p>The first European to view the falls was the Scottish missionary and explorer David Livingstone, who named them in honor of Queen Victoria in 1855. However, the falls had been a significant site for local Tonga and Lozi people for centuries, a place of worship and awe. The archaeology of the area reveals a long history of human settlement, dating back to the Early Stone Age.</p>
+                <p>Victoria Falls is a UNESCO World Heritage site and a crucial driver of tourism for both Zambia and Zimbabwe. The environmental challenge here is one of sustainable development. There is a delicate balance to be struck between developing tourist infrastructure like hotels and preserving the natural beauty and ecological integrity of the site. Proposals for hydropower dams upstream on the Zambezi also pose a potential threat to the river’s flow and the waterfall’s grandeur.</p>
                 <h3>Comprehension Questions</h3>
                 <!-- Full Chapter 5 questions are here -->
             </section>
             
             <section id="chapter-6">
                  <h2>The Sahara Desert, Africa</h2>
-                <p>The Sahara Desert is the largest hot desert in the world, spanning an immense 3.6 million square miles (9.2 million square km) across North Africa. It is a land of extreme temperatures and varied landscapes, featuring vast sand seas (ergs), barren rocky plateaus (hamadas), and ancient, dry riverbeds (wadis).</p>
-                <p>While seemingly barren, the Sahara supports a surprising amount of life that has adapted to the hyper-arid conditions. This includes mammals like the addax antelope and the fennec fox. Historically, the Sahara was much greener. Rock art found in places like Tassili n’Ajjer in Algeria depicts a savanna environment teeming with elephants, giraffes, and crocodiles, a period known as the “Green Sahara” which ended around 5,000 years ago.</p>
-                <p>For millennia, the Sahara has been a crossroads of cultures, not a barrier. Trans-Saharan trade routes, traversed by camel caravans, connected West Africa with the Mediterranean world, facilitating the exchange of goods like gold, salt, and unfortunately, slaves, which profoundly shaped the economies and cultures of three continents. The desert is home to various nomadic and semi-nomadic peoples, such as the Tuareg and the Tubu.</p>
-                <p>The Sahara is expanding, a process known as desertification, which is accelerated by climate change and unsustainable land management practices along its southern border, the Sahel. This threatens the livelihoods of millions of people. On the other hand, there is growing interest in the Sahara’s potential for large-scale solar energy projects, which could provide clean energy for Africa and Europe, presenting both an opportunity and new environmental considerations.</p>
-                <h3>Vocabulary</h3>
+                 <h3>Vocabulary</h3>
                 <ol class="vocabulary-list list-decimal pl-5">
                     <li><strong>desertification /dɪˌzɜrtəfɪˈkeɪʃən/</strong>: Planting trees is one of the most effective ways to combat desertification.</li>
                     <li><strong>ergs /ɜrɡz/</strong>: Some of the largest ergs, or sand seas, can be found in the Sahara.</li>
@@ -265,16 +343,17 @@
                     <li><strong>hyper-arid /ˈhaɪpər ˈærɪd/</strong>: Very few plants are capable of surviving in the hyper-arid conditions of the Atacama Desert.</li>
                     <li><strong>immense /ɪˈmɛns/</strong>: The company’s new headquarters is an immense skyscraper that dominates the city skyline.</li>
                 </ol>
+                 <h3>Reading Passage</h3>
+                 <p>The Sahara Desert is the largest hot desert in the world, spanning an immense 3.6 million square miles (9.2 million square km) across North Africa. It is a land of extreme temperatures and varied landscapes, featuring vast sand seas (ergs), barren rocky plateaus (hamadas), and ancient, dry riverbeds (wadis).</p>
+                <p>While seemingly barren, the Sahara supports a surprising amount of life that has adapted to the hyper-arid conditions. This includes mammals like the addax antelope and the fennec fox. Historically, the Sahara was much greener. Rock art found in places like Tassili n’Ajjer in Algeria depicts a savanna environment teeming with elephants, giraffes, and crocodiles, a period known as the “Green Sahara” which ended around 5,000 years ago.</p>
+                <p>For millennia, the Sahara has been a crossroads of cultures, not a barrier. Trans-Saharan trade routes, traversed by camel caravans, connected West Africa with the Mediterranean world, facilitating the exchange of goods like gold, salt, and unfortunately, slaves, which profoundly shaped the economies and cultures of three continents. The desert is home to various nomadic and semi-nomadic peoples, such as the Tuareg and the Tubu.</p>
+                <p>The Sahara is expanding, a process known as desertification, which is accelerated by climate change and unsustainable land management practices along its southern border, the Sahel. This threatens the livelihoods of millions of people. On the other hand, there is growing interest in the Sahara’s potential for large-scale solar energy projects, which could provide clean energy for Africa and Europe, presenting both an opportunity and new environmental considerations.</p>
                 <h3>Comprehension Questions</h3>
                 <!-- Full Chapter 6 questions are here -->
             </section>
             
             <section id="chapter-7">
                 <h2>The Galápagos Islands, Ecuador</h2>
-                <p>The Galápagos Islands are a remote volcanic archipelago of 19 islands and numerous islets in the Pacific Ocean, about 600 miles (1,000 km) off the coast of Ecuador. Born from fire, their volcanic origins are evident everywhere. The islands are famous for their high number of endemic species, a direct consequence of their isolation.</p>
-                <p>The unique wildlife of the Galápagos, particularly the giant tortoises, marine iguanas, and various species of finches, were instrumental in shaping Charles Darwin’s theory of evolution by natural selection following his visit in 1835. He observed that similar species varied from island to island, having adapted to the specific environmental conditions and food sources available on each. For this reason, they are often called a “living laboratory.”</p>
-                <p>Historically, the islands were used by pirates and whalers as a base for centuries before being claimed by Ecuador in 1832. There is also a fascinating, albeit dark, human history of attempts to colonize the islands, filled with mysterious disappearances and unsolved murders, particularly on Floreana Island in the 1930s.</p>
-                <p>The Galápagos are a UNESCO World Heritage site and a strictly managed national park. However, the ecosystem is incredibly fragile. The biggest environmental threats are the introduction of invasive species (like goats, rats, and fire ants), which outcompete or prey on native wildlife, and the pressures of tourism. Illegal fishing, especially for sharks, also remains a persistent problem. Consequently, rigorous biosecurity measures and conservation programs are in constant operation to protect this irreplaceable natural treasure.</p>
                 <h3>Vocabulary</h3>
                 <ol class="vocabulary-list list-decimal pl-5">
                     <li><strong>archipelago /ˌɑrkəˈpɛləˌɡoʊ/</strong>: The Hawaiian archipelago consists of eight major islands and numerous smaller islets.</li>
@@ -298,16 +377,17 @@
                     <li><strong>pirates /ˈpaɪrəts/</strong>: In the 17th century, pirates roamed the Caribbean Sea in search of treasure ships to plunder.</li>
                     <li><strong>irreplaceable /ˌɪrɪˈpleɪsəbəl/</strong>: The museum’s most valuable painting is considered an irreplaceable masterpiece.</li>
                 </ol>
+                <h3>Reading Passage</h3>
+                <p>The Galápagos Islands are a remote volcanic archipelago of 19 islands and numerous islets in the Pacific Ocean, about 600 miles (1,000 km) off the coast of Ecuador. Born from fire, their volcanic origins are evident everywhere. The islands are famous for their high number of endemic species, a direct consequence of their isolation.</p>
+                <p>The unique wildlife of the Galápagos, particularly the giant tortoises, marine iguanas, and various species of finches, were instrumental in shaping Charles Darwin’s theory of evolution by natural selection following his visit in 1835. He observed that similar species varied from island to island, having adapted to the specific environmental conditions and food sources available on each. For this reason, they are often called a “living laboratory.”</p>
+                <p>Historically, the islands were used by pirates and whalers as a base for centuries before being claimed by Ecuador in 1832. There is also a fascinating, albeit dark, human history of attempts to colonize the islands, filled with mysterious disappearances and unsolved murders, particularly on Floreana Island in the 1930s.</p>
+                <p>The Galápagos are a UNESCO World Heritage site and a strictly managed national park. However, the ecosystem is incredibly fragile. The biggest environmental threats are the introduction of invasive species (like goats, rats, and fire ants), which outcompete or prey on native wildlife, and the pressures of tourism. Illegal fishing, especially for sharks, also remains a persistent problem. Consequently, rigorous biosecurity measures and conservation programs are in constant operation to protect this irreplaceable natural treasure.</p>
                 <h3>Comprehension Questions</h3>
                 <!-- Full Chapter 7 questions are here -->
             </section>
             
             <section id="chapter-8">
                  <h2>The Northern Lights (Aurora Borealis)</h2>
-                <p>The Northern Lights, or Aurora Borealis, are a natural light display in the Earth’s sky, typically observed in the high-latitude regions. This mesmerizing phenomenon is caused by collisions between energetic charged particles, released from the sun in a “solar wind,” and atoms in the Earth’s upper atmosphere. The Earth’s magnetic field funnels these particles towards the poles, creating the auroral ovals.</p>
-                <p>The colors of the aurora are a direct result of which gas is being excited and at what altitude. The most common color, a pale yellowish-green, is produced by oxygen molecules at about 60 miles (100 km) up. The rarer, all-red auroras are produced by high-altitude oxygen, at heights of up to 200 miles (320 km). Nitrogen, on the other hand, can produce blue or purplish-red light.</p>
-                <p>Throughout history, cultures have interpreted the aurora in myriad ways. The Vikings, for example, believed the lights were reflections off the armor of the Valkyries, the mythical warrior maidens. In contrast, some North American Inuit groups saw them as the spirits of their ancestors playing a game with a walrus skull. Today, aurora tourism is a significant economic driver for communities in the “auroral zone,” including parts of Norway, Sweden, Finland, Iceland, Canada, and Alaska.</p>
-                <p>While an atmospheric phenomenon, the aurora is intrinsically linked to the Earth’s environment. The magnetic field that guides the aurora-causing particles also protects us from the full force of the solar wind, which would otherwise strip away our atmosphere. The study of the aurora, therefore, provides valuable information about space weather, which can impact satellites, communication systems, and even power grids on Earth.</p>
                 <h3>Vocabulary</h3>
                 <ol class="vocabulary-list list-decimal pl-5">
                     <li><strong>Aurora Borealis /əˌrɔrə ˌbɔriˈælɪs/</strong>: We traveled to Norway in the winter with the hope of seeing the Aurora Borealis.</li>
@@ -331,16 +411,17 @@
                     <li><strong>interpretation /ɪnˌtɜrprɪˈteɪʃən/</strong>: The poem is open to more than one interpretation, and students debated its true meaning.</li>
                     <li><strong>spectacle /ˈspɛktəkəl/</strong>: The opening ceremony of the Olympic Games is always a grand spectacle.</li>
                 </ol>
+                 <h3>Reading Passage</h3>
+                 <p>The Northern Lights, or Aurora Borealis, are a natural light display in the Earth’s sky, typically observed in the high-latitude regions. This mesmerizing phenomenon is caused by collisions between energetic charged particles, released from the sun in a “solar wind,” and atoms in the Earth’s upper atmosphere. The Earth’s magnetic field funnels these particles towards the poles, creating the auroral ovals.</p>
+                <p>The colors of the aurora are a direct result of which gas is being excited and at what altitude. The most common color, a pale yellowish-green, is produced by oxygen molecules at about 60 miles (100 km) up. The rarer, all-red auroras are produced by high-altitude oxygen, at heights of up to 200 miles (320 km). Nitrogen, on the other hand, can produce blue or purplish-red light.</p>
+                <p>Throughout history, cultures have interpreted the aurora in myriad ways. The Vikings, for example, believed the lights were reflections off the armor of the Valkyries, the mythical warrior maidens. In contrast, some North American Inuit groups saw them as the spirits of their ancestors playing a game with a walrus skull. Today, aurora tourism is a significant economic driver for communities in the “auroral zone,” including parts of Norway, Sweden, Finland, Iceland, Canada, and Alaska.</p>
+                <p>While an atmospheric phenomenon, the aurora is intrinsically linked to the Earth’s environment. The magnetic field that guides the aurora-causing particles also protects us from the full force of the solar wind, which would otherwise strip away our atmosphere. The study of the aurora, therefore, provides valuable information about space weather, which can impact satellites, communication systems, and even power grids on Earth.</p>
                 <h3>Comprehension Questions</h3>
                 <!-- Full Chapter 8 questions are here -->
             </section>
             
             <section id="chapter-9">
                 <h2>The Naica Mine (Cave of Crystals)</h2>
-                <p>The Naica Mine in Chihuahua, Mexico, is the site of one of the most extraordinary geological discoveries ever made: the Cave of Crystals (Cueva de los Cristales). This chamber, located 980 feet (300 meters) underground, is filled with colossal selenite crystals, a transparent form of gypsum. Some of these crystalline beams are over 36 feet (11 meters) long and weigh an estimated 55 tons.</p>
-                <p>The growth of these giant crystals was possible due to a unique and remarkably stable set of conditions that persisted for hundreds of thousands of years. The cave was flooded with mineral-rich groundwater, which was kept at a constant, high temperature (around 136°F or 58°C) by the magma chamber lying deep below. This stable, super-saturated environment allowed the selenite crystals to grow to their unparalleled size.</p>
-                <p>The Cave of Crystals was discovered by accident in 2000 by miners drilling a new tunnel for the Naica lead and silver mine. Its discovery opened a new window for scientists to study mineral formation and even extremophile microbes that were found dormant inside the crystals.</p>
-                <p>The cave is completely inaccessible to the public due to its lethal environment of extreme heat and humidity. After its discovery, the water was pumped out to allow for study. Now that mining operations have ceased, there is an ongoing scientific and ethical debate about whether to allow the cave to re-flood. Flooding the cave would halt human access but would arguably be the best way to preserve the crystals and allow them, perhaps, to continue their slow growth, protecting this geological wonder for future millennia.</p>
                 <h3>Vocabulary</h3>
                 <ol class="vocabulary-list list-decimal pl-5">
                     <li><strong>selenite crystals /ˈsɛləˌnaɪt ˈkrɪstəlz/</strong>: The museum displayed a beautiful, translucent piece of selenite crystals.</li>
@@ -364,17 +445,18 @@
                     <li><strong>formation /fɔrˈmeɪʃən/</strong>: The stunning rock formation was shaped by centuries of wind and water erosion.</li>
                     <li><strong>wonderland /ˈwʌndərˌlænd/</strong>: For a child who loves books, the giant library was a complete wonderland.</li>
                 </ol>
+                <h3>Reading Passage</h3>
+                 <p>The Naica Mine in Chihuahua, Mexico, is the site of one of the most extraordinary geological discoveries ever made: the Cave of Crystals (Cueva de los Cristales). This chamber, located 980 feet (300 meters) underground, is filled with colossal selenite crystals, a transparent form of gypsum. Some of these crystalline beams are over 36 feet (11 meters) long and weigh an estimated 55 tons.</p>
+                <p>The growth of these giant crystals was possible due to a unique and remarkably stable set of conditions that persisted for hundreds of thousands of years. The cave was flooded with mineral-rich groundwater, which was kept at a constant, high temperature (around 136°F or 58°C) by the magma chamber lying deep below. This stable, super-saturated environment allowed the selenite crystals to grow to their unparalleled size.</p>
+                <p>The Cave of Crystals was discovered by accident in 2000 by miners drilling a new tunnel for the Naica lead and silver mine. Its discovery opened a new window for scientists to study mineral formation and even extremophile microbes that were found dormant inside the crystals.</p>
+                <p>The cave is completely inaccessible to the public due to its lethal environment of extreme heat and humidity. After its discovery, the water was pumped out to allow for study. Now that mining operations have ceased, there is an ongoing scientific and ethical debate about whether to allow the cave to re-flood. Flooding the cave would halt human access but would arguably be the best way to preserve the crystals and allow them, perhaps, to continue their slow growth, protecting this geological wonder for future millennia.</p>
                 <h3>Comprehension Questions</h3>
                 <!-- Full Chapter 9 questions are here -->
             </section>
             
             <section id="chapter-10">
                 <h2>The Serengeti Migration, Tanzania/Kenya</h2>
-                <p>The Great Migration in the Serengeti-Mara ecosystem of Tanzania and Kenya is the largest and longest overland migration of terrestrial animals on the planet. Annually, over 1.5 million wildebeest, accompanied by hundreds of thousands of zebras, gazelles, and elands, journey in a continuous clockwise direction for over 1,000 miles in search of fresh grazing and water, following the seasonal rains.</p>
-                <p>This epic journey is a raw and powerful demonstration of the cycle of life and death. The herds face constant threats. For instance, the dramatic river crossings of the Grumeti and Mara rivers are legendary, with giant Nile crocodiles lying in wait. On the plains, predators such as lions, cheetahs, leopards, and hyenas relentlessly stalk the herds, culling the weak and the young.</p>
-                <p>The lands of the Serengeti have been home to the Maasai people for centuries. Their semi-nomadic, pastoralist lifestyle traditionally coexisted with the wildlife. The name “Serengeti” itself is derived from the Maasai word “siringet,” meaning “endless plains.” Historically, the importance of this ecosystem was recognized by conservationists like Bernhard Grzimek, whose work in the 1950s was crucial in raising global awareness and promoting its protection.</p>
-                <p>The Serengeti ecosystem is a UNESCO World Heritage site, yet it faces significant threats. Poaching remains a persistent problem. However, the most pressing long-term threat is habitat fragmentation. Proposed roads and railway lines that would bisect the park could sever the ancient migration routes, with catastrophic consequences for the wildebeest population and the entire ecosystem that depends on them. Therefore, balancing human development needs with the imperative to protect this iconic migration is a major and ongoing conservation challenge.</p>
-                <h3>Vocabulary</h3>
+                 <h3>Vocabulary</h3>
                 <ol class="vocabulary-list list-decimal pl-5">
                    <li><strong>migration /maɪˈɡreɪʃən/</strong>: The annual migration of monarch butterflies from Canada to Mexico is an incredible journey.</li>
                     <li><strong>ecosystem /ˈikoʊˌsɪstəm/</strong>: The removal of a single species can cause the collapse of an entire ecosystem.</li>
@@ -397,6 +479,11 @@
                     <li><strong>imperative /ɪmˈpɛrətɪv/</strong>: It is imperative that we act now to address the issue of climate change before it’s too late.</li>
                     <li><strong>bisects /baɪˈsɛkts/</strong>: The river bisects the city, dividing it into a northern and a southern half.</li>
                 </ol>
+                <h3>Reading Passage</h3>
+                 <p>The Great Migration in the Serengeti-Mara ecosystem of Tanzania and Kenya is the largest and longest overland migration of terrestrial animals on the planet. Annually, over 1.5 million wildebeest, accompanied by hundreds of thousands of zebras, gazelles, and elands, journey in a continuous clockwise direction for over 1,000 miles in search of fresh grazing and water, following the seasonal rains.</p>
+                <p>This epic journey is a raw and powerful demonstration of the cycle of life and death. The herds face constant threats. For instance, the dramatic river crossings of the Grumeti and Mara rivers are legendary, with giant Nile crocodiles lying in wait. On the plains, predators such as lions, cheetahs, leopards, and hyenas relentlessly stalk the herds, culling the weak and the young.</p>
+                <p>The lands of the Serengeti have been home to the Maasai people for centuries. Their semi-nomadic, pastoralist lifestyle traditionally coexisted with the wildlife. The name “Serengeti” itself is derived from the Maasai word “siringet,” meaning “endless plains.” Historically, the importance of this ecosystem was recognized by conservationists like Bernhard Grzimek, whose work in the 1950s was crucial in raising global awareness and promoting its protection.</p>
+                <p>The Serengeti ecosystem is a UNESCO World Heritage site, yet it faces significant threats. Poaching remains a persistent problem. However, the most pressing long-term threat is habitat fragmentation. Proposed roads and railway lines that would bisect the park could sever the ancient migration routes, with catastrophic consequences for the wildebeest population and the entire ecosystem that depends on them. Therefore, balancing human development needs with the imperative to protect this iconic migration is a major and ongoing conservation challenge.</p>
                 <h3>Comprehension Questions</h3>
                 <!-- Full Chapter 10 questions are here -->
             </section>
@@ -439,7 +526,6 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Smooth scroll for Table of Contents
             document.querySelectorAll('#table-of-contents a').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     e.preventDefault();
@@ -449,7 +535,6 @@
                 });
             });
 
-            // Interactive Questions Logic
             function handleButtonClick(button, isCorrect) {
                 const questionBlock = button.closest('.question-block');
                 questionBlock.querySelectorAll('.tf-button, .mcq-option').forEach(btn => {
@@ -457,7 +542,6 @@
                     btn.disabled = true; 
                 });
                 questionBlock.querySelectorAll('.feedback').forEach(fb => fb.style.display = 'none');
-
                 if (button.classList.contains('mcq-option')) {
                     if(isCorrect) {
                         button.classList.add('correct-answer');
@@ -469,7 +553,6 @@
                 } else {
                      button.classList.add(isCorrect ? 'correct-answer' : 'incorrect');
                 }
-                
                 const feedbackEl = questionBlock.querySelector(isCorrect ? '.feedback.correct' : '.feedback.incorrect');
                 if(feedbackEl) feedbackEl.style.display = 'block';
             }
@@ -486,7 +569,6 @@
             });
         });
 
-        // --- SCRIPT FOR CHATBOT ---
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
