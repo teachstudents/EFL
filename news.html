@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live News & Audio Streams</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Audio player styling */
+        audio {
+            width: 100%;
+            border-radius: 8px;
+            filter: sepia(20%) saturate(70%) grayscale(1) contrast(99%) hue-rotate(-12deg);
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <!-- Header Section -->
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2">Live News Feed</h1>
+            <p class="text-lg text-gray-600">Your daily source for news and live audio broadcasts</p>
+        </header>
+
+        <!-- Audio Streams Section -->
+        <section id="audio-streams" class="mb-10">
+            <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mb-6">Live Audio Streams</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- BBC World Service Player -->
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <h3 class="font-semibold text-lg mb-3">BBC World Service</h3>
+                    <audio controls preload="none">
+                        <source src="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+                <!-- NPR News Player -->
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <h3 class="font-semibold text-lg mb-3">NPR News</h3>
+                     <audio controls preload="none">
+                        <source src="https://npr-ice.streamguys1.com/live.mp3" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+        </section>
+
+        <!-- News Articles Section -->
+        <section id="news-articles">
+            <div class="flex justify-between items-center border-b-2 border-blue-500 pb-2 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Latest Spaceflight News</h2>
+            </div>
+            <!-- Loading Spinner -->
+            <div id="loading" class="text-center py-10">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                <p class="mt-4 text-gray-600">Fetching latest news...</p>
+            </div>
+            <!-- News articles will be injected here by JavaScript -->
+            <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+             <!-- Error Message Display -->
+            <div id="error-message" class="hidden text-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mt-6">
+                <strong class="font-bold">Error:</strong>
+                <span class="block sm:inline" id="error-text"></span>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- JavaScript to Fetch and Display News -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const newsContainer = document.getElementById('news-container');
+            const loadingIndicator = document.getElementById('loading');
+            const errorMessageDiv = document.getElementById('error-message');
+            const errorTextSpan = document.getElementById('error-text');
+
+            // This is a true keyless API that provides a JSON feed with CORS support.
+            // No proxy is needed, making it much more reliable.
+            const NEWS_API_URL = 'https://api.spaceflightnewsapi.net/v4/articles/?limit=12';
+
+            /**
+             * Fetches and displays news directly from the API.
+             */
+            async function fetchNews() {
+                loadingIndicator.style.display = 'block';
+                newsContainer.innerHTML = '';
+                errorMessageDiv.classList.add('hidden');
+
+                try {
+                    const response = await fetch(NEWS_API_URL);
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok, status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    
+                    // The API returns an object with a 'results' array
+                    displayArticles(data.results);
+
+                } catch (error) {
+                    console.error('Error fetching news:', error);
+                    displayError(`Could not fetch news. Please try again later. Details: ${error.message}`);
+                } finally {
+                    loadingIndicator.style.display = 'none';
+                }
+            }
+
+            /**
+             * Displays an error message in the UI.
+             */
+            function displayError(message) {
+                errorTextSpan.textContent = message;
+                errorMessageDiv.classList.remove('hidden');
+            }
+
+
+            /**
+             * Creates and appends article cards to the container.
+             * @param {Array} articles - An array of article objects from the API.
+             */
+            function displayArticles(articles) {
+                if (!articles || articles.length === 0) {
+                    displayError("No articles were found.");
+                    return;
+                }
+
+                articles.forEach(article => {
+                    const articleEl = document.createElement('div');
+                    articleEl.className = 'card bg-white rounded-lg shadow-md overflow-hidden';
+                    
+                    const title = article.title || 'No Title';
+                    const link = article.url || '#';
+                    const pubDateStr = article.published_at;
+                    const pubDate = pubDateStr ? new Date(pubDateStr).toLocaleDateString() : 'N/A';
+                    const imageUrl = article.image_url || `https://placehold.co/600x400/e2e8f0/4a5568?text=News`;
+                    const newsSite = article.news_site || 'Unknown Source';
+
+                    articleEl.innerHTML = `
+                        <a href="${link}" target="_blank" rel="noopener noreferrer" class="block h-full">
+                            <img class="w-full h-48 object-cover" src="${imageUrl}" alt="Article thumbnail" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/4a5568?text=Image+Not+Found';">
+                            <div class="p-4 flex flex-col h-full">
+                                <h3 class="font-bold text-lg mb-2 flex-grow">${title}</h3>
+                                <div class="text-sm text-gray-500 mt-2">
+                                    <p><strong>${newsSite}</strong></p>
+                                    <p>Published: ${pubDate}</p>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                    newsContainer.appendChild(articleEl);
+                });
+            }
+
+            // Initial fetch on page load
+            fetchNews();
+        });
+    </script>
+
+</body>
+</html>
