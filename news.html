@@ -4,13 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live News & Audio Streams</title>
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Custom Styles -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -32,6 +29,12 @@
         }
         .card {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
         }
         .card:hover {
             transform: translateY(-5px);
@@ -49,17 +52,14 @@
 
     <div class="container mx-auto p-4 md:p-8 max-w-7xl">
 
-        <!-- Header Section -->
         <header class="mb-8 text-center">
             <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2">Live News Feed</h1>
             <p class="text-lg text-gray-600">Your daily source for news and live audio broadcasts</p>
         </header>
 
-        <!-- Audio Streams Section -->
         <section id="audio-streams" class="mb-10">
             <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mb-6">Live Audio Streams</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- BBC World Service Player -->
                 <div class="bg-white p-4 rounded-lg shadow-md">
                     <h3 class="font-semibold text-lg mb-3">BBC World Service</h3>
                     <audio controls preload="none">
@@ -67,7 +67,6 @@
                         Your browser does not support the audio element.
                     </audio>
                 </div>
-                <!-- NPR News Player -->
                 <div class="bg-white p-4 rounded-lg shadow-md">
                     <h3 class="font-semibold text-lg mb-3">NPR News</h3>
                      <audio controls preload="none">
@@ -78,21 +77,26 @@
             </div>
         </section>
 
-        <!-- News Articles Section -->
         <section id="news-articles">
-            <div class="flex justify-between items-center border-b-2 border-blue-500 pb-2 mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Latest Spaceflight News</h2>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-blue-500 pb-2 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">Top Stories</h2>
+                <div class="relative">
+                    <select id="news-source-selector" class="appearance-none w-full sm:w-auto bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="cna">Channel News Asia (Singapore)</option>
+                        <option value="aljazeera">Al Jazeera</option>
+                    </select>
+                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                    </span>
+                </div>
             </div>
-            <!-- Loading Spinner -->
             <div id="loading" class="text-center py-10">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
                 <p class="mt-4 text-gray-600">Fetching latest news...</p>
             </div>
-            <!-- News articles will be injected here by JavaScript -->
             <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             </div>
-             <!-- Error Message Display -->
-            <div id="error-message" class="hidden text-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mt-6">
+             <div id="error-message" class="hidden text-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mt-6">
                 <strong class="font-bold">Error:</strong>
                 <span class="block sm:inline" id="error-text"></span>
             </div>
@@ -100,35 +104,45 @@
 
     </div>
 
-    <!-- JavaScript to Fetch and Display News -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const newsContainer = document.getElementById('news-container');
             const loadingIndicator = document.getElementById('loading');
+            const sourceSelector = document.getElementById('news-source-selector');
             const errorMessageDiv = document.getElementById('error-message');
             const errorTextSpan = document.getElementById('error-text');
 
-            // This is a true keyless API that provides a JSON feed with CORS support.
-            // No proxy is needed, making it much more reliable.
-            const NEWS_API_URL = 'https://api.spaceflightnewsapi.net/v4/articles/?limit=12';
+            // Using public RSS feeds from sources generally accessible in China.
+            const newsSources = {
+                cna: 'https://www.channelnewsasia.com/rssfeeds/8395986',
+                aljazeera: 'https://www.aljazeera.com/xml/rss/all.xml',
+            };
+            
+            // This service converts RSS feeds to a usable JSON format.
+            const RSS2JSON_API_ENDPOINT = 'https://api.rss2json.com/v1/api.json?rss_url=';
 
             /**
-             * Fetches and displays news directly from the API.
+             * Fetches and displays news from the selected source.
              */
-            async function fetchNews() {
+            async function fetchNews(sourceKey) {
                 loadingIndicator.style.display = 'block';
                 newsContainer.innerHTML = '';
                 errorMessageDiv.classList.add('hidden');
 
+                const feedUrl = newsSources[sourceKey];
+
                 try {
-                    const response = await fetch(NEWS_API_URL);
+                    const response = await fetch(`${RSS2JSON_API_ENDPOINT}${encodeURIComponent(feedUrl)}`);
                     if (!response.ok) {
                         throw new Error(`Network response was not ok, status: ${response.status}`);
                     }
                     const data = await response.json();
                     
-                    // The API returns an object with a 'results' array
-                    displayArticles(data.results);
+                    if (data.status !== 'ok') {
+                        throw new Error('Could not retrieve news feed. The source might be temporarily unavailable.');
+                    }
+                    
+                    displayArticles(data.items, data.feed.title);
 
                 } catch (error) {
                     console.error('Error fetching news:', error);
@@ -150,33 +164,36 @@
             /**
              * Creates and appends article cards to the container.
              * @param {Array} articles - An array of article objects from the API.
+             * @param {string} feedTitle - The title of the news source.
              */
-            function displayArticles(articles) {
+            function displayArticles(articles, feedTitle) {
                 if (!articles || articles.length === 0) {
-                    displayError("No articles were found.");
+                    displayError("No articles were found for this source.");
                     return;
                 }
 
                 articles.forEach(article => {
                     const articleEl = document.createElement('div');
-                    articleEl.className = 'card bg-white rounded-lg shadow-md overflow-hidden';
+                    articleEl.className = 'card';
                     
                     const title = article.title || 'No Title';
-                    const link = article.url || '#';
-                    const pubDateStr = article.published_at;
+                    const link = article.link || '#';
+                    const pubDateStr = article.pubDate;
                     const pubDate = pubDateStr ? new Date(pubDateStr).toLocaleDateString() : 'N/A';
-                    const imageUrl = article.image_url || `https://placehold.co/600x400/e2e8f0/4a5568?text=News`;
-                    const newsSite = article.news_site || 'Unknown Source';
+                    
+                    // The description often contains HTML, so we strip it for a clean summary
+                    const description = (article.description || 'No summary available.')
+                                        .replace(/<[^>]*>?/gm, '')
+                                        .substring(0, 150);
+
 
                     articleEl.innerHTML = `
-                        <a href="${link}" target="_blank" rel="noopener noreferrer" class="block h-full">
-                            <img class="w-full h-48 object-cover" src="${imageUrl}" alt="Article thumbnail" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/4a5568?text=Image+Not+Found';">
-                            <div class="p-4 flex flex-col h-full">
-                                <h3 class="font-bold text-lg mb-2 flex-grow">${title}</h3>
-                                <div class="text-sm text-gray-500 mt-2">
-                                    <p><strong>${newsSite}</strong></p>
-                                    <p>Published: ${pubDate}</p>
-                                </div>
+                        <a href="${link}" target="_blank" rel="noopener noreferrer" class="flex flex-col h-full">
+                            <h3 class="font-bold text-lg mb-2">${title}</h3>
+                            <p class="text-gray-600 text-sm mb-4 flex-grow">${description}...</p>
+                            <div class="text-xs text-gray-500 mt-auto">
+                                <p><strong>${feedTitle}</strong></p>
+                                <p>Published: ${pubDate}</p>
                             </div>
                         </a>
                     `;
@@ -184,8 +201,13 @@
                 });
             }
 
-            // Initial fetch on page load
-            fetchNews();
+            // Event listener for the source dropdown
+            sourceSelector.addEventListener('change', (event) => {
+                fetchNews(event.target.value);
+            });
+
+            // Initial fetch on page load with the default source
+            fetchNews(sourceSelector.value);
         });
     </script>
 
