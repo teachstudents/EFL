@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joel Mitchell's Personalized Learning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+        }
+        .prose p {
+            margin-bottom: 1em;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        @media (min-width: 768px) {
+            .prose p {
+                font-size: 1.125rem;
+            }
+        }
+        .prose h1, .prose h2, .prose h3 {
+            font-weight: 700;
+        }
+        .prose h2 {
+            margin-top: 2.5em;
+            margin-bottom: 1.25em;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5em;
+        }
+        .prose h3 {
+            margin-top: 2em;
+            margin-bottom: 1em;
+        }
+        .prose ul, .prose ol {
+            margin-left: 1.5em;
+            padding-left: 1.5em;
+        }
+        .question-block {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .answer-choice {
+            display: block;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background-color: #ffffff;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .answer-choice:hover:not(:disabled) {
+            background-color: #f8fafc;
+            border-color: #94a3b8;
+        }
+        .feedback {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.9em;
+        }
+        .correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #166534;
+            font-weight: 600;
+        }
+        .incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b;
+        }
+        .explanation {
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-5xl">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight">Joel Mitchell's Personalized Learning</h1>
+        </header>
+
+        <main class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div>
+                    <label for="cefr-level" class="block text-sm font-bold text-gray-700 mb-2">CEFR Level:</label>
+                    <select id="cefr-level" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <option>A1</option><option>A2</option><option>A2+</option>
+                        <option selected>B1</option><option>B1+</option><option>B2</option>
+                        <option>B2+</option><option>C1</option><option>C2</option>
+                    </select>
+                </div>
+                 <div>
+                    <label for="filter-type" class="block text-sm font-bold text-gray-700 mb-2">Filter Type:</label>
+                    <select id="filter-type" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <option>General</option><option>IELTS</option><option>TOEFL</option>
+                    </select>
+                </div>
+                <div class="md:col-span-1">
+                    <label for="topic-input" class="block text-sm font-bold text-gray-700 mb-2">Topic:</label>
+                    <input type="text" id="topic-input" placeholder="e.g., 'Artificial Intelligence'" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+            </div>
+
+            <button id="generate-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105">
+                Generate Content
+            </button>
+
+            <div id="loading" class="text-center mt-6 hidden">
+                <div class="inline-flex items-center">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="text-gray-600 font-semibold">Generating your lesson... Please wait.</span>
+                </div>
+            </div>
+
+            <div id="error" class="mt-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden"></div>
+        </main>
+
+        <section id="results" class="mt-8 bg-white p-6 sm:p-8 rounded-2xl shadow-lg hidden prose max-w-none">
+            <!-- Content will be injected here -->
+        </section>
+    </div>
+
+    <script>
+        const generateBtn = document.getElementById('generate-btn');
+        const cefrLevelSelect = document.getElementById('cefr-level');
+        const filterTypeSelect = document.getElementById('filter-type');
+        const topicInput = document.getElementById('topic-input');
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const resultsDiv = document.getElementById('results');
+
+        let keywordsList = [];
+
+        const forbiddenKeywords = ['violence', 'hate speech', 'adult content', 'politics', 'religion', 'dangerous activities', 'self-harm', 'graphic content', 'illegal substances'];
+
+        generateBtn.addEventListener('click', async () => {
+            const cefrLevel = cefrLevelSelect.value;
+            const filterType = filterTypeSelect.value;
+            const topic = topicInput.value.trim();
+
+            errorDiv.classList.add('hidden');
+            resultsDiv.classList.add('hidden');
+            resultsDiv.innerHTML = '';
+            keywordsList = [];
+
+            if (!topic) { showError('Please enter a topic.'); return; }
+            if (isTopicForbidden(topic)) { showError('This topic is not appropriate. Please choose another one.'); return; }
+
+            loadingDiv.classList.remove('hidden');
+            generateBtn.disabled = true;
+
+            try {
+                const prompt = createPrompt(cefrLevel, topic, filterType);
+                const responseText = await callGeminiAPI(prompt);
+                displayInteractiveResults(responseText);
+            } catch (err) {
+                console.error(err);
+                showError(`Content generation failed. Reason: ${err.message}. Please adjust your topic or try again later.`);
+            } finally {
+                loadingDiv.classList.add('hidden');
+                generateBtn.disabled = false;
+            }
+        });
+
+        function isTopicForbidden(topic) {
+            return forbiddenKeywords.some(keyword => topic.toLowerCase().includes(keyword));
+        }
+
+        function createPrompt(level, topic, filterType) {
+            let questionPrompt;
+            const instantFeedbackInstructions = `For each question, you MUST provide the answer and a brief explanation on the lines immediately following it, using these exact formats:
+- For Multiple Choice: Provide 4 options (A, B, C, D). Then, \`ANSWER: A\` and \`EXPLANATION: [brief reason]\`.
+- For True/False/Not Given: \`ANSWER: True\` and \`EXPLANATION: [brief reason]\`.
+            `;
+            
+            switch(filterType) {
+                case 'IELTS':
+                     questionPrompt = `
+                        **IELTS Reading Questions:** Generate a set of 8-10 IELTS-style reading comprehension questions. Include a mix of question types like **Multiple Choice, True/False/Not Given, and Matching Features.** ${instantFeedbackInstructions}
+                    `;
+                    break;
+                case 'TOEFL':
+                    questionPrompt = `
+                        **TOEFL Reading Questions:** Generate a set of 8-10 TOEFL-style reading comprehension questions. Include a mix of question types like **Factual Information, Vocabulary, and Inference questions.** ${instantFeedbackInstructions}
+                    `;
+                    break;
+                default:
+                    questionPrompt = `
+                        **Reading Comprehension Questions:** Generate 5 **True/False** questions and 5 **Open-ended** questions. For the True/False questions, provide the answer and a brief explanation immediately after each one.
+                    `;
+            }
+            
+            return `You are an expert in English language teaching (ELT). Generate educational materials for a high school student at CEFR level ${level} on the topic "${topic}". The entire output must be a single block of markdown text.
+                1.  **Warm-up Questions:** 5 discussion questions.
+                2.  **Keywords List:** 20 keywords with IPA transcriptions. Extract only the keyword itself for a separate list.
+                3.  **Sample Sentences:** 20 sentences using the keywords.
+                4.  **Article:** A 5-paragraph article using the keywords.
+                5.  ${questionPrompt}
+            `;
+        }
+
+        async function callGeminiAPI(prompt) {
+            let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // Keyless API
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
+            
+            const result = await response.json();
+            if (result.promptFeedback && result.promptFeedback.blockReason) {
+                throw new Error(`Content generation blocked. Reason: ${result.promptFeedback.blockReason}`);
+            }
+            if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                return result.candidates[0].content.parts[0].text;
+            }
+            throw new Error('Unexpected API response structure.');
+        }
+        
+        function displayInteractiveResults(text) {
+            // Clean up raw markdown characters that might be returned
+            const cleanedText = text.replace(/```markdown|```/g, '').replace(/---/g, '');
+            
+            let html = '';
+            const sections = cleanedText.split(/(?=^##?#? )/m).filter(s => s.trim());
+
+            sections.forEach(section => {
+                const lines = section.trim().split('\n');
+                const titleLine = lines.shift() || '';
+                const title = titleLine.replace(/^##?#? /, '').replace(/\*\*/g, '').trim();
+                let content = lines.join('\n');
+                
+                html += `<div class="p-2"><h2>${title}</h2>`;
+
+                if (title.includes('Keywords List')) {
+                    keywordsList = lines.map(line => line.match(/^\*?\s*([\w\s'-]+)\s*:/)?.[1]?.trim()).filter(Boolean);
+                }
+                
+                if (title.includes('Sample Sentences') || title.includes('Article')) {
+                    content = boldKeywordsInText(content);
+                }
+
+                if (title.includes('Questions')) {
+                     html += parseInteractiveQuiz(content);
+                } else {
+                    html += simpleMarkdownToHtml(content);
+                }
+                html += `</div>`;
+            });
+
+            resultsDiv.innerHTML = html;
+            resultsDiv.classList.remove('hidden');
+            addInteractivityListeners();
+        }
+
+        function boldKeywordsInText(text) {
+            if (keywordsList.length === 0) return text;
+            const sortedKeywords = [...keywordsList].sort((a, b) => b.length - a.length);
+            let processedText = text;
+            sortedKeywords.forEach(keyword => {
+                const regex = new RegExp(`\\b(${keyword})\\b`, 'gi');
+                processedText = processedText.replace(regex, '<strong>$1</strong>');
+            });
+            return processedText;
+        }
+
+        function parseInteractiveQuiz(content) {
+            let html = '<div id="quiz-container">';
+            const questions = content.split(/^\d+\./m).filter(q => q.trim() !== '');
+            
+            questions.forEach((q, index) => {
+                const qNum = index + 1;
+                const lines = q.trim().split('\n');
+                const questionText = lines.shift() || "";
+                
+                html += `<div class="question-block" id="q-${qNum}"><p><strong>${qNum}. ${questionText}</strong></p>`;
+                
+                const options = lines.filter(l => /^[A-Z]\. |^True$|^False$|^Not Given$/i.test(l));
+                const answerLine = lines.find(l => l.trim().startsWith('ANSWER:'));
+                const explanationLine = lines.find(l => l.trim().startsWith('EXPLANATION:'));
+                
+                if (options.length > 0 && answerLine) {
+                    const answer = answerLine.replace('ANSWER:', '').trim();
+                    const explanation = explanationLine ? explanationLine.replace('EXPLANATION:', '').trim() : 'No explanation provided.';
+
+                    options.forEach(optionText => {
+                        const optionValue = optionText.match(/^[A-Z](?=\.)|^True|^False|^Not Given/i)?.[0];
+                        const isCorrect = optionValue && (answer.toLowerCase().startsWith(optionValue.toLowerCase()));
+                        html += `<button class="answer-choice" data-correct="${isCorrect}" data-question="q-${qNum}" data-explanation="${explanation.replace(/"/g, '&quot;')}">${optionText}</button>`;
+                    });
+                     html += `<div class="feedback hidden"></div>`;
+                } else {
+                     // Non-interactive questions like open-ended or matching
+                     html += `<div class="text-sm text-gray-600 p-2">${lines.join('<br>')}</div>`;
+                }
+                
+                html += `</div>`;
+            });
+
+            html += '</div>';
+            return html;
+        }
+
+        function addInteractivityListeners() {
+            resultsDiv.addEventListener('click', function(e) {
+                if (e.target.matches('.answer-choice') && !e.target.disabled) {
+                    const button = e.target;
+                    const isCorrect = button.dataset.correct === 'true';
+                    const questionBlock = document.getElementById(button.dataset.question);
+                    const feedbackDiv = questionBlock.querySelector('.feedback');
+                    
+                    questionBlock.querySelectorAll('.answer-choice').forEach(btn => {
+                        btn.disabled = true;
+                        if (btn.dataset.correct === 'true') {
+                            btn.classList.add('correct');
+                        }
+                    });
+
+                    if (isCorrect) {
+                        button.classList.add('correct');
+                    } else {
+                        button.classList.add('incorrect');
+                        feedbackDiv.innerHTML = `<strong>Incorrect.</strong> ${button.dataset.explanation}`;
+                        feedbackDiv.className = 'feedback explanation';
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                }
+            });
+        }
+        
+        function simpleMarkdownToHtml(text) {
+            let html = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+                .split('\n')
+                .map(line => {
+                    if (line.match(/^\s*[\*\-]\s/)) {
+                        return `<li>${line.replace(/^\s*[\*\-]\s/, '')}</li>`;
+                    }
+                    return line ? `<p>${line}</p>` : '';
+                })
+                .join('');
+            
+            // Wrap adjacent list items
+            html = html.replace(/<\/p><li>/g, '</li>').replace(/<li>/g, '<ul><li>').replace(/<\/li><\/ul>/g, '</li>');
+            html = html.replace(/(<\/li>)+/g, '</li></ul>').replace(/<ul>/g,'').replace('</ul>','');
+            html = `<ul>${html}</ul>`;
+            html = html.replace(/<p><ul>/g,'<ul>').replace(/<\/ul><\/p>/g,'</ul>');
+            
+            return html;
+        }
+        
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
