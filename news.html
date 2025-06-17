@@ -3,32 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live News & AI Chat</title>
+    <title>Live News, Weather & AI Chat (China Demo)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- STYLES FOR NEWS PAGE -->
+    <!-- STYLES -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f0f2f5;
         }
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        
         .card {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             background-color: white;
@@ -42,33 +34,20 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        /* Audio player styling */
         audio {
             width: 100%;
             border-radius: 8px;
             filter: sepia(20%) saturate(70%) grayscale(1) contrast(99%) hue-rotate(-12deg);
         }
-    </style>
-    <!-- STYLES FOR CHATBOT -->
-    <style>
-        .chat-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        .chat-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .chat-container::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 3px;
-        }
-        .chat-container::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
+        .chat-container::-webkit-scrollbar { width: 6px; }
+        .chat-container::-webkit-scrollbar-track { background: #f1f1f1; }
+        .chat-container::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
+        .chat-container::-webkit-scrollbar-thumb:hover { background: #555; }
+
         .message-bubble {
-            max-width: 80%;
+            max-width: 85%;
             word-wrap: break-word;
         }
-        /* Style for lists parsed from Markdown */
         .message-bubble ul {
             padding-left: 20px;
             list-style: disc;
@@ -87,12 +66,38 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .weather-icon-emoji {
+            font-size: 4rem; /* 64px */
+            line-height: 1;
+        }
     </style>
 </head>
 <body class="antialiased text-gray-800">
 
-    <!-- NEWS PAGE CONTENT -->
     <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <!-- WEATHER SECTION -->
+        <section id="weather-section" class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <div id="weather-loading" class="text-center text-gray-600">Loading Beijing weather...</div>
+            <div id="weather-content" class="hidden">
+                <div class="flex flex-wrap justify-between items-center">
+                    <div class="flex-shrink-0 mb-4 sm:mb-0">
+                        <h2 class="text-2xl font-bold text-gray-800">Beijing Weather</h2>
+                        <p id="beijing-date" class="text-gray-500"></p>
+                        <p id="beijing-time" class="text-gray-500 font-semibold text-lg"></p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div id="weather-icon" class="weather-icon-emoji"></div>
+                        <div>
+                            <p id="weather-temp" class="text-4xl font-bold text-gray-800"></p>
+                            <p id="weather-desc" class="text-gray-600 capitalize"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div id="weather-error" class="hidden text-center text-red-600 bg-red-100 p-3 rounded-lg"></div>
+        </section>
+
+        <!-- NEWS PAGE CONTENT -->
         <header class="mb-8 text-center">
             <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2">Live News Feed</h1>
             <p class="text-lg text-gray-600">Your daily source for news and live audio broadcasts</p>
@@ -101,20 +106,8 @@
         <section id="audio-streams" class="mb-10">
             <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mb-6">Live Audio Streams</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-4 rounded-lg shadow-md">
-                    <h3 class="font-semibold text-lg mb-3">BBC World Service</h3>
-                    <audio controls preload="none">
-                        <source src="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
-                </div>
-                <div class="bg-white p-4 rounded-lg shadow-md">
-                    <h3 class="font-semibold text-lg mb-3">NPR News</h3>
-                     <audio controls preload="none">
-                        <source src="https://npr-ice.streamguys1.com/live.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
-                </div>
+                <div class="bg-white p-4 rounded-lg shadow-md"><h3 class="font-semibold text-lg mb-3">BBC World Service</h3><audio controls preload="none"><source src="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service" type="audio/mpeg">Your browser does not support the audio element.</audio></div>
+                <div class="bg-white p-4 rounded-lg shadow-md"><h3 class="font-semibold text-lg mb-3">NPR News</h3><audio controls preload="none"><source src="https://npr-ice.streamguys1.com/live.mp3" type="audio/mpeg">Your browser does not support the audio element.</audio></div>
             </div>
         </section>
 
@@ -122,210 +115,181 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-blue-500 pb-2 mb-6">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">Top Stories</h2>
                 <div class="relative">
-                    <select id="news-source-selector" class="appearance-none w-full sm:w-auto bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="cna">Channel News Asia (Singapore)</option>
-                        <option value="aljazeera">Al Jazeera</option>
-                    </select>
-                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                    </span>
+                    <select id="news-source-selector" class="appearance-none w-full sm:w-auto bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><option value="cna">Channel News Asia (Singapore)</option><option value="aljazeera">Al Jazeera</option></select>
+                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"><svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg></span>
                 </div>
             </div>
-            <div id="loading" class="text-center py-10">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p class="mt-4 text-gray-600">Fetching latest news...</p>
-            </div>
-            <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            </div>
-             <div id="error-message" class="hidden text-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mt-6">
-                <strong class="font-bold">Error:</strong>
-                <span class="block sm:inline" id="error-text"></span>
-            </div>
+            <div id="loading" class="text-center py-10"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div><p class="mt-4 text-gray-600">Fetching latest news...</p></div>
+            <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div id="error-message" class="hidden text-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mt-6"><strong class="font-bold">Error:</strong><span class="block sm:inline" id="error-text"></span></div>
         </section>
     </div>
 
     <!-- CHATBOT HTML -->
     <div id="chatbot-container-wrapper" class="fixed bottom-20 right-5 hidden z-50">
         <div class="w-full max-w-sm h-full sm:h-[80vh] sm:max-h-[600px] bg-white rounded-lg shadow-2xl flex flex-col">
-            <!-- Header -->
-            <header class="bg-blue-600 text-white p-4 rounded-t-lg flex items-center shadow-md">
-                <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-            </header>
-
-            <!-- Chat Container -->
-            <div id="chat-container" class="flex-1 p-6 overflow-y-auto chat-container bg-gray-50">
-                <!-- Initial Greeting -->
-                <div class="flex justify-start mb-4">
-                    <div class="bg-gray-200 text-gray-800 p-3 rounded-lg message-bubble">
-                        <p>Hello! How can I assist you today?</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Loading Indicator -->
-            <div id="chatbot-loading-indicator" class="p-4 hidden">
-                 <div class="flex justify-start items-center">
-                    <div class="bg-gray-200 p-3 rounded-lg">
-                        <div class="loader"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Input Area -->
-            <footer class="p-4 bg-white border-t border-gray-200 rounded-b-lg">
-                <div class="flex items-center">
-                    <input type="text" id="user-input" class="flex-1 border border-gray-300 rounded-full py-3 px-5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your message...">
-                    <button id="send-button" class="ml-4 bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    </button>
-                </div>
-            </footer>
+            <header class="bg-blue-600 text-white p-4 rounded-t-lg flex items-center shadow-md"><svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg><h3 class="font-semibold text-lg">AI Assistant</h3></header>
+            <div id="chat-container" class="flex-1 p-6 overflow-y-auto chat-container bg-gray-50"><div class="flex justify-start mb-4"><div class="bg-gray-200 text-gray-800 p-3 rounded-lg message-bubble"><p>Hello! I am a live AI assistant. How can I help you today?</p></div></div></div>
+            <div id="chatbot-loading-indicator" class="p-4 hidden"><div class="flex justify-start items-center"><div class="bg-gray-200 p-3 rounded-lg"><div class="loader"></div></div></div></div>
+            <footer class="p-4 bg-white border-t border-gray-200 rounded-b-lg"><div class="flex items-center"><input type="text" id="user-input" class="flex-1 border border-gray-300 rounded-full py-3 px-5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your message..."><button id="send-button" class="ml-4 bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></button></div></footer>
         </div>
     </div>
-    
-    <!-- FLOATING CHATBOT TOGGLE BUTTON -->
-    <button id="chatbot-toggle-button" class="fixed bottom-5 right-5 bg-blue-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-110 z-50">
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-    </button>
+    <button id="chatbot-toggle-button" class="fixed bottom-5 right-5 bg-blue-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-110 z-50"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg></button>
 
-
-    <!-- SCRIPT FOR NEWS PAGE -->
+    <!-- SCRIPT FOR PAGE CONTENT (WEATHER AND NEWS) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- WEATHER SCRIPT (KEYLESS) ---
+            const weatherApiUrl = 'https://wttr.in/Beijing?format=j1';
+
+            async function fetchWeather() {
+                try {
+                    const response = await fetch(weatherApiUrl);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    displayWeather(data);
+                } catch (error) {
+                    console.error("Error fetching weather:", error);
+                    displayWeatherError(`Could not load weather. ${error.message}.`);
+                }
+            }
+            
+            function displayWeather(data) {
+                document.getElementById('weather-loading').classList.add('hidden');
+                document.getElementById('weather-error').classList.add('hidden');
+                document.getElementById('weather-content').classList.remove('hidden');
+
+                const condition = data.current_condition[0];
+                document.getElementById('weather-temp').textContent = `${condition.temp_C}°C`;
+                const weatherDesc = condition.weatherDesc[0].value;
+                document.getElementById('weather-desc').textContent = weatherDesc;
+                document.getElementById('weather-icon').textContent = getWeatherEmoji(condition.weatherCode);
+            }
+
+            function getWeatherEmoji(weatherCode) {
+                const code = parseInt(weatherCode);
+                // Codes from wttr.in documentation
+                if (code >= 389 && code <= 395 || code >= 293 && code <= 308) return '🌨️'; // Snow/Sleet
+                if (code >= 353 && code <= 371 || code >= 263 && code <= 284) return '🌧️'; // Rain
+                if (code >= 227 && code <= 230 || code == 386) return '🌩️'; // Thunder
+                if (code >= 200 && code <= 200) return '⛈️'; // Thundery Showers
+                if (code >= 176 && code <= 185 || code == 248 || code == 260) return '🌫️'; // Fog/Mist
+                if (code >= 119 && code <= 122 || code == 143) return '☁️'; // Cloudy
+                if (code === 116) return '⛅'; // Partly Cloudy
+                if (code === 113) return '☀️'; // Sunny/Clear
+                return '🌡️'; // Default
+            }
+
+            function displayWeatherError(message) {
+                document.getElementById('weather-loading').classList.add('hidden');
+                const errorDiv = document.getElementById('weather-error');
+                errorDiv.textContent = `⚠️ ${message}`;
+                errorDiv.classList.remove('hidden');
+            }
+
+            function updateTime() {
+                const now = new Date();
+                const beijingDateOptions = { timeZone: 'Asia/Shanghai', year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+                const beijingTimeOptions = { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+                
+                document.getElementById('beijing-date').textContent = now.toLocaleDateString('en-US', beijingDateOptions);
+                document.getElementById('beijing-time').textContent = now.toLocaleTimeString('en-US', beijingTimeOptions);
+            }
+
+            // Initial calls
+            fetchWeather();
+            updateTime();
+            // Refresh weather every 15 minutes and time every second
+            setInterval(fetchWeather, 900000); 
+            setInterval(updateTime, 1000);
+            
+            // --- NEWS SCRIPT ---
             const newsContainer = document.getElementById('news-container');
             const loadingIndicator = document.getElementById('loading');
             const sourceSelector = document.getElementById('news-source-selector');
             const errorMessageDiv = document.getElementById('error-message');
             const errorTextSpan = document.getElementById('error-text');
-
-            // Using public RSS feeds from sources generally accessible in China.
-            const newsSources = {
-                cna: 'https://www.channelnewsasia.com/rssfeeds/8395986',
-                aljazeera: 'https://www.aljazeera.com/xml/rss/all.xml',
-            };
-            
-            // This service converts RSS feeds to a usable JSON format.
+            const newsSources = { cna: 'https://www.channelnewsasia.com/rssfeeds/8395986', aljazeera: 'https://www.aljazeera.com/xml/rss/all.xml' };
             const RSS2JSON_API_ENDPOINT = 'https://api.rss2json.com/v1/api.json?rss_url=';
-
+            
             async function fetchNews(sourceKey) {
                 loadingIndicator.style.display = 'block';
                 newsContainer.innerHTML = '';
                 errorMessageDiv.classList.add('hidden');
-
                 const feedUrl = newsSources[sourceKey];
-
                 try {
                     const response = await fetch(`${RSS2JSON_API_ENDPOINT}${encodeURIComponent(feedUrl)}`);
-                    if (!response.ok) {
-                        throw new Error(`Network response was not ok, status: ${response.status}`);
-                    }
+                    if (!response.ok) { throw new Error(`Network response was not ok, status: ${response.status}`); }
                     const data = await response.json();
-                    
-                    if (data.status !== 'ok') {
-                        throw new Error('Could not retrieve news feed. The source might be temporarily unavailable.');
-                    }
-                    
+                    if (data.status !== 'ok') { throw new Error('Could not retrieve news feed. Source may be unavailable.'); }
                     displayArticles(data.items, data.feed.title);
-
-                } catch (error) {
-                    console.error('Error fetching news:', error);
-                    displayError(`Could not fetch news. Please try again later. Details: ${error.message}`);
-                } finally {
-                    loadingIndicator.style.display = 'none';
-                }
+                } catch (error) { console.error('Error fetching news:', error); displayNewsError(`Could not fetch news. Please try again later. Details: ${error.message}`); } 
+                finally { loadingIndicator.style.display = 'none'; }
             }
 
-            function displayError(message) {
-                errorTextSpan.textContent = message;
-                errorMessageDiv.classList.remove('hidden');
-            }
-
+            function displayNewsError(message) { errorTextSpan.textContent = message; errorMessageDiv.classList.remove('hidden'); }
+            
             function displayArticles(articles, feedTitle) {
-                if (!articles || articles.length === 0) {
-                    displayError("No articles were found for this source.");
-                    return;
-                }
-
+                if (!articles || articles.length === 0) { displayNewsError("No articles found for this source."); return; }
                 articles.forEach(article => {
                     const articleEl = document.createElement('div');
                     articleEl.className = 'card';
-                    
                     const title = article.title || 'No Title';
                     const link = article.link || '#';
                     const pubDateStr = article.pubDate;
                     const pubDate = pubDateStr ? new Date(pubDateStr).toLocaleDateString() : 'N/A';
-                    
-                    const description = (article.description || 'No summary available.')
-                                        .replace(/<[^>]*>?/gm, '')
-                                        .substring(0, 150);
-
-
-                    articleEl.innerHTML = `
-                        <a href="${link}" target="_blank" rel="noopener noreferrer" class="flex flex-col h-full">
-                            <h3 class="font-bold text-lg mb-2">${title}</h3>
-                            <p class="text-gray-600 text-sm mb-4 flex-grow">${description}...</p>
-                            <div class="text-xs text-gray-500 mt-auto">
-                                <p><strong>${feedTitle}</strong></p>
-                                <p>Published: ${pubDate}</p>
-                            </div>
-                        </a>
-                    `;
+                    const description = (article.description || 'No summary available.').replace(/<[^>]*>?/gm, '').substring(0, 150);
+                    articleEl.innerHTML = `<a href="${link}" target="_blank" rel="noopener noreferrer" class="flex flex-col h-full"><h3 class="font-bold text-lg mb-2">${title}</h3><p class="text-gray-600 text-sm mb-4 flex-grow">${description}...</p><div class="text-xs text-gray-500 mt-auto"><p><strong>${feedTitle}</strong></p><p>Published: ${pubDate}</p></div></a>`;
                     newsContainer.appendChild(articleEl);
                 });
             }
-
-            sourceSelector.addEventListener('change', (event) => {
-                fetchNews(event.target.value);
-            });
-
+            
+            sourceSelector.addEventListener('change', (event) => { fetchNews(event.target.value); });
             fetchNews(sourceSelector.value);
         });
     </script>
     
-    <!-- SCRIPT FOR CHATBOT -->
+    <!-- SCRIPT FOR CHATBOT (LIVE DEMO WITH SAFETY FEATURES) -->
     <script>
-        // Chatbot UI Elements
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
         const chatbotLoadingIndicator = document.getElementById('chatbot-loading-indicator');
-        
-        // Chatbot Toggle Elements
         const chatbotToggleButton = document.getElementById('chatbot-toggle-button');
         const chatbotContainerWrapper = document.getElementById('chatbot-container-wrapper');
 
-        // --- Event Listeners ---
         sendButton.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        });
-        
-        chatbotToggleButton.addEventListener('click', () => {
-            chatbotContainerWrapper.classList.toggle('hidden');
-        });
+        userInput.addEventListener('keypress', (event) => { if (event.key === 'Enter') sendMessage(); });
+        chatbotToggleButton.addEventListener('click', () => { chatbotContainerWrapper.classList.toggle('hidden'); });
 
-        // --- Main Send Message Function ---
         async function sendMessage() {
             const messageText = userInput.value.trim();
             if (!messageText) return;
-
             displayMessage(messageText, 'user');
             userInput.value = '';
-            
             chatbotLoadingIndicator.classList.remove('hidden');
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
-            const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
+            // --- LIVE AI CALL (WITH SAFETY FEATURES) ---
             try {
+                const apiKey = ""; // API key is injected by the environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
                 const payload = {
-                    contents: [{
-                        role: "user",
-                        parts: [{ text: messageText }]
-                    }]
+                    contents: [{ role: "user", parts: [{ text: messageText }] }],
+                    systemInstruction: {
+                        parts: [{
+                            text: "Please provide answers that are clear, simple, and suitable for all ages. Present information in an organized way, using lists when helpful."
+                        }]
+                    },
+                    safetySettings: [
+                        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_LOW_AND_ABOVE" },
+                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_LOW_AND_ABOVE" },
+                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_LOW_AND_ABOVE" },
+                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_LOW_AND_ABOVE" }
+                    ]
                 };
 
                 const response = await fetch(apiUrl, {
@@ -333,18 +297,25 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
+
                 if (!response.ok) {
-                    throw new Error(`API Error: ${response.statusText}`);
+                    const errorData = await response.json();
+                    throw new Error(`API Error: ${errorData.error.message || response.statusText}`);
                 }
 
                 const result = await response.json();
+                let aiResponse;
 
-                let aiResponse = "Sorry, I couldn't get a response.";
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                  aiResponse = result.candidates[0].content.parts[0].text;
+                // Check for safety blocks first
+                if (result.promptFeedback && result.promptFeedback.blockReason) {
+                    aiResponse = "I'm sorry, your request couldn't be processed due to safety settings. Please try a different topic.";
+                } else if (result.candidates && result.candidates[0].finishReason === "SAFETY") {
+                    aiResponse = "I'm sorry, I can't provide a response on this topic as it may not be safe for all audiences. Please ask about something else.";
+                } else if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                    aiResponse = result.candidates[0].content.parts[0].text;
+                } else {
+                    // Generic fallback if no response and no safety block
+                    aiResponse = "Sorry, I couldn't get a response. Please try again.";
                 }
                 
                 chatbotLoadingIndicator.classList.add('hidden');
@@ -353,20 +324,22 @@
             } catch (error) {
                 console.error('Error fetching AI response:', error);
                 chatbotLoadingIndicator.classList.add('hidden');
-                displayMessage('Sorry, there was an error connecting to the AI.', 'ai');
+                displayMessage(`Sorry, an error occurred. Details: ${error.message}`, 'ai');
             }
         }
-        
+
         function parseMarkdown(text) {
             let html = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            html = html.replace(/^\s*[\*-]\s*(.*)/gm, '<li>$1</li>');
-            html = html.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
-            html = html.split('\n\n').map(paragraph => {
-                if (paragraph.startsWith('<ul>')) return paragraph;
-                return paragraph.trim() ? `<p>${paragraph.replace(/\n/g, '<br>')}</p>` : '';
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            html = html.replace(/^\s*[\*-]\s+(.*)/gm, '<li>$1</li>');
+            html = html.replace(/<\/li>\s*<li>/g, '</li><li>');
+            const listRegex = /(<li>.*<\/li>)/s;
+            if (listRegex.test(html)) { html = html.replace(listRegex, '<ul>$1</ul>'); }
+            return html.split(/\n\s*\n/).map(p => {
+                if (p.startsWith('<ul>') || p.startsWith('<p>')) return p;
+                return p.trim() ? `<p>${p.replace(/\n/g, '<br>')}</p>` : '';
             }).join('');
-            return html;
         }
 
         function displayMessage(text, sender) {
@@ -384,11 +357,40 @@
                 messageBubble.classList.add('bg-gray-200', 'text-gray-800');
                 messageBubble.innerHTML = parseMarkdown(text);
             }
-
             messageWrapper.appendChild(messageBubble);
             chatContainer.appendChild(messageWrapper);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
+
+        /*
+        // --- PRODUCTION CODE FOR CHINA (BAIDU ERNIE BOT) ---
+        // When deploying in China, replace the "LIVE AI CALL (DEMO ENVIRONMENT)"
+        // block above with this one, and add your Baidu API keys.
+        async function sendMessageBaidu() {
+            try {
+                const BAIDU_API_KEY = "YOUR_BAIDU_API_KEY";
+                const BAIDU_SECRET_KEY = "YOUR_BAIDU_SECRET_KEY";
+                const tokenUrl = `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${BAIDU_API_KEY}&client_secret=${BAIDU_SECRET_KEY}`;
+                const tokenResponse = await fetch(tokenUrl, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } });
+                if (!tokenResponse.ok) throw new Error('Failed to fetch Baidu access token.');
+                const tokenData = await tokenResponse.json();
+                const accessToken = tokenData.access_token;
+                const apiUrl = `https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/eb-instant?access_token=${accessToken}`;
+                const payload = { messages: [{ role: "user", content: messageText }] };
+                const chatResponse = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!chatResponse.ok) { const errorData = await chatResponse.json(); throw new Error(`API Error: ${errorData.error_msg || chatResponse.statusText}`); }
+                const result = await chatResponse.json();
+                let aiResponse = "抱歉，我无法获得回复。(Sorry, I couldn't get a response.)";
+                if (result && result.result) { aiResponse = result.result; } else if (result.error_msg) { aiResponse = `Error: ${result.error_msg}`; }
+                chatbotLoadingIndicator.classList.add('hidden');
+                displayMessage(aiResponse, 'ai');
+            } catch (error) {
+                console.error('Error fetching Baidu AI response:', error);
+                chatbotLoadingIndicator.classList.add('hidden');
+                displayMessage(`Sorry, there was an error connecting to Baidu AI. Please check your API keys. \n\nDetails: ${error.message}`, 'ai');
+            }
+        }
+        */
     </script>
 </body>
 </html>
