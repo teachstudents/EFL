@@ -94,7 +94,7 @@
             border-radius: 15px;
             background-color: var(--team2-color);
             color: var(--primary-text);
-            font-size: 1.5rem;
+            font-size: 1.8rem; /* Increased from 1.5rem */
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s;
@@ -175,7 +175,7 @@
             border-radius: 12px;
             background-color: var(--primary-bg);
             color: var(--primary-text);
-            font-size: 1.2rem;
+            font-size: 1.5rem; /* Increased from 1.2rem */
             cursor: pointer;
             transition: all 0.2s ease;
             -webkit-tap-highlight-color: transparent;
@@ -195,12 +195,11 @@
             .player-panel { border-left: none; border-top: 2px solid var(--secondary-bg); }
             h1 { font-size: 2.5rem; }
             .sentence-container { font-size: 1.25rem; }
-            .option-btn { font-size: 1.0rem; padding: 15px; }
+            .option-btn { font-size: 1.2rem; padding: 15px; } /* Increased from 1.0rem */
         }
     </style>
 </head>
 <body>
-    <!-- Main Menu Screen -->
     <div id="main-menu" class="screen active">
         <div class="container">
             <h1>Collocation Challenge</h1>
@@ -209,10 +208,8 @@
         </div>
     </div>
 
-    <!-- Game Screen -->
     <div id="game-screen" class="screen">
         <div id="game-container">
-            <!-- Team 1 Panel (Left) -->
             <div id="team1-panel" class="player-panel">
                 <div class="hud">
                     <span>Team 1</span>
@@ -223,7 +220,6 @@
                 <div class="question-container"><div id="team1-sentence" class="sentence-container"></div></div>
                 <div id="team1-options" class="options-container"></div>
             </div>
-            <!-- Team 2 Panel (Right) -->
             <div id="team2-panel" class="player-panel">
                 <div class="hud">
                     <span>Team 2</span>
@@ -237,7 +233,6 @@
         </div>
     </div>
 
-    <!-- Winner Screen -->
     <div id="winner-screen" class="screen">
         <div class="container">
             <h1>Game Over!</h1>
@@ -256,7 +251,6 @@
         </div>
     </div>
 
-    <!-- Audio elements -->
     <audio id="correct-sound" src="https://raw.githubusercontent.com/teachstudents/EFL/main/correct.mp3" preload="auto"></audio>
     <audio id="incorrect-sound" src="https://raw.githubusercontent.com/teachstudents/EFL/main/incorrect.mp3" preload="auto"></audio>
     <audio id="level-up-sound" src="https://raw.githubusercontent.com/teachstudents/EFL/main/game1.mp3" preload="auto"></audio>
