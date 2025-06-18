@@ -1,1 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Teller Listening Challenge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-image: linear-gradient(to bottom right, #e0f2fe, #dbeafe); /* Tailwind sky-100 to blue-100 */
+            color: #1e293b; /* slate-800 */
+            padding: 20px;
+            text-align: center;
+        }
+        .hidden { display: none !important; }
+        .game-container {
+            background-color: white;
+            padding: 25px 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1); 
+            width: 100%;
+            max-width: 750px; 
+            margin-top: 20px;
+        }
+        #start-screen input[type="text"] {
+            border: 2px solid #e2e8f0; 
+            padding: 12px 15px; 
+            border-radius: 8px;
+            margin-right: 10px;
+            width: calc(100% - 140px); 
+            max-width: 320px;
+            transition: border-color 0.3s ease;
+            color: #1e293b;
+        }
+        #start-screen input[type="text"]:focus {
+            border-color: #0284c7; /* sky-600 */
+            outline: none;
+        }
+        .game-button, .choice-button, .action-button, .settings-button { 
+            padding: 12px 24px; 
+            font-size: 1.05rem; 
+            font-weight: 600; 
+            color: white;
+            background-color: #0ea5e9; /* sky-500 */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .game-button:hover:not(:disabled), .settings-button:hover { 
+            background-color: #0284c7; /* sky-600 */ 
+            transform: translateY(-1px); 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15); 
+        }
+        .game-button:disabled {
+            background-color: #94a3b8; 
+            color: #e5e7eb;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        
+        .choice-button {
+            background-color: #f8fafc; 
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
+            margin: 6px 0;
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-size: 1.25rem; 
+            font-family: 'Courier New', monospace;
+            padding: 1rem;
+            line-height: 1.4; 
+        }
+        .choice-button:hover:not(:disabled) { 
+            background-color: #f1f5f9; 
+            border-color: #94a3b8;
+            transform: translateY(-1px); 
+        }
+        .choice-button.correct { background-color: #10b981; color: white; border-color: #059669;}
+        .choice-button.incorrect { background-color: #f43f5e; color: white; border-color: #e11d48;}
+        .choice-button:disabled { 
+            opacity: 0.7;
+        }
+        .choice-button.correct:disabled, .choice-button.incorrect:disabled {
+            opacity: 1; 
+        }
 
+        .action-button { 
+            background-color: #0284c7; /* sky-600 */
+            font-size: 0.9rem;
+            padding: 8px 16px;
+        }
+        .action-button:hover {
+            background-color: #0369a1; /* sky-700 */
+        }
+        
+        #game-stats div { margin: 6px 0; font-size: 1rem; color: #334155; }
+        #game-stats span.font-bold { color: #0f766e; }
+
+        .modal-overlay {
+            background-color: rgba(30, 41, 59, 0.7); 
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px; 
+            border-radius: 12px; 
+            width: 95%;
+            max-width: 600px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative; 
+        }
+        #feedback { font-weight: 600; margin-top: 15px; min-height: 28px; font-size: 1.1rem; }
+        
+        #badge-alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #0ea5e9;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 2000;
+            font-weight: 600;
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        #badges-display span {
+            background-color: #fde047; 
+            color: #713f12; 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin: 0 4px;
+            display: inline-block;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .voice-selector-container {
+            margin: 15px 0; padding: 15px; background-color: #e0f2fe; border-radius: 10px;
+            border: 1px solid #bae6fd; 
+        }
+        #voiceSelect {
+            padding: 10px 14px; 
+            border-radius: 8px;
+            border: 2px solid #7dd3fc; 
+            background-color: white;
+            min-width: 220px;
+            font-weight: 500;
+            color: #374151;
+            transition: border-color 0.3s ease;
+        }
+        #voiceSelect:focus {
+            border-color: #0ea5e9; 
+            outline: none;
+        }
+        #current-activity-display {
+            min-height: 60px; 
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f0f9ff; 
+            border-radius: 8px;
+            border: 1px solid #e0f2fe; 
+            color: #075985;
+            font-style: italic;
+            font-weight: 500;
+        }
+        
+        #question-stimulus-display { 
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0369a1; 
+            margin-bottom: 10px;
+            text-align: center;
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #0ea5e9;
+        }
+        .settings-button {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        .settings-modal-content label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #374151;
+        }
+         .settings-modal-content input[type="checkbox"] {
+            margin-right: 8px;
+            height: 1.25rem;
+            width: 1.25rem;
+            accent-color: #0e7490;
+        }
+
+        @media (max-width: 480px) { 
+            #start-screen input[type="text"] {
+                width: 100%; max-width: none; margin-bottom:10px; margin-right:0;
+            }
+            .game-button, .choice-button, .action-button, .settings-button { padding: 10px 18px; font-size: 0.95rem;}
+            .game-container { padding: 20px 15px; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="correctSoundEffect" preload="auto"></audio> 
+    <audio id="incorrectSoundEffect" preload="auto"></audio> 
+    <div id="badge-alert" class="hidden">Badge Unlocked!</div>
+
+    <div id="start-screen" class="game-container text-center">
+        <h1 class="text-4xl font-bold mb-4 text-cyan-800">Time Teller Listening Challenge</h1>
+        <p class="mb-6 text-slate-600 text-lg">Enter your name and test your time-telling skills!</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center">
+            <input type="text" id="username" placeholder="Your Gamer Name">
+            <button id="start-button" class="game-button mt-3 sm:mt-0">Start Game</button>
+        </div>
+    </div>
+
+    <div id="game-screen" class="game-container hidden">
+        <div class="flex flex-wrap justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold text-cyan-800">Go, <span id="display-username"></span>!</h2>
+            <div>
+                <button id="settings-button" class="settings-button mr-2">Settings</button>
+                <button id="quit-button" class="game-button !bg-rose-500 hover:!bg-rose-600 !text-white">Quit</button>
+            </div>
+        </div>
+        
+        <div id="game-stats" class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-6 text-slate-700">
+            <div>Score: <span id="score" class="font-bold text-xl">0</span></div> 
+            <div>Question: <span id="question-count" class="font-bold text-xl">0</span> / <span id="total-question-count" class="font-bold text-xl">20</span></div>
+            <div id="game-timer-display">Game Time: <span class="font-bold text-xl">--:--</span></div>
+            <div>Badges: <span id="badges-display">None</span></div>
+        </div>
+
+        <div class="voice-selector-container">
+            <label for="voiceSelect" class="text-slate-700 font-semibold">Select English Voice:</label>
+            <select id="voiceSelect"></select>
+        </div>
+        
+        <div id="current-activity-display" class="text-lg">
+            Click "Start First Question" to begin!
+        </div>
+        <button id="initiate-question-button" class="game-button mt-4">Start First Question</button>
+
+    </div>
+
+    <div id="question-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <img id="rewardGif" class="hidden" alt="Reward Animation"> 
+            <div class="flex justify-between items-center mb-2">
+                <p class="text-sm text-slate-500">Question Timer: <span id="modal-timer" class="font-bold text-base">--</span>s</p>
+                <button id="repeat-button" class="action-button">Repeat Audio</button>
+            </div>
+            <div id="question-stimulus-display" class="mb-4 p-4 bg-slate-100 rounded-lg min-h-[60px] flex flex-col justify-center items-center">
+                Listen to the time...
+            </div>
+            <p id="question-text" class="mb-5 text-xl font-semibold text-slate-800"></p>
+            <div id="answer-options" class="grid grid-cols-1 sm:grid-cols-3 gap-3"> 
+                {/* Answer buttons will be dynamically added here by JavaScript */}
+            </div>
+            <div id="feedback" class="mt-5"></div>
+        </div>
+    </div>
+    
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="settings-modal-content modal-content">
+            <h3 class="text-2xl font-bold mb-6 text-cyan-800">Settings</h3>
+            <div>
+                <label for="toggle-tts">
+                    <input type="checkbox" id="toggle-tts" checked> Enable Text-to-Speech
+                </label>
+            </div>
+            <div class="mt-4">
+                <label for="toggle-sfx">
+                    <input type="checkbox" id="toggle-sfx" checked> Enable Sound Effects
+                </label>
+            </div>
+            <button id="close-settings-button" class="game-button mt-8 w-full">Close</button>
+        </div>
+    </div>
+
+    <div id="game-over-screen" class="game-container hidden text-center">
+        <h2 class="text-3xl font-bold text-cyan-800 mb-5">Game Over, <span id="final-username"></span>!</h2>
+        <div class="mb-4">
+            <p class="text-2xl text-slate-700 mb-1">Final Score: <span id="final-score" class="font-bold text-cyan-600">0</span></p>
+            <p class="text-xl text-slate-600">Badges Earned: <span id="final-badges-display">None</span></p>
+        </div>
+        <div id="high-scores-container" class="mt-6 mb-6 p-4 border border-cyan-300 rounded-lg">
+            <h4 class="text-xl font-semibold text-cyan-700 mb-3">High Scores</h4>
+            <ol id="high-scores-list" class="list-decimal list-inside text-left text-slate-600">
+                {/* High scores will be populated here */}
+            </ol>
+        </div>
+        <button id="play-again-button" class="game-button">Play Again!</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM Fully Loaded and Parsed - Time Teller Listening Challenge");
+            
+            // --- DOM Elements ---
+            const startScreen = document.getElementById('start-screen');
+            const gameScreen = document.getElementById('game-screen');
+            const gameOverScreen = document.getElementById('game-over-screen');
+            const usernameInput = document.getElementById('username');
+            const startButton = document.getElementById('start-button');
+            const quitButton = document.getElementById('quit-button');
+            const displayUsername = document.getElementById('display-username');
+            const scoreDisplay = document.getElementById('score');
+            const questionCountDisplay = document.getElementById('question-count');
+            const totalQuestionCountDisplay = document.getElementById('total-question-count');
+            const gameTimerDisplay = document.querySelector('#game-timer-display span');
+            const badgesDisplay = document.getElementById('badges-display');
+            const voiceSelect = document.getElementById('voiceSelect');
+            const currentActivityDisplay = document.getElementById('current-activity-display');
+            const initiateQuestionButton = document.getElementById('initiate-question-button');
+            const badgeAlert = document.getElementById('badge-alert');
+            
+            const questionModal = document.getElementById('question-modal');
+            const modalTimerDisplay = document.getElementById('modal-timer');
+            const questionStimulusDisplay = document.getElementById('question-stimulus-display');
+            const questionTextDisplay = document.getElementById('question-text');
+            const answerOptionsContainer = document.getElementById('answer-options');
+            const feedbackDisplay = document.getElementById('feedback');
+            const repeatButton = document.getElementById('repeat-button');
+            const rewardGif = document.getElementById('rewardGif'); 
+
+            const settingsButton = document.getElementById('settings-button');
+            const settingsModal = document.getElementById('settings-modal');
+            const closeSettingsButton = document.getElementById('close-settings-button');
+            const toggleTtsCheckbox = document.getElementById('toggle-tts');
+            const toggleSfxCheckbox = document.getElementById('toggle-sfx');
+
+            const finalUsernameDisplay = document.getElementById('final-username');
+            const finalScoreDisplay = document.getElementById('final-score');
+            const finalBadgesDisplay = document.getElementById('final-badges-display');
+            const playAgainButton = document.getElementById('play-again-button');
+            const highScoresList = document.getElementById('high-scores-list');
+
+
+            // --- Game Data & Config ---
+            const TOTAL_QUESTIONS_PER_GAME = 20; 
+            const POINTS_PER_CORRECT_ANSWER = 10; 
+            const TIME_PER_QUESTION_SECONDS = 20; 
+            let gameData = {};
+            let currentQuestionData = {}; 
+            let questionTimerInterval = null;
+            let overallGameTimerInterval = null;
+            let voices = [];
+            let userSelectedVoice = null; 
+            let voicesPopulated = false;
+            let settings = { isTtsEnabled: true, areSoundEffectsEnabled: true };
+            
+            // --- NEW: Engaging Feedback Phrases ---
+            const positivePraises = [
+                "Excellent!", "Great job!", "You got it!", "That's right!", "Awesome!", "Perfect!", "Well done!", "You're a star!"
+            ];
+            const motivationalPhrases = [
+                "Almost there!", "Good try!", "Keep going!", "Don't give up!", "You can do it!", "Nice attempt!"
+            ];
+
+            const idiomaticTimeQuestions = [
+                { spoken: "Quarter past one", correct: "1:15" }, { spoken: "Quarter to two", correct: "1:45" },
+                { spoken: "Ten till three", correct: "2:50" }, { spoken: "Ten past four", correct: "4:10" },
+                { spoken: "Twenty to five", correct: "4:40" }, { spoken: "Twenty past six", correct: "6:20" },
+                { spoken: "Five to seven", correct: "6:55" }, { spoken: "Five past eight", correct: "8:05" },
+                { spoken: "Half past nine", correct: "9:30" }, { spoken: "Half past ten", correct: "10:30" },
+                { spoken: "Quarter past eleven", correct: "11:15" }, { spoken: "Quarter to twelve", correct: "11:45" },
+                { spoken: "Ten till one", correct: "12:50" }, { spoken: "Twenty-five to five", correct: "4:35"},
+                { spoken: "Twenty-five past six", correct: "6:25"}
+            ];
+
+            // --- Load & Save Settings ---
+            function loadSettings() {
+                const savedSettings = localStorage.getItem('listeningGameSettings');
+                if (savedSettings) settings = JSON.parse(savedSettings);
+                toggleTtsCheckbox.checked = settings.isTtsEnabled;
+                toggleSfxCheckbox.checked = settings.areSoundEffectsEnabled;
+            }
+            function saveSettings() {
+                localStorage.setItem('listeningGameSettings', JSON.stringify(settings));
+            }
+            
+            // --- High Score Logic ---
+            const MAX_HIGH_SCORES = 5;
+            function getHighScores() {
+                return JSON.parse(localStorage.getItem('listeningGameHighScores') || '[]');
+            }
+            function saveHighScore(score, username) {
+                const highScores = getHighScores();
+                const newScore = { score, username, date: new Date().toLocaleDateString() };
+                highScores.push(newScore);
+                highScores.sort((a, b) => b.score - a.score); 
+                highScores.splice(MAX_HIGH_SCORES); 
+                localStorage.setItem('listeningGameHighScores', JSON.stringify(highScores));
+            }
+            function displayHighScores() {
+                const highScores = getHighScores();
+                highScoresList.innerHTML = highScores.length === 0 
+                    ? '<li class="text-slate-500">No high scores yet!</li>'
+                    : highScores.map(s => `<li>${s.username}: ${s.score} (on ${s.date})</li>`).join('');
+            }
+
+            // --- TTS Functions ---
+            function populateVoiceList(loadedVoices) {
+                if (voicesPopulated) return;
+                voices = loadedVoices.filter(voice => voice.lang.startsWith('en'));
+                if (voices.length === 0) {
+                    currentActivityDisplay.textContent = "No English voices found for Text-to-Speech.";
+                    initiateQuestionButton.disabled = true;
+                    return;
+                }
+                
+                voiceSelect.innerHTML = voices.map(voice => 
+                    `<option data-name="${voice.name}" data-lang="${voice.lang}">${voice.name} (${voice.lang})</option>`
+                ).join('');
+
+                const naturalKeywords = ["natural", "neural", "studio", "premium"];
+                let defaultVoice = voices.find(v => naturalKeywords.some(kw => v.name.toLowerCase().includes(kw))) ||
+                                 voices.find(v => v.name.toLowerCase().includes("google") && v.name.toLowerCase().includes("us")) ||
+                                 voices.find(v => v.default);
+                if (!defaultVoice) defaultVoice = voices[0];
+                
+                userSelectedVoice = defaultVoice;
+                const defaultOption = voiceSelect.querySelector(`option[data-name="${defaultVoice.name}"]`);
+                if(defaultOption) defaultOption.selected = true;
+
+                voicesPopulated = true;
+                initiateQuestionButton.disabled = false;
+            }
+            
+            function initSpeechSynthesis() {
+                if ('speechSynthesis' in window) {
+                    const tryPopulate = () => {
+                        const currentVoices = speechSynthesis.getVoices();
+                        if (currentVoices.length > 0) populateVoiceList(currentVoices);
+                    };
+                    speechSynthesis.onvoiceschanged = tryPopulate;
+                    tryPopulate();
+                    setTimeout(tryPopulate, 250); // Fallback for some browsers
+
+                    voiceSelect.addEventListener('change', (e) => {
+                        const selectedOption = e.target.options[e.target.selectedIndex];
+                        userSelectedVoice = voices.find(v => v.name === selectedOption.dataset.name);
+                    });
+                } else {
+                    currentActivityDisplay.textContent = "Text-to-Speech is not supported in this browser.";
+                    initiateQuestionButton.disabled = true;
+                }
+            }
+                 
+            function speak(text, callback) {
+                if (!settings.isTtsEnabled || !('speechSynthesis' in window) || !text) {
+                    if (callback) setTimeout(callback, 0);
+                    return;
+                }
+                speechSynthesis.cancel(); // Clear any previous utterances
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = userSelectedVoice;
+                utterance.onend = () => {
+                    if (callback) callback();
+                };
+                utterance.onerror = (event) => {
+                    console.error("Speech Synthesis Error:", event.error);
+                    if (callback) callback(); // Ensure callback fires even on error
+                };
+                speechSynthesis.speak(utterance);
+            }
+
+            // --- Game Logic Functions ---
+            function resetGameData() {
+                gameData = {
+                    username: usernameInput.value.trim() || "Player",
+                    score: 0,
+                    questionsAnswered: 0,
+                    totalQuestions: TOTAL_QUESTIONS_PER_GAME,
+                    badges: [],
+                    correctStreak: 0,
+                    gameStartTime: Date.now()
+                };
+                updateGameStatsDisplay();
+                initiateQuestionButton.textContent = "Start First Question";
+                initiateQuestionButton.disabled = false;
+                currentActivityDisplay.textContent = "Click 'Start First Question' to begin!";
+            }
+
+            function updateGameStatsDisplay() {
+                displayUsername.textContent = gameData.username;
+                scoreDisplay.textContent = gameData.score;
+                questionCountDisplay.textContent = gameData.questionsAnswered;
+                totalQuestionCountDisplay.textContent = gameData.totalQuestions;
+                badgesDisplay.innerHTML = gameData.badges.length > 0 
+                    ? gameData.badges.map(b => `<span class="inline-block">${b}</span>`).join(' ') 
+                    : 'None';
+            }
+            
+            function startGame() {
+                if (!usernameInput.value.trim()) {
+                    usernameInput.classList.add('border-red-500');
+                    return;
+                }
+                resetGameData();
+                startOverallGameTimer();
+                startScreen.classList.add('hidden');
+                gameOverScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+            }
+
+            function startOverallGameTimer() {
+                clearInterval(overallGameTimerInterval);
+                overallGameTimerInterval = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - gameData.gameStartTime) / 1000);
+                    const minutes = Math.floor(elapsed / 60);
+                    const seconds = elapsed % 60;
+                    gameTimerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                }, 1000);
+            }
+            
+            // --- NEW: Procedural Question Generation ---
+            function generateRandomTimeQuestion() {
+                const hour = Math.floor(Math.random() * 12) + 1;
+                const minute = Math.floor(Math.random() * 60);
+                const minuteString = String(minute).padStart(2, '0');
+                
+                let spoken = `${hour} `;
+                if (minute === 0) {
+                    spoken = `${hour} o'clock`;
+                } else if (minute < 10) {
+                    spoken += `oh ${minute}`;
+                } else {
+                    spoken += `${minute}`;
+                }
+                return { spoken, correct: `${hour}:${minuteString}` };
+            }
+
+            function getNextQuestion() {
+                // Mix of idiomatic phrases and procedurally generated times
+                if (Math.random() > 0.65 && idiomaticTimeQuestions.length > 0) {
+                    const index = Math.floor(Math.random() * idiomaticTimeQuestions.length);
+                    return idiomaticTimeQuestions[index];
+                }
+                return generateRandomTimeQuestion();
+            }
+
+            function startNewQuestionRound() {
+                if (gameData.questionsAnswered >= TOTAL_QUESTIONS_PER_GAME) {
+                    endGame();
+                    return;
+                }
+                initiateQuestionButton.disabled = true;
+                currentActivityDisplay.textContent = "Listen carefully...";
+
+                currentQuestionData = getNextQuestion();
+                console.log(`New Question: "${currentQuestionData.spoken}" -> ${currentQuestionData.correct}`);
+                
+                questionStimulusDisplay.textContent = `Listen to the time...`;
+                questionTextDisplay.textContent = `Which digital time matches what you heard?`;
+                
+                const questionAudio = currentQuestionData.spoken;
+
+                if(settings.isTtsEnabled){
+                    speak(questionAudio, displayQuestionModalWithOptions);
+                } else {
+                    questionStimulusDisplay.textContent = `"${questionAudio}"`;
+                    displayQuestionModalWithOptions();
+                }
+            }
+
+            function generateDistractorTimes(correctTime) {
+                const [hour, minute] = correctTime.split(':').map(Number);
+                let distractors = new Set();
+                while (distractors.size < 2) {
+                    const type = Math.floor(Math.random() * 3);
+                    let newHour = hour, newMinute = minute;
+                    if (type === 0) newMinute = (minute + 5 + Math.floor(Math.random()*3)*5) % 60; // Similar minute
+                    else if (type === 1) newHour = (hour % 12) + (Math.random() < 0.5 ? -1 : 1); // Different hour
+                    else newMinute = 60 - minute; // Mirrored minute
+                    
+                    if (newHour <= 0) newHour = 12;
+                    if (newHour > 12) newHour = 1;
+                    
+                    const distractor = `${newHour}:${String(newMinute).padStart(2, '0')}`;
+                    if (distractor !== correctTime) distractors.add(distractor);
+                }
+                return Array.from(distractors);
+            }
+            
+            function displayQuestionModalWithOptions() {
+                const { correct } = currentQuestionData;
+                let options = [correct, ...generateDistractorTimes(correct)]; 
+                for (let i = options.length - 1; i > 0; i--) { // Shuffle options
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [options[i], options[j]] = [options[j], options[i]];
+                }
+
+                answerOptionsContainer.innerHTML = options.map(optionText => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-button';
+                    btn.textContent = optionText;
+                    btn.onclick = () => checkAnswer(optionText, correct, btn);
+                    return btn.outerHTML;
+                }).join('');
+                
+                feedbackDisplay.textContent = '';
+                rewardGif.classList.add('hidden');
+                questionModal.classList.remove('hidden');
+                startQuestionTimer();
+            }
+            
+            function startQuestionTimer() {
+                clearInterval(questionTimerInterval);
+                let timeLeft = TIME_PER_QUESTION_SECONDS;
+                modalTimerDisplay.textContent = timeLeft;
+                questionTimerInterval = setInterval(() => {
+                    timeLeft--;
+                    modalTimerDisplay.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(questionTimerInterval);
+                        feedbackDisplay.textContent = `Time's up! The correct time was: ${currentQuestionData.correct}`;
+                        feedbackDisplay.style.color = '#f59e0b';
+                        disableAnswerOptions(currentQuestionData.correct);
+                        gameData.correctStreak = 0;
+                        setTimeout(proceedToNext, 3000); // Auto-proceed after timeout
+                    }
+                }, 1000);
+            }
+
+            function disableAnswerOptions(correctAnswerText = null) {
+                Array.from(answerOptionsContainer.children).forEach(btn => {
+                    btn.disabled = true;
+                    if (correctAnswerText && btn.textContent === correctAnswerText && !btn.classList.contains('correct')) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+
+            function checkAnswer(selectedAnswerText, correctAnswerText, buttonElement) {
+                clearInterval(questionTimerInterval);
+                disableAnswerOptions(); 
+                gameData.questionsAnswered++;
+
+                let feedbackText = '';
+                if (selectedAnswerText === correctAnswerText) {
+                    gameData.score += POINTS_PER_CORRECT_ANSWER;
+                    gameData.correctStreak++;
+                    buttonElement.classList.add('correct');
+                    const praise = positivePraises[Math.floor(Math.random() * positivePraises.length)];
+                    feedbackText = praise;
+                    feedbackDisplay.textContent = feedbackText;
+                    feedbackDisplay.style.color = '#10b981';
+                    if (gameData.correctStreak === 5) awardBadge("Time Master!");
+                } else {
+                    gameData.correctStreak = 0;
+                    buttonElement.classList.add('incorrect');
+                    Array.from(answerOptionsContainer.children).find(btn => btn.textContent === correctAnswerText)?.classList.add('correct');
+                    const motivation = motivationalPhrases[Math.floor(Math.random() * motivationalPhrases.length)];
+                    feedbackText = `${motivation} The correct answer was ${correctAnswerText}.`;
+                    feedbackDisplay.textContent = `Not quite. The correct time was: ${correctAnswerText}`;
+                    feedbackDisplay.style.color = '#f43f5e';
+                }
+                
+                speak(feedbackText, () => {
+                     // The timeout ensures even if speech is fast, user has time to see result
+                });
+
+                updateGameStatsDisplay();
+                setTimeout(proceedToNext, 3500); // Auto-proceed to next question after 3.5s
+            }
+            
+            // --- NEW: Automated Progression ---
+            function proceedToNext() {
+                questionModal.classList.add('hidden');
+                if (gameData.questionsAnswered >= TOTAL_QUESTIONS_PER_GAME) {
+                    endGame();
+                } else {
+                    startNewQuestionRound();
+                }
+            }
+            
+            function endGame() {
+                clearInterval(overallGameTimerInterval);
+                saveHighScore(gameData.score, gameData.username);
+                displayHighScores();
+                
+                gameScreen.classList.add('hidden');
+                questionModal.classList.add('hidden');
+                gameOverScreen.classList.remove('hidden');
+                
+                finalUsernameDisplay.textContent = gameData.username;
+                finalScoreDisplay.textContent = gameData.score;
+                finalBadgesDisplay.innerHTML = badgesDisplay.innerHTML;
+            }
+
+            function awardBadge(badgeName) {
+                if (!gameData.badges.includes(badgeName)) {
+                    gameData.badges.push(badgeName);
+                    updateGameStatsDisplay();
+                    badgeAlert.textContent = `Badge Unlocked: ${badgeName}!`;
+                    badgeAlert.classList.remove('hidden');
+                    setTimeout(() => badgeAlert.classList.add('hidden'), 2500);
+                }
+            }
+
+            function quitGame() {
+                if (confirm("Are you sure you want to quit?")) {
+                    clearInterval(questionTimerInterval);
+                    clearInterval(overallGameTimerInterval);
+                    gameScreen.classList.add('hidden');
+                    questionModal.classList.add('hidden');
+                    gameOverScreen.classList.add('hidden');
+                    startScreen.classList.remove('hidden');
+                }
+            }
+
+            // --- Event Listeners ---
+            startButton.addEventListener('click', startGame);
+            usernameInput.addEventListener('keyup', (e) => {
+                if(e.key === 'Enter') startGame();
+            });
+            playAgainButton.addEventListener('click', () => {
+                gameOverScreen.classList.add('hidden');
+                startScreen.classList.remove('hidden');
+            });
+            initiateQuestionButton.addEventListener('click', startNewQuestionRound);
+            quitButton.addEventListener('click', quitGame);
+            repeatButton.addEventListener('click', () => {
+                if (currentQuestionData && currentQuestionData.spoken) {
+                    speak(currentQuestionData.spoken, null);
+                }
+            });
+            settingsButton.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+            closeSettingsButton.addEventListener('click', () => settingsModal.classList.add('hidden'));
+            toggleTtsCheckbox.addEventListener('change', (e) => {
+                settings.isTtsEnabled = e.target.checked;
+                saveSettings();
+                if (!settings.isTtsEnabled) speechSynthesis.cancel();
+            });
+            toggleSfxCheckbox.addEventListener('change', (e) => {
+                settings.areSoundEffectsEnabled = e.target.checked;
+                saveSettings();
+            });
+
+            // --- Initial Load ---
+            initSpeechSynthesis();
+            loadSettings(); 
+        });
+    </script>
+</body>
+</html>
