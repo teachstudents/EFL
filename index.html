@@ -2,9 +2,9 @@
 // This file defines the project and its dependencies.
 
 {
-  "name": "secure-ai-backend",
+  "name": "multi-purpose-ai-backend",
   "version": "1.0.0",
-  "description": "Secure backend for AI chat",
+  "description": "Secure backend for AI chat and summarization",
   "main": "HttpTrigger1/index.js",
   "dependencies": {
     "@azure/identity": "^4.0.0",
@@ -38,6 +38,7 @@
 ```javascript
 // File: HttpTrigger1/index.js
 // This is the main logic for your secure backend function.
+// It now handles both 'chat' and 'summarize' requests.
 
 const { OpenAIClient } = require("@azure/openai");
 const { DefaultAzureCredential } = require("@azure/identity");
@@ -46,14 +47,11 @@ module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
 
     // --- Configuration ---
-    // These values should be set in your Azure Function App's Configuration settings.
     const azureOpenAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT;
     const azureOpenAIDeploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME;
-    // Set FRONTEND_URL to your GitHub pages URL in the Function App's configuration.
     const frontendUrl = process.env.FRONTEND_URL || "*"; 
 
     // --- CORS Preflight Handling ---
-    // Browsers send an OPTIONS request to check permissions before sending the actual POST request.
     if (req.method === 'OPTIONS') {
         context.res = {
             status: 204, // No Content
@@ -67,47 +65,51 @@ module.exports = async function (context, req) {
         return;
     }
 
+    const commonHeaders = { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': frontendUrl 
+    };
+
     if (!azureOpenAIEndpoint || !azureOpenAIDeploymentName) {
-        context.res = {
-            status: 500,
-            headers: { 'Access-Control-Allow-Origin': frontendUrl },
-            body: "Error: Application settings AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_DEPLOYMENT_NAME must be set."
-        };
+        context.res = { status: 500, headers: commonHeaders, body: { error: "Azure OpenAI endpoint and deployment name must be configured in application settings." } };
         return;
     }
 
-    const userMessage = (req.body && req.body.message);
+    const { type, content } = req.body;
 
-    if (!userMessage) {
-        context.res = {
-            status: 400,
-            headers: { 'Access-Control-Allow-Origin': frontendUrl },
-            body: "Please pass a 'message' in the request body"
-        };
+    if (!type || !content) {
+        context.res = { status: 400, headers: commonHeaders, body: { error: "Request body must include 'type' (chat/summarize) and 'content'." } };
         return;
     }
 
     try {
-        // --- Keyless Authentication ---
-        // DefaultAzureCredential will automatically use the Function App's Managed Identity.
         const credential = new DefaultAzureCredential();
         const client = new OpenAIClient(azureOpenAIEndpoint, credential);
 
-        const messages = [
-            { role: "system", content: "You are a helpful assistant." },
-            { role: "user", content: userMessage },
-        ];
+        let messages;
+
+        // --- DYNAMIC PROMPT SELECTION ---
+        if (type === 'chat') {
+            messages = [
+                { role: "system", content: "You are a helpful assistant. Provide clear, simple answers suitable for all ages. Use lists when helpful." },
+                { role: "user", content: content },
+            ];
+        } else if (type === 'summarize') {
+            messages = [
+                { role: "system", content: "You are an expert at summarizing news articles. Provide a concise, neutral summary of the following text, suitable for all audiences. The summary should be about 2-3 sentences long." },
+                { role: "user", content: content },
+            ];
+        } else {
+            context.res = { status: 400, headers: commonHeaders, body: { error: "Invalid request 'type'. Must be 'chat' or 'summarize'." } };
+            return;
+        }
 
         const result = await client.getChatCompletions(azureOpenAIDeploymentName, messages);
-
         const aiResponse = result.choices[0].message.content;
 
         context.res = {
             status: 200,
-            headers: { 
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': frontendUrl 
-            },
+            headers: commonHeaders,
             body: { response: aiResponse }
         };
 
@@ -115,8 +117,8 @@ module.exports = async function (context, req) {
         context.log.error("Error calling Azure OpenAI: ", error);
         context.res = {
             status: 500,
-            headers: { 'Access-Control-Allow-Origin': frontendUrl },
-            body: `Error processing your request. ${error.message}`
+            headers: commonHeaders,
+            body: { error: `Error processing your request. ${error.message}` }
         };
     }
 }
