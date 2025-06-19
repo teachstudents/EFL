@@ -335,13 +335,12 @@
                 ]
             };
 
-            const TOTAL_QUESTIONS = 10;
+            const WINNING_SCORE = 100;
             const POINTS_PER_CORRECT = 10;
             const QUESTION_TIME_LIMIT = 20;
 
             let players = [ { score: 0, name: 'Player 1' }, { score: 0, name: 'Player 2' } ];
             let currentQuestion = {};
-            let questionsAsked = 0;
             let isRoundOver = false;
             let voices = [];
             let preferredVoices = [];
@@ -480,11 +479,6 @@
 
             function askQuestion() {
                 resetBoard();
-                if (questionsAsked >= TOTAL_QUESTIONS) {
-                    endGame();
-                    return;
-                }
-                questionsAsked++;
                 isRoundOver = false;
                 
                 currentQuestion = generateScheduleQuestion();
@@ -529,6 +523,13 @@
                     setTimeout(() => {
                         panel.scorePopup.classList.remove('active');
                     }, 800);
+                    
+                    // Check for winner
+                    if (players[playerIndex].score >= WINNING_SCORE) {
+                        setTimeout(endGame, 1000);
+                    } else {
+                        setTimeout(askQuestion, 2000);
+                    }
 
                 } else {
                     button.classList.add('incorrect');
@@ -542,9 +543,8 @@
                             }
                         });
                     });
+                    setTimeout(askQuestion, 2000);
                 }
-                
-                setTimeout(askQuestion, 2000);
             }
             
             async function startGame() {
@@ -559,7 +559,6 @@
                 dom.startOverlay.classList.add('hidden');
                 dom.winnerAnnouncement.classList.add('hidden');
                 
-                questionsAsked = 0;
                 players.forEach(p => p.score = 0);
                 updateScores();
                 
@@ -576,12 +575,16 @@
                 dom.playAgainBtn.classList.remove('hidden');
                 
                 let winnerText;
-                if (players[0].score > players[1].score) {
+                if (players[0].score >= WINNING_SCORE) {
                     winnerText = `${players[0].name} Wins!`;
-                } else if (players[1].score > players[0].score) {
+                } else if (players[1].score >= WINNING_SCORE) {
                     winnerText = `${players[1].name} Wins!`;
                 } else {
-                    winnerText = "It's a Tie!";
+                     // This case happens if endGame is called by other means (less likely now)
+                    winnerText = players[0].score > players[1].score ? `${players[0].name} Wins!` : `${players[1].name} Wins!`;
+                    if (players[0].score === players[1].score) {
+                        winnerText = "It's a Tie!";
+                    }
                 }
                 dom.winnerAnnouncement.textContent = winnerText;
                 dom.winnerAnnouncement.classList.remove('hidden');
