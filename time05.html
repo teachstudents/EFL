@@ -42,7 +42,7 @@
         .game-board {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto 1fr;
+            grid-template-rows: auto auto 1fr;
             height: 100vh;
             width: 100%;
             gap: 0;
@@ -51,17 +51,29 @@
         .game-title {
             grid-column: 1 / -1;
             font-weight: 700;
-            font-size: 1.75rem;
+            font-size: 2rem;
             color: var(--main-text);
             text-align: center;
             padding: 0.5rem;
+        }
+
+        #timer-display {
+            grid-column: 1 / -1;
+            justify-self: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem 2rem;
+            font-weight: 700;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 12px;
+            font-size: 1.25rem;
         }
 
         .player-panel {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 1.5rem;
+            padding: 2.5rem;
             transition: background-color 0.3s;
         }
 
@@ -76,37 +88,37 @@
 
         .player-header {
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             position: relative;
         }
         
         .player-name {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 700;
         }
         #player-1-panel .player-name { color: var(--p1-accent); }
         #player-2-panel .player-name { color: var(--p2-accent); }
         
         .player-score {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             color: var(--main-text);
             margin-top: 0.5rem;
         }
         
         .badges-display-container {
-            margin-top: 0.75rem;
-            min-height: 30px;
+            margin-top: 1rem;
+            min-height: 34px;
         }
 
         .badge {
             display: inline-block;
             background-color: var(--badge-bg);
             color: var(--badge-text);
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 0.9rem;
             font-weight: 600;
-            margin: 0 4px;
+            margin: 0 5px;
         }
 
         .score-popup {
@@ -114,7 +126,7 @@
             left: 50%;
             top: 20px;
             transform: translateX(-50%);
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: var(--correct-bg);
             opacity: 0;
@@ -131,26 +143,26 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1rem;
-            min-height: 200px;
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
 
         .answer-btn {
-            padding: 1rem;
+            padding: 1.5rem;
             width: 100%;
-            max-width: 400px;
-            font-size: 1.25rem;
+            max-width: 450px;
+            font-size: 1.5rem;
             font-weight: 600;
-            border-radius: 12px;
+            border-radius: 16px;
             background-color: var(--btn-bg);
             color: var(--btn-text);
-            border: 2px solid #d1d5db;
+            border: 3px solid #d1d5db;
             cursor: pointer;
             transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.05);
         }
         .answer-btn:not(:disabled):hover {
-            transform: translateY(-3px);
+            transform: translateY(-4px);
             background-color: var(--btn-hover-bg);
         }
         .answer-btn:disabled {
@@ -171,25 +183,10 @@
         
         .feedback-display {
             text-align: center;
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: 600;
-            margin-top: 2rem;
+            margin-top: 2.5rem;
             height: 3rem;
-        }
-
-        .game-controls {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            background: white;
-            padding: 1rem;
-            border-radius: 16px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            z-index: 5;
         }
 
         .control-btn {
@@ -206,14 +203,6 @@
         .control-btn:hover {
             transform: translateY(-2px);
             background-color: var(--btn-hover-bg);
-        }
-        
-        #timer-display {
-            font-weight: 700;
-            background-color: #ef4444;
-            color: white;
-            border-color: #b91c1c;
-            pointer-events: none;
         }
         
         #badge-alert {
@@ -237,8 +226,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             z-index: 10;
+            overflow-y: auto;
+            justify-content: flex-start; /* MODIFIED */
+            padding-top: 10vh; /* MODIFIED */
         }
         .start-box, .game-over-box {
             background: white;
@@ -282,7 +273,7 @@
             }
             .game-board {
                 grid-template-columns: 1fr;
-                grid-template-rows: auto auto 1fr 1fr;
+                grid-template-rows: auto auto auto 1fr 1fr;
             }
             #player-1-panel {
                 border-right: none;
@@ -303,6 +294,7 @@
 
     <div class="game-board hidden">
         <h1 class="game-title">Question: <span id="question-count">0</span> / 25</h1>
+        <div id="timer-display" class="hidden">Time: 20</div>
 
         <!-- Player 1 Panel -->
         <div class="player-panel" id="player-1-panel">
@@ -348,10 +340,6 @@
             <button id="play-again-btn" class="control-btn w-full mt-8">Play Again</button>
         </div>
     </div>
-
-    <div class="game-controls hidden">
-        <div id="timer-display" class="control-btn hidden">Time: 20</div>
-    </div>
     
     <div id="badge-alert">Badge Unlocked!</div>
 
@@ -363,7 +351,6 @@
                 p1NameInput: document.getElementById('p1-name-input'),
                 p2NameInput: document.getElementById('p2-name-input'),
                 gameBoard: document.querySelector('.game-board'),
-                gameControls: document.querySelector('.game-controls'),
                 
                 gameOverContainer: document.getElementById('game-over-container'),
                 winnerAnnouncement: document.querySelector('.winner-announcement'),
@@ -572,7 +559,6 @@
                 dom.startOverlay.classList.add('hidden');
                 dom.gameOverContainer.classList.add('hidden');
                 dom.gameBoard.classList.remove('hidden');
-                dom.gameControls.classList.remove('hidden');
                 
                 questionsAsked = 0;
                 askQuestion();
@@ -632,7 +618,6 @@
                 
                 displayHighScores();
                 dom.gameBoard.classList.add('hidden');
-                dom.gameControls.classList.add('hidden');
                 dom.gameOverContainer.classList.remove('hidden');
             }
             
