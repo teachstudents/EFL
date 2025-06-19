@@ -3,1062 +3,605 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Teller Listening Challenge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>2-Player Schedule Change Challenge</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Bungee&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --p1-bg: #f0f9ff; /* sky-50 */
+            --p1-accent: #0ea5e9; /* sky-500 */
+            --p1-accent-dark: #0284c7; /* sky-600 */
+            --p2-bg: #fff7ed; /* orange-50 */
+            --p2-accent: #f97316; /* orange-500 */
+            --p2-accent-dark: #ea580c; /* orange-600 */
+            --correct-bg: #16a34a; /* green-600 */
+            --incorrect-bg: #dc2626; /* red-600 */
+            --main-text: #44403c; /* stone-700 */
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; 
+        }
+
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr;
+            height: 100vh;
+            width: 100%;
+            gap: 0;
+        }
+        
+        .game-title {
+            grid-column: 1 / -1;
+            font-family: 'Bungee', cursive;
+            color: var(--main-text);
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .player-panel {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-image: linear-gradient(to bottom right, #e0f2fe, #dbeafe); /* Tailwind sky-100 to blue-100 */
-            color: #1e293b; /* slate-800 */
-            padding: 20px;
+            justify-content: center;
+            padding: 2rem;
+            transition: background-color 0.3s;
+        }
+
+        #player-1-panel {
+            background-color: var(--p1-bg);
+            border-right: 4px solid #cbd5e1;
+        }
+
+        #player-2-panel {
+            background-color: var(--p2-bg);
+        }
+
+        .player-header {
             text-align: center;
+            margin-bottom: 2.5rem; /* Increased margin */
+            position: relative; /* For score popup positioning */
         }
-        .hidden { display: none !important; }
-        .game-container {
-            background-color: white;
-            padding: 25px 30px; 
-            border-radius: 16px; 
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1); 
-            width: 100%;
-            max-width: 750px; 
-            margin-top: 20px;
+        
+        .player-name {
+            font-size: 2rem;
+            font-weight: 700;
         }
-        #start-screen input[type="text"] {
-            border: 2px solid #e2e8f0; 
-            padding: 12px 15px; 
-            border-radius: 8px;
-            margin-right: 10px;
-            width: calc(100% - 140px); 
-            max-width: 320px;
-            transition: border-color 0.3s ease;
-            color: #1e293b;
+        #player-1-panel .player-name { color: var(--p1-accent-dark); }
+        #player-2-panel .player-name { color: var(--p2-accent-dark); }
+        
+        .player-score {
+            font-size: 1.5rem;
+            color: var(--main-text);
         }
-        #start-screen input[type="text"]:focus {
-            border-color: #0284c7; /* sky-600 */
-            outline: none;
+        
+        .score-popup {
+            position: absolute;
+            left: 50%;
+            top: 20px; /* Start below the score */
+            transform: translateX(-50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--correct-bg);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+            pointer-events: none;
         }
-        .game-button, .choice-button, .action-button, .settings-button { 
-            padding: 12px 24px; 
-            font-size: 1.05rem; 
-            font-weight: 600; 
-            color: white;
-            background-color: #0ea5e9; /* sky-500 */
+
+        .score-popup.active {
+            transform: translate(-50%, -80px); /* Move up */
+            opacity: 1;
+        }
+
+        .answer-buttons {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap; 
+            justify-content: center;
+            gap: 1rem;
+            min-height: 120px; /* Reserve space for buttons */
+        }
+
+        .answer-btn {
+            padding: 1rem 1.5rem;
+            font-size: 1.75rem;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            border-radius: 12px;
             border: none;
-            border-radius: 8px;
+            color: white;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s, background-color 0.2s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .game-button:hover:not(:disabled), .settings-button:hover { 
-            background-color: #0284c7; /* sky-600 */ 
-            transform: translateY(-1px); 
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15); 
+        .answer-btn:not(:disabled):hover {
+            transform: translateY(-3px);
         }
-        .game-button:disabled {
-            background-color: #94a3b8; 
-            color: #e5e7eb;
+        .answer-btn:disabled {
             cursor: not-allowed;
             opacity: 0.8;
         }
+
+        #player-1-panel .answer-btn { background-color: var(--p1-accent); }
+        #player-1-panel .answer-btn:not(:disabled):hover { background-color: var(--p1-accent-dark); }
+        #player-2-panel .answer-btn { background-color: var(--p2-accent); }
+        #player-2-panel .answer-btn:not(:disabled):hover { background-color: var(--p2-accent-dark); }
+
+        .answer-btn.correct { background-color: var(--correct-bg) !important; }
+        .answer-btn.incorrect { background-color: var(--incorrect-bg) !important; }
         
-        .choice-button {
-            background-color: #f8fafc; 
-            color: #1e293b;
-            border: 1px solid #e2e8f0;
-            margin: 6px 0;
-            display: block;
-            width: 100%;
+        .feedback-display {
             text-align: center;
-            font-size: 1.25rem; 
-            font-family: 'Courier New', monospace;
-            padding: 1rem;
-            line-height: 1.4; 
-        }
-        .choice-button:hover:not(:disabled) { 
-            background-color: #f1f5f9; 
-            border-color: #94a3b8;
-            transform: translateY(-1px); 
-        }
-        .choice-button.correct { background-color: #10b981; color: white; border-color: #059669;}
-        .choice-button.incorrect { background-color: #f43f5e; color: white; border-color: #e11d48;}
-        .choice-button:disabled { 
-             opacity: 0.7;
-        }
-        .choice-button.correct:disabled, .choice-button.incorrect:disabled {
-            opacity: 1; 
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 2rem; /* Increased margin */
+            height: 3rem;
         }
 
-        .action-button { 
-            background-color: #0284c7; /* sky-600 */
-            font-size: 0.9rem;
-            padding: 8px 16px;
-        }
-        .action-button:hover {
-            background-color: #0369a1; /* sky-700 */
-        }
-        
-        #game-stats div { margin: 6px 0; font-size: 1rem; color: #334155; }
-        #game-stats span.font-bold { color: #0f766e; }
-
-        .modal-overlay {
-            background-color: rgba(30, 41, 59, 0.7); 
+        .game-controls {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 15px;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 30px; 
-            border-radius: 12px; 
-            width: 95%;
-            max-width: 600px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            position: relative; 
-        }
-        #feedback { font-weight: 600; margin-top: 15px; min-height: 28px; font-size: 1.1rem; }
-        
-        #badge-alert {
-            position: fixed;
-            top: 20px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #0ea5e9;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            z-index: 2000;
-            font-weight: 600;
-            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-        }
-        #badges-display span {
-            background-color: #fde047; 
-            color: #713f12; 
-            padding: 4px 10px; 
-            border-radius: 12px; 
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin: 0 4px;
-            display: inline-block;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        .voice-selector-container {
-            margin: 15px 0; padding: 15px; background-color: #e0f2fe; border-radius: 10px;
-            border: 1px solid #bae6fd; 
-        }
-        #voiceSelect {
-            padding: 10px 14px; 
-            border-radius: 8px;
-            border: 2px solid #7dd3fc; 
-            background-color: white;
-            min-width: 220px;
-            font-weight: 500;
-            color: #374151;
-            transition: border-color 0.3s ease;
-        }
-        #voiceSelect:focus {
-            border-color: #0ea5e9; 
-            outline: none;
-        }
-        #current-activity-display {
-            min-height: 60px; 
-            padding: 15px;
-            margin-bottom: 15px;
-            background-color: #f0f9ff; 
-            border-radius: 8px;
-            border: 1px solid #e0f2fe; 
-            color: #075985;
-            font-style: italic;
-            font-weight: 500;
-        }
-        
-        #question-stimulus-display { 
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #0369a1; 
-            margin-bottom: 10px;
-            text-align: center;
-            background: #f8fafc;
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 4px solid #0ea5e9;
-        }
-        .settings-button {
-            padding: 8px 16px;
-            font-size: 0.9rem;
-            margin-top: 10px;
-        }
-        .settings-modal-content label {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
-            font-weight: 500;
-            color: #374151;
-        }
-         .settings-modal-content input[type="checkbox"] {
-            margin-right: 8px;
-            height: 1.25rem;
-            width: 1.25rem;
-            accent-color: #0e7490;
+            gap: 1rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 5;
         }
 
-        @media (max-width: 480px) { 
-            #start-screen input[type="text"] {
-                 width: 100%; max-width: none; margin-bottom:10px; margin-right:0;
+        .control-btn {
+            padding: 1rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .control-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        #start-game-btn, #play-again-btn {
+             background-color: #fb923c;
+             color: white;
+        }
+        #start-game-btn:hover, #play-again-btn:hover {
+             background-color: #f97316;
+        }
+
+        #timer-display {
+            font-family: 'Bungee', cursive;
+            background-color: #ef4444;
+            color: white;
+            pointer-events: none;
+        }
+
+        .start-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .start-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+        .start-box input {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .winner-announcement {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-size: 3rem;
+            font-weight: bold;
+            font-family: 'Bungee', cursive;
+            color: #f59e0b; /* amber-500 */
+        }
+        
+        @media (max-width: 768px) {
+            html, body {
+                height: auto;
+                overflow: auto;
             }
-            .game-button, .choice-button, .action-button, .settings-button { padding: 10px 18px; font-size: 0.95rem;}
-            .game-container { padding: 20px 15px; }
+            .game-board {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr 1fr;
+                height: auto;
+                min-height: 100vh;
+            }
+            #player-1-panel {
+                border-right: none;
+                border-bottom: 4px solid #cbd5e1;
+            }
+        }
+        @media (max-width: 600px) {
+            .player-panel { padding: 1rem; }
+            .answer-btn { padding: 0.75rem 1rem; font-size: 1.5rem; }
+            .player-name { font-size: 1.5rem; }
+            .player-score { font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
-    <audio id="correctSoundEffect" preload="auto"></audio> 
-    <audio id="incorrectSoundEffect" preload="auto"></audio> 
-    <div id="badge-alert" class="hidden">Badge Unlocked!</div>
-
-    <div id="start-screen" class="game-container text-center">
-        <h1 class="text-4xl font-bold mb-4 text-cyan-800">Time Teller Listening Challenge</h1>
-        <p class="mb-6 text-slate-600 text-lg">Enter your name and test your time-telling skills!</p>
-        <div class="flex flex-col sm:flex-row items-center justify-center">
-            <input type="text" id="username" placeholder="Your Gamer Name">
-            <button id="start-button" class="game-button mt-3 sm:mt-0">Start Game</button>
+    <div class="start-overlay" id="start-overlay">
+        <div class="start-box">
+            <h1 class="text-3xl font-bold mb-4">Schedule Change Challenge</h1>
+            <input type="text" id="p1-name-input" placeholder="Player 1 Name" value="">
+            <input type="text" id="p2-name-input" placeholder="Player 2 Name" value="">
+            <button id="start-game-btn" class="control-btn">Start Game</button>
         </div>
     </div>
 
-    <div id="game-screen" class="game-container hidden">
-        <div class="flex flex-wrap justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold text-cyan-800">Go, <span id="display-username"></span>!</h2>
-            <div>
-                 <button id="settings-button" class="settings-button mr-2">Settings</button>
-                 <button id="quit-button" class="game-button !bg-rose-500 hover:!bg-rose-600 !text-white">Quit</button>
+    <div class="game-board">
+        <h1 class="game-title">Schedule Change Challenge</h1>
+
+        <!-- Player 1 Panel -->
+        <div class="player-panel" id="player-1-panel">
+            <div class="player-header">
+                <h2 class="player-name" id="p1-name">Player 1</h2>
+                <p class="player-score">Score: <span id="p1-score">0</span></p>
+                <span class="score-popup">+10</span>
             </div>
-        </div>
-        
-        <div id="game-stats" class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-6 text-slate-700">
-            <div>Score: <span id="score" class="font-bold text-xl">0</span> / <span id="total-possible-score" class="font-bold text-xl">0</span></div> 
-            <div>Questions Remaining: <span id="questions-remaining" class="font-bold text-xl">54</span></div>
-            <div id="game-timer-display">Game Time: <span class="font-bold text-xl">15:00</span></div>
-            <div>Badges: <span id="badges-display">None</span></div>
+            <div class="answer-buttons" id="p1-answers">
+                <button class="answer-btn" data-player="0" disabled>&nbsp;</button>
+                <button class="answer-btn" data-player="0" disabled>&nbsp;</button>
+                <button class="answer-btn" data-player="0" disabled>&nbsp;</button>
+            </div>
+            <div class="feedback-display" id="p1-feedback"></div>
         </div>
 
-        <div class="voice-selector-container">
-            <label for="voiceSelect" class="text-slate-700 font-semibold">Select English Voice:</label>
-            <select id="voiceSelect"></select>
+        <!-- Player 2 Panel -->
+        <div class="player-panel" id="player-2-panel">
+            <div class="player-header">
+                <h2 class="player-name" id="p2-name">Player 2</h2>
+                <p class="player-score">Score: <span id="p2-score">0</span></p>
+                <span class="score-popup">+10</span>
+            </div>
+            <div class="answer-buttons" id="p2-answers">
+                <button class="answer-btn" data-player="1" disabled>&nbsp;</button>
+                <button class="answer-btn" data-player="1" disabled>&nbsp;</button>
+                <button class="answer-btn" data-player="1" disabled>&nbsp;</button>
+            </div>
+            <div class="feedback-display" id="p2-feedback"></div>
         </div>
-        
-        <div id="current-activity-display" class="text-lg">
-            Click "Start First Question" to begin!
-        </div>
-        <button id="initiate-question-button" class="game-button mt-4">Start First Question / Next Question</button>
 
+        <div class="winner-announcement hidden" id="winner-announcement"></div>
     </div>
 
-    <div id="question-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <img id="rewardGif" class="hidden" alt="Reward Animation"> 
-            <div class="flex justify-between items-center mb-2">
-                <p class="text-sm text-slate-500">Question Timer: <span id="modal-timer" class="font-bold text-base">--</span>s</p>
-                <button id="repeat-button" class="action-button">Repeat Audio</button>
-            </div>
-            <div id="question-stimulus-display" class="mb-4 p-4 bg-slate-100 rounded-lg min-h-[60px] flex flex-col justify-center items-center">
-                Listen to the time...
-            </div>
-            <p id="question-text" class="mb-5 text-xl font-semibold text-slate-800"></p>
-            <div id="answer-options" class="grid grid-cols-1 sm:grid-cols-3 gap-3"> 
-                {/* Answer buttons will be dynamically added here by JavaScript */}
-            </div>
-            <div id="feedback" class="mt-5"></div>
-            <button id="next-question-button-modal" class="game-button mt-5 hidden w-full !bg-emerald-500 hover:!bg-emerald-600 text-white">Next Question</button>
-        </div>
-    </div>
-    
-    <div id="settings-modal" class="modal-overlay hidden">
-        <div class="settings-modal-content modal-content">
-            <h3 class="text-2xl font-bold mb-6 text-cyan-800">Settings</h3>
-            <div>
-                <label for="toggle-tts">
-                    <input type="checkbox" id="toggle-tts" checked> Enable Text-to-Speech
-                </label>
-            </div>
-            <div class="mt-4">
-                <label for="toggle-sfx">
-                    <input type="checkbox" id="toggle-sfx" checked> Enable Sound Effects
-                </label>
-            </div>
-            <button id="close-settings-button" class="game-button mt-8 w-full">Close</button>
-        </div>
-    </div>
-
-    <div id="game-over-screen" class="game-container hidden text-center">
-        <h2 class="text-3xl font-bold text-cyan-800 mb-5">Game Over, <span id="final-username"></span>!</h2>
-        <div class="mb-4">
-            <p class="text-2xl text-slate-700 mb-1">Final Score: <span id="final-score" class="font-bold text-cyan-600">0</span> / <span id="final-total-possible-score" class="font-bold text-cyan-600">0</span></p>
-            <p class="text-xl text-slate-600">Badges Earned: <span id="final-badges-display">None</span></p>
-        </div>
-        <div id="high-scores-container" class="mt-6 mb-6 p-4 border border-cyan-300 rounded-lg">
-            <h4 class="text-xl font-semibold text-cyan-700 mb-3">High Scores</h4>
-            <ol id="high-scores-list" class="list-decimal list-inside text-left text-slate-600">
-                {/* High scores will be populated here */}
-            </ol>
-        </div>
-        <button id="play-again-button" class="game-button">Play Again!</button>
+    <div class="game-controls">
+        <div id="timer-display" class="control-btn hidden">Time: 20</div>
+        <button id="play-again-btn" class="control-btn hidden">Play Again</button>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM Fully Loaded and Parsed - Time Teller Listening Challenge");
-            
-            // --- DOM Elements ---
-            const startScreen = document.getElementById('start-screen');
-            const gameScreen = document.getElementById('game-screen');
-            const gameOverScreen = document.getElementById('game-over-screen');
-            const usernameInput = document.getElementById('username');
-            const startButton = document.getElementById('start-button');
-            const quitButton = document.getElementById('quit-button');
-            const displayUsername = document.getElementById('display-username');
-            const scoreDisplay = document.getElementById('score');
-            const totalPossibleScoreDisplay = document.getElementById('total-possible-score'); 
-            const questionsRemainingDisplay = document.getElementById('questions-remaining');
-            const gameTimerDisplay = document.querySelector('#game-timer-display span');
-            const badgesDisplay = document.getElementById('badges-display');
-            const voiceSelect = document.getElementById('voiceSelect');
-            const currentActivityDisplay = document.getElementById('current-activity-display');
-            const initiateQuestionButton = document.getElementById('initiate-question-button');
-            const badgeAlert = document.getElementById('badge-alert');
-            
-            const questionModal = document.getElementById('question-modal');
-            const modalTimerDisplay = document.getElementById('modal-timer');
-            const questionStimulusDisplay = document.getElementById('question-stimulus-display');
-            const questionTextDisplay = document.getElementById('question-text');
-            const answerOptionsContainer = document.getElementById('answer-options');
-            const feedbackDisplay = document.getElementById('feedback');
-            const nextQuestionButtonModal = document.getElementById('next-question-button-modal');
-            const repeatButton = document.getElementById('repeat-button');
-            const correctSoundEffect = document.getElementById('correctSoundEffect'); 
-            const incorrectSoundEffect = document.getElementById('incorrectSoundEffect'); 
-            const rewardGif = document.getElementById('rewardGif'); 
+            const dom = {
+                startOverlay: document.getElementById('start-overlay'),
+                startGameBtn: document.getElementById('start-game-btn'),
+                p1NameInput: document.getElementById('p1-name-input'),
+                p2NameInput: document.getElementById('p2-name-input'),
+                
+                winnerAnnouncement: document.getElementById('winner-announcement'),
+                
+                playAgainBtn: document.getElementById('play-again-btn'),
+                timerDisplay: document.getElementById('timer-display'),
 
-            const settingsButton = document.getElementById('settings-button');
-            const settingsModal = document.getElementById('settings-modal');
-            const closeSettingsButton = document.getElementById('close-settings-button');
-            const toggleTtsCheckbox = document.getElementById('toggle-tts');
-            const toggleSfxCheckbox = document.getElementById('toggle-sfx');
-
-            const finalUsernameDisplay = document.getElementById('final-username');
-            const finalScoreDisplay = document.getElementById('final-score');
-            const finalTotalPossibleScoreDisplay = document.getElementById('final-total-possible-score'); 
-            const finalBadgesDisplay = document.getElementById('final-badges-display');
-            const playAgainButton = document.getElementById('play-again-button');
-            const highScoresList = document.getElementById('high-scores-list');
-
-
-            // --- Game Data & Config ---
-            let TOTAL_QUESTIONS_PER_GAME; 
-            const POINTS_PER_CORRECT_ANSWER = 2; 
-            const TIME_PER_QUESTION = 20; 
-            const GAME_DURATION_SECONDS = 15 * 60; 
-            let gameData = {};
-            let currentQuestionData = {}; 
-            let questionTimerInterval = null;
-            let overallGameTimerInterval = null;
-            let voices = [];
-            let userSelectedVoice = null; 
-            let currentNarratorVoice = null; 
-            let speakTimeoutId = null; 
-            let voicesPopulated = false;
-            let currentUtterance = null; 
-            let currentUtteranceCallback = null; 
-            let isSpeakingTransition = false; 
-            let settings = {
-                isTtsEnabled: true,
-                areSoundEffectsEnabled: true
+                playerPanels: [
+                    {
+                        name: document.getElementById('p1-name'),
+                        score: document.getElementById('p1-score'),
+                        answers: document.getElementById('p1-answers'),
+                        feedback: document.getElementById('p1-feedback'),
+                        scorePopup: document.querySelector('#player-1-panel .score-popup')
+                    },
+                    {
+                        name: document.getElementById('p2-name'),
+                        score: document.getElementById('p2-score'),
+                        answers: document.getElementById('p2-answers'),
+                        feedback: document.getElementById('p2-feedback'),
+                        scorePopup: document.querySelector('#player-2-panel .score-popup')
+                    }
+                ]
             };
 
+            const TOTAL_QUESTIONS = 10;
+            const POINTS_PER_CORRECT = 10;
+            const QUESTION_TIME_LIMIT = 20;
 
-            let shuffledQuestionIndices = [];
-            let currentQuestionIndexInShuffledList = 0;
-
-            const timeQuestions = [
-                { spoken: "Quarter past one", correct: "1:15" },
-                { spoken: "Quarter to two", correct: "1:45" },
-                { spoken: "Ten till three", correct: "2:50" },
-                { spoken: "Ten past four", correct: "4:10" },
-                { spoken: "Twenty to five", correct: "4:40" },
-                { spoken: "Twenty past six", correct: "6:20" },
-                { spoken: "Five to seven", correct: "6:55" },
-                { spoken: "Five past eight", correct: "8:05" },
-                { spoken: "Half past nine", correct: "9:30" },
-                { spoken: "Half past ten", correct: "10:30" },
-                { spoken: "Quarter past eleven", correct: "11:15" },
-                { spoken: "Quarter to twelve", correct: "11:45" },
-                { spoken: "Ten till one", correct: "12:50" },
-                { spoken: "Ten past two", correct: "2:10" },
-                { spoken: "Twenty to three", correct: "2:40" },
-                { spoken: "Twenty past four", correct: "4:20" },
-                { spoken: "Five to five", correct: "4:55" },
-                { spoken: "Five past six", correct: "6:05" },
-                { spoken: "Half past seven", correct: "7:30" },
-                { spoken: "Half past eight", correct: "8:30" },
-                { spoken: "Quarter past nine", correct: "9:15" },
-                { spoken: "Quarter to ten", correct: "9:45" },
-                { spoken: "Ten till eleven", correct: "10:50" },
-                { spoken: "Ten past twelve", correct: "12:10" },
-                { spoken: "Twenty to one", correct: "12:40" },
-                { spoken: "Twenty past two", correct: "2:20" },
-                { spoken: "Five to three", correct: "2:55" },
-                { spoken: "Five past four", correct: "4:05" },
-                { spoken: "Half past five", correct: "5:30" },
-                { spoken: "Half past six", correct: "6:30" },
-                { spoken: "Quarter past seven", correct: "7:15" },
-                { spoken: "Quarter to eight", correct: "7:45" },
-                { spoken: "Ten till nine", correct: "8:50" },
-                { spoken: "Ten past ten", correct: "10:10" },
-                { spoken: "Twenty to eleven", correct: "10:40" },
-                { spoken: "Twenty past twelve", correct: "12:20" },
-                { spoken: "Five to one", correct: "12:55" },
-                { spoken: "Five past two", correct: "2:05" },
-                { spoken: "Half past three", correct: "3:30" },
-                { spoken: "Half past four", correct: "4:30" },
-                { spoken: "Quarter past five", correct: "5:15" },
-                { spoken: "Quarter to six", correct: "5:45" },
-                { spoken: "Ten till seven", correct: "6:50" },
-                { spoken: "Ten past eight", correct: "8:10" },
-                { spoken: "Twenty to nine", correct: "8:40" },
-                { spoken: "Twenty past ten", correct: "10:20" },
-                { spoken: "Five to eleven", correct: "10:55" },
-                { spoken: "Five past twelve", correct: "12:05" },
-                { spoken: "Half past one", correct: "1:30" },
-                { spoken: "Half past two", correct: "2:30" },
-                { spoken: "Quarter past three", correct: "3:15"},
-                { spoken: "Quarter to four", correct: "3:45"},
-                { spoken: "Twenty-five to five", correct: "4:35"},
-                { spoken: "Twenty-five past six", correct: "6:25"}
-            ];
-            TOTAL_QUESTIONS_PER_GAME = timeQuestions.length; 
-
-            // --- Load Settings ---
-            function loadSettings() {
-                const savedSettings = localStorage.getItem('listeningGameSettings');
-                if (savedSettings) {
-                    settings = JSON.parse(savedSettings);
-                }
-                toggleTtsCheckbox.checked = settings.isTtsEnabled;
-                toggleSfxCheckbox.checked = settings.areSoundEffectsEnabled;
-            }
-
-            // --- Save Settings ---
-            function saveSettings() {
-                localStorage.setItem('listeningGameSettings', JSON.stringify(settings));
-            }
+            let players = [ { score: 0, name: 'Player 1' }, { score: 0, name: 'Player 2' } ];
+            let currentQuestion = {};
+            let questionsAsked = 0;
+            let isRoundOver = false;
+            let voices = [];
+            let preferredVoices = [];
+            let questionTimer;
             
-            // --- High Score Logic ---
-            const MAX_HIGH_SCORES = 5;
-            function getHighScores() {
-                const scores = localStorage.getItem('listeningGameHighScores');
-                return scores ? JSON.parse(scores) : [];
+            let correctSynth, incorrectSynth;
+            function setupSounds() {
+                correctSynth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.2 } }).toDestination();
+                incorrectSynth = new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 } }).toDestination();
             }
 
-            function saveHighScore(score, username) {
-                const highScores = getHighScores();
-                const newScore = { score, username, date: new Date().toLocaleDateString() };
-                highScores.push(newScore);
-                highScores.sort((a, b) => b.score - a.score); 
-                highScores.splice(MAX_HIGH_SCORES); 
-                localStorage.setItem('listeningGameHighScores', JSON.stringify(highScores));
-            }
-
-            function displayHighScores() {
-                const highScores = getHighScores();
-                highScoresList.innerHTML = ''; 
-                if (highScores.length === 0) {
-                    highScoresList.innerHTML = '<li class="text-slate-500">No high scores yet!</li>';
-                    return;
-                }
-                highScores.forEach(scoreItem => {
-                    const li = document.createElement('li');
-                    li.textContent = `${scoreItem.username}: ${scoreItem.score} (on ${scoreItem.date})`;
-                    highScoresList.appendChild(li);
-                });
-            }
-
-
-            // --- TTS Functions ---
-            function getVoiceByName(namePart) {
-                if (!voices || voices.length === 0) return null;
-                const lowerNamePart = namePart.toLowerCase();
-                return voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes(lowerNamePart));
-            }
-
-            function getVoiceForCurrentQuestionSet(questionNum) { 
-                let targetVoiceName = "";
-                const upcomingQuestionIndex = questionNum;
-
-                if (upcomingQuestionIndex < 10) targetVoiceName = "emma";
-                else if (upcomingQuestionIndex < 20) targetVoiceName = "roger";
-                else if (upcomingQuestionIndex < 30) targetVoiceName = "jenny";
-                else if (upcomingQuestionIndex < 40) targetVoiceName = "eric"; 
-                else if (upcomingQuestionIndex < 50) targetVoiceName = "thomas";
-                else targetVoiceName = "emma"; 
-
-                if (targetVoiceName) {
-                    const foundVoice = getVoiceByName(targetVoiceName);
-                    if (foundVoice) return foundVoice;
-                }
-                return userSelectedVoice || (voices.length > 0 ? voices[0] : null);
-            }
-
-            function populateVoiceList(loadedVoices) {
-                if (voicesPopulated && loadedVoices.length === voices.length && voiceSelect.options.length === loadedVoices.filter(v => v.lang.startsWith('en')).length) return;
-                console.log("populateVoiceList called with", loadedVoices.length, "voices");
-                
-                voices = loadedVoices; 
-                voiceSelect.innerHTML = '';
-                const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
-                
-                englishVoices.forEach(voice => {
-                    const option = document.createElement('option');
-                    option.textContent = `${voice.name} (${voice.lang})`;
-                    option.setAttribute('data-name', voice.name);
-                    option.setAttribute('data-lang', voice.lang);
-                    voiceSelect.appendChild(option);
-                });
-
-                if (englishVoices.length > 0) {
-                    voicesPopulated = true;
-                    console.log("English voices found:", englishVoices.length);
-                    let initialDefaultVoice = getVoiceByName("emma"); 
-
-                    if (!initialDefaultVoice) { 
-                        const naturalKeywords = ["natural", "neural", "wavenet", "studio", "enhanced", "premium"];
-                        initialDefaultVoice = englishVoices.find(v => naturalKeywords.some(kw => v.name.toLowerCase().includes(kw)));
-                        if (!initialDefaultVoice) initialDefaultVoice = englishVoices.find(v => v.name === "Google US English" || v.name.toLowerCase().includes("united states"));
-                        if (!initialDefaultVoice) initialDefaultVoice = englishVoices.find(v => v.name === "Microsoft Zira Desktop - English (United States)");
-                        if (!initialDefaultVoice) initialDefaultVoice = englishVoices.find(v => v.default && v.lang.startsWith('en')); 
-                        if (!initialDefaultVoice) initialDefaultVoice = englishVoices[0]; 
-                    }
-                    
-                    userSelectedVoice = initialDefaultVoice; 
-                    currentNarratorVoice = userSelectedVoice; 
-                    console.log("Initial default voice (userSelectedVoice):", userSelectedVoice ? userSelectedVoice.name : "None");
-                    
-                    for (let i = 0; i < voiceSelect.options.length; i++) {
-                        if (voiceSelect.options[i].dataset.name === userSelectedVoice.name && voiceSelect.options[i].dataset.lang === userSelectedVoice.lang) {
-                            voiceSelect.selectedIndex = i;
-                            break;
-                        }
-                    }
-                    initiateQuestionButton.disabled = false; 
-                } else {
-                    currentActivityDisplay.textContent = "No English voices found for Text-to-Speech. Game may not function correctly.";
-                    initiateQuestionButton.disabled = true; 
-                    console.warn("No English voices found.");
-                }
-            }
-            
             function initSpeechSynthesis() {
-                 if ('speechSynthesis' in window) {
-                    console.log("Speech Synthesis API supported.");
-                    const tryPopulate = () => {
-                        const currentVoices = speechSynthesis.getVoices();
-                        if (currentVoices.length > 0 ) {
-                             if (!voicesPopulated || voices.length !== currentVoices.length || voiceSelect.options.length === 0) {
-                                populateVoiceList(currentVoices);
-                             }
-                        } else if (currentVoices.length === 0 && !voicesPopulated){
-                             console.log("getVoices() returned empty list initially.");
-                        }
+                if ('speechSynthesis' in window) {
+                    const getVoices = () => {
+                        voices = speechSynthesis.getVoices().filter(voice => voice.lang.startsWith('en'));
+                        const naturalKeywords = ["neural", "natural", "studio", "premium", "google", "zira", "david"];
+                        preferredVoices = voices.filter(v => naturalKeywords.some(kw => v.name.toLowerCase().includes(kw)));
+                        if (preferredVoices.length === 0) preferredVoices = voices;
                     };
-
-                    if (speechSynthesis.onvoiceschanged !== undefined) {
-                        speechSynthesis.onvoiceschanged = tryPopulate;
-                    }
-                    tryPopulate(); 
-                    setTimeout(tryPopulate, 300); 
-                    setTimeout(tryPopulate, 1200); 
-
-                    voiceSelect.addEventListener('change', (e) => {
-                        const selectedOption = e.target.options[e.target.selectedIndex];
-                        userSelectedVoice = voices.find(voice => voice.name === selectedOption.dataset.name && voice.lang === selectedOption.dataset.lang);
-                        console.log("User changed voice to:", userSelectedVoice ? userSelectedVoice.name : "None");
-                    });
+                    getVoices();
+                    speechSynthesis.onvoiceschanged = getVoices;
                 } else {
-                    console.warn("Speech Synthesis not supported");
-                    if(voiceSelect.parentElement) voiceSelect.parentElement.classList.add('hidden');
-                    currentActivityDisplay.textContent = "Text-to-Speech is not supported in your browser.";
-                    initiateQuestionButton.disabled = true; 
+                    console.warn("Text-to-Speech is not supported in this browser.");
                 }
             }
-             
-
+            
             function speak(text, callback) {
-                if (!settings.isTtsEnabled) {
-                    console.log("TTS is disabled in settings.");
-                    if (callback) setTimeout(callback, 0);
+                if (!('speechSynthesis' in window) || voices.length === 0) {
+                    if (callback) callback();
                     return;
                 }
+                const voice = preferredVoices[Math.floor(Math.random() * preferredVoices.length)];
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = voice;
+                utterance.onend = callback;
+                speechSynthesis.cancel();
+                speechSynthesis.speak(utterance);
+            }
 
-                if (isSpeakingTransition) {
-                    console.warn("Speak request ignored: Previous speech transition in progress for:", text ? text.substring(0,30) + "..." : "No text");
-                    if (callback) setTimeout(callback, 0); 
-                    return;
-                }
-                isSpeakingTransition = true;
-                console.log("Speak request for:", text ? text.substring(0,30) + "..." : "No text provided");
-
-                if (!('speechSynthesis'in window) || !text) {
-                    console.warn("Speak function: TTS not supported or no text.");
-                    isSpeakingTransition = false;
-                    if (callback) setTimeout(callback, 0);
-                    return;
-                }
-
-                if (speakTimeoutId) clearTimeout(speakTimeoutId);
+            function generateScheduleQuestion() {
+                const events = ["The flight to Tokyo", "The train to Central Station", "The bus to the airport", "The weekly team meeting", "The opening concert", "The Python workshop"];
+                const times = ["1:00", "1:30", "2:00", "2:30", "3:00", "3:30", "4:00", "4:30", "5:00"];
+                const changes = [10, 15, 20, 25, 30, 45, 60];
+                const templates = [
+                    (evt, t1, ch) => `Attention passengers. ${evt}, originally scheduled for ${t1}, has been delayed by ${ch} minutes.`,
+                    (evt, t1) => `This is a schedule announcement. ${evt} from ${t1} has been moved forward by half an hour.`,
+                    (evt, t1, t2) => `Please note a schedule change. ${evt} has been rescheduled from ${t1} to ${t2}.`
+                ];
                 
-                if (currentUtterance) { 
-                    currentUtterance.onend = null;
-                    currentUtterance.onerror = null;
-                    currentUtterance.onstart = null;
-                }
-
-                currentUtterance = new SpeechSynthesisUtterance(text);
-                currentUtteranceCallback = callback; 
-
-                currentNarratorVoice = getVoiceForCurrentQuestionSet(gameData.questionsAnswered || 0);
-                currentUtterance.voice = currentNarratorVoice || userSelectedVoice; 
-
-                if (!currentUtterance.voice && voices && voices.length > 0) {
-                     let fallbackVoice = voices.find(v => v.default && v.lang.startsWith('en'));
-                     if (!fallbackVoice) fallbackVoice = voices.find(v => v.lang.startsWith('en'));
-                     if (!fallbackVoice && voices.length > 0) fallbackVoice = voices[0];
-                     currentUtterance.voice = fallbackVoice;
-                }
+                const event = events[Math.floor(Math.random() * events.length)];
+                const originalTime = times[Math.floor(Math.random() * times.length)];
+                const changeMinutes = changes[Math.floor(Math.random() * changes.length)];
                 
-                currentUtterance.onstart = () => {
-                     console.log("Speech event: onstart for current utterance:", text.substring(0,15) + "...");
-                };
-
-                currentUtterance.onend = () => {
-                    console.log("Speech event: onend for current utterance:", text.substring(0,15) + "...");
-                    isSpeakingTransition = false;
-                    if (currentUtteranceCallback) { 
-                        const cb = currentUtteranceCallback;
-                        currentUtteranceCallback = null; 
-                        try { cb(); } catch(e) { console.error("Error in onend callback:", e); }
-                    }
-                };
-                currentUtterance.onerror = (event) => {
-                    console.error("SpeechSynthesisUtterance.onerror for current utterance. Event:", event, "Error type:", event.error, "Text:", text.substring(0,30) + "...");
-                    isSpeakingTransition = false;
-                    if (event.error && event.error !== 'canceled' && event.error !== 'interrupted') { 
-                        currentActivityDisplay.textContent = `Audio Error (${event.error}). Try another voice.`;
-                    } else if (event.error === 'canceled') {
-                        console.warn("Current utterance speech was CANCELED.");
-                    } else if (event.error === 'interrupted') {
-                        console.warn("Current utterance speech was INTERRUPTED.");
-                    }
-                    if (currentUtteranceCallback) { 
-                        const cb = currentUtteranceCallback;
-                        currentUtteranceCallback = null; 
-                        try { cb(); } catch(e) { console.error("Error in onerror callback:", e); }
-                    }
-                };
+                let [h, m] = originalTime.split(':').map(Number);
+                m += changeMinutes;
+                if (m >= 60) {
+                    h += Math.floor(m / 60);
+                    m %= 60;
+                }
+                if (h > 12) h -= 12;
+                if (h === 0) h = 12;
                 
-                const doSpeak = () => {
-                    console.log("Executing speechSynthesis.speak for:", text.substring(0,30) + "...");
-                    speechSynthesis.speak(currentUtterance);
-                };
-
-                if (speechSynthesis.speaking || speechSynthesis.pending) {
-                    console.log("Speech is speaking or pending. Canceling...");
-                    speechSynthesis.cancel(); 
-                    speakTimeoutId = setTimeout(doSpeak, 300); 
-                } else {
-                    speakTimeoutId = setTimeout(doSpeak, 50); 
-                }
-            }
-
-            // --- Game Logic Functions ---
-            function resetGameData() {
-                gameData = {
-                    username: usernameInput.value.trim() || "Player",
-                    score: 0,
-                    questionsAnswered: 0,
-                    totalQuestions: TOTAL_QUESTIONS_PER_GAME, 
-                    badges: [],
-                    correctStreak: 0,
-                    fastAnswers: 0,
-                    gameTimeLeft: GAME_DURATION_SECONDS
-                };
-                shuffledQuestionIndices = Array.from(Array(timeQuestions.length).keys());
-                shuffleArray(shuffledQuestionIndices); 
-                currentQuestionIndexInShuffledList = 0; 
-
-                updateGameStatsDisplay(); 
-                initiateQuestionButton.textContent = "Start First Question";
-                const englishVoicesExist = voices && voices.filter(v => v.lang.startsWith('en')).length > 0;
-                initiateQuestionButton.disabled = !('speechSynthesis' in window) || !englishVoicesExist;
-                currentActivityDisplay.textContent = "Click 'Start First Question' to begin!";
-                 if (initiateQuestionButton.disabled && settings.isTtsEnabled) { 
-                    currentActivityDisplay.textContent = "Text-to-Speech is not available or no English voices found. Cannot start game.";
-                } else if (!settings.isTtsEnabled) {
-                     currentActivityDisplay.textContent = "Text-to-Speech is disabled in settings. Click to begin.";
-                     initiateQuestionButton.disabled = false; 
-                }
-            }
-
-            function updateGameStatsDisplay() {
-                displayUsername.textContent = gameData.username;
-                scoreDisplay.textContent = gameData.score;
-                totalPossibleScoreDisplay.textContent = gameData.totalQuestions * POINTS_PER_CORRECT_ANSWER; 
-                questionsRemainingDisplay.textContent = gameData.totalQuestions - gameData.questionsAnswered;
-                updateBadgesDisplay();
-            }
-            
-            function showBadgeAlert(badgeName) {
-                badgeAlert.textContent = `Badge Unlocked: ${badgeName}!`;
-                badgeAlert.classList.remove('hidden');
-                badgeAlert.style.opacity = 1;
-                badgeAlert.style.transform = 'translate(-50%, 0)';
-                setTimeout(() => {
-                    badgeAlert.style.opacity = 0;
-                    badgeAlert.style.transform = 'translate(-50%, -20px)';
-                    setTimeout(() => badgeAlert.classList.add('hidden'), 500);
-                }, 2500);
-            }
-
-            function awardBadge(badgeName) {
-                if (!gameData.badges.includes(badgeName)) {
-                    gameData.badges.push(badgeName);
-                    updateBadgesDisplay();
-                    showBadgeAlert(badgeName); 
-                }
-            }
-
-            function updateBadgesDisplay() {
-                 badgesDisplay.innerHTML = gameData.badges.length > 0 ? 
-                    gameData.badges.map(b => `<span class="inline-block">${b}</span>`).join(' ') : 'None';
-            }
-
-            function startGame() {
-                console.log("startGame called");
-                loadSettings(); 
-                if (!usernameInput.value.trim()) {
-                    const nameField = document.getElementById('username');
-                    nameField.classList.add('border-red-500', 'placeholder-red-400');
-                    nameField.focus();
-                    setTimeout(() => nameField.classList.remove('border-red-500', 'placeholder-red-400'), 2000);
-                    return;
-                }
-                resetGameData(); 
-                startOverallGameTimer();
-                startScreen.classList.add('hidden');
-                gameOverScreen.classList.add('hidden');
-                gameScreen.classList.remove('hidden');
-            }
-
-            function startOverallGameTimer() {
-                clearInterval(overallGameTimerInterval);
-                overallGameTimerInterval = setInterval(() => {
-                    gameData.gameTimeLeft--;
-                    const minutes = Math.floor(gameData.gameTimeLeft / 60);
-                    const seconds = gameData.gameTimeLeft % 60;
-                    gameTimerDisplay.textContent = `${minutes}:${String(seconds).padStart(2, '0')}`;
-                    if (gameData.gameTimeLeft <= 0) {
-                        endGame();
-                    }
-                }, 1000);
-            }
-            
-            function startNewQuestionRound() {
-                console.log("startNewQuestionRound. Qs answered:", gameData.questionsAnswered, " Shuffled list index:", currentQuestionIndexInShuffledList);
-                if (gameData.questionsAnswered >= TOTAL_QUESTIONS_PER_GAME) { 
-                    endGame();
-                    return;
-                }
-                initiateQuestionButton.disabled = true; 
-                currentActivityDisplay.textContent = settings.isTtsEnabled ? "Listen carefully..." : "Read the question below.";
-
-                if (currentQuestionIndexInShuffledList >= shuffledQuestionIndices.length) {
-                    console.warn("Ran out of unique questions. This should not happen if TOTAL_QUESTIONS_PER_GAME is set to list length.");
-                    endGame();
-                    return;
-                }
-
-                const questionIndex = shuffledQuestionIndices[currentQuestionIndexInShuffledList];
-                currentQuestionData = { ...timeQuestions[questionIndex] }; 
+                const newTime = `${h}:${String(m).padStart(2, '0')}`;
+                const scenario = templates[0](event, originalTime, changeMinutes);
                 
-                console.log(`New Question: ${currentQuestionData.spoken}`);
-                questionStimulusDisplay.innerHTML = `Listen to the time...`; 
-                questionTextDisplay.textContent = `Which digital time matches what you heard?`;
-                
-                if(settings.isTtsEnabled){
-                    speak(currentQuestionData.spoken, () => {
-                        displayQuestionModalWithOptions();
+                return { scenario, originalTime, correctAnswer: newTime };
+            }
+
+            function generateDistractorOptions(correctAnswer, originalTime) {
+                let options = new Set([correctAnswer, originalTime]);
+                while(options.size < 3) {
+                    const [h, m] = correctAnswer.split(':').map(Number);
+                    const change = (Math.random() < 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1) * 15;
+                    let newM = m + change;
+                    let newH = h;
+                    if (newM >= 60) { newH++; newM -= 60; }
+                    if (newM < 0) { newH--; newM += 60; }
+                    if (newH > 12) newH = 1;
+                    if (newH <= 0) newH = 12;
+                    options.add(`${newH}:${String(newM).padStart(2, '0')}`);
+                }
+                const shuffledOptions = Array.from(options);
+                shuffledOptions.sort(() => Math.random() - 0.5);
+                return shuffledOptions;
+            }
+
+            function resetBoard() {
+                dom.playerPanels.forEach((panel) => {
+                    panel.feedback.textContent = '';
+                    const buttons = panel.answers.querySelectorAll('.answer-btn');
+                    buttons.forEach(btn => {
+                        btn.className = 'answer-btn';
+                        btn.disabled = true;
+                        btn.innerHTML = '&nbsp;';
                     });
-                } else {
-                     displayQuestionModalWithOptions(); 
-                }
-            }
-
-            function generateDistractorTimes(correctTime) {
-                const [hour, minute] = correctTime.split(':').map(Number);
-                let distractors = new Set();
-                while (distractors.size < 2) {
-                    const randomChoice = Math.floor(Math.random() * 4);
-                    let newHour = hour;
-                    let newMinute = minute;
-
-                    switch (randomChoice) {
-                        case 0: // Swap hour and minute parts
-                            newHour = minute === 0 ? 12 : Math.floor(minute / 5) || 12;
-                            newMinute = hour * 5 % 60;
-                            break;
-                        case 1: // Add/subtract 5/10/15 minutes
-                            const diff = [5, 10, 15, -5, -10, -15][Math.floor(Math.random() * 6)];
-                            newMinute = (minute + diff + 60) % 60;
-                            break;
-                        case 2: // Change hour
-                            newHour = (hour % 12) + (Math.random() < 0.5 ? -1 : 1);
-                            if(newHour <= 0) newHour = 12;
-                            if(newHour > 12) newHour = 1;
-                            break;
-                        case 3: // Mirror minutes (e.g., :15 -> :45)
-                            if (minute !== 30 && minute !== 0) {
-                                newMinute = 60 - minute;
-                            } else { // if it's on the hour or half hour, just change by 5
-                                newMinute = (minute + 5) % 60;
-                            }
-                            break;
-                    }
-                    
-                    const distractor = `${String(newHour)}:${String(newMinute).padStart(2, '0')}`;
-                    if (distractor !== correctTime) {
-                        distractors.add(distractor);
-                    }
-                }
-                return Array.from(distractors);
-            }
-            
-            function displayQuestionModalWithOptions() {
-                const { correct } = currentQuestionData;
-                let options = [correct, ...generateDistractorTimes(correct)]; 
-                shuffleArray(options); 
-
-                answerOptionsContainer.innerHTML = '';
-                options.forEach(optionText => {
-                    const choiceBtn = document.createElement('button');
-                    choiceBtn.classList.add('choice-button');
-                    choiceBtn.textContent = optionText;
-                    choiceBtn.disabled = false; 
-                    choiceBtn.addEventListener('click', () => checkAnswer(optionText, correct, choiceBtn));
-                    answerOptionsContainer.appendChild(choiceBtn);
                 });
-                
-                feedbackDisplay.textContent = '';
-                nextQuestionButtonModal.classList.add('hidden');
-                rewardGif.classList.add('hidden'); 
-                questionModal.classList.remove('hidden');
-                startQuestionTimer();
             }
             
-            function shuffleArray(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-                return array;
+            function stopQuestionTimer() {
+                clearInterval(questionTimer);
+                dom.timerDisplay.classList.add('hidden');
             }
-            
-            function startQuestionTimer() {
-                clearInterval(questionTimerInterval);
-                gameData.timeLeft = TIME_PER_QUESTION;
-                modalTimerDisplay.textContent = gameData.timeLeft;
-                questionTimerInterval = setInterval(() => {
-                    gameData.timeLeft--;
-                    modalTimerDisplay.textContent = gameData.timeLeft;
-                    if (gameData.timeLeft <= 0) {
-                        clearInterval(questionTimerInterval);
-                        const correctAnswerText = currentQuestionData.correct;
-                        feedbackDisplay.textContent = `Time's up! The correct time was: ${correctAnswerText}`;
-                        feedbackDisplay.style.color = '#f59e0b'; 
-                        disableAnswerOptions(correctAnswerText);
-                        nextQuestionButtonModal.classList.remove('hidden');
-                        gameData.correctStreak = 0;
-                        
-                        gameData.questionsAnswered++; 
-                        currentQuestionIndexInShuffledList++; 
 
-                        updateGameStatsDisplay();
-                        if (gameData.questionsAnswered >= gameData.totalQuestions) {
-                             nextQuestionButtonModal.textContent = "Show Results";
+            function handleTimeOut() {
+                stopQuestionTimer();
+                if(isRoundOver) return;
+
+                isRoundOver = true;
+                incorrectSynth.triggerAttackRelease("C3", "8n", Tone.now());
+                
+                dom.playerPanels.forEach(p => {
+                    p.feedback.textContent = `Time's up!`;
+                    p.answers.querySelectorAll('.answer-btn').forEach(b => {
+                        b.disabled = true;
+                        if (b.textContent === currentQuestion.correctAnswer) {
+                            b.classList.add('correct');
                         }
+                    });
+                });
+                setTimeout(askQuestion, 2000);
+            }
+
+            function startQuestionTimer() {
+                let timeLeft = QUESTION_TIME_LIMIT;
+                dom.timerDisplay.textContent = `Time: ${timeLeft}`;
+                dom.timerDisplay.classList.remove('hidden');
+
+                questionTimer = setInterval(() => {
+                    timeLeft--;
+                    dom.timerDisplay.textContent = `Time: ${timeLeft}`;
+                    if (timeLeft <= 0) {
+                        handleTimeOut();
                     }
                 }, 1000);
             }
 
-            function disableAnswerOptions(correctAnswerText = null) {
-                Array.from(answerOptionsContainer.children).forEach(btn => {
-                    btn.disabled = true;
-                    if (correctAnswerText && btn.textContent === correctAnswerText && !btn.classList.contains('correct')) {
-                        btn.classList.add('correct'); 
-                    }
+            function askQuestion() {
+                resetBoard();
+                if (questionsAsked >= TOTAL_QUESTIONS) {
+                    endGame();
+                    return;
+                }
+                questionsAsked++;
+                isRoundOver = false;
+                
+                currentQuestion = generateScheduleQuestion();
+                let options = generateDistractorOptions(currentQuestion.correctAnswer, currentQuestion.originalTime);
+
+                speak(currentQuestion.scenario, () => {
+                    dom.playerPanels.forEach((panel) => {
+                        const buttons = panel.answers.querySelectorAll('.answer-btn');
+                        buttons.forEach((btn, i) => {
+                            btn.textContent = options[i];
+                            btn.disabled = false;
+                        });
+                    });
+                    startQuestionTimer();
                 });
             }
+            
+            function handleAnswer(e) {
+                if (isRoundOver) return;
+                const button = e.target;
+                if (!button.matches('.answer-btn') || button.disabled) return;
+                
+                isRoundOver = true;
+                stopQuestionTimer();
 
-            function checkAnswer(selectedAnswerText, correctAnswerText, buttonElement) {
-                clearInterval(questionTimerInterval);
-                disableAnswerOptions(correctAnswerText); 
-                gameData.questionsAnswered++;
-                currentQuestionIndexInShuffledList++; 
+                dom.playerPanels.forEach(p => {
+                    p.answers.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
+                });
 
-                if (selectedAnswerText === correctAnswerText) {
-                    gameData.score += POINTS_PER_CORRECT_ANSWER; 
-                    feedbackDisplay.textContent = "Correct! Well done!";
-                    feedbackDisplay.style.color = '#10b981'; 
-                    buttonElement.classList.add('correct');
-                    gameData.correctStreak++;
-
-                    if (settings.areSoundEffectsEnabled && correctSoundEffect.src && !correctSoundEffect.src.endsWith('/') && !correctSoundEffect.src.startsWith('blob:')) { 
-                        correctSoundEffect.currentTime = 0;
-                        correctSoundEffect.play().catch(e => console.warn("Could not play correct.mp3.", e));
-                    } else if (settings.areSoundEffectsEnabled) {
-                        console.log("Placeholder: Play correct.mp3 (src not set).");
-                    }
+                const playerIndex = parseInt(button.dataset.player, 10);
+                const panel = dom.playerPanels[playerIndex];
+                
+                const selectedAnswer = button.textContent;
+                if (selectedAnswer === currentQuestion.correctAnswer) {
+                    players[playerIndex].score += POINTS_PER_CORRECT;
+                    panel.score.textContent = players[playerIndex].score;
+                    button.classList.add('correct');
+                    panel.feedback.textContent = "Awesome! You got it!";
+                    correctSynth.triggerAttackRelease("C5", "8n", Tone.now());
                     
-                    if (rewardGif.src && !rewardGif.src.endsWith('/') && !rewardGif.src.startsWith('blob:') && !rewardGif.src.includes('placehold.co')) {
-                         rewardGif.classList.remove('hidden');
-                    } else { 
-                        rewardGif.src = 'https://placehold.co/120x120/a7f3d0/14532d?text=Awesome!'; 
-                        rewardGif.classList.remove('hidden');
-                    }
-                    setTimeout(() => rewardGif.classList.add('hidden'), 2500);
-
-                    if (gameData.correctStreak === 5) awardBadge("Time Master!");
-                    if (gameData.correctStreak === 10) awardBadge("Clockwork Pro!");
+                    panel.scorePopup.classList.add('active');
+                    setTimeout(() => {
+                        panel.scorePopup.classList.remove('active');
+                    }, 800);
 
                 } else {
-                    feedbackDisplay.textContent = `Not quite. The correct time was: ${correctAnswerText}`;
-                    feedbackDisplay.style.color = '#f43f5e'; 
-                    buttonElement.classList.add('incorrect');
-                     Array.from(answerOptionsContainer.children).find(btn => btn.textContent === correctAnswerText)?.classList.add('correct');
-                    gameData.correctStreak = 0;
-
-                    if (settings.areSoundEffectsEnabled && incorrectSoundEffect.src && !incorrectSoundEffect.src.endsWith('/') && !incorrectSoundEffect.src.startsWith('blob:')) {
-                        incorrectSoundEffect.currentTime = 0;
-                        incorrectSoundEffect.play().catch(e => console.warn("Could not play incorrect.mp3.", e));
-                    } else if (settings.areSoundEffectsEnabled) {
-                        console.log("Placeholder: Play incorrect.mp3 (src not set).");
-                    }
+                    button.classList.add('incorrect');
+                    panel.feedback.textContent = `Nope! It was ${currentQuestion.correctAnswer}`;
+                    incorrectSynth.triggerAttackRelease("C3", "8n", Tone.now());
+                    
+                    dom.playerPanels.forEach(p => {
+                         p.answers.querySelectorAll('.answer-btn').forEach(b => {
+                            if (b.textContent === currentQuestion.correctAnswer) {
+                                b.classList.add('correct');
+                            }
+                        });
+                    });
                 }
                 
-                updateGameStatsDisplay();
-                checkBadges();
-                nextQuestionButtonModal.classList.remove('hidden');
-
-                if (gameData.questionsAnswered >= gameData.totalQuestions) {
-                    nextQuestionButtonModal.textContent = "Show Results";
-                }
+                setTimeout(askQuestion, 2000);
             }
             
-            function checkBadges() {
-                if (gameData.score >= (TOTAL_QUESTIONS_PER_GAME * POINTS_PER_CORRECT_ANSWER * 0.5) && !gameData.badges.includes("Halfway Hero!")) awardBadge("Halfway Hero!");
-                if (gameData.score >= (TOTAL_QUESTIONS_PER_GAME * POINTS_PER_CORRECT_ANSWER * 0.8) && !gameData.badges.includes("Super Scorer!")) awardBadge("Super Scorer!");
-                if (gameData.questionsAnswered === gameData.totalQuestions && gameData.score === (TOTAL_QUESTIONS_PER_GAME * POINTS_PER_CORRECT_ANSWER)) awardBadge("Perfect Score!");
-                else if (gameData.questionsAnswered === gameData.totalQuestions && gameData.score > 0) awardBadge("Test Complete!");
-            }
-
-            function proceedAfterModal() { 
-                questionModal.classList.add('hidden');
-                initiateQuestionButton.disabled = false; 
+            async function startGame() {
+                await Tone.start();
+                setupSounds();
                 
-                if (gameData.questionsAnswered >= TOTAL_QUESTIONS_PER_GAME) {
-                    endGame();
-                } else {
-                   nextQuestionButtonModal.textContent = "Next Question"; 
-                   currentActivityDisplay.textContent = "Click 'Next Question' to continue.";
-                   initiateQuestionButton.textContent = "Next Question";
-                }
+                players[0].name = dom.p1NameInput.value.trim() || 'Player 1';
+                players[1].name = dom.p2NameInput.value.trim() || 'Player 2';
+                dom.playerPanels[0].name.textContent = players[0].name;
+                dom.playerPanels[1].name.textContent = players[1].name;
+                
+                dom.startOverlay.classList.add('hidden');
+                dom.winnerAnnouncement.classList.add('hidden');
+                
+                questionsAsked = 0;
+                players.forEach(p => p.score = 0);
+                updateScores();
+                
+                askQuestion();
             }
-            
+
+            function updateScores() {
+                dom.playerPanels[0].score.textContent = players[0].score;
+                dom.playerPanels[1].score.textContent = players[1].score;
+            }
+
             function endGame() {
-                clearInterval(overallGameTimerInterval);
-                console.log("endGame called");
-                saveHighScore(gameData.score, gameData.username);
-                displayHighScores();
-                initiateQuestionButton.textContent = "Play Again?"; 
-                initiateQuestionButton.disabled = false; 
-                questionModal.classList.add('hidden'); 
-                gameOverScreen.classList.remove('hidden');
-                gameScreen.classList.add('hidden'); 
-                finalUsernameDisplay.textContent = gameData.username;
-                finalScoreDisplay.textContent = gameData.score;
-                finalTotalPossibleScoreDisplay.textContent = gameData.totalQuestions * POINTS_PER_CORRECT_ANSWER; 
-                finalBadgesDisplay.innerHTML = gameData.badges.length > 0 ? 
-                    gameData.badges.map(b => `<span class="inline-block">${b}</span>`).join(' ') : 'None';
+                stopQuestionTimer();
+                dom.playAgainBtn.classList.remove('hidden');
+                
+                let winnerText;
+                if (players[0].score > players[1].score) {
+                    winnerText = `${players[0].name} Wins!`;
+                } else if (players[1].score > players[0].score) {
+                    winnerText = `${players[1].name} Wins!`;
+                } else {
+                    winnerText = "It's a Tie!";
+                }
+                dom.winnerAnnouncement.textContent = winnerText;
+                dom.winnerAnnouncement.classList.remove('hidden');
             }
             
-            function quitGame() {
-                 clearInterval(questionTimerInterval);
-                 clearInterval(overallGameTimerInterval);
-                 if (confirm("Are you sure you want to quit? Your progress may be lost.")) {
-                    gameScreen.classList.add('hidden');
-                    questionModal.classList.add('hidden');
-                    gameOverScreen.classList.add('hidden'); 
-                    startScreen.classList.remove('hidden');
-                 }
+            function resetGame() {
+                dom.playAgainBtn.classList.add('hidden');
+                dom.startOverlay.classList.remove('hidden');
+                dom.winnerAnnouncement.classList.add('hidden');
+                resetBoard();
             }
 
-            // --- Settings Modal Logic ---
-            settingsButton.addEventListener('click', () => {
-                settingsModal.classList.remove('hidden');
-            });
-            closeSettingsButton.addEventListener('click', () => {
-                settingsModal.classList.add('hidden');
-            });
-            toggleTtsCheckbox.addEventListener('change', (e) => {
-                settings.isTtsEnabled = e.target.checked;
-                saveSettings();
-                if (!settings.isTtsEnabled && (speechSynthesis.speaking || speechSynthesis.pending)) {
-                    speechSynthesis.cancel(); 
-                }
-            });
-            toggleSfxCheckbox.addEventListener('change', (e) => {
-                settings.areSoundEffectsEnabled = e.target.checked;
-                saveSettings();
-            });
-
-
-            // --- Event Listeners ---
-            startButton.addEventListener('click', startGame);
-            playAgainButton.addEventListener('click', () => {
-                gameOverScreen.classList.add('hidden');
-                startScreen.classList.remove('hidden'); 
-            });
-            nextQuestionButtonModal.addEventListener('click', proceedAfterModal);
-            initiateQuestionButton.addEventListener('click', startNewQuestionRound);
-            quitButton.addEventListener('click', quitGame);
-            repeatButton.addEventListener('click', () => { 
-                if (currentQuestionData && currentQuestionData.spoken) { 
-                    speak(currentQuestionData.spoken, null); 
-                } else {
-                    console.log("Nothing to repeat or currentQuestionData not set.");
-                }
-            });
-
+            // Event Listeners
+            dom.startGameBtn.addEventListener('click', startGame);
+            dom.playAgainBtn.addEventListener('click', resetGame);
+            dom.playerPanels[0].answers.addEventListener('click', handleAnswer);
+            dom.playerPanels[1].answers.addEventListener('click', handleAnswer);
+            
             // Initial Load
             initSpeechSynthesis();
-            loadSettings(); 
-
         });
     </script>
 </body>
