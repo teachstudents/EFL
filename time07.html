@@ -51,7 +51,7 @@
         .game-title {
             grid-column: 1 / -1;
             font-weight: 700;
-            font-size: 2rem;
+            font-size: 1.75rem;
             color: var(--main-text);
             text-align: center;
             padding: 0.5rem;
@@ -93,32 +93,32 @@
         }
         
         .player-name {
-            font-size: 2.5rem;
+            font-size: 2.25rem;
             font-weight: 700;
         }
         #player-1-panel .player-name { color: var(--p1-accent); }
         #player-2-panel .player-name { color: var(--p2-accent); }
         
         .player-score {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             color: var(--main-text);
             margin-top: 0.5rem;
         }
         
         .badges-display-container {
-            margin-top: 1rem;
-            min-height: 34px;
+            margin-top: 0.75rem;
+            min-height: 30px;
         }
 
         .badge {
             display: inline-block;
             background-color: var(--badge-bg);
             color: var(--badge-text);
-            padding: 5px 12px;
-            border-radius: 16px;
-            font-size: 0.9rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
             font-weight: 600;
-            margin: 0 5px;
+            margin: 0 4px;
         }
 
         .score-popup {
@@ -126,7 +126,7 @@
             left: 50%;
             top: 20px;
             transform: translateX(-50%);
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: bold;
             color: var(--correct-bg);
             opacity: 0;
@@ -144,25 +144,25 @@
             flex-direction: column;
             align-items: center;
             gap: 1rem;
-            margin-top: 1.5rem;
+            margin-top: 1rem;
         }
 
         .answer-btn {
             padding: 1rem;
             width: 100%;
-            max-width: 450px;
-            font-size: 1.5rem; /* Increased size */
+            max-width: 400px;
+            font-size: 1.25rem;
             font-weight: 600;
-            border-radius: 16px;
+            border-radius: 12px;
             background-color: var(--btn-bg);
             color: var(--btn-text);
-            border: 3px solid #d1d5db;
+            border: 2px solid #d1d5db;
             cursor: pointer;
             transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
-            box-shadow: 0 6px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
         .answer-btn:not(:disabled):hover {
-            transform: translateY(-4px);
+            transform: translateY(-3px);
             background-color: var(--btn-hover-bg);
         }
         .answer-btn:disabled {
@@ -183,10 +183,10 @@
         
         .feedback-display {
             text-align: center;
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            margin-top: 1.5rem;
-            height: 3rem;
+            margin-top: 1rem;
+            height: 2.5rem;
         }
 
         .control-btn {
@@ -292,7 +292,7 @@
     </div>
 
     <div class="game-board hidden">
-        <h1 class="game-title">Question: <span id="question-count">0</span> / 25</h1>
+        <h1 class="game-title">Question: <span id="question-count">0</span> / 100</h1>
         <div id="timer-display" class="hidden">Time: 20</div>
 
         <!-- Player 1 Panel -->
@@ -350,7 +350,6 @@
                 p1NameInput: document.getElementById('p1-name-input'),
                 p2NameInput: document.getElementById('p2-name-input'),
                 gameBoard: document.querySelector('.game-board'),
-                gameTitle: document.querySelector('.game-title'),
                 
                 gameOverContainer: document.getElementById('game-over-container'),
                 winnerAnnouncement: document.querySelector('.winner-announcement'),
@@ -367,7 +366,7 @@
                 ]
             };
 
-            const TOTAL_QUESTIONS = 25;
+            const TOTAL_QUESTIONS = 100;
             const POINTS_PER_CORRECT = 4;
             const QUESTION_TIME_LIMIT = 20;
 
@@ -407,12 +406,10 @@
                 const items = ['hat', 'shirt', 'jacket', 'car', 'phone case', 'backpack'];
                 const colors = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange', 'Black', 'White', 'Pink', 'Brown'];
                 
-                // Get 3 unique colors
                 const shuffledColors = colors.sort(() => 0.5 - Math.random());
                 const chosenColors = shuffledColors.slice(0, 3);
                 const [correctAnswer, distractor1, distractor2] = chosenColors;
 
-                // Get 2 unique people
                 const person1 = people[Math.floor(Math.random() * people.length)];
                 let person2 = people[Math.floor(Math.random() * people.length)];
                 while (person1 === person2) { person2 = people[Math.floor(Math.random() * people.length)]; }
@@ -429,7 +426,6 @@
                 
                 return { scenario, correctAnswer, options: chosenColors.sort(() => 0.5 - Math.random()) };
             }
-
 
             function resetBoard() { dom.playerPanels.forEach((panel) => { panel.feedback.textContent = ''; const buttons = panel.answers.querySelectorAll('.answer-btn'); buttons.forEach(btn => { btn.className = 'answer-btn'; btn.disabled = true; btn.innerHTML = '&nbsp;'; }); }); }
             function stopQuestionTimer() { clearInterval(questionTimer); dom.timerDisplay.classList.add('hidden'); }
