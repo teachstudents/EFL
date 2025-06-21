@@ -58,55 +58,27 @@
         .vocabulary-list li {
             margin-bottom: 1rem;
         }
-        .short-answer-list li {
-            margin-bottom: 1rem;
-        }
-        .question-block {
-            margin-bottom: 2rem;
-            border-left: 3px solid #e9ecef;
-            padding-left: 1.5rem;
-        }
-        .feedback {
-            display: none;
-            margin-top: 0.75rem;
-            padding: 0.75rem 1rem;
-            border-radius: 0.375rem;
-            font-size: 0.9rem;
-        }
-        .feedback.correct {
-            background-color: #dcfce7;
-            color: #166534;
-        }
-        .feedback.incorrect {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        .tf-button, .mcq-option {
-            padding: 0.5rem 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            background-color: white;
-            cursor: pointer;
+        
+        /* New styles for the comprehension button */
+        .comprehension-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px; /* pill shape */
+            text-decoration: none;
+            font-weight: bold;
             transition: all 0.2s ease-in-out;
-            text-align: left;
-            margin-bottom: 0.5rem;
-            width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .tf-button:hover, .mcq-option:hover {
-            background-color: #f9fafb;
-            border-color: #60a5fa;
+        .comprehension-btn:hover {
+            background-color: #2563eb; /* blue-600 */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        .tf-button.correct-answer, .mcq-option.correct-answer {
-            background-color: #22c55e;
-            color: white;
-            border-color: #16a34a;
-        }
-        .mcq-option.incorrect, .tf-button.incorrect {
-            background-color: #ef4444;
-            color: white;
-            border-color: #b91c1c;
-        }
-        /* New Styles for TTS */
+
+        /* Styles for TTS */
         .speak-button {
             background-color: #dbeafe;
             color: #3b82f6;
@@ -220,33 +192,35 @@
                     <p>The Grand Canyon holds deep spiritual significance for at least 11 Native American tribes, including the Hualapai, Havasupai, and Navajo, who consider it a sacred place of origin and healing. Historically, the first Europeans to see the canyon were Spanish explorers in 1540, led by García López de Cárdenas, though their descriptions failed to capture its scale.</p>
                     <p>Designated a national park in 1919 and a UNESCO World Heritage site in 1979, the Grand Canyon is, in theory, well-protected. Nevertheless, it faces considerable environmental threats. Water diversion from the Colorado River for agriculture and urban centers has dramatically altered the river’s flow and sediment load, impacting the delicate riparian ecosystems. Furthermore, uranium mining on adjacent lands poses a contamination risk, while the constant pressure from millions of tourists annually presents ongoing management challenges.</p>
                 </div>
-                <h3>Comprehension Questions</h3>
+                <div class="mt-4">
+                    <a href="https://teachstudents.github.io/EFL/worldexp01.html" target="_blank" class="comprehension-btn">Comprehension Questions</a>
+                </div>
             </section>
             
             <section id="chapter-2">
                 <h2>The Great Barrier Reef, Australia</h2>
                  <h3>Vocabulary</h3>
                 <ol class="vocabulary-list list-decimal pl-5">
-                    <li><strong>coral reef /ˈkɔrəl rif/</strong>: A healthy coral reef is a bustling community, teeming with thousands of different organisms.</li>
-                    <li><strong>kaleidoscope /kəˈlaɪdəˌskoʊp/</strong>: The autumn forest was a kaleidoscope of red, yellow, and orange leaves.</li>
-                    <li><strong>biodiversity /ˌbaɪoʊdaɪˈvɜrsəti/</strong>: This small island has a greater biodiversity of bird species than the entire mainland.</li>
-                    <li><strong>coral polyps /ˈkɔrəl ˈpɑlɪps/</strong>: Each individual coral polyp secretes a limestone skeleton that contributes to the reef’s structure.</li>
-                    <li><strong>metropolis /məˈtrɑpəlɪs/</strong>: Tokyo is a vast, futuristic metropolis that is home to millions of people.</li>
-                    <li><strong>dugongs /ˈduɡɔŋz/</strong>: Dugongs, which are related to manatees, are gentle marine mammals that feed on seagrass.</li>
-                    <li><strong>Aboriginal /ˌæbəˈrɪdʒənəl/</strong>: The gallery featured a stunning collection of Aboriginal art from across the continent.</li>
-                    <li><strong>existential threat /ˌɛɡzɪˈstɛnʃəl θrɛt/</strong>: The development of artificial intelligence is considered by some to be an existential threat to humanity.</li>
-                    <li><strong>coral bleaching /ˈkɔrəl ˈblitʃɪŋ/</strong>: Scientists use satellite imagery to monitor the extent of coral bleaching across the globe.</li>
-                    <li><strong>agricultural runoff /ˌæɡrɪˈkʌltʃərəl ˈrʌnˌɔf/</strong>: The local lake has been contaminated by agricultural runoff containing pesticides and fertilizers.</li>
-                    <li><strong>crown-of-thorns starfish /ˈkraʊn əv θɔrnz ˈstɑrˌfɪʃ/</strong>: Divers are working to control the population of the destructive crown-of-thorns starfish.</li>
-                    <li><strong>paramount /ˈpærəˌmaʊnt/</strong>: In any emergency situation, the safety of the children is paramount.</li>
-                    <li><strong>conservation /ˌkɑnsərˈveɪʃən/</strong>: Water conservation is essential in desert climates to ensure a stable supply.</li>
-                    <li><strong>indigenous /ɪnˈdɪdʒənəs/</strong>: The new law aims to protect the rights of the country’s indigenous communities.</li>
-                    <li><strong>ecosystem /ˈikoʊˌsɪstəm/</strong>: The introduction of an invasive species can completely disrupt a balanced ecosystem.</li>
-                    <li><strong>Captain James Cook /ˈkæptən dʒeɪmz kʊk/</strong>: The explorer Captain James Cook was the first European to map the eastern coast of Australia.</li>
-                    <li><strong>pollutants /pəˈlutənts/</strong>: The factory was fined for releasing illegal pollutants into the river.</li>
-                    <li><strong>symbiotic /ˌsɪmbaɪˈɑtɪk/</strong>: The clownfish and the sea anemone have a famous symbiotic relationship that benefits both.</li>
-                    <li><strong>UNESCO /juˈnɛskoʊ/</strong>:The historic center of the city is protected as a UNESCO World Heritage site.</li>
-                    <li><strong>peril /ˈpɛrəl/</strong>: The sailors knew they were in great peril as the storm approached.</li>
+                     <li><strong>coral reef /ˈkɔrəl rif/</strong>: A healthy coral reef is a bustling community, teeming with thousands of different organisms.</li>
+                     <li><strong>kaleidoscope /kəˈlaɪdəˌskoʊp/</strong>: The autumn forest was a kaleidoscope of red, yellow, and orange leaves.</li>
+                     <li><strong>biodiversity /ˌbaɪoʊdaɪˈvɜrsəti/</strong>: This small island has a greater biodiversity of bird species than the entire mainland.</li>
+                     <li><strong>coral polyps /ˈkɔrəl ˈpɑlɪps/</strong>: Each individual coral polyp secretes a limestone skeleton that contributes to the reef’s structure.</li>
+                     <li><strong>metropolis /məˈtrɑpəlɪs/</strong>: Tokyo is a vast, futuristic metropolis that is home to millions of people.</li>
+                     <li><strong>dugongs /ˈduɡɔŋz/</strong>: Dugongs, which are related to manatees, are gentle marine mammals that feed on seagrass.</li>
+                     <li><strong>Aboriginal /ˌæbəˈrɪdʒənəl/</strong>: The gallery featured a stunning collection of Aboriginal art from across the continent.</li>
+                     <li><strong>existential threat /ˌɛɡzɪˈstɛnʃəl θrɛt/</strong>: The development of artificial intelligence is considered by some to be an existential threat to humanity.</li>
+                     <li><strong>coral bleaching /ˈkɔrəl ˈblitʃɪŋ/</strong>: Scientists use satellite imagery to monitor the extent of coral bleaching across the globe.</li>
+                     <li><strong>agricultural runoff /ˌæɡrɪˈkʌltʃərəl ˈrʌnˌɔf/</strong>: The local lake has been contaminated by agricultural runoff containing pesticides and fertilizers.</li>
+                     <li><strong>crown-of-thorns starfish /ˈkraʊn əv θɔrnz ˈstɑrˌfɪʃ/</strong>: Divers are working to control the population of the destructive crown-of-thorns starfish.</li>
+                     <li><strong>paramount /ˈpærəˌmaʊnt/</strong>: In any emergency situation, the safety of the children is paramount.</li>
+                     <li><strong>conservation /ˌkɑnsərˈveɪʃən/</strong>: Water conservation is essential in desert climates to ensure a stable supply.</li>
+                     <li><strong>indigenous /ɪnˈdɪdʒənəs/</strong>: The new law aims to protect the rights of the country’s indigenous communities.</li>
+                     <li><strong>ecosystem /ˈikoʊˌsɪstəm/</strong>: The introduction of an invasive species can completely disrupt a balanced ecosystem.</li>
+                     <li><strong>Captain James Cook /ˈkæptən dʒeɪmz kʊk/</strong>: The explorer Captain James Cook was the first European to map the eastern coast of Australia.</li>
+                     <li><strong>pollutants /pəˈlutənts/</strong>: The factory was fined for releasing illegal pollutants into the river.</li>
+                     <li><strong>symbiotic /ˌsɪmbaɪˈɑtɪk/</strong>: The clownfish and the sea anemone have a famous symbiotic relationship that benefits both.</li>
+                     <li><strong>UNESCO /juˈnɛskoʊ/</strong>:The historic center of the city is protected as a UNESCO World Heritage site.</li>
+                     <li><strong>peril /ˈpɛrəl/</strong>: The sailors knew they were in great peril as the storm approached.</li>
                 </ol>
                 <div class="flex items-center justify-between">
                     <h3>Reading Passage</h3>
@@ -256,14 +230,16 @@
                 </div>
                 <div class="passage-content">
                      <p>The Great Barrier Reef is the largest coral reef system on the planet, an enormous structure stretching for over 1,400 miles (2,300 km) off the coast of Queensland. Composed of over 2,900 individual reefs and 900 islands, this vibrant underwater metropolis is so vast it is clearly visible from space. Fundamentally, it is built by billions of tiny organisms known as coral polyps.</p>
-                    <p>The reef is a global hotspot of marine biodiversity, providing a home to a dazzling array of life. It supports over 1,500 species of fish, 400 types of coral, 4,000 species of mollusks, and is a critical habitat for larger animals like sea turtles, dugongs (sea cows), and various species of dolphins and whales. This intricate coral architecture provides essential shelter and vital breeding grounds for countless marine creatures.</p>
-                    <p>For over 60,000 years, the Great Barrier Reef has been an integral part of the cultural and spiritual identity of Aboriginal and Torres Strait Islander peoples. Their traditional knowledge of the reef is now being incorporated into modern conservation strategies. Historically, Captain James Cook ran aground on the reef in 1770, which led to the first detailed European charting of this massive natural wonder.</p>
-                    <p>Today, the reef faces an existential threat. The most significant danger is climate change; rising ocean temperatures cause mass coral bleaching, a phenomenon where the coral expels its symbiotic algae and turns white, often leading to death. Additionally, agricultural runoff carrying pesticides and sediment pollutes the water, while outbreaks of the predatory crown-of-thorns starfish can devastate entire sections of the reef. Urgent and substantial global action on climate change is paramount for its survival.</p>
+                     <p>The reef is a global hotspot of marine biodiversity, providing a home to a dazzling array of life. It supports over 1,500 species of fish, 400 types of coral, 4,000 species of mollusks, and is a critical habitat for larger animals like sea turtles, dugongs (sea cows), and various species of dolphins and whales. This intricate coral architecture provides essential shelter and vital breeding grounds for countless marine creatures.</p>
+                     <p>For over 60,000 years, the Great Barrier Reef has been an integral part of the cultural and spiritual identity of Aboriginal and Torres Strait Islander peoples. Their traditional knowledge of the reef is now being incorporated into modern conservation strategies. Historically, Captain James Cook ran aground on the reef in 1770, which led to the first detailed European charting of this massive natural wonder.</p>
+                     <p>Today, the reef faces an existential threat. The most significant danger is climate change; rising ocean temperatures cause mass coral bleaching, a phenomenon where the coral expels its symbiotic algae and turns white, often leading to death. Additionally, agricultural runoff carrying pesticides and sediment pollutes the water, while outbreaks of the predatory crown-of-thorns starfish can devastate entire sections of the reef. Urgent and substantial global action on climate change is paramount for its survival.</p>
                 </div>
-                <h3>Comprehension Questions</h3>
+                <div class="mt-4">
+                    <a href="https://teachstudents.github.io/EFL/worldexp02.html" target="_blank" class="comprehension-btn">Comprehension Questions</a>
+                </div>
             </section>
             
-            <section id="chapter-3">
+             <section id="chapter-3">
                 <h2>The Amazon Rainforest, South America</h2>
                 <h3>Vocabulary</h3>
                 <ol class="vocabulary-list list-decimal pl-5">
@@ -300,33 +276,35 @@
                     <p>The Amazon is home to approximately 400 distinct Indigenous groups, each with its own language, culture, and profound traditional knowledge of the forest. These communities are often the most effective guardians of the rainforest. Historically, complex societies, including large urban-like settlements, existed within the Amazon before the arrival of Europeans, a fact only recently confirmed by archaeological research.</p>
                     <p>The Amazon is facing an alarming rate of deforestation. The primary drivers are cattle ranching and soy cultivation, followed by logging, mining, and large-scale infrastructure projects like dams and highways. This destruction not only threatens biodiversity but also disrupts the global carbon cycle and jeopardizes the survival of its indigenous inhabitants. Consequently, protecting the Amazon is one of the most critical environmental challenges of our time.</p>
                 </div>
-                <h3>Comprehension Questions</h3>
+                <div class="mt-4">
+                    <a href="https://teachstudents.github.io/EFL/worldexp03.html" target="_blank" class="comprehension-btn">Comprehension Questions</a>
+                </div>
             </section>
 
             <section id="chapter-4">
                 <h2>Mount Everest, Nepal/China</h2>
                 <h3>Vocabulary</h3>
                 <ol class="vocabulary-list list-decimal pl-5">
-                    <li><strong>tectonic plates /tɛkˈtɑnɪk pleɪts/</strong>: The island of Iceland was formed by the separation of two tectonic plates.</li>
-                    <li><strong>summit /ˈsʌmɪt/</strong>: After a week of hiking, the group finally reached the mountain’s windy summit.</li>
-                    <li><strong>Sagarmatha /ˌsɑɡərˈmɑtɑ/</strong>: The national park is named Sagarmatha to honor the Nepali name for the great mountain.</li>
-                    <li><strong>Chomolungma /ˌtʃoʊmoʊˈlʊŋmə/</strong>: Tibetan monks have revered the mountain they call Chomolungma for centuries.</li>
-                    <li><strong>mountaineering /ˌmaʊntəˈnɪrɪŋ/</strong>: Proper mountaineering requires extensive training, experience, and specialized equipment.</li>
-                    <li><strong>death zone /dɛθ zoʊn/</strong>:Climbers must use supplemental oxygen when ascending into the thin air of the death zone.</li>
-                    <li><strong>Sir Edmund Hillary /sər ˈɛdmənd ˈhɪləri/</strong>: After his famous climb, Sir Edmund Hillary dedicated much of his life to helping the Sherpa people.</li>
-                    <li><strong>Tenzing Norgay /ˈtɛnzɪŋ ˈnɔrɡeɪ/</strong>: Tenzing Norgay was a highly experienced climber long before his historic ascent of Everest.</li>
-                    <li><strong>Sherpa /ˈʃɜrpə/</strong>: He hired a Sherpa to help carry his gear up to the base camp.</li>
-                    <li><strong>overcrowding /ˌoʊvərˈkraʊdɪŋ/</strong>: Overcrowding in the city’s schools is a serious issue that affects the quality of education.</li>
-                    <li><strong>waste accumulation /weɪst əˌkjumjəˈleɪʃən/</strong>: The town’s landfill is full due to decades of unchecked waste accumulation.</li>
-                    <li><strong>conservation /ˌkɑnsərˈveɪʃən/</strong>: The conservation of historic manuscripts requires climate-controlled storage facilities.</li>
-                    <li><strong>regulations /ˌrɛɡjəˈleɪʃənz/</strong>: The government introduced new safety regulations for the airline industry.</li>
-                    <li><strong>sacred /ˈseɪkrɪd/</strong>: In many cultures, the eagle is considered a sacred animal with great power.</li>
-                    <li><strong>collision /kəˈlɪʒən/</strong>: The accident was a high-speed collision between a car and a truck.</li>
-                    <li><strong>altitude /ˈæltɪˌtud/</strong>: The pilot announced that the plane had reached its cruising altitude of 35,000 feet.</li>
-                    <li><strong>fragile environment /ˈfrædʒəl ɛnˈvaɪrənmənt/</strong>: The Arctic tundra is a fragile environment that is highly susceptible to climate change.</li>
-                    <li><strong>plagued /pleɪɡd/</strong>: The project was plagued by delays and budget overruns from the very beginning.</li>
-                    <li><strong>bottlenecks /ˈbɑtəlˌnɛks/</strong>: The narrow bridge creates one of the worst traffic bottlenecks in the entire city.</li>
-                    <li><strong>expedition /ˌɛkspəˈdɪʃən/</strong>: The scientific expedition to Antarctica will study the effects of melting ice sheets.</li>
+                     <li><strong>tectonic plates /tɛkˈtɑnɪk pleɪts/</strong>: The island of Iceland was formed by the separation of two tectonic plates.</li>
+                     <li><strong>summit /ˈsʌmɪt/</strong>: After a week of hiking, the group finally reached the mountain’s windy summit.</li>
+                     <li><strong>Sagarmatha /ˌsɑɡərˈmɑtɑ/</strong>: The national park is named Sagarmatha to honor the Nepali name for the great mountain.</li>
+                     <li><strong>Chomolungma /ˌtʃoʊmoʊˈlʊŋmə/</strong>: Tibetan monks have revered the mountain they call Chomolungma for centuries.</li>
+                     <li><strong>mountaineering /ˌmaʊntəˈnɪrɪŋ/</strong>: Proper mountaineering requires extensive training, experience, and specialized equipment.</li>
+                     <li><strong>death zone /dɛθ zoʊn/</strong>:Climbers must use supplemental oxygen when ascending into the thin air of the death zone.</li>
+                     <li><strong>Sir Edmund Hillary /sər ˈɛdmənd ˈhɪləri/</strong>: After his famous climb, Sir Edmund Hillary dedicated much of his life to helping the Sherpa people.</li>
+                     <li><strong>Tenzing Norgay /ˈtɛnzɪŋ ˈnɔrɡeɪ/</strong>: Tenzing Norgay was a highly experienced climber long before his historic ascent of Everest.</li>
+                     <li><strong>Sherpa /ˈʃɜrpə/</strong>: He hired a Sherpa to help carry his gear up to the base camp.</li>
+                     <li><strong>overcrowding /ˌoʊvərˈkraʊdɪŋ/</strong>: Overcrowding in the city’s schools is a serious issue that affects the quality of education.</li>
+                     <li><strong>waste accumulation /weɪst əˌkjumjəˈleɪʃən/</strong>: The town’s landfill is full due to decades of unchecked waste accumulation.</li>
+                     <li><strong>conservation /ˌkɑnsərˈveɪʃən/</strong>: The conservation of historic manuscripts requires climate-controlled storage facilities.</li>
+                     <li><strong>regulations /ˌrɛɡjəˈleɪʃənz/</strong>: The government introduced new safety regulations for the airline industry.</li>
+                     <li><strong>sacred /ˈseɪkrɪd/</strong>: In many cultures, the eagle is considered a sacred animal with great power.</li>
+                     <li><strong>collision /kəˈlɪʒən/</strong>: The accident was a high-speed collision between a car and a truck.</li>
+                     <li><strong>altitude /ˈæltɪˌtud/</strong>: The pilot announced that the plane had reached its cruising altitude of 35,000 feet.</li>
+                     <li><strong>fragile environment /ˈfrædʒəl ɛnˈvaɪrənmənt/</strong>: The Arctic tundra is a fragile environment that is highly susceptible to climate change.</li>
+                     <li><strong>plagued /pleɪɡd/</strong>: The project was plagued by delays and budget overruns from the very beginning.</li>
+                     <li><strong>bottlenecks /ˈbɑtəlˌnɛks/</strong>: The narrow bridge creates one of the worst traffic bottlenecks in the entire city.</li>
+                     <li><strong>expedition /ˌɛkspəˈdɪʃən/</strong>: The scientific expedition to Antarctica will study the effects of melting ice sheets.</li>
                 </ol>
                 <div class="flex items-center justify-between">
                     <h3>Reading Passage</h3>
@@ -340,7 +318,9 @@
                     <p>Known as Sagarmatha (“Forehead in the Sky”) in Nepali and Chomolungma (“Holy Mother”) in Tibetan, Mount Everest is a sacred mountain to local communities. It has also become the ultimate challenge for mountaineers from around the world. Historically, the mountain was first successfully summited on May 29, 1953, by Sir Edmund Hillary of New Zealand and Tenzing Norgay, a Sherpa of Nepal, an event that captured the world’s imagination.</p>
                     <p>The increasing popularity of climbing Everest has led to significant environmental problems. Overcrowding on popular routes has created dangerous bottlenecks. Moreover, the mountain has been plagued by waste accumulation, with discarded oxygen canisters, climbing gear, and human waste littering the slopes, earning it the unfortunate nickname of “the world’s highest garbage dump.” In response, both Nepal and China have implemented stricter regulations and cleanup expeditions.</p>
                 </div>
-                <h3>Comprehension Questions</h3>
+                <div class="mt-4">
+                    <a href="https://teachstudents.github.io/EFL/worldexp04.html" target="_blank" class="comprehension-btn">Comprehension Questions</a>
+                </div>
             </section>
 
             <section id="chapter-5">
@@ -380,7 +360,9 @@
                     <p>The first European to view the falls was the Scottish missionary and explorer David Livingstone, who named them in honor of Queen Victoria in 1855. However, the falls had been a significant site for local Tonga and Lozi people for centuries, a place of worship and awe. The archaeology of the area reveals a long history of human settlement, dating back to the Early Stone Age.</p>
                     <p>Victoria Falls is a UNESCO World Heritage site and a crucial driver of tourism for both Zambia and Zimbabwe. The environmental challenge here is one of sustainable development. There is a delicate balance to be struck between developing tourist infrastructure like hotels and preserving the natural beauty and ecological integrity of the site. Proposals for hydropower dams upstream on the Zambezi also pose a potential threat to the river’s flow and the waterfall’s grandeur.</p>
                 </div>
-                <h3>Comprehension Questions</h3>
+                 <div class="mt-4">
+                    <a href="https://teachstudents.github.io/EFL/worldexp05.html" target="_blank" class="comprehension-btn">Comprehension Questions</a>
+                </div>
             </section>
             
             <section id="chapter-6">
@@ -415,18 +397,20 @@
                     </button>
                 </div>
                 <div class="passage-content">
-                    <p>The Sahara Desert is the largest hot desert in the world, spanning an immense 3.6 million square miles (9.2 million square km) across North Africa. It is a land of extreme temperatures and varied landscapes, featuring vast sand seas (ergs), barren rocky plateaus (hamadas), and ancient, dry riverbeds (wadis).</p>
+                   <p>The Sahara Desert is the largest hot desert in the world, spanning an immense 3.6 million square miles (9.2 million square km) across North Africa. It is a land of extreme temperatures and varied landscapes, featuring vast sand seas (ergs), barren rocky plateaus (hamadas), and ancient, dry riverbeds (wadis).</p>
                     <p>While seemingly barren, the Sahara supports a surprising amount of life that has adapted to the hyper-arid conditions. This includes mammals like the addax antelope and the fennec fox. Historically, the Sahara was much greener. Rock art found in places like Tassili n’Ajjer in Algeria depicts a savanna environment teeming with elephants, giraffes, and crocodiles, a period known as the “Green Sahara” which ended around 5,000 years ago.</p>
                     <p>For millennia, the Sahara has been a crossroads of cultures, not a barrier. Trans-Saharan trade routes, traversed by camel caravans, connected West Africa with the Mediterranean world, facilitating the exchange of goods like gold, salt, and unfortunately, slaves, which profoundly shaped the economies and cultures of three continents. The desert is home to various nomadic and semi-nomadic peoples, such as the Tuareg and the Tubu.</p>
                     <p>The Sahara is expanding, a process known as desertification, which is accelerated by climate change and unsustainable land management practices along its southern border, the Sahel. This threatens the livelihoods of millions of people. On the other hand, there is growing interest in the Sahara’s potential for large-scale solar energy projects, which could provide clean energy for Africa and Europe, presenting both an opportunity and new environmental considerations.</p>
                 </div>
-                <h3>Comprehension Questions</h3>
+                <div class="mt-4">
+                    <a href="https://teachstudents.github.io/EFL/worldexp06.html" target="_blank" class="comprehension-btn">Comprehension Questions</a>
+                </div>
             </section>
             
             <section id="chapter-7">
                 <h2>The Galápagos Islands, Ecuador</h2>
                 <h3>Vocabulary</h3>
-                <ol class="vocabulary-list list-decimal pl-5">
+                 <ol class="vocabulary-list list-decimal pl-5">
                     <li><strong>archipelago /ˌɑrkəˈpɛləˌɡoʊ/</strong>: The Hawaiian archipelago consists of eight major islands and numerous smaller islets.</li>
                     <li><strong>volcanic /vɑlˈkænɪk/</strong>: The rich, dark soil is a result of the island’s volcanic origins.</li>
                     <li><strong>endemic species /ɛnˈdɛmɪk ˈspiʃiz/</strong>: The lemur is an endemic species, found naturally only on the island of Madagascar.</li>
@@ -460,7 +444,9 @@
                     <p>Historically, the islands were used by pirates and whalers as a base for centuries before being claimed by Ecuador in 1832. There is also a fascinating, albeit dark, human history of attempts to colonize the islands, filled with mysterious disappearances and unsolved murders, particularly on Floreana Island in the 1930s.</p>
                     <p>The Galápagos are a UNESCO World Heritage site and a strictly managed national park. However, the ecosystem is incredibly fragile. The biggest environmental threats are the introduction of invasive species (like goats, rats, and fire ants), which outcompete or prey on native wildlife, and the pressures of tourism. Illegal fishing, especially for sharks, also remains a persistent problem. Consequently, rigorous biosecurity measures and conservation programs are in constant operation to protect this irreplaceable natural treasure.</p>
                 </div>
-                <h3>Comprehension Questions</h3>
+                <div class="mt-4">
+                    <a href="https://teachstudents.github.io/EFL/worldexp07.html" target="_blank" class="comprehension-btn">Comprehension Questions</a>
+                </div>
             </section>
             
             <section id="chapter-8">
@@ -495,12 +481,14 @@
                     </button>
                 </div>
                 <div class="passage-content">
-                    <p>The Northern Lights, or Aurora Borealis, are a natural light display in the Earth’s sky, typically observed in the high-latitude regions. This mesmerizing phenomenon is caused by collisions between energetic charged particles, released from the sun in a “solar wind,” and atoms in the Earth’s upper atmosphere. The Earth’s magnetic field funnels these particles towards the poles, creating the auroral ovals.</p>
+                     <p>The Northern Lights, or Aurora Borealis, are a natural light display in the Earth’s sky, typically observed in the high-latitude regions. This mesmerizing phenomenon is caused by collisions between energetic charged particles, released from the sun in a “solar wind,” and atoms in the Earth’s upper atmosphere. The Earth’s magnetic field funnels these particles towards the poles, creating the auroral ovals.</p>
                     <p>The colors of the aurora are a direct result of which gas is being excited and at what altitude. The most common color, a pale yellowish-green, is produced by oxygen molecules at about 60 miles (100 km) up. The rarer, all-red auroras are produced by high-altitude oxygen, at heights of up to 200 miles (320 km). Nitrogen, on the other hand, can produce blue or purplish-red light.</p>
                     <p>Throughout history, cultures have interpreted the aurora in myriad ways. The Vikings, for example, believed the lights were reflections off the armor of the Valkyries, the mythical warrior maidens. In contrast, some North American Inuit groups saw them as the spirits of their ancestors playing a game with a walrus skull. Today, aurora tourism is a significant economic driver for communities in the “auroral zone,” including parts of Norway, Sweden, Finland, Iceland, Canada, and Alaska.</p>
                     <p>While an atmospheric phenomenon, the aurora is intrinsically linked to the Earth’s environment. The magnetic field that guides the aurora-causing particles also protects us from the full force of the solar wind, which would otherwise strip away our atmosphere. The study of the aurora, therefore, provides valuable information about space weather, which can impact satellites, communication systems, and even power grids on Earth.</p>
                 </div>
-                <h3>Comprehension Questions</h3>
+                <div class="mt-4">
+                    <a href="https://teachstudents.github.io/EFL/worldexp08.html" target="_blank" class="comprehension-btn">Comprehension Questions</a>
+                </div>
             </section>
             
             <section id="chapter-9">
@@ -540,7 +528,9 @@
                     <p>The Cave of Crystals was discovered by accident in 2000 by miners drilling a new tunnel for the Naica lead and silver mine. Its discovery opened a new window for scientists to study mineral formation and even extremophile microbes that were found dormant inside the crystals.</p>
                     <p>The cave is completely inaccessible to the public due to its lethal environment of extreme heat and humidity. After its discovery, the water was pumped out to allow for study. Now that mining operations have ceased, there is an ongoing scientific and ethical debate about whether to allow the cave to re-flood. Flooding the cave would halt human access but would arguably be the best way to preserve the crystals and allow them, perhaps, to continue their slow growth, protecting this geological wonder for future millennia.</p>
                 </div>
-                <h3>Comprehension Questions</h3>
+                <div class="mt-4">
+                    <a href="https://teachstudents.github.io/EFL/worldexp09.html" target="_blank" class="comprehension-btn">Comprehension Questions</a>
+                </div>
             </section>
             
             <section id="chapter-10">
@@ -575,12 +565,14 @@
                     </button>
                 </div>
                 <div class="passage-content">
-                    <p>The Great Migration in the Serengeti-Mara ecosystem of Tanzania and Kenya is the largest and longest overland migration of terrestrial animals on the planet. Annually, over 1.5 million wildebeest, accompanied by hundreds of thousands of zebras, gazelles, and elands, journey in a continuous clockwise direction for over 1,000 miles in search of fresh grazing and water, following the seasonal rains.</p>
+                     <p>The Great Migration in the Serengeti-Mara ecosystem of Tanzania and Kenya is the largest and longest overland migration of terrestrial animals on the planet. Annually, over 1.5 million wildebeest, accompanied by hundreds of thousands of zebras, gazelles, and elands, journey in a continuous clockwise direction for over 1,000 miles in search of fresh grazing and water, following the seasonal rains.</p>
                     <p>This epic journey is a raw and powerful demonstration of the cycle of life and death. The herds face constant threats. For instance, the dramatic river crossings of the Grumeti and Mara rivers are legendary, with giant Nile crocodiles lying in wait. On the plains, predators such as lions, cheetahs, leopards, and hyenas relentlessly stalk the herds, culling the weak and the young.</p>
                     <p>The lands of the Serengeti have been home to the Maasai people for centuries. Their semi-nomadic, pastoralist lifestyle traditionally coexisted with the wildlife. The name “Serengeti” itself is derived from the Maasai word “siringet,” meaning “endless plains.” Historically, the importance of this ecosystem was recognized by conservationists like Bernhard Grzimek, whose work in the 1950s was crucial in raising global awareness and promoting its protection.</p>
                     <p>The Serengeti ecosystem is a UNESCO World Heritage site, yet it faces significant threats. Poaching remains a persistent problem. However, the most pressing long-term threat is habitat fragmentation. Proposed roads and railway lines that would bisect the park could sever the ancient migration routes, with catastrophic consequences for the wildebeest population and the entire ecosystem that depends on them. Therefore, balancing human development needs with the imperative to protect this iconic migration is a major and ongoing conservation challenge.</p>
                 </div>
-                <h3>Comprehension Questions</h3>
+                <div class="mt-4">
+                    <a href="https://teachstudents.github.io/EFL/worldexp10.html" target="_blank" class="comprehension-btn">Comprehension Questions</a>
+                </div>
             </section>
 
         </main>
@@ -612,7 +604,6 @@
                 });
             });
 
-
             // TEXT-TO-SPEECH (TTS) SCRIPT
             const synth = window.speechSynthesis;
             const voiceSelect = document.getElementById('voice-select');
@@ -635,28 +626,23 @@
                 ];
 
                 desiredVoices.forEach(desired => {
-                    // Find the best match for the desired voice by searching for the key name
                     let foundVoice = voices.find(v => v.name.includes(desired.searchKey) && v.lang === 'en-US');
                     
-                    // If no direct match by name, find a generic fallback of the same gender
                     if (!foundVoice) {
                         if (desired.gender === 'female') {
                             foundVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Female') || v.name.includes('Zira')));
-                        } else { // male
+                        } else {
                              foundVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David')));
                         }
                     }
                     
-                    // If still no voice, grab the first available US English voice
                     if (!foundVoice) {
                         foundVoice = voices.find(v => v.lang === 'en-US');
                     }
-                     // If still nothing, take the very first English voice available
                     if (!foundVoice) {
                         foundVoice = voices[0];
                     }
                     
-                    // If a voice is found, add it to the dropdown.
                     if(foundVoice){
                         const option = document.createElement('option');
                         option.textContent = `${desired.name} (using ${foundVoice.name})`;
@@ -716,12 +702,9 @@
                     };
                     
                     utterance.onerror = (event) => {
-                        // The 'canceled' error is expected when we interrupt speech.
-                        // We only log errors that are not 'canceled'.
                         if (event.error !== 'canceled') {
                              console.error('SpeechSynthesisUtterance.onerror event:', event);
                         }
-                        // Always reset the button state on any error or completion.
                         if (currentlySpeakingButton === button) {
                             resetSpeakingButton();
                         }
@@ -732,16 +715,14 @@
             }
 
             if (synth) {
-                // The 'voiceschanged' event is crucial. Some browsers load voices asynchronously.
                 if (speechSynthesis.onvoiceschanged !== undefined) {
                     speechSynthesis.onvoiceschanged = populateVoiceList;
                 } else {
-                    populateVoiceList(); // For browsers that load voices instantly.
+                    populateVoiceList(); 
                 }
 
                 speakButtons.forEach(button => button.addEventListener('click', handleSpeak));
 
-                // This interval is a workaround for a browser bug where the TTS engine can go idle.
                 if (!speechKeeperInterval) {
                     speechKeeperInterval = setInterval(() => {
                         if (synth.paused || !synth.speaking) {
@@ -755,7 +736,6 @@
                  document.getElementById('voice-selection-wrapper').classList.add('hidden');
             }
 
-            // Cleanup on page leave
             window.onbeforeunload = function() {
                 if (speechKeeperInterval) clearInterval(speechKeeperInterval);
                 if (synth && synth.speaking) synth.cancel();
