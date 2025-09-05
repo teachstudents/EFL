@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Racing Adventure - Student Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .game-title {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+            to { text-shadow: 0 4px 20px rgba(255,255,255,0.5); }
+        }
+
+        .grade-selection {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .grade-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 2rem 3rem;
+            border-radius: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .grade-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+        }
+
+        .student-count {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        /* Game Screen */
+        .game-screen {
+            display: none;
+            height: 100vh;
+            position: relative;
+            background: #87CEEB;
+        }
+
+        .game-header {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            background: rgba(255,255,255,0.9);
+            padding: 0.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-size: 0.8rem;
+        }
+
+        .control-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .speed-slider {
+            width: 100px;
+        }
+
+        .timer {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .city-map {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            background: linear-gradient(45deg, #90EE90 0%, #98FB98 50%, #90EE90 100%);
+            overflow: hidden;
+        }
+
+        /* Roads */
+        .road {
+            position: absolute;
+            background: #333;
+            border: 2px solid #FFD700;
+        }
+
+        .road-horizontal {
+            height: 80px;
+            border-top: 4px dashed #FFF;
+            border-bottom: 4px dashed #FFF;
+        }
+
+        .road-vertical {
+            width: 80px;
+            border-left: 4px dashed #FFF;
+            border-right: 4px dashed #FFF;
+        }
+
+        .intersection {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: #333;
+            border: 2px solid #FFD700;
+            z-index: 1;
+        }
+
+        /* Traffic Lights */
+        .traffic-light {
+            position: absolute;
+            width: 15px;
+            height: 30px;
+            background: #222;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            padding: 2px;
+            z-index: 50;
+        }
+
+        .light {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #444;
+            transition: background 0.2s;
+        }
+
+        .light.red { box-shadow: 0 0 10px #ff4444; }
+        .light.yellow { box-shadow: 0 0 10px #ffff44; }
+        .light.green { box-shadow: 0 0 10px #44ff44; }
+
+        /* Buildings */
+        .building {
+            position: absolute;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .building:hover {
+            transform: scale(1.2);
+        }
+
+        /* Trees and Decorations */
+        .decoration {
+            position: absolute;
+            font-size: 2rem;
+            z-index: 5;
+        }
+
+        /* Student Racers */
+        .student-racer {
+            position: absolute;
+            left: 0; /* Let transform handle all positioning */
+            top: 0;  /* Let transform handle all positioning */
+            background: white;
+            border: 2px solid #333;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            cursor: move;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .student-racer .racer-tooltip {
+            visibility: hidden;
+            width: 120px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .student-racer:hover .racer-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+
+        .student-racer.moving {
+            animation: bounce 0.5s ease-in-out infinite alternate;
+        }
+
+        .student-racer.stopped {
+            animation: none;
+            border-color: #ff4444;
+        }
+
+        .student-racer.leader {
+            border: 3px solid #FFD700;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            /* Scale is part of transform, so we add it in JS now */
+        }
+
+        @keyframes bounce {
+            from { transform: var(--transform-pos) scale(1); }
+            to { transform: var(--transform-pos) translateY(-3px) scale(1.05); }
+        }
+
+        .finish-line {
+            position: absolute;
+            width: 40px;
+            height: 80px;
+            background: repeating-linear-gradient(
+                45deg,
+                #000,
+                #000 8px,
+                #fff 8px,
+                #fff 16px
+            );
+            border: 2px solid #FFD700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            z-index: 50;
+            text-align: center;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .leaderboard {
+            position: absolute;
+            top: 60px;
+            right: 10px;
+            background: rgba(255,255,255,0.95);
+            padding: 0.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 200;
+            min-width: 180px;
+            font-size: 0.7rem;
+        }
+
+        .leaderboard h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .leader-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            margin-bottom: 3px;
+            color: #333;
+        }
+
+        .leader-item .rank {
+            font-weight: bold;
+            color: white;
+            background-color: rgba(0,0,0,0.4);
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .leader-item .name {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .leader-item.first {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            font-weight: bold;
+            color: black;
+        }
+        .leader-item.first .rank {
+             background-color: white;
+             color: #b8860b;
+        }
+
+        .leader-item.second {
+            background: linear-gradient(45deg, #C0C0C0, #A8A8A8);
+            color: black;
+        }
+        .leader-item.second .rank {
+            background-color: white;
+            color: #555;
+        }
+
+        .leader-item.third {
+            background: linear-gradient(45deg, #CD7F32, #B8860B);
+            color: white;
+        }
+        .leader-item.third .rank {
+            background-color: white;
+            color: #8B4513;
+        }
+
+        /* Fireworks */
+        .firework {
+            position: absolute;
+            pointer-events: none;
+            z-index: 200;
+        }
+
+        .spark {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            animation: sparkle 1s ease-out forwards;
+        }
+
+        @keyframes sparkle {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        .winner-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 300;
+            display: none;
+            animation: popup-in 0.5s ease-out forwards;
+        }
+        
+        @keyframes popup-in {
+            from { transform: translate(-50%, -50%) scale(0); }
+            to { transform: translate(-50%, -50%) scale(1); }
+        }
+
+
+        /* Weather Effects */
+        .weather-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 150;
+            display: none;
+        }
+
+        .rain {
+            background-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(100,100,200,0.4) 100%);
+            animation: rain-fall 0.5s linear infinite;
+        }
+
+        .snow {
+            background-image: radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px);
+            background-size: 25px 25px;
+            animation: snow-fall 3s linear infinite;
+        }
+
+        @keyframes rain-fall {
+             0% { background-position: 0px 0px; }
+             100% { background-position: 0px 1000px; }
+        }
+
+        @keyframes snow-fall {
+             0% { background-position: 0px 0px; }
+             100% { background-position: 20px 1000px; }
+        }
+
+        .weather-alert {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.95);
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            z-index: 250;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2.5rem;
+            }
+            
+            .grade-btn {
+                padding: 1.5rem 2rem;
+                font-size: 1.2rem;
+            }
+            
+            .grade-selection {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .leaderboard {
+                top: 10px;
+                right: 5px;
+                min-width: 120px;
+                font-size: 0.6rem;
+            }
+            
+            .game-header {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.2rem;
+                padding: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Start Screen -->
+    <div class="start-screen" id="startScreen">
+        <h1 class="game-title">🏁 City Racing Adventure 🏁</h1>
+        <p style="font-size: 1.5rem; margin-bottom: 3rem;">Choose Your Grade to Start Racing!</p>
+        
+        <div class="grade-selection">
+            <button class="grade-btn" onclick="startGame(10)">
+                <div>Grade 10</div>
+                <div class="student-count">总共 / Total: 16</div>
+            </button>
+            <button class="grade-btn" onclick="startGame(11)">
+                <div>Grade 11</div>
+                <div class="student-count">总共 / Total: 14</div>
+            </button>
+            <button class="grade-btn" onclick="startGame(12)">
+                <div>Grade 12</div>
+                <div class="student-count">总共 / Total: 13</div>
+            </button>
+        </div>
+        
+        <p style="font-size: 1.2rem; opacity: 0.8;">Students will automatically race through the city following traffic rules!</p>
+    </div>
+
+    <!-- Game Screen -->
+    <div class="game-screen" id="gameScreen">
+        <div class="game-header">
+            <button class="control-btn" onclick="startRace()" id="startBtn">🚀 Start Race</button>
+            <button class="control-btn" onclick="stopRace()" id="stopBtn" style="display: none;">⏹️ Stop</button>
+            <button class="control-btn" onclick="resetGame()">🔄 Reset</button>
+            <div class="speed-control">
+                <span>Speed:</span>
+                <input type="range" class="speed-slider" min="1" max="10" value="5" id="speedSlider" oninput="updateSpeed()">
+                <span id="speedValue">5</span>
+            </div>
+            <div class="timer" id="timer">Time: 00:00</div>
+            <button class="control-btn" onclick="backToStart()">🏠 Home</button>
+        </div>
+
+        <div class="leaderboard" id="leaderboard">
+            <h3>🏆 Leaderboard</h3>
+            <div id="leaderList"></div>
+        </div>
+
+        <div class="city-map" id="cityMap">
+            <!-- Roads, intersections, and traffic lights will be generated here -->
+        </div>
+
+        <div class="weather-overlay" id="weatherOverlay"></div>
+        <div class="weather-alert" id="weatherAlert"></div>
+
+        <div class="finish-line" id="finishLine">
+            🏁<br>FINISH
+        </div>
+
+        <div class="winner-popup" id="winnerPopup">
+            🎉 Congratulations! 🎉<br>
+            <span id="winnerName"></span> Wins!
+        </div>
+    </div>
+
+    <script>
+        // Student data for each grade
+        const studentData = {
+            10: ["冯奕尘", "黄若涵", "李丰屹", "李鹏潞", "梁锦天", "刘景扬", "龙俊志", "马赫", "聂溪康", "庞云蔚", "曲家瑞", "孙诗童", "王子言", "杨晴珺", "张宸恺", "赵浩文"],
+            11: ["陈峻弘", "韩睿雄", "何怡敏", "康艺芸", "李雨霏", "李沾衣", "刘圃言", "庞泽霖", "王梓晗", "尹九思", "游项雯", "于浚哲", "臧姝婷", "张澜馨"],
+            12: ["安政聿", "蔡子墨", "刘镇榕", "马知行", "邱天", "盛思语", "唐可盈", "田子凡", "谢斯飞", "杨加麒", "张程皓", "赵晨达鑫", "周逸凡"]
+        };
+
+        const vehicleEmojis = ['🚗', '🚙', '🏎️', '🛻', '🏍️', '🛵', '🚲', '🛴', '🛹', '🦽', '🦼', '🚌', '🚎', '🚐', '🚕', '🚋', '🚤', '🚁', '🚜', '🚑', '🚒', '🚓', '🚛', '🚚'];
+        const buildings = ["🏢", "🏬", "🏪", "🏫", "🏨", "🏦", "🏛️", "🏰", "🏟️", "🏭", "🏤", "🏥", "🏠", "🏡", "🏘️"];
+        const decorations = ["🌳", "🌲", "🌴", "🌺", "🌻", "🌷", "🌹", "🌸", "🌵", "🍁", "🍄", "⛲", "🗿"];
+
+        let currentGrade = null;
+        let gameRunning = false;
+        let gameSpeed = 5;
+        let startTime = null;
+        let timerInterval = null;
+        let raceInterval = null;
+        let studentRacers = [];
+        let finishedRacers = [];
+        let trafficLights = [];
+        let roads = [];
+        let cityZones = [];
+        let intersections = [];
+        let weatherActive = false;
+        let weatherType = null;
+        let weatherTimer = 0;
+        let path = [];
+        let totalPathLength = 0;
+
+        let audioContext = null;
+
+        const ROAD_WIDTH = 80;
+
+        function initAudio() {
+            if (audioContext && audioContext.state === 'running') return;
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                console.warn('Audio not supported');
+            }
+        }
+
+        function playBeep(frequency = 440, duration = 200, volume = 0.1) {
+            if (!audioContext || audioContext.state === 'suspended') return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'square';
+            
+            gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration / 1000);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration / 1000);
+        }
+
+        function startGame(grade) {
+            currentGrade = grade;
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            
+            initAudio();
+            setupCity();
+            createStudentRacers();
+            resetGame(); // Position racers correctly before start
+        }
+
+        function setupCity() {
+            const cityMap = document.getElementById('cityMap');
+            cityMap.innerHTML = ''; // Clear previous city
+            roads = [];
+            intersections = [];
+            trafficLights = [];
+            cityZones = [];
+
+            createRoadGrid();
+            calculateTotalPathLength();
+            
+            defineCityZones();
+            addBuildingsAndDecorations();
+            
+            createTrafficLights();
+        }
+
+        function createRoadGrid() {
+            const cityMap = document.getElementById('cityMap');
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            const marginX = 80;
+            const numRows = 6;
+            const availableHeight = h - 150; 
+            const rowSpacing = availableHeight / numRows;
+
+            path = [];
+            
+            for (let i = 0; i < numRows; i++) {
+                const y = h - 80 - (i * rowSpacing);
+                if (i % 2 === 0) { // Even rows go left to right
+                    path.push({ x: marginX, y: y });
+                    path.push({ x: w - marginX, y: y });
+                } else { // Odd rows go right to left
+                    path.push({ x: w - marginX, y: y });
+                    path.push({ x: marginX, y: y });
+                }
+            }
+
+            for (let i = 0; i < path.length - 1; i++) {
+                const p1 = path[i];
+                const p2 = path[i+1];
+                let isTurn = (i < path.length - 2 && path[i+2].x !== p2.x && path[i+2].y !== p2.y);
+                if (isTurn) {
+                    const roadEl = document.createElement('div');
+                     const roadData = {
+                        type: 'vertical',
+                        x: p2.x - ROAD_WIDTH / 2,
+                        y: Math.min(p1.y, path[i+2].y) - ROAD_WIDTH / 2,
+                        width: ROAD_WIDTH,
+                        height: rowSpacing + ROAD_WIDTH
+                    };
+                    roadEl.style.left = roadData.x + 'px';
+                    roadEl.style.top = roadData.y + 'px';
+                    roadEl.style.width = roadData.width + 'px';
+                    roadEl.style.height = roadData.height + 'px';
+                    roadEl.className = `road road-vertical`;
+                    cityMap.appendChild(roadEl);
+                    roads.push(roadData);
+                } else {
+                    const roadEl = document.createElement('div');
+                    const roadData = {
+                        type: 'horizontal',
+                        x: Math.min(p1.x, p2.x),
+                        y: p1.y - ROAD_WIDTH / 2,
+                        width: Math.abs(p2.x - p1.x),
+                        height: ROAD_WIDTH
+                    };
+                    roadEl.style.left = roadData.x + 'px';
+                    roadEl.style.top = roadData.y + 'px';
+                    roadEl.style.width = roadData.width + 'px';
+                    roadEl.style.height = roadData.height + 'px';
+                    roadEl.className = `road road-horizontal`;
+                    cityMap.appendChild(roadEl);
+                    roads.push(roadData);
+                }
+            }
+            
+            intersections = path.slice(1, -1).filter((p, i) => path[i].x !== path[i+2].x);
+
+            intersections.forEach(i => {
+                 const intersectionEl = document.createElement('div');
+                 intersectionEl.className = 'intersection';
+                 intersectionEl.style.left = (i.x - ROAD_WIDTH / 2) + 'px';
+                 intersectionEl.style.top = (i.y - ROAD_WIDTH / 2) + 'px';
+                 cityMap.appendChild(intersectionEl);
+            });
+            
+            const finishPoint = path[path.length - 1];
+            const finishLine = document.getElementById('finishLine');
+            finishLine.style.left = (finishPoint.x) + 'px';
+            finishLine.style.top = (finishPoint.y - ROAD_WIDTH / 2) + 'px';
+        }
+        
+        function defineCityZones() {
+            const horizontalRoads = roads.filter(r => r.type === 'horizontal').sort((a,b) => b.y - a.y);
+            if (horizontalRoads.length > 0) {
+                 cityZones.push({ x: 0, y: 0, width: window.innerWidth, height: horizontalRoads[horizontalRoads.length-1].y });
+            }
+            for(let i=0; i < horizontalRoads.length -1; i++) {
+                const r1 = horizontalRoads[i];
+                const r2 = horizontalRoads[i+1];
+                cityZones.push({
+                    x: 0,
+                    y: r2.y + r2.height,
+                    width: window.innerWidth,
+                    height: r1.y - (r2.y + r2.height)
+                });
+            }
+        }
+        
+        function addBuildingsAndDecorations() {
+            const cityMap = document.getElementById('cityMap');
+            cityZones.forEach(zone => {
+                if (zone.height < 60) return;
+                const numBuildings = Math.floor(Math.random() * 3) + 2;
+                for (let i=0; i < numBuildings; i++) {
+                    const building = document.createElement('div');
+                    building.className = 'building';
+                    building.textContent = buildings[Math.floor(Math.random() * buildings.length)];
+                    building.style.left = (zone.x + Math.random() * zone.width) + 'px';
+                    building.style.top = (zone.y + Math.random() * (zone.height - 60)) + 'px';
+                    cityMap.appendChild(building);
+                }
+                 const numDecorations = Math.floor(Math.random() * 4) + 3;
+                 for (let i=0; i < numDecorations; i++) {
+                    const decoration = document.createElement('div');
+                    decoration.className = 'decoration';
+                    decoration.textContent = decorations[Math.floor(Math.random() * decorations.length)];
+                    decoration.style.left = (zone.x + Math.random() * zone.width) + 'px';
+                    decoration.style.top = (zone.y + Math.random() * (zone.height - 40)) + 'px';
+                    cityMap.appendChild(decoration);
+                }
+            });
+        }
+
+
+        function calculateTotalPathLength() {
+            totalPathLength = 0;
+            for (let i = 0; i < path.length - 1; i++) {
+                const p1 = path[i];
+                const p2 = path[i+1];
+                totalPathLength += Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+            }
+        }
+        
+        function createTrafficLights() {
+            const cityMap = document.getElementById('cityMap');
+            
+            intersections.forEach((intersection) => {
+                const lightEl = document.createElement('div');
+                lightEl.className = 'traffic-light';
+                
+                const lightX = intersection.x > window.innerWidth / 2 
+                    ? intersection.x - ROAD_WIDTH / 2 - 20 
+                    : intersection.x + ROAD_WIDTH / 2 + 5;
+                
+                lightEl.style.left = lightX + 'px';
+                lightEl.style.top = (intersection.y - 15) + 'px';
+                
+                const redLight = document.createElement('div'); redLight.className = 'light';
+                const yellowLight = document.createElement('div'); yellowLight.className = 'light';
+                const greenLight = document.createElement('div'); greenLight.className = 'light';
+                
+                lightEl.appendChild(redLight);
+                lightEl.appendChild(yellowLight);
+                lightEl.appendChild(greenLight);
+                cityMap.appendChild(lightEl);
+                
+                trafficLights.push({
+                    element: lightEl,
+                    x: intersection.x,
+                    y: intersection.y,
+                    state: 'green',
+                    timer: Math.random() * 5000 + 3000,
+                    redLight, yellowLight, greenLight
+                });
+            });
+            
+            if (trafficLights.length > 0) {
+                 setInterval(updateTrafficLights, 100);
+            }
+        }
+
+        function updateTrafficLights() {
+            trafficLights.forEach(light => {
+                light.timer -= 100;
+                
+                if (light.timer <= 0) {
+                    switch (light.state) {
+                        case 'green': light.state = 'yellow'; light.timer = 1500; break;
+                        case 'yellow': light.state = 'red'; light.timer = 4000 + Math.random() * 2000; break;
+                        case 'red': light.state = 'green'; light.timer = 5000 + Math.random() * 2000; break;
+                    }
+                }
+                
+                light.redLight.style.background = light.state === 'red' ? '#ff4444' : '#444';
+                light.yellowLight.style.background = light.state === 'yellow' ? '#ffff44' : '#444';
+                light.greenLight.style.background = light.state === 'green' ? '#44ff44' : '#444';
+                light.redLight.classList.toggle('red', light.state === 'red');
+                light.yellowLight.classList.toggle('yellow', light.state === 'yellow');
+                light.greenLight.classList.toggle('green', light.state === 'green');
+            });
+        }
+        
+        function createStudentRacers() {
+            const cityMap = document.getElementById('cityMap');
+            const students = studentData[currentGrade];
+            studentRacers.forEach(racer => racer.element.remove());
+            studentRacers = [];
+
+            students.forEach((student, index) => {
+                const racer = document.createElement('div');
+                racer.className = 'student-racer';
+                
+                const vehicle = vehicleEmojis[Math.floor(Math.random() * vehicleEmojis.length)];
+                
+                racer.innerHTML = `${vehicle}<span class="racer-tooltip">${student}</span>`;
+                
+                const racerData = {
+                    element: racer,
+                    name: student,
+                    vehicle: vehicle,
+                    x: 0, y: 0,
+                    pathIndex: 0,
+                    speed: 0,
+                    baseSpeed: Math.random() * 0.5 + 0.75,
+                    speedChangeTimer: 0,
+                    progress: 0,
+                    finished: false,
+                    stopped: false,
+                    distanceTraveled: 0,
+                    laneOffset: (Math.random() - 0.5) * (ROAD_WIDTH - 35),
+                };
+                
+                studentRacers.push(racerData);
+                cityMap.appendChild(racer);
+            });
+        }
+
+        function startRace() {
+            if (gameRunning) return;
+            
+            gameRunning = true;
+            startTime = Date.now();
+            finishedRacers = [];
+            weatherActive = false;
+            
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'inline-block';
+            
+            studentRacers.forEach(racer => {
+                racer.element.classList.add('moving');
+                racer.speed = racer.baseSpeed;
+                racer.speedChangeTimer = Math.random() * 4000 + 2000;
+            });
+
+            timerInterval = setInterval(updateTimer, 100);
+            raceInterval = setInterval(updateRace, 1000 / 60);
+            
+            setTimeout(() => triggerWeather(), Math.random() * 15000 + 5000);
+            
+            playBeep(800, 150);
+            setTimeout(() => playBeep(800, 150), 200);
+            setTimeout(() => playBeep(1200, 300), 400);
+        }
+
+        function stopRace() {
+            gameRunning = false;
+            
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('stopBtn').style.display = 'none';
+            
+            studentRacers.forEach(racer => {
+                racer.element.classList.remove('moving', 'stopped');
+            });
+
+            clearInterval(timerInterval);
+            clearInterval(raceInterval);
+            timerInterval = null;
+            raceInterval = null;
+        }
+
+        function updateRace() {
+            if (!gameRunning) return;
+
+            updateWeather();
+
+            studentRacers.forEach(racer => {
+                if (racer.finished) return;
+
+                // Dynamic Speed Change Logic
+                racer.speedChangeTimer -= (1000/60);
+                if (racer.speedChangeTimer <= 0) {
+                    racer.speed = racer.baseSpeed * (0.5 + Math.random()); // Fluctuate speed
+                    racer.speedChangeTimer = Math.random() * 4000 + 2000; // Reset timer
+                }
+
+                const atRedLight = checkTrafficLight(racer);
+                
+                if (atRedLight) {
+                    racer.stopped = true;
+                    racer.element.classList.remove('moving');
+                    racer.element.classList.add('stopped');
+                    return;
+                } else {
+                    racer.stopped = false;
+                    racer.element.classList.add('moving');
+                    racer.element.classList.remove('stopped');
+                }
+
+                let speedMultiplier = 1;
+                if (weatherActive) {
+                    speedMultiplier = weatherType === 'rain' ? 0.6 : 0.4;
+                }
+
+                if (racer.pathIndex >= path.length - 1) {
+                    finishRaceFor(racer);
+                    return;
+                }
+
+                // ** CORE MOVEMENT LOGIC **
+                const target = path[racer.pathIndex + 1];
+                const dx = target.x - racer.x;
+                const dy = target.y - racer.y;
+                const distanceToTarget = Math.sqrt(dx * dx + dy * dy);
+                const speed = racer.speed * gameSpeed * 0.25 * speedMultiplier;
+
+                if (distanceToTarget < speed) {
+                    racer.x = target.x;
+                    racer.y = target.y;
+                    racer.pathIndex++;
+                } else {
+                    racer.x += (dx / distanceToTarget) * speed;
+                    racer.y += (dy / distanceToTarget) * speed;
+                }
+                
+                racer.distanceTraveled += speed;
+
+                // ** VISUAL POSITIONING LOGIC **
+                let displayX = racer.x;
+                let displayY = racer.y;
+                const currentSegmentStart = path[racer.pathIndex];
+                
+                // Add a check to prevent error when racer finishes
+                if (!path[racer.pathIndex + 1]) {
+                    finishRaceFor(racer);
+                    return;
+                }
+                const currentSegmentEnd = path[racer.pathIndex + 1];
+
+                // Apply lane offset perpendicular to the direction of travel
+                if (currentSegmentStart.y === currentSegmentEnd.y) { // Horizontal road
+                    displayY += racer.laneOffset;
+                } else { // Vertical road
+                    displayX += racer.laneOffset;
+                }
+
+                const translate = `translate(${displayX - 15}px, ${displayY - 15}px)`;
+                racer.element.style.setProperty('--transform-pos', translate);
+                
+                let scale = (racer.element.classList.contains('leader')) ? ' scale(1.2)' : '';
+                racer.element.style.transform = translate + scale;
+                
+                updateProgress(racer);
+            });
+
+            updateLeaderboard();
+
+            // More frequent and varied car beeps
+            if (Math.random() < 0.05) {
+                playBeep(300 + Math.random() * 500, 100 + Math.random() * 150, 0.05 + Math.random() * 0.05);
+            }
+        }
+
+        function finishRaceFor(racer) {
+            if (racer.finished) return;
+            racer.finished = true;
+            finishedRacers.push(racer);
+            
+            createFireworks(racer.x, racer.y);
+            playBeep(1000, 300, 0.2);
+
+            if (finishedRacers.length === 1) {
+                showWinner(racer);
+            }
+            if (finishedRacers.length === studentRacers.length) {
+                stopRace();
+            }
+        }
+
+        function checkTrafficLight(racer) {
+            if (racer.pathIndex >= path.length -1) return false;
+            
+            const targetWaypoint = path[racer.pathIndex + 1];
+            const relevantLight = trafficLights.find(light => {
+                const dx = light.x - targetWaypoint.x;
+                const dy = light.y - targetWaypoint.y;
+                return Math.sqrt(dx * dx + dy * dy) < 10;
+            });
+
+            if (relevantLight && (relevantLight.state === 'red' || relevantLight.state === 'yellow')) {
+                const distToIntersection = Math.sqrt(
+                    Math.pow(racer.x - targetWaypoint.x, 2) + Math.pow(racer.y - targetWaypoint.y, 2)
+                );
+                return distToIntersection < 60; 
+            }
+            return false;
+        }
+
+        function updateProgress(racer) {
+            let distanceCovered = 0;
+            for (let i = 0; i < racer.pathIndex; i++) {
+                distanceCovered += Math.sqrt(Math.pow(path[i+1].x - path[i].x, 2) + Math.pow(path[i+1].y - path[i].y, 2));
+            }
+            const lastWaypoint = path[racer.pathIndex];
+            distanceCovered += Math.sqrt(Math.pow(racer.x - lastWaypoint.x, 2) + Math.pow(racer.y - lastWaypoint.y, 2));
+            
+            racer.progress = (distanceCovered / totalPathLength) * 100;
+        }
+
+        function triggerWeather() {
+            if (!gameRunning || weatherActive) return;
+            
+            weatherActive = true;
+            weatherType = Math.random() < 0.5 ? 'rain' : 'snow';
+            weatherTimer = 10000;
+            
+            const overlay = document.getElementById('weatherOverlay');
+            const alert = document.getElementById('weatherAlert');
+            
+            overlay.style.display = 'block';
+            overlay.className = `weather-overlay ${weatherType}`;
+            
+            alert.style.display = 'block';
+            alert.textContent = weatherType === 'rain' ? '🌧️ Heavy Rain! Slowing down!' : '❄️ Snow Storm! Drive carefully!';
+            
+            setTimeout(() => { alert.style.display = 'none'; }, 3000);
+        }
+
+        function updateWeather() {
+            if (weatherActive) {
+                weatherTimer -= (1000/60);
+                if (weatherTimer <= 0) {
+                    weatherActive = false;
+                    document.getElementById('weatherOverlay').style.display = 'none';
+                    if (gameRunning) {
+                        setTimeout(() => triggerWeather(), Math.random() * 20000 + 10000);
+                    }
+                }
+            }
+        }
+
+        function updateLeaderboard() {
+            const leaderList = document.getElementById('leaderList');
+            
+            const sortedRacers = [...studentRacers].sort((a, b) => b.progress - a.progress);
+
+            studentRacers.forEach(r => r.element.classList.remove('leader'));
+            if (sortedRacers.length > 0 && !sortedRacers[0].finished) {
+                sortedRacers[0].element.classList.add('leader');
+            }
+
+            leaderList.innerHTML = '';
+            sortedRacers.slice(0, 5).forEach((racer, index) => {
+                const item = document.createElement('div');
+                item.className = 'leader-item';
+                
+                // Simplified podium styling based on the racer's current rank in the sorted list
+                if (index === 0) item.classList.add('first');
+                else if (index === 1) item.classList.add('second');
+                else if (index === 2) item.classList.add('third');
+                
+                const position = index + 1;
+                // Simplified status - just an icon, no redundant rank number
+                const status = racer.finished ? '🏁' : racer.stopped ? '🛑' : '🏎️';
+                
+                item.innerHTML = `
+                    <span class="rank">${position}</span>
+                    <span class="vehicle">${racer.vehicle}</span>
+                    <span class="name">${racer.name.substring(0, 5)}</span>
+                    <span class="status">${status}</span>
+                `;
+                leaderList.appendChild(item);
+            });
+        }
+
+        function createFireworks(x, y) {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#ffd700', '#ff9ff3', '#54a0ff'];
+            for (let i = 0; i < 30; i++) {
+                const spark = document.createElement('div');
+                spark.className = 'spark';
+                spark.style.background = colors[i % colors.length];
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 50 + 20;
+                spark.style.transform = `translate(${x + Math.cos(angle) * distance}px, ${y + Math.sin(angle) * distance}px)`;
+                document.getElementById('cityMap').appendChild(spark);
+                setTimeout(() => spark.remove(), 1000);
+            }
+        }
+
+        function showWinner(winner) {
+            const popup = document.getElementById('winnerPopup');
+            document.getElementById('winnerName').textContent = winner.name;
+            popup.style.display = 'block';
+            
+            setTimeout(() => { popup.style.display = 'none'; }, 5000);
+        }
+
+        function updateTimer() {
+            if (!startTime) return;
+            const elapsed = Date.now() - startTime;
+            const minutes = Math.floor(elapsed / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            document.getElementById('timer').textContent = `Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateSpeed() {
+            gameSpeed = parseInt(document.getElementById('speedSlider').value);
+            document.getElementById('speedValue').textContent = gameSpeed;
+        }
+
+        function resetGame() {
+            stopRace();
+            finishedRacers = [];
+            startTime = null;
+            document.getElementById('timer').textContent = 'Time: 00:00';
+            
+            studentRacers.forEach((racer, index) => {
+                const startPos = path[0];
+                const startX = startPos.x - 60 - (index % 4) * 40;
+                const startY = startPos.y;
+                
+                racer.x = startX;
+                racer.y = startY;
+                
+                const displayYwithOffset = racer.y + racer.laneOffset;
+                const translate = `translate(${racer.x - 15}px, ${displayYwithOffset - 15}px)`;
+                
+                racer.element.style.setProperty('--transform-pos', translate);
+                racer.element.style.transform = translate;
+                
+                racer.progress = 0;
+                racer.finished = false;
+                racer.stopped = false;
+                racer.distanceTraveled = 0;
+                racer.pathIndex = 0;
+                racer.element.classList.remove('leader', 'stopped', 'moving');
+            });
+            
+            updateLeaderboard();
+        }
+
+        function backToStart() {
+            stopRace();
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'flex';
+            currentGrade = null;
+        }
+
+        document.body.addEventListener('click', () => {
+             if (!audioContext) initAudio();
+             if (audioContext.state === 'suspended') audioContext.resume();
+        }, { once: true });
+        
+        window.addEventListener('resize', () => {
+            if (currentGrade) {
+                stopRace();
+                setupCity();
+                createStudentRacers();
+                resetGame();
+            }
+        });
+    </script>
+</body>
+</html>

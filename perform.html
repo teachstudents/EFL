@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Rubric Calculator with Storage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* gray-50 */
+        }
+        input[type="range"] {
+            -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 3px;
+            background: #e5e7eb; /* gray-200 */ outline: none; opacity: 0.9; transition: opacity .2s;
+        }
+        input[type="range"]:hover { opacity: 1; }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%;
+            background: #0891b2; /* cyan-600 */ cursor: pointer; transition: transform .2s;
+        }
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.2);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 18px; height: 18px; border-radius: 50%; background: #0891b2; cursor: pointer;
+        }
+        .table-container { max-height: 400px; overflow-y: auto; }
+        .toast {
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        /* Hide dropdowns by default */
+        .student-select-container { display: none; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-5 max-w-5xl">
+        <header class="text-center mb-5">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Student Performance Rubric</h1>
+            <p class="text-gray-600 mt-1 text-sm">Select a student, enter scores, save records, and export data.</p>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <!-- Left Column: Rubric -->
+            <div class="lg:col-span-2 space-y-5">
+                <!-- Editing State Indicator -->
+                <div id="editing-indicator" class="hidden bg-amber-100 border-l-4 border-amber-500 text-amber-800 p-3 rounded-md text-sm">
+                    <p><span class="font-bold">Currently Editing:</span> <span id="editing-student-name"></span></p>
+                </div>
+
+                <!-- Student Information Section -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                    <h2 class="text-lg font-semibold mb-3 text-gray-800 border-b border-gray-200 pb-2">Student Information</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <label for="grade-select" class="block text-xs font-medium text-gray-600 mb-1">Select Grade</label>
+                            <select id="grade-select" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 text-sm">
+                                <option value="">-- Choose a Grade --</option>
+                                <option value="10">Grade 10</option>
+                                <option value="11">Grade 11</option>
+                                <option value="12">Grade 12</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                             <label class="block text-xs font-medium text-gray-600 mb-1">Select Student</label>
+                            <div id="student-select-container-10" class="student-select-container">
+                                <select id="student-select-10" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 text-sm"></select>
+                            </div>
+                            <div id="student-select-container-11" class="student-select-container">
+                                <select id="student-select-11" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 text-sm"></select>
+                            </div>
+                             <div id="student-select-container-12" class="student-select-container">
+                                <select id="student-select-12" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 text-sm"></select>
+                            </div>
+                            <p id="student-placeholder" class="text-gray-500 text-sm py-1.5">Please select a grade first.</p>
+                        </div>
+                        <div>
+                            <label for="lessonTitle" class="block text-xs font-medium text-gray-600 mb-1">Lesson Title</label>
+                            <input type="text" id="lessonTitle" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 text-sm" placeholder="e.g., Intro to Algebra">
+                        </div>
+                        <div>
+                            <label for="assessmentDate" class="block text-xs font-medium text-gray-600 mb-1">Date</label>
+                            <input type="date" id="assessmentDate" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 text-sm">
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label for="recordNotes" class="block text-xs font-medium text-gray-600 mb-1">Notes / Comments</label>
+                        <textarea id="recordNotes" rows="3" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 text-sm" placeholder="Add qualitative feedback or anecdotes..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Rubric Criteria -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                    <h2 class="text-lg font-semibold mb-3 text-gray-800 border-b border-gray-200 pb-2">Assessment Criteria</h2>
+                    <div id="rubric-container" class="space-y-4">
+                        <!-- Criteria will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Score & Actions -->
+            <div class="lg:col-span-1">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 sticky top-5">
+                    <div class="bg-cyan-700 text-white p-5 rounded-xl text-center mb-3">
+                        <h2 class="text-lg font-semibold mb-1">Weighted Score</h2>
+                        <p id="final-score" class="text-5xl font-bold tracking-tight">0.00</p>
+                        <p class="text-cyan-200 mt-1 text-sm">out of 100</p>
+                    </div>
+                    <div class="space-y-2">
+                        <input type="hidden" id="record-id">
+                        <button id="save-button" class="w-full bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-cyan-700 transition-colors text-sm">Add New Record</button>
+                        <button id="reset-button" class="w-full bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors text-sm">Clear Form</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Saved Records Section -->
+        <div class="mt-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+            <div class="flex flex-wrap justify-between items-center border-b border-gray-200 pb-2 mb-3 gap-2">
+                <h2 class="text-lg font-semibold text-gray-800">Saved Records</h2>
+                <div class="flex items-center gap-2 flex-wrap justify-end">
+                   <button id="copy-button" class="bg-blue-600 text-white font-semibold py-1.5 px-3 rounded-lg shadow-sm hover:bg-blue-700 transition-colors text-xs">Copy for Excel</button>
+                   <button id="export-all-button" class="bg-emerald-600 text-white font-semibold py-1.5 px-3 rounded-lg shadow-sm hover:bg-emerald-700 transition-colors text-xs">Export All</button>
+                   <button id="export-g10-button" class="bg-emerald-500 text-white font-semibold py-1.5 px-3 rounded-lg shadow-sm hover:bg-emerald-600 transition-colors text-xs">Export G10</button>
+                   <button id="export-g11-button" class="bg-emerald-500 text-white font-semibold py-1.5 px-3 rounded-lg shadow-sm hover:bg-emerald-600 transition-colors text-xs">Export G11</button>
+                   <button id="export-g12-button" class="bg-emerald-500 text-white font-semibold py-1.5 px-3 rounded-lg shadow-sm hover:bg-emerald-600 transition-colors text-xs">Export G12</button>
+                   <button id="clear-all-button" class="bg-red-600 text-white font-semibold py-1.5 px-3 rounded-lg shadow-sm hover:bg-red-700 transition-colors text-xs">Clear All Data</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="w-full text-sm text-left text-gray-600">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0">
+                        <tr>
+                            <th scope="col" class="px-4 py-2">Student</th>
+                            <th scope="col" class="px-4 py-2">Grade</th>
+                            <th scope="col" class="px-4 py-2">Lesson</th>
+                            <th scope="col" class="px-4 py-2">Notes</th>
+                            <th scope="col" class="px-4 py-2">Date</th>
+                            <th scope="col" class="px-4 py-2 text-center">Score</th>
+                            <th scope="col" class="px-4 py-2 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-tbody">
+                        <!-- Saved records will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            <p id="no-records-msg" class="text-center text-gray-500 py-8 text-sm">No records saved yet. Fill out the form and click "Add New Record".</p>
+        </div>
+    </div>
+
+    <!-- Custom Modal -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+        <div id="modal-box" class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm">
+            <p id="modal-text" class="text-gray-700 mb-4">Modal message here.</p>
+            <div id="modal-actions" class="flex justify-end space-x-2">
+                <!-- Buttons are added dynamically -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="toast fixed bottom-5 right-5 bg-gray-900 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 transform translate-y-2">
+        <p id="toast-text"></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- DATA ---
+            const studentsByGrade = {
+                '10': ['冯奕尘 / FENG, YICHEN', '黄若涵 / HUANG, RUOHAN', '李丰屹 / LI, FENGYI', '李鹏潞 / LI, PENGLU', '梁锦天 / LING, JINTIAN', '刘景扬 / LIU, JINGYANG', '龙俊志 / LONG, JUNZHI', '马赫 / MA, HE', '聂溪康 / NIE, XIKANG', '庞云蔚 / PANG, YUNWEI', '曲家瑞 / QU, JIARUI', '孙诗童 / SUN, SHITONG', '王子言 / WANG, ZIYAN', '杨晴珺 / YANG, QINGJUN', '张宸恺 / ZHANG, CHENKAI', '赵浩文 / ZHAO, HAOWEN'],
+                '11': ['陈峻弘 / CHEN,JUNHONG', '韩睿雄 / HAN,RUIXIONG', '何怡敏 / HE,YIMIN', '康艺芸 / KANG,YIYUN', '李雨霏 / LI,YUFEI', '李沾衣 / LI,ZHANYI', '刘圃言 / LIU,PUYAN', '庞泽霖 / PANG,ZELIN', '王梓晗 / WANG,ZIHAN', '尹九思 / YIN,JIUSI', '游项雯 / YOU, XIANGWEN', '于浚哲 / YU,JUNZHE', '臧姝婷 / ZANG,SHUTING', '张澜馨 / ZHANG,LANXIN'],
+                '12': ['安政聿 / AN,ZHENGYU', '蔡子墨 / CAI,ZIMO', '刘镇榕 / LIU,ZHENRONG', '马知行 / MA,ZHIXING', '邱天 / QIU,TIAN', '盛思语 / SHENG,SIYU', '唐可盈 / TANG,KEYING', '田子凡 / TIAN,ZIFAN', '谢斯飞 / XIE,SIFEI', '杨加麒 / YANG,JIAQI', '张程皓 / ZHANG,CHENGHAO', '赵晨达鑫 / ZHAO,CHENDAXIN', '周逸凡 / ZHOU,YIFAN']
+            };
+
+            const criteria = [
+                { name: 'Communication & Understanding', weight: 0.15, score: 60, id: 'comm', description: 'Demonstrates understanding, clearly communicates ideas, and uses academic vocabulary correctly.' },
+                { name: 'Engagement & Participation', weight: 0.15, score: 60, id: 'engagepart', description: 'Shows interest in learning tasks and actively contributes to discussions and group activities.' },
+                { name: 'Self-Regulation', weight: 0.10, score: 60, id: 'self', description: 'Manages focus, behavior, and emotions effectively.' },
+                { name: 'Collaboration', weight: 0.10, score: 60, id: 'collab', description: 'Works constructively with peers toward a common goal.' },
+                { name: 'Task Completion', weight: 0.10, score: 60, id: 'task', description: 'Completes assignments and meets required deadlines.' },
+                { name: 'Feedback Response', weight: 0.10, score: 60, id: 'feedback', description: 'Applies constructive feedback to improve work.' },
+                { name: 'Creativity', weight: 0.10, score: 60, id: 'creative', description: 'Generates original ideas and solutions to problems.' },
+                { name: 'Growth Over Time', weight: 0.10, score: 60, id: 'growth', description: 'Shows measurable improvement in skills and understanding.' },
+                { name: 'Digital Literacy', weight: 0.05, score: 60, id: 'digital', description: 'Uses technology responsibly and effectively for learning.' },
+                { name: 'Cultural Awareness', weight: 0.05, score: 60, id: 'culture', description: 'Shows respect for and understanding of diverse perspectives.' }
+            ];
+            let savedRecords = [];
+
+            // --- DOM ELEMENTS ---
+            const rubricContainer = document.getElementById('rubric-container');
+            const finalScoreEl = document.getElementById('final-score');
+            const saveButton = document.getElementById('save-button');
+            const resetButton = document.getElementById('reset-button');
+            const copyButton = document.getElementById('copy-button');
+            const clearAllButton = document.getElementById('clear-all-button');
+            const exportAllButton = document.getElementById('export-all-button');
+            const exportG10Button = document.getElementById('export-g10-button');
+            const exportG11Button = document.getElementById('export-g11-button');
+            const exportG12Button = document.getElementById('export-g12-button');
+            
+            const gradeSelect = document.getElementById('grade-select');
+            const studentSelects = {
+                '10': document.getElementById('student-select-10'),
+                '11': document.getElementById('student-select-11'),
+                '12': document.getElementById('student-select-12')
+            };
+            const studentSelectContainers = {
+                '10': document.getElementById('student-select-container-10'),
+                '11': document.getElementById('student-select-container-11'),
+                '12': document.getElementById('student-select-container-12')
+            };
+            const studentPlaceholder = document.getElementById('student-placeholder');
+
+            const lessonTitleEl = document.getElementById('lessonTitle');
+            const assessmentDateEl = document.getElementById('assessmentDate');
+            const recordNotesEl = document.getElementById('recordNotes');
+            const recordsTbody = document.getElementById('records-tbody');
+            const noRecordsMsg = document.getElementById('no-records-msg');
+            const recordIdInput = document.getElementById('record-id');
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modalText = document.getElementById('modal-text');
+            const modalActions = document.getElementById('modal-actions');
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toast-text');
+            const editingIndicator = document.getElementById('editing-indicator');
+            const editingStudentName = document.getElementById('editing-student-name');
+
+            // --- UI/UX FUNCTIONS ---
+            const showModal = (text, type = 'alert', onConfirm = null) => {
+                modalText.textContent = text;
+                modalActions.innerHTML = '';
+                if (type === 'confirm') {
+                    const confirmBtn = document.createElement('button');
+                    confirmBtn.textContent = 'Confirm';
+                    confirmBtn.className = 'bg-red-600 text-white font-semibold py-1.5 px-4 rounded-lg text-sm';
+                    confirmBtn.onclick = () => { hideModal(); if (onConfirm) onConfirm(); };
+                    modalActions.appendChild(confirmBtn);
+
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.textContent = 'Cancel';
+                    cancelBtn.className = 'bg-gray-200 text-gray-800 font-semibold py-1.5 px-4 rounded-lg text-sm';
+                    cancelBtn.onclick = hideModal;
+                    modalActions.appendChild(cancelBtn);
+                } else {
+                    const okBtn = document.createElement('button');
+                    okBtn.textContent = 'OK';
+                    okBtn.className = 'bg-cyan-600 text-white font-semibold py-1.5 px-4 rounded-lg text-sm';
+                    okBtn.onclick = hideModal;
+                    modalActions.appendChild(okBtn);
+                }
+                modalOverlay.classList.remove('hidden');
+                modalOverlay.classList.add('flex');
+            };
+            const hideModal = () => {
+                modalOverlay.classList.remove('flex');
+                modalOverlay.classList.add('hidden');
+            };
+
+            const showToast = (message) => {
+                toastText.textContent = message;
+                toast.classList.remove('opacity-0', 'translate-y-2');
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-y-2');
+                }, 2000);
+            };
+
+            // --- CORE FUNCTIONS ---
+            const calculateScore = () => {
+                let totalScore = criteria.reduce((sum, criterion) => {
+                    const inputEl = document.getElementById(`score-${criterion.id}`);
+                    return sum + (parseFloat(inputEl.value) * criterion.weight);
+                }, 0);
+                finalScoreEl.textContent = totalScore.toFixed(2);
+            };
+
+            const renderRubric = () => {
+                rubricContainer.innerHTML = criteria.map(criterion => `
+                    <div>
+                        <div class="flex items-start gap-3">
+                            <span class="text-sm font-bold text-cyan-800 bg-cyan-100 w-9 h-9 flex items-center justify-center rounded-full flex-shrink-0 mt-1">${Math.round(criterion.weight * 100)}%</span>
+                            <div class="flex-grow">
+                                <label for="score-${criterion.id}" class="text-sm font-medium text-gray-700">${criterion.name}</label>
+                                <p class="text-xs text-gray-500">${criterion.description}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-2 pl-12">
+                            <input type="range" id="score-${criterion.id}" min="0" max="100" value="${criterion.score}" class="w-full slider">
+                            <span id="value-${criterion.id}" class="font-semibold text-gray-800 w-10 text-center text-sm">${criterion.score}</span>
+                        </div>
+                    </div>
+                `).join('');
+            };
+
+            const renderRecords = () => {
+                recordsTbody.innerHTML = '';
+                const currentEditingId = recordIdInput.value;
+                if (savedRecords.length === 0) {
+                    noRecordsMsg.style.display = 'block';
+                    recordsTbody.style.display = 'none';
+                } else {
+                    noRecordsMsg.style.display = 'none';
+                    recordsTbody.style.display = '';
+                    // Sort records by date, most recent first
+                    const sortedRecords = [...savedRecords].sort((a, b) => new Date(b.date) - new Date(a.date));
+                    sortedRecords.forEach(record => {
+                        const isEditing = record.id == currentEditingId;
+                        const tr = document.createElement('tr');
+                        tr.className = `border-b border-gray-200 ${isEditing ? 'bg-amber-100' : 'odd:bg-white even:bg-gray-50 hover:bg-gray-100'}`;
+                        tr.dataset.recordId = record.id;
+                        const truncatedNotes = (record.notes || '').substring(0, 30) + ((record.notes || '').length > 30 ? '...' : '');
+                        tr.innerHTML = `
+                            <td class="px-4 py-2 font-medium text-gray-900">${record.studentName}</td>
+                            <td class="px-4 py-2">${record.grade}</td>
+                            <td class="px-4 py-2">${record.lessonTitle}</td>
+                            <td class="px-4 py-2 text-gray-500 text-xs" title="${record.notes || ''}">${truncatedNotes}</td>
+                            <td class="px-4 py-2">${record.date}</td>
+                            <td class="px-4 py-2 text-center font-bold text-cyan-700">${record.weightedScore}</td>
+                            <td class="px-4 py-2 text-center">
+                                <div class="flex justify-center items-center gap-3">
+                                    <button class="load-btn text-gray-400 hover:text-blue-600" data-id="${record.id}" title="Edit Record">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                                    </button>
+                                    <button class="delete-btn text-gray-400 hover:text-red-600" data-id="${record.id}" title="Delete Record">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        recordsTbody.appendChild(tr);
+                    });
+                }
+            };
+
+            // --- DATA MANAGEMENT ---
+            const saveRecordsToStorage = () => localStorage.setItem('studentRubricRecords', JSON.stringify(savedRecords));
+            const loadRecordsFromStorage = () => {
+                const records = localStorage.getItem('studentRubricRecords');
+                savedRecords = records ? JSON.parse(records) : [];
+            };
+
+            const saveRecord = () => {
+                const grade = gradeSelect.value;
+                if (!grade) {
+                    showModal('Please select a grade.');
+                    return;
+                }
+                const studentName = studentSelects[grade].value;
+                if (!studentName) {
+                    showModal('Please select a student.');
+                    return;
+                }
+
+                const record = { 
+                    grade,
+                    studentName, 
+                    lessonTitle: lessonTitleEl.value.trim(), 
+                    date: assessmentDateEl.value, 
+                    notes: recordNotesEl.value.trim(),
+                    scores: {}, 
+                    weightedScore: finalScoreEl.textContent 
+                };
+                criteria.forEach(c => record.scores[c.id] = document.getElementById(`score-${c.id}`).value);
+
+                const existingId = recordIdInput.value;
+                if (existingId) {
+                    const index = savedRecords.findIndex(r => r.id == existingId);
+                    if (index > -1) savedRecords[index] = { ...savedRecords[index], ...record };
+                    showToast('Record updated successfully!');
+                } else {
+                    record.id = Date.now();
+                    savedRecords.push(record);
+                    showToast('Record added successfully!');
+                }
+                
+                saveRecordsToStorage();
+                resetForm();
+            };
+
+            const loadRecord = (id) => {
+                const record = savedRecords.find(r => r.id == id);
+                if (!record) return;
+
+                // Set grade and trigger change to show correct student list
+                gradeSelect.value = record.grade;
+                gradeSelect.dispatchEvent(new Event('change'));
+
+                // Set student, lesson, date, etc.
+                studentSelects[record.grade].value = record.studentName;
+                lessonTitleEl.value = record.lessonTitle;
+                assessmentDateEl.value = record.date;
+                recordNotesEl.value = record.notes || '';
+                recordIdInput.value = record.id;
+
+                criteria.forEach(c => {
+                    const score = record.scores[c.id] || 60;
+                    document.getElementById(`score-${c.id}`).value = score;
+                    document.getElementById(`value-${c.id}`).textContent = score;
+                });
+
+                calculateScore();
+                saveButton.textContent = 'Update Record';
+                saveButton.classList.replace('bg-cyan-600', 'bg-amber-500');
+                saveButton.classList.replace('hover:bg-cyan-700', 'hover:bg-amber-600');
+                
+                editingStudentName.textContent = `${record.studentName} (Grade ${record.grade})`;
+                editingIndicator.classList.remove('hidden');
+
+                renderRecords();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+
+            const deleteRecord = (id) => {
+                showModal('Are you sure you want to delete this record?', 'confirm', () => {
+                    savedRecords = savedRecords.filter(r => r.id != id);
+                    saveRecordsToStorage();
+                    renderRecords();
+                    showToast('Record deleted.');
+                });
+            };
+            
+            const resetForm = () => {
+                gradeSelect.value = '';
+                gradeSelect.dispatchEvent(new Event('change')); // Trigger change to hide student dropdowns
+                lessonTitleEl.value = '';
+                recordNotesEl.value = '';
+                recordIdInput.value = '';
+                setTodaysDate();
+                criteria.forEach(c => {
+                    document.getElementById(`score-${c.id}`).value = 60;
+                    document.getElementById(`value-${c.id}`).textContent = 60;
+                });
+                calculateScore();
+                saveButton.textContent = 'Add New Record';
+                saveButton.classList.replace('bg-amber-500', 'bg-cyan-600');
+                saveButton.classList.replace('hover:bg-amber-600', 'hover:bg-cyan-700');
+                editingIndicator.classList.add('hidden');
+                renderRecords();
+            };
+
+            const getTransposedData = (records) => {
+                const headerRow = ['Criterion', ...records.map(r => `${r.studentName} (G${r.grade})`)];
+                const dataRows = [
+                    ['Date', ...records.map(r => r.date)],
+                    ['Lesson Title', ...records.map(r => r.lessonTitle)],
+                    ['Notes', ...records.map(r => r.notes || '')],
+                    ['Weighted Score', ...records.map(r => r.weightedScore)],
+                    ...criteria.map(criterion => [
+                        criterion.name,
+                        ...records.map(record => record.scores[criterion.id] || 'N/A')
+                    ])
+                ];
+                return [headerRow, ...dataRows];
+            };
+
+            const exportToCSV = (recordsToExport, gradeIdentifier = 'All') => {
+                if (recordsToExport.length === 0) {
+                    showModal(`No records to export for Grade ${gradeIdentifier}.`);
+                    return;
+                }
+                const escapeCSV = (val) => `"${String(val).replace(/"/g, '""')}"`;
+                const allRows = getTransposedData(recordsToExport);
+                const csvContent = allRows.map(row => row.map(escapeCSV).join(',')).join('\n');
+
+                // Add BOM for Excel to recognize UTF-8
+                const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", `rubric_export_Grade_${gradeIdentifier}_${new Date().toISOString().slice(0,10)}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+
+            const copyAllForExcel = () => {
+                if (savedRecords.length === 0) {
+                    showModal('No records to copy.');
+                    return;
+                }
+                const allRows = getTransposedData(savedRecords);
+                const tsvContent = allRows.map(row => row.join('\t')).join('\n');
+
+                const textArea = document.createElement("textarea");
+                textArea.value = tsvContent;
+                textArea.style.position = "fixed";
+                textArea.style.top = "-9999px";
+                textArea.style.left = "-9999px";
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast('Data copied to clipboard!');
+                } catch (err) {
+                    showModal('Failed to copy data. Please try again.');
+                } finally {
+                    document.body.removeChild(textArea);
+                }
+            };
+
+            // --- EVENT LISTENERS ---
+            const setupEventListeners = () => {
+                rubricContainer.addEventListener('input', e => {
+                    if (e.target.type === 'range') {
+                        document.getElementById(`value-${e.target.id.split('-')[1]}`).textContent = e.target.value;
+                        calculateScore();
+                    }
+                });
+                
+                gradeSelect.addEventListener('change', () => {
+                    const selectedGrade = gradeSelect.value;
+                    // Hide all student dropdowns
+                    Object.values(studentSelectContainers).forEach(container => container.style.display = 'none');
+                    
+                    if (selectedGrade) {
+                        studentSelectContainers[selectedGrade].style.display = 'block';
+                        studentPlaceholder.style.display = 'none';
+                    } else {
+                        studentPlaceholder.style.display = 'block';
+                    }
+                });
+
+                saveButton.addEventListener('click', saveRecord);
+                resetButton.addEventListener('click', resetForm);
+                copyButton.addEventListener('click', copyAllForExcel);
+                
+                exportAllButton.addEventListener('click', () => exportToCSV(savedRecords, 'All'));
+                exportG10Button.addEventListener('click', () => {
+                    const grade10Records = savedRecords.filter(r => r.grade == '10');
+                    exportToCSV(grade10Records, '10');
+                });
+                exportG11Button.addEventListener('click', () => {
+                    const grade11Records = savedRecords.filter(r => r.grade == '11');
+                    exportToCSV(grade11Records, '11');
+                });
+                exportG12Button.addEventListener('click', () => {
+                    const grade12Records = savedRecords.filter(r => r.grade == '12');
+                    exportToCSV(grade12Records, '12');
+                });
+
+                clearAllButton.addEventListener('click', () => {
+                    showModal('Are you sure you want to delete ALL saved records? This cannot be undone.', 'confirm', () => {
+                        savedRecords = [];
+                        saveRecordsToStorage();
+                        renderRecords();
+                        showToast('All records have been cleared.');
+                    });
+                });
+
+                recordsTbody.addEventListener('click', e => {
+                    const loadBtn = e.target.closest('.load-btn');
+                    const deleteBtn = e.target.closest('.delete-btn');
+                    if (loadBtn) {
+                        loadRecord(loadBtn.dataset.id);
+                    } else if (deleteBtn) {
+                        deleteRecord(deleteBtn.dataset.id);
+                    }
+                });
+            };
+            
+            const setTodaysDate = () => {
+                assessmentDateEl.value = new Date().toISOString().slice(0,10);
+            };
+
+            const populateStudentDropdowns = () => {
+                for (const grade in studentsByGrade) {
+                    const selectEl = studentSelects[grade];
+                    selectEl.innerHTML = '<option value="">-- Select a Student --</option>';
+                    studentsByGrade[grade].forEach(studentName => {
+                        const option = document.createElement('option');
+                        option.value = studentName;
+                        option.textContent = studentName;
+                        selectEl.appendChild(option);
+                    });
+                }
+            };
+
+            // --- INITIALIZATION ---
+            populateStudentDropdowns();
+            renderRubric();
+            loadRecordsFromStorage();
+            renderRecords();
+            setupEventListeners();
+            setTodaysDate();
+            calculateScore();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Joel's Speaking Practice 03</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden; /* Prevent body from scrolling */
+            position: relative;
+        }
+        /* Snowfall effect */
+        .snowflake {
+            color: #fff;
+            font-size: 1em;
+            font-family: Arial, sans-serif;
+            text-shadow: 0 0 5px #000;
+            position: fixed;
+            top: -10%;
+            z-index: 0;
+            user-select: none;
+            animation: snowfall linear infinite;
+        }
+
+        @keyframes snowfall {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+        }
+        .timer-circle {
+            stroke-dasharray: 283;
+            stroke-dashoffset: 0;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 1s linear;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .recording-indicator {
+            animation: pulse 1.5s infinite;
+        }
+        .app-shell {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-height: 100vh;
+        }
+        audio::-webkit-media-controls-panel {
+            padding: 5px;
+        }
+        audio::-webkit-media-controls-play-button,
+        audio::-webkit-media-controls-timeline,
+        audio::-webkit-media-controls-current-time-display,
+        audio::-webkit-media-controls-time-remaining-display {
+            margin: 0 2px;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #4f46e5;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Make sure app content is above the snow */
+        #app-container {
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
+    
+    <div id="snow-container"></div>
+
+    <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 fixed top-4 right-4 z-50">
+        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 10.607a1 1 0 010-1.414l.707-.707a1 1 0 111.414 1.414l-.707-.707a1 1 0 01-1.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707z"></path></svg>
+    </button>
+
+    <div id="app-container" class="w-full max-w-xl mx-auto text-center h-full">
+        
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center">
+            <div id="name-entry-container">
+                <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">Joel's Speaking Practice 03</h1>
+                <input type="text" id="name-input" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 text-center text-lg text-gray-900 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                <button id="start-with-name-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg text-xl shadow-md">Start</button>
+            </div>
+            <div id="topic-selection-container" class="hidden">
+                 <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">Hello, <span id="user-name-display"></span>!</h1>
+                 <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                     <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
+                     <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
+                     <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
+                 </div>
+                <div id="topic-selection" class="grid grid-cols-3 gap-4">
+                    <!-- Topic buttons will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Practice Screen -->
+        <div id="practice-screen" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg app-shell p-3 sm:p-4">
+            <header class="flex-shrink-0">
+                <div class="flex justify-between items-center mb-1">
+                    <button id="back-to-topics-btn" class="text-indigo-500 hover:text-indigo-700"><i class="fas fa-arrow-left mr-2"></i>Topics</button>
+                </div>
+                <!-- Timer Display -->
+                <div class="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-2 flex-shrink-0">
+                    <svg class="w-full h-full" viewBox="0 0 100 100">
+                        <circle class="text-gray-200 dark:text-gray-700" stroke-width="10" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                        <circle id="timer-progress" class="timer-circle text-indigo-500" stroke-width="10" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                    </svg>
+                    <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-2xl font-bold"></div>
+                </div>
+                <p id="phase-indicator" class="font-semibold text-indigo-500 dark:text-indigo-400 mb-2 text-base flex-shrink-0"></p>
+
+                <!-- Question Display -->
+                <div id="question-container" class="min-h-[50px] flex items-center justify-center mb-2">
+                    <h2 id="question-text" class="text-base sm:text-lg font-semibold leading-relaxed text-left w-full"></h2>
+                </div>
+                
+                <div id="error-message-box" class="hidden text-red-500 bg-red-100 dark:bg-red-900/50 p-2 rounded-lg text-sm mb-2"></div>
+
+                <!-- Recording Action Buttons -->
+                <div id="recording-actions-container" class="flex flex-col items-center justify-center mb-2">
+                    <!-- Initial Record Button -->
+                    <button id="record-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold w-14 h-14 rounded-full text-xl shadow-md transition-transform transform hover:scale-105 flex items-center justify-center">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <!-- Stop Button -->
+                    <button id="stop-record-btn" class="hidden bg-gray-700 hover:bg-gray-800 text-white font-bold w-14 h-14 rounded-full text-xl shadow-md flex items-center justify-center">
+                        <i class="fas fa-stop"></i>
+                    </button>
+                    <!-- Post-Recording Controls -->
+                    <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-2">
+                        <audio id="audio-player" controls class="w-full max-w-xs"></audio>
+                        <div class="flex items-center justify-center space-x-2 w-full max-w-xs">
+                             <button id="download-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-colors">
+                                 <i class="fas fa-download mr-1"></i>Download
+                             </button>
+                            <a href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ" target="_blank" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md">
+                                 <i class="fas fa-upload mr-1"></i>Upload
+                             </a>
+                        </div>
+                    </div>
+                </div>
+                 <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold mb-1">
+                     <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
+                     Recording...
+                 </div>
+            </header>
+            
+            <main class="flex-grow flex flex-col overflow-y-auto min-h-0 space-y-2 pt-2">
+                 <!-- Sentence Starters -->
+                <div id="starters-container" class="hidden text-left">
+                    <h3 class="text-sm font-bold mb-1 text-center">Sentence Starters</h3>
+                    <div id="starters-list" class="flex flex-wrap gap-2 justify-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">
+                        <!-- Buttons will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Word Bank -->
+                <div id="word-bank-container" class="hidden text-left">
+                    <h3 class="text-sm font-bold mb-1 text-center">Word Bank</h3>
+                    <div id="word-bank-list" class="flex flex-wrap gap-2 justify-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">
+                        <!-- Buttons will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Sample Answers Display -->
+                <div id="samples-container" class="hidden text-left">
+                    <h3 class="text-sm font-bold mb-1 text-center flex-shrink-0">Sample Responses</h3>
+                    <ul id="samples-list" class="space-y-2 list-disc list-inside bg-indigo-900/70 dark:bg-indigo-900/90 p-3 rounded-lg max-h-28 sm:max-h-32 overflow-y-auto">
+                    </ul>
+                </div>
+            </main>
+
+            <footer class="flex-shrink-0 mt-2">
+                <!-- Next Button -->
+                <div id="controls-container">
+                     <button id="next-btn" class="hidden w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg text-lg shadow-md">Next</button>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Certificate Screen -->
+        <div id="certificate-screen" class="hidden bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center items-center">
+            <div id="certificate-to-download" class="w-full bg-gray-50 dark:bg-gray-700 p-8 rounded-lg border-4 border-yellow-400 dark:border-yellow-500 text-center">
+                <i class="fas fa-award text-6xl text-yellow-500 mb-4"></i>
+                <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Certificate of Completion</h1>
+                <p class="text-lg mt-2 text-gray-600 dark:text-gray-300">This certificate is awarded to</p>
+                <p id="certificate-name" class="text-4xl font-bold my-4 text-indigo-600 dark:text-indigo-400"></p>
+                <p class="text-lg mt-2 text-gray-600 dark:text-gray-300">for successfully completing all 9 speaking practice topics.</p>
+                <p class="text-sm mt-6 text-gray-500 dark:text-gray-400">Issued on: <span id="certificate-date"></span></p>
+            </div>
+            <button id="download-certificate-btn" class="mt-6 w-full max-w-xs bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-xl shadow-md">
+                <i class="fas fa-download mr-2"></i>Download Certificate
+            </button>
+             <button id="back-to-main-menu-btn" class="mt-3 text-sm text-indigo-500 hover:underline">Back to Main Menu</button>
+        </div>
+
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DATA: Questions and Sample Answers for Part 03 ---
+        const practiceData = {
+            "Academic Challenges": [
+                { 
+                    question: "How would you handle a situation where you disagree with a professor's grade or feedback on your work?", 
+                    starters: ["First, I would...", "I would make an appointment to...", "It's important to be polite, so I would say...", "My approach would be to..."], 
+                    wordBank: ["review feedback", "office hours (Sprechstunde)", "ask for clarification", "understand the criteria", "provide examples", "respectful", "constructive", "objective"], 
+                    samples: [
+                        "First, I would carefully review the feedback to make sure I understand it. Then I would make an appointment during the professor's office hours to ask for clarification.",
+                        "My approach would be to ask questions to understand their perspective better, for example, I might ask 'Could you explain which part of my answer did not meet the criteria?'",
+                        "I would be very respectful and explain my point of view calmly, providing specific examples from my work to support my reasoning, because I want to have a constructive conversation."
+                    ] 
+                },
+                { 
+                    question: "What strategies will you use to manage your time effectively when you have multiple difficult exams in the same week?", 
+                    starters: ["I would start by creating a...", "My strategy is to prioritize...", "To avoid stress, I will make sure to...", "I would break down my studying into..."], 
+                    wordBank: ["study plan (Lernplan)", "prioritize subjects", "time management", "study groups", "take breaks", "Pomodoro Technique", "review sessions", "stay organized"], 
+                    samples: [
+                        "I would create a detailed study plan for the weeks before, allocating specific days and hours to each subject so I don't leave everything to the last minute.",
+                        "My strategy would be to prioritize the most difficult subject first, because that is the one that will require the most time and energy.",
+                        "To manage the stress, I would form a study group with classmates because explaining concepts to others is a great way to check your own understanding."
+                    ] 
+                }
+            ],
+            "Social Nuances": [
+                { 
+                    question: "Imagine you are invited to a German friend's birthday party at their home. What would you do to be a good guest?", 
+                    starters: ["To be a good guest, I would bring a...", "It's polite to arrive...", "I would make sure to...", "I think it's important to offer..."], 
+                    wordBank: ["small gift (Geschenk)", "on time", "greet everyone", "help clean up", "socialize", "bottle of wine", "flowers", "mingle"], 
+                    samples: [
+                        "To be a good guest, I would bring a small gift, like a bottle of wine or some chocolates, because it is a nice gesture to thank the host.",
+                        "I would make sure to arrive on time, not too early or too late, because punctuality is very important for social events in Germany.",
+                        "I think it's important to socialize with other guests, not just my friend, and I would also offer to help with cleaning up at the end of the party."
+                    ] 
+                },
+                { 
+                    question: "Describe how you would politely decline an invitation to a social event if you need to study.", 
+                    starters: ["I would thank them for the invitation and say...", "I would be honest and explain...", "A polite way to decline is...", "I would suggest..."], 
+                    wordBank: ["thank you for the invitation", "unfortunately", "have to study", "important exam", "maybe next time", "suggest another time", "appreciate the thought"], 
+                    samples: [
+                        "I would say something like: 'Thank you so much for inviting me, that sounds really fun! Unfortunately, I can't make it because I have an important exam to study for.'",
+                        "A polite way is to be honest but also show you are sad to miss it. For example: 'I would love to come, but I have to prepare for a big presentation.'",
+                        "I would thank them and then suggest meeting up another time, for example, 'I can't this time, but are you free to get a coffee next week after my exam?'"
+                    ] 
+                }
+            ],
+            "Bureaucracy": [
+                { 
+                    question: "What steps would you take if you lost your passport or residence permit in Germany?", 
+                    starters: ["The first thing I would do is...", "I would immediately go to the...", "It's important to report it to...", "After that, I would contact..."], 
+                    wordBank: ["police (Polizei)", "report it missing (Verlustanzeige)", "embassy (Botschaft)", "Foreigners' Office (Ausländerbehörde)", "documents", "appointment", "stay calm"], 
+                    samples: [
+                        "The first thing I would do is go to the nearest police station to report it missing, because you need an official police report for the next steps.",
+                        "After reporting it to the police, I would immediately contact the Chinese embassy to ask about the procedure for getting a replacement passport.",
+                        "I would also inform the Foreigners' Office (Ausländerbehörde) because my residence permit was lost and I need to apply for a replacement."
+                    ] 
+                },
+                 { 
+                    question: "How would you prepare for an appointment at the Foreigners' Office (Ausländerbehörde) to extend your student visa?", 
+                    starters: ["To prepare, I would first check...", "I would gather all the necessary...", "It's crucial to make sure my... is in order.", "I would also practice..."], 
+                    wordBank: ["website", "required documents", "application form", "proof of finance (Finanzierungsnachweis)", "health insurance", "enrollment certificate", "passport photos", "make copies"], 
+                    samples: [
+                        "To prepare, I would carefully check the website of the Ausländerbehörde to get the correct application form and a list of all required documents.",
+                        "I would gather all the documents well in advance, for example, my proof of finance and a new enrollment certificate from the university.",
+                        "It is crucial to make copies of everything, because you often need to submit copies and show the original documents during the appointment."
+                    ] 
+                }
+            ],
+            "Health & Wellbeing": [
+                { 
+                    question: "Describe what you would do if you felt sick and needed to see a doctor in Germany for the first time.", 
+                    starters: ["First, I would search for a...", "I would call the clinic to...", "During the appointment, I would explain...", "It's important to bring my..."], 
+                    wordBank: ["general practitioner (Hausarzt)", "make an appointment (Termin)", "health insurance card", "symptoms (Symptome)", "prescription (Rezept)", "pharmacy (Apotheke)"], 
+                    samples: [
+                        "First, I would search online for a general practitioner, a 'Hausarzt', near my apartment and then call their office to make an appointment.",
+                        "It is important to bring my health insurance card to the appointment because the doctor's office will need it for billing.",
+                        "During the appointment, I would try to describe my symptoms as clearly as possible in German, or write them down beforehand if I'm nervous."
+                    ] 
+                },
+                { 
+                    question: "How will you take care of your mental health and deal with feelings of homesickness?", 
+                    starters: ["To deal with homesickness, I will...", "It's important to maintain a routine, so I will...", "I plan to stay connected with...", "If I feel overwhelmed, I will..."], 
+                    wordBank: ["stay busy", "regular video calls", "new hobbies", "exercise", "talk to friends", "university counseling", "healthy food", "explore the city", "stay positive"], 
+                    samples: [
+                        "To take care of my mental health, I will make sure to get regular exercise, because physical activity is a great way to reduce stress.",
+                        "I will schedule regular video calls with my family and friends in China, because staying connected with them will help me feel less alone.",
+                        "If I feel overwhelmed, I will not be afraid to seek help, for example, by talking to the university's psychological counseling service."
+                    ] 
+                }
+            ],
+            "Travel Planning": [
+                { 
+                    question: "If you had a long weekend, how would you plan a short trip to a neighboring country like France?", 
+                    starters: ["First, I would decide on a...", "I would look for transportation, like...", "To save money, I would stay in a...", "I would create a simple..."], 
+                    wordBank: ["destination", "budget", "book tickets", "train (Deutsche Bahn)", "Flixbus", "hostel", "itinerary", "research attractions", "pack light"], 
+                    samples: [
+                        "First, I would decide on a specific city, like Strasbourg, because it is close to the German border and easy to reach by train.",
+                        "I would look for affordable transportation options online, comparing prices for the train versus a long-distance bus like Flixbus.",
+                        "To save money, I would book a bed in a hostel instead of a hotel, because it is much cheaper and also a good way to meet other young travelers."
+                    ] 
+                },
+                { 
+                    question: "What are some safety precautions you would take when traveling alone in Europe?", 
+                    starters: ["A key precaution is to...", "I would make sure to always...", "Before I leave, I would...", "To avoid problems, I would never..."], 
+                    wordBank: ["be aware of my surroundings", "share my itinerary", "keep valuables safe", "avoid walking alone at night", "emergency contacts", "photocopy of passport", "trust my instincts"], 
+                    samples: [
+                        "A very important precaution is to always be aware of my surroundings, especially in crowded tourist areas, to protect myself from pickpockets.",
+                        "Before I leave, I would share my detailed itinerary and hostel address with a friend or my family, so someone always knows where I am.",
+                        "To keep my valuables safe, I would use a money belt under my clothes for my passport and extra cash, and never leave my bag unattended."
+                    ] 
+                }
+            ],
+            "Money & Budgeting": [
+                { 
+                    question: "Besides rent, what do you think will be your biggest monthly expense, and how do you plan to budget for it?", 
+                    starters: ["I believe my biggest expense will be...", "To budget for this, I will...", "I plan to control this cost by...", "I will set aside a certain amount for..."], 
+                    wordBank: ["food (Lebensmittel)", "health insurance", "transportation", "social activities", "cooking at home", "student discounts (Studentenrabatt)", "budgeting app", "track expenses"], 
+                    samples: [
+                        "I believe my biggest expense after rent will be food, so I plan to save money by cooking most of my meals at home instead of eating out.",
+                        "To budget for food, I will shop at discount supermarkets like Aldi or Lidl, because they offer good quality products at lower prices.",
+                        "I will use a budgeting app on my phone to track all my expenses, because this will help me see exactly where my money is going each month."
+                    ] 
+                },
+                { 
+                    question: "What is your opinion on using credit cards versus cash (Bargeld) in Germany?", 
+                    starters: ["Based on what I've heard, I think...", "I plan to use cash more often because...", "While cards are convenient, I know that...", "I think a mix of both is..."], 
+                    wordBank: ["cash is king (Bargeld ist König)", "some places don't accept cards", "bakeries", "small shops", "EC card (Girocard)", "control spending", "convenience"], 
+                    samples: [
+                        "I've heard that 'cash is king' in Germany, so I plan to always carry some cash with me, especially for small purchases at bakeries or markets.",
+                        "I will probably use my German bank card, the EC-Karte, for larger purchases, but I will rely on cash for daily expenses because it helps me control my spending.",
+                        "My opinion is that while card payments are becoming more common, many smaller, independent shops still prefer cash, so it's best to be prepared for both."
+                    ] 
+                }
+            ],
+            "Internships": [
+                { 
+                    question: "What kind of internship (Praktikum) would be most valuable for your career, and how would you go about finding one?", 
+                    starters: ["The most valuable internship would be...", "To find one, I would use...", "I would start by preparing my...", "Networking is important, so I would..."], 
+                    wordBank: ["internship (Praktikum)", "CV (Lebenslauf)", "cover letter", "university career service", "LinkedIn", "job portals", "networking events", "relevant experience"], 
+                    samples: [
+                        "The most valuable internship for me would be one in the research and development department of a car company, because it aligns perfectly with my major.",
+                        "To find an internship, I would use my university's career service center because they have connections with local companies and can help review my CV.",
+                        "I would also actively use professional networking sites like LinkedIn to connect with people who work in my field of interest in Germany."
+                    ] 
+                },
+                { 
+                    question: "After finishing your studies, would you consider staying in Germany for work, or would you prefer to return to China? Explain why.", 
+                    starters: ["At the moment, I am considering...", "My preference would be to... because...", "It depends on the opportunities, but...", "I think gaining work experience in Germany would be..."], 
+                    wordBank: ["gain work experience", "job opportunities", "return home", "long-term plan", "career goals", "family reasons", "valuable", "competitive job market"], 
+                    samples: [
+                        "My current plan is to stay in Germany for a few years after graduation, because gaining international work experience at a German company would be very valuable for my career.",
+                        "I would prefer to return to China eventually, because my family is there and the tech industry in cities like Shenzhen is also developing very rapidly.",
+                        "It really depends on the job opportunities. If I get a great offer from a German company, I will stay, but if there is a better opportunity in China, I will go back."
+                    ] 
+                }
+            ],
+            "Communication": [
+                { 
+                    question: "How would you handle a group project where a German team member is very direct and critical of your ideas?", 
+                    starters: ["I would try not to take it...", "My first step would be to listen...", "I would ask them to explain...", "I think it's important to focus on..."], 
+                    wordBank: ["personally", "constructive criticism", "understand their reasoning", "focus on the goal", "different perspectives", "cultural difference", "find a compromise", "professional"], 
+                    samples: [
+                        "I would try not to take it personally, because I know that direct feedback is a normal part of German academic and work culture.",
+                        "I would listen to their criticism and then ask them to explain their reasoning, so I can understand their perspective and we can find the best solution together.",
+                        "It's important to focus on our common goal, which is to get a good grade, so I would see the criticism as a way to improve our project, not as a personal attack."
+                    ] 
+                },
+                { 
+                    question: "Describe a situation where small talk is common in China but might be less common in Germany.", 
+                    starters: ["One example is when...", "In China, it's common to ask..., but in Germany...", "I've heard that Germans value...", "I would adapt by..."], 
+                    wordBank: ["personal questions", "salary", "age", "marital status", "privacy", "getting straight to the point", "respect boundaries", "stick to neutral topics"], 
+                    samples: [
+                        "In China, it is quite common for colleagues to ask personal questions about family or salary, but I know this would be considered inappropriate in a German workplace.",
+                        "An example is making small talk with a cashier in a supermarket. While it can happen in China, I've heard that in Germany, the interaction is usually very quick and efficient.",
+                        "I would adapt by avoiding overly personal questions and sticking to more neutral topics like the weather, hobbies, or weekend plans until I know someone better."
+                    ] 
+                }
+            ],
+            "Integration": [
+                { 
+                    question: "What aspects of Chinese culture are you most excited to share with your new friends in Germany?", 
+                    starters: ["I'm excited to share our...", "I would love to cook... for them.", "I could teach them about...", "I think they would be interested in..."], 
+                    wordBank: ["food culture", "festivals (Spring Festival)", "calligraphy", "tea ceremony", "dumpling-making party", "language", "history", "traditions"], 
+                    samples: [
+                        "I am most excited to share our food culture, for example, by hosting a dumpling-making party for my new friends, because it is a fun and delicious activity.",
+                        "I would love to teach them about Chinese festivals, like the Spring Festival, and explain the traditions behind it, such as giving red envelopes.",
+                        "I think they might be interested in learning some basic Chinese calligraphy, because it is a unique art form that is very different from Western writing."
+                    ] 
+                },
+                { 
+                    question: "How do you plan to balance adapting to German culture while also maintaining your own cultural identity?", 
+                    starters: ["I believe it's possible to...", "I will embrace German customs like..., but I will still...", "My plan is to find a balance by...", "I think the key is to be..."], 
+                    wordBank: ["open-minded", "find a balance", "embrace new things", "stay true to my roots", "Chinese student association", "celebrate my own holidays", "bicultural", "best of both worlds"], 
+                    samples: [
+                        "I plan to find a balance by being open-minded and embracing German customs, for example, by joining local clubs, while still celebrating Chinese New Year with other Chinese students.",
+                        "I think the key is to see it as adding a new culture, not replacing my own. I can enjoy German bread and cheese, but also cook the Chinese food I love.",
+                        "I will join the Chinese student association at my university, because it will be a good way to connect with people who share my background while I am also making German friends."
+                    ] 
+                }
+            ]
+        };
+
+
+        // --- DOM Elements ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const practiceScreen = document.getElementById('practice-screen');
+        const nameEntryContainer = document.getElementById('name-entry-container');
+        const nameInput = document.getElementById('name-input');
+        const startWithNameBtn = document.getElementById('start-with-name-btn');
+        const topicSelectionContainer = document.getElementById('topic-selection-container');
+        const userNameDisplay = document.getElementById('user-name-display');
+        const topicSelection = document.getElementById('topic-selection');
+        const nextBtn = document.getElementById('next-btn');
+        const backToTopicsBtn = document.getElementById('back-to-topics-btn');
+        
+        const timerDisplay = document.getElementById('timer-display');
+        const timerProgress = document.getElementById('timer-progress');
+        const phaseIndicator = document.getElementById('phase-indicator');
+        
+        const questionContainer = document.getElementById('question-container');
+        const questionText = document.getElementById('question-text');
+        const samplesContainer = document.getElementById('samples-container');
+        const samplesList = document.getElementById('samples-list');
+        const startersContainer = document.getElementById('starters-container');
+        const startersList = document.getElementById('starters-list');
+        const wordBankContainer = document.getElementById('word-bank-container');
+        const wordBankList = document.getElementById('word-bank-list');
+        const errorMessagebox = document.getElementById('error-message-box');
+
+        const recordBtn = document.getElementById('record-btn');
+        const stopRecordBtn = document.getElementById('stop-record-btn');
+        const audioPlayer = document.getElementById('audio-player');
+        const recordingStatus = document.getElementById('recording-status');
+        const postRecordingActions = document.getElementById('post-recording-actions');
+        const downloadBtn = document.getElementById('download-btn');
+        
+        // Certificate UI
+        const certificateScreen = document.getElementById('certificate-screen');
+        const downloadCertificateBtn = document.getElementById('download-certificate-btn');
+        const backToMainMenuBtn = document.getElementById('back-to-main-menu-btn');
+
+
+        // --- State Variables ---
+        let userName = '';
+        let currentQuestionIndex = 0;
+        let currentQuestions = [];
+        let timerInterval;
+        let mediaRecorder;
+        let audioChunks = [];
+        let recordedBlob = null;
+        let completedTopics = {};
+        let speechRecognition;
+        let finalTranscript = '';
+
+        const FULL_DASH_ARRAY = 283;
+        const DEFAULT_RESPONSE_TIME = 60;
+        const READ_TIME = 60;
+
+        // --- Text-to-Speech ---
+        const synth = window.speechSynthesis;
+        let preferredVoice = null;
+        let ttsInitialized = false;
+
+        function initializeTTS() {
+            return new Promise((resolve) => {
+                if (!synth) {
+                    ttsInitialized = true;
+                    return resolve();
+                }
+
+                const setBestVoice = () => {
+                    const voices = synth.getVoices();
+                    if (voices.length === 0) return;
+                    
+                    const scoreVoice = (voice) => {
+                        let score = 0;
+                        const name = voice.name.toLowerCase();
+                        if (name.includes('natural')) score += 5;
+                        if (name.includes('brian') || name.includes('emma')) score += 4;
+                        if (name.includes('microsoft')) score += 3;
+                        if (name.includes('google')) score += 2;
+                        if (voice.localService) score += 1;
+                        return score;
+                    };
+
+                    const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+                    if (englishVoices.length > 0) {
+                        englishVoices.sort((a, b) => scoreVoice(b) - scoreVoice(a));
+                        preferredVoice = englishVoices[0];
+                    }
+                    
+                    ttsInitialized = true;
+                    resolve();
+                };
+
+                if (synth.getVoices().length > 0) {
+                    setBestVoice();
+                } else {
+                    synth.onvoiceschanged = setBestVoice;
+                }
+            });
+        }
+
+        function speak(text, isFeedback = false) {
+            if (!ttsInitialized) return;
+            try {
+                if (synth.speaking) synth.cancel();
+                const utterThis = new SpeechSynthesisUtterance(text);
+                utterThis.onerror = (event) => console.error('SpeechSynthesisUtterance.onerror', event);
+                if (preferredVoice) utterThis.voice = preferredVoice;
+                utterThis.pitch = 1;  
+                utterThis.rate = 0.85; // Slow down speech as requested
+                synth.speak(utterThis);
+            } catch (e) {
+                console.error("Speech synthesis failed:", e);
+            }
+        }
+
+        // --- Local Storage ---
+        function loadProgress() {
+            const savedCompletedTopics = localStorage.getItem('languagePracticeCompletedTopics');
+            if (savedCompletedTopics) {
+                try {
+                    const parsed = JSON.parse(savedCompletedTopics);
+                    // Basic validation to ensure it's an object
+                    if (typeof parsed === 'object' && parsed !== null) {
+                       completedTopics = parsed;
+                    } else {
+                        completedTopics = {};
+                    }
+                } catch (e) {
+                    console.error("Failed to parse saved progress:", e);
+                    completedTopics = {}; // Reset progress if data is corrupt
+                }
+            }
+            const savedName = localStorage.getItem('languagePracticeUserName');
+            if (savedName) {
+                 userName = savedName;
+                 nameInput.value = userName;
+            }
+        }
+
+        function saveProgress() {
+            localStorage.setItem('languagePracticeCompletedTopics', JSON.stringify(completedTopics));
+            if(userName) localStorage.setItem('languagePracticeUserName', userName);
+        }
+
+        // --- UI Initialization ---
+        function initializeTopics() {
+            topicSelection.innerHTML = '';
+            for (const topic in practiceData) {
+                const button = document.createElement('button');
+                
+                let checkmark = '';
+                if (completedTopics && completedTopics[topic]) {
+                    checkmark = `<i class="fas fa-check-circle text-green-500 ml-2"></i>`;
+                    button.className = "w-full bg-green-100 dark:bg-green-900/50 p-2 rounded-lg shadow-md hover:bg-green-200 dark:hover:bg-green-800/60 transition-colors flex items-center justify-center";
+                } else {
+                    button.className = "w-full bg-white dark:bg-gray-700 p-2 rounded-lg shadow-md hover:bg-indigo-100 dark:hover:bg-indigo-800 transition-all transform hover:scale-105 flex items-center justify-center";
+                }
+
+                button.innerHTML = `<span class="text-sm font-semibold">${topic}</span> ${checkmark}`;
+                button.dataset.topic = topic;
+                button.addEventListener('click', () => startPractice(topic));
+                topicSelection.appendChild(button);
+            }
+        }
+
+        // --- Core App Logic ---
+        function startPractice(topic) {
+            currentQuestions = practiceData[topic];
+            currentQuestions.topicName = topic;
+            currentQuestionIndex = 0;
+            welcomeScreen.classList.add('hidden');
+            practiceScreen.classList.remove('hidden');
+            certificateScreen.classList.add('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex >= currentQuestions.length) {
+                phaseIndicator.textContent = "Topic Complete!";
+                questionText.textContent = "You've finished this topic. Well done!";
+                completedTopics[currentQuestions.topicName] = true;
+                saveProgress();
+                checkAllTopicsCompleted();
+                resetRecordingUI();
+                nextBtn.classList.add('hidden');
+                speak("You've completed this topic! Well done.");
+                return;
+            }
+
+            const item = currentQuestions[currentQuestionIndex];
+            resetUIForNewQuestion();
+            
+            let fullQuestion = (item.intro ? item.intro + " " : "") + item.question;
+            questionText.textContent = fullQuestion;
+            questionText.classList.add('fade-in');
+            setTimeout(() => questionText.classList.remove('fade-in'), 500);
+
+            speak(fullQuestion);
+            
+            // Populate Sentence Starters
+            if (item.starters && item.starters.length > 0) {
+                startersList.innerHTML = '';
+                item.starters.forEach(starter => {
+                    const button = document.createElement('button');
+                    button.className = 'bg-indigo-500 text-white text-sm font-medium px-2.5 py-1 rounded-full dark:bg-indigo-600 dark:text-white cursor-default';
+                    button.textContent = starter;
+                    startersList.appendChild(button);
+                });
+                startersContainer.classList.remove('hidden');
+            }
+
+            // Populate Word Bank
+            if (item.wordBank && item.wordBank.length > 0) {
+                wordBankList.innerHTML = '';
+                item.wordBank.forEach(word => {
+                    const button = document.createElement('button');
+                    button.className = 'bg-green-500 text-white text-sm font-medium px-2.5 py-1 rounded-full dark:bg-green-600 dark:text-white cursor-default';
+                    button.textContent = word;
+                    wordBankList.appendChild(button);
+                });
+                wordBankContainer.classList.remove('hidden');
+            }
+
+            const responseTime = item.timer || DEFAULT_RESPONSE_TIME;
+            phaseIndicator.textContent = `Prepare & Record (Question ${currentQuestionIndex + 1} of ${currentQuestions.length})`;
+            startTimer(responseTime, showSampleAnswersAndStartReadTimer);
+        }
+
+        function showSampleAnswersAndStartReadTimer() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                stopRecording();
+            }
+            
+            phaseIndicator.textContent = "Review";
+            recordBtn.disabled = true;
+            recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            const item = currentQuestions[currentQuestionIndex];
+            if (item.samples && item.samples.length > 0) {
+                samplesList.innerHTML = '';
+                item.samples.forEach(sample => {
+                    const li = document.createElement('li');
+                    li.textContent = sample;
+                    // Changed to white text as requested
+                    li.className = 'text-white text-sm sm:text-base';
+                    samplesList.appendChild(li);
+                });
+                samplesContainer.classList.remove('hidden');
+            }
+
+
+            startTimer(READ_TIME, () => {
+                phaseIndicator.textContent = "Time's up!";
+                nextBtn.classList.remove('hidden');
+            });
+        }
+        
+        // --- Certificate Logic ---
+        function checkAllTopicsCompleted() {
+            const totalTopics = Object.keys(practiceData).length;
+            const completedCount = Object.keys(completedTopics).length;
+            if (completedCount === totalTopics) {
+                showCertificate();
+            }
+        }
+        
+        function showCertificate() {
+            practiceScreen.classList.add('hidden');
+            welcomeScreen.classList.add('hidden');
+            certificateScreen.classList.remove('hidden');
+            document.getElementById('certificate-name').textContent = userName;
+            document.getElementById('certificate-date').textContent = new Date().toLocaleDateString();
+        }
+        
+        function showErrorMessage(message) {
+            errorMessagebox.textContent = message;
+            errorMessagebox.classList.remove('hidden');
+            setTimeout(() => {
+                errorMessagebox.classList.add('hidden');
+            }, 5000); // Hide after 5 seconds
+        }
+
+        // --- Recording & Transcription Logic ---
+        async function startRecording() {
+            if (!window.MediaRecorder) {
+                showErrorMessage("Audio recording is not supported on this browser.");
+                return;
+            }
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                const isEdge = window.navigator.userAgent.includes("Edg");
+                let options = {};
+                if (!isEdge) {
+                    const mimeTypes = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/ogg'];
+                    const supportedType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
+                    if (supportedType) options.mimeType = supportedType;
+                }
+                
+                mediaRecorder = new MediaRecorder(stream, options);
+                mediaRecorder.start();
+                startTranscription();
+
+                recordBtn.classList.add('hidden');
+                stopRecordBtn.classList.remove('hidden');
+                recordingStatus.classList.remove('hidden');
+
+                audioChunks = [];
+                mediaRecorder.addEventListener("dataavailable", event => {
+                    audioChunks.push(event.data);
+                });
+
+                mediaRecorder.addEventListener("stop", () => {
+                    recordedBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(recordedBlob);
+                    audioPlayer.src = audioUrl;
+                    postRecordingActions.classList.remove('hidden');
+                    recordingStatus.classList.add('hidden');
+                    stopRecordBtn.classList.add('hidden');
+                    recordBtn.classList.add('hidden');
+                });
+            } catch (err) {
+                console.error("Error starting recording:", err);
+                showErrorMessage("Could not start audio recording. Please grant microphone permission.");
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder) {
+                mediaRecorder.stop();
+            }
+            if (speechRecognition) {
+                speechRecognition.stop();
+            }
+        }
+
+        function startTranscription() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                console.warn("Speech recognition not supported.");
+                return;
+            }
+
+            speechRecognition = new SpeechRecognition();
+            speechRecognition.continuous = true;
+            speechRecognition.interimResults = true;
+            speechRecognition.lang = 'en-US';
+            finalTranscript = '';
+
+            speechRecognition.onresult = (event) => {
+                let interimTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+            };
+            
+            speechRecognition.onerror = (event) => {
+                 console.error('Speech recognition error detected: ' + event.error);
+            }
+
+            speechRecognition.start();
+        }
+
+        // --- Timer Functions ---
+        function startTimer(duration, onEndCallback) {
+            let timeLeft = duration;
+            clearInterval(timerInterval);
+            updateTimerDisplay(timeLeft, duration);
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay(timeLeft, duration);
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    if(onEndCallback) onEndCallback();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay(timeLeft, totalDuration) {
+            const minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            if (seconds < 10) seconds = `0${seconds}`;
+            timerDisplay.textContent = `${minutes}:${seconds}`;
+            
+            const fraction = timeLeft / totalDuration;
+            const offset = fraction * FULL_DASH_ARRAY;
+            timerProgress.style.strokeDashoffset = FULL_DASH_ARRAY - offset;
+        }
+
+        // --- UI Helper Functions ---
+        function resetUIForNewQuestion() {
+            samplesContainer.classList.add('hidden');
+            startersContainer.classList.add('hidden');
+            wordBankContainer.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            errorMessagebox.classList.add('hidden');
+            recordBtn.disabled = false;
+            recordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            resetRecordingUI();
+        }
+
+        function resetRecordingUI() {
+            recordBtn.classList.remove('hidden');
+            stopRecordBtn.classList.add('hidden');
+            recordingStatus.classList.add('hidden');
+            postRecordingActions.classList.add('hidden');
+            audioPlayer.src = '';
+            audioChunks = [];
+            recordedBlob = null;
+            finalTranscript = '';
+        }
+
+        // --- Theme Toggle Logic ---
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                themeToggleLightIcon.classList.remove('hidden');
+                themeToggleDarkIcon.classList.add('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeToggleDarkIcon.classList.remove('hidden');
+                themeToggleLightIcon.classList.add('hidden');
+            }
+        };
+        
+        // --- Snowfall Logic ---
+        function createSnow() {
+            const snowContainer = document.getElementById('snow-container');
+            const snowflakeCount = 50;
+            for (let i = 0; i < snowflakeCount; i++) {
+                let snowflake = document.createElement('div');
+                snowflake.innerHTML = '❄';
+                snowflake.classList.add('snowflake');
+                snowflake.style.left = Math.random() * 100 + 'vw';
+                snowflake.style.animationDuration = Math.random() * 5 + 5 + 's'; // 5-10 seconds
+                snowflake.style.animationDelay = Math.random() * 5 + 's';
+                snowflake.style.fontSize = Math.random() * 1.5 + 0.5 + 'em';
+                snowflake.style.opacity = Math.random();
+                snowContainer.appendChild(snowflake);
+            }
+        }
+
+
+        // --- Event Listeners ---
+        startWithNameBtn.addEventListener('click', () => {
+            userName = nameInput.value.trim();
+            if (userName) {
+                saveProgress();
+                nameEntryContainer.classList.add('hidden');
+                userNameDisplay.textContent = userName;
+                topicSelectionContainer.classList.remove('hidden');
+            } else {
+                // Using a custom message box instead of alert()
+                const nameError = document.createElement('div');
+                nameError.textContent = "Please enter your name.";
+                nameError.className = "text-red-500 text-sm mt-2";
+                startWithNameBtn.insertAdjacentElement('afterend', nameError);
+                setTimeout(() => nameError.remove(), 2000);
+            }
+        });
+
+        recordBtn.addEventListener('click', startRecording);
+        stopRecordBtn.addEventListener('click', stopRecording);
+        
+        downloadCertificateBtn.addEventListener('click', () => {
+            const certificateNode = document.getElementById('certificate-to-download');
+            html2canvas(certificateNode, { scale: 2 }).then(canvas => {
+                const a = document.createElement('a');
+                a.href = canvas.toDataURL('image/png');
+                a.download = `Certificate_of_Completion_${userName.replace(/\s+/g, '_')}.png`;
+                a.click();
+            });
+        });
+
+        backToMainMenuBtn.addEventListener('click', () => {
+            certificateScreen.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
+            initializeTopics();
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (recordedBlob) {
+                const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
+                const sanitizedUserName = userName.replace(/\s+/g, '_');
+                const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
+                
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = URL.createObjectURL(recordedBlob);
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                // Visual feedback
+                const originalText = downloadBtn.innerHTML;
+                downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
+                downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                downloadBtn.classList.add('bg-green-600');
+                setTimeout(() => {
+                    downloadBtn.innerHTML = originalText;
+                    downloadBtn.classList.remove('bg-green-600');
+                    downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                }, 2000);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            showQuestion();
+        });
+
+        backToTopicsBtn.addEventListener('click', () => {
+            practiceScreen.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
+            clearInterval(timerInterval);
+            initializeTopics();
+        });
+        
+        themeToggleBtn.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
+            applyTheme(isDark ? 'dark' : 'light');
+        });
+
+        // --- Initial Load ---
+        async function main() {
+            // Set initial theme
+            const savedTheme = localStorage.getItem('color-theme');
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else {
+                // If no theme saved, use system preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    applyTheme('dark');
+                } else {
+                    applyTheme('light');
+                }
+            }
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !SpeechRecognition) {
+                recordBtn.disabled = true;
+                recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                recordBtn.title = "Audio recording or recognition is not supported on this browser.";
+            }
+            if (!window.speechSynthesis) {
+                 console.warn("Text-to-speech is not supported on this browser.");
+            }
+            
+            await initializeTTS().catch(err => console.error(err));
+            
+            createSnow();
+            loadProgress();
+            initializeTopics();
+        }
+        
+        main();
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Racer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            overflow: hidden; /* Prevent scrolling */
+        }
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            touch-action: none;
+        }
+        /* Make canvas responsive within its container */
+        canvas {
+            background-color: #f0f0f0;
+            border: 2px solid #333;
+            border-radius: 0.75rem;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .leaderboard {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            /* Adjust max-height based on new layout */
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-800 text-white flex flex-col items-center justify-center h-screen p-2 md:p-4">
+
+    <!-- Selection Screen -->
+    <div id="selectionScreen" class="text-center">
+        <h1 class="text-5xl font-bold mb-8">Select a Grade to Race</h1>
+        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6">
+            <button data-grade="10" class="grade-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg text-2xl transition-transform transform hover:scale-105">
+                Grade 10
+            </button>
+            <button data-grade="11" class="grade-btn bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg text-2xl transition-transform transform hover:scale-105">
+                Grade 11
+            </button>
+            <button data-grade="12" class="grade-btn bg-purple-500 hover:bg-purple-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg text-2xl transition-transform transform hover:scale-105">
+                Grade 12
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="hidden w-full h-full flex-col items-center">
+        <div class="flex flex-col md:flex-row w-full h-full items-start justify-center gap-4">
+            <!-- Game Canvas (Larger Area) -->
+            <div class="w-full md:w-5/6 h-full flex flex-col items-center">
+                 <div class="w-full h-full relative">
+                    <canvas id="gameCanvas"></canvas>
+                    <div id="messageOverlay" class="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center rounded-lg text-center hidden">
+                        <h2 id="messageTitle" class="text-5xl font-bold mb-4"></h2>
+                        <p id="messageText" class="text-xl"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Leaderboard & Controls -->
+            <div class="w-full md:w-1/6 flex flex-col gap-4">
+                 <h1 id="raceTitle" class="text-2xl font-bold text-center"></h1>
+                <div>
+                    <h2 class="text-xl font-bold text-center mb-2">Leaderboard</h2>
+                    <div id="leaderboard" class="leaderboard p-2 rounded-lg border border-gray-600">
+                        <!-- Leaderboard items will be inserted here -->
+                    </div>
+                </div>
+                <!-- Controls -->
+                <div class="flex flex-col items-center justify-center space-y-4 bg-gray-700 p-4 rounded-lg">
+                     <div class="flex items-center space-x-4">
+                        <button id="backButton" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg text-sm">Back</button>
+                        <button id="startButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg text-sm">Start Race</button>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-lg">🐢</span>
+                        <input id="speedSlider" type="range" min="0.5" max="2" value="1" step="0.1" class="w-full h-3 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                        <span class="text-lg">🐇</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- DOM Elements ---
+        const selectionScreen = document.getElementById('selectionScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startButton = document.getElementById('startButton');
+        const backButton = document.getElementById('backButton');
+        const speedSlider = document.getElementById('speedSlider');
+        const messageOverlay = document.getElementById('messageOverlay');
+        const messageTitle = document.getElementById('messageTitle');
+        const messageText = document.getElementById('messageText');
+        const raceTitle = document.getElementById('raceTitle');
+        const leaderboardDiv = document.getElementById('leaderboard');
+        
+        // --- Game State ---
+        let gameRunning = false;
+        let animationFrameId;
+        let racers = [];
+        let simulationSpeed = 1;
+
+        // --- Game Data ---
+        let TILE_SIZE = 40;
+        let cols, rows;
+        const studentData = {
+            10: ["冯奕尘", "黄若涵", "李丰屹", "李鹏潞", "梁锦天", "刘景扬", "龙俊志", "马赫", "聂溪康", "庞云蔚", "曲家瑞", "孙诗童", "王子言", "杨晴珺", "张宸恺", "赵浩文"],
+            11: ["陈峻弘", "韩睿雄", "何怡敏", "康艺芸", "李雨霏", "李沾衣", "刘圃言", "庞泽霖", "王梓晗", "尹九思", "游项雯", "于浚哲", "臧姝婷", "张澜馨"],
+            12: ["安政聿", "蔡子墨", "刘镇榕", "马知行", "邱天", "盛思语", "唐可盈", "田子凡", "谢斯飞", "杨加麒", "张程皓", "赵晨达鑫", "周逸凡"]
+        };
+        const vehicleEmojis = ['🚗', '🚙', '🏎️', '🛻', '🏍️', '🛵', '🚲', '🛴', '🛹', '🦽', '🦼', '🚌', '🚎', '🚐', '🚕', '🚋', '🚤', '🚁', '🚜', '🚑', '🚒', '🚓', '🚛', '🚚'];
+        const map = [
+            [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+            [3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+            [3, 1, 3, 2, 3, 1, 2, 3, 2, 3, 2, 3, 1, 2, 3, 2, 1, 3, 2, 3, 2, 3, 2, 1, 3],
+            [3, 1, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+            [3, 1, 3, 1, 1, 3, 2, 3, 2, 3, 2, 1, 2, 3, 2, 3, 1, 2, 3, 1, 2, 3, 2, 1, 3],
+            [3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+            [3, 1, 2, 3, 2, 1, 3, 2, 3, 2, 3, 1, 2, 3, 2, 3, 1, 3, 2, 3, 2, 3, 2, 1, 3],
+            [3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+            [3, 1, 2, 3, 2, 3, 2, 3, 2, 1, 2, 3, 2, 3, 2, 1, 2, 3, 2, 3, 2, 3, 1, 1, 3],
+            [3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+            [3, 1, 2, 3, 2, 1, 2, 3, 2, 3, 2, 3, 2, 1, 2, 3, 2, 3, 2, 1, 2, 3, 2, 1, 3],
+            [3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+            [3, 1, 2, 3, 2, 3, 2, 3, 2, 1, 2, 3, 2, 3, 2, 1, 2, 3, 2, 3, 2, 3, 1, 1, 3],
+            [3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+            [3, 1, 2, 3, 2, 1, 2, 3, 2, 3, 2, 3, 2, 1, 2, 3, 2, 3, 2, 1, 2, 3, 2, 1, 3],
+            [3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+            [3, 1, 2, 3, 2, 3, 2, 1, 2, 3, 2, 3, 2, 3, 1, 2, 3, 2, 3, 2, 3, 2, 1, 1, 3],
+            [3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+            [3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 3],
+            [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+        ];
+        const racePath = [
+            {x: 1, y: 1}, {x: 23, y: 1}, {x: 23, y: 3}, {x: 1, y: 3},
+            {x: 1, y: 5}, {x: 23, y: 5}, {x: 23, y: 7}, {x: 1, y: 7},
+            {x: 1, y: 9}, {x: 23, y: 9}, {x: 23, y: 11}, {x: 1, y: 11},
+            {x: 1, y: 13}, {x: 23, y: 13}, {x: 23, y: 15}, {x: 1, y: 15},
+            {x: 1, y: 17}, {x: 23, y: 17}, {x: 23, y: 18}, {x: 22, y: 18}
+        ];
+        const trafficLightNodes = [1, 3, 5, 7, 9, 11, 13, 15, 17];
+        const EMOJIS = { building: ['🏢', '🏭', '🏤', '🏥', '🏦'], tree: ['🌳', '🌲', '🌴'], start: '🟢', finish: '🏁' };
+        let emojiMap = [];
+
+        // --- Sound Engine ---
+        let synth;
+        const setupSound = () => {
+            if (Tone.context.state !== 'running') Tone.start();
+            synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        };
+        const playWinSound = () => {
+            synth.triggerAttackRelease(['C4', 'E4', 'G4', 'C5'], '8n', Tone.now());
+        };
+
+        // --- Setup and Initialization ---
+        function setupSelectionScreen() {
+            document.querySelectorAll('.grade-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const grade = button.dataset.grade;
+                    initializeRace(grade);
+                });
+            });
+            backButton.addEventListener('click', () => {
+                endGame(); // Stop current race
+                gameScreen.classList.add('hidden');
+                selectionScreen.classList.remove('hidden');
+            });
+        }
+
+        function initializeRace(grade) {
+            selectionScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            raceTitle.textContent = `Grade ${grade} Race!`;
+            
+            // Reset speed slider to default
+            speedSlider.value = 1;
+            simulationSpeed = 1;
+
+            // Create racers in random order
+            racers = [];
+            const students = [...studentData[grade]].sort(() => 0.5 - Math.random());
+            let shuffledVehicles = [...vehicleEmojis].sort(() => 0.5 - Math.random());
+            students.forEach((name, index) => {
+                racers.push({
+                    name: name,
+                    emoji: shuffledVehicles[index % shuffledVehicles.length],
+                    x: 0, y: 0, // Will be set in initializeGame
+                    speed: (Math.random() * 0.4 + 0.6), 
+                    pathIndex: 0,
+                    progress: 0,
+                    finished: false,
+                    finishTime: 0,
+                    isStopped: false, 
+                    stopEndTime: 0
+                });
+            });
+
+            initializeGame();
+        }
+
+        function initializeGame() {
+            cols = map[0].length;
+            rows = map.length;
+
+            // Resize canvas to fit container
+            const canvasContainer = canvas.parentElement;
+            const containerWidth = canvasContainer.clientWidth;
+            const containerHeight = canvasContainer.clientHeight;
+            const mapAspectRatio = cols / rows;
+            
+            let canvasWidth = containerWidth;
+            let canvasHeight = containerWidth / mapAspectRatio;
+
+            if (canvasHeight > containerHeight) {
+                canvasHeight = containerHeight;
+                canvasWidth = containerHeight * mapAspectRatio;
+            }
+
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            TILE_SIZE = canvas.width / cols;
+            
+            emojiMap = map.map(row => row.map(tile => {
+                if (tile === 2) return EMOJIS.building[Math.floor(Math.random() * EMOJIS.building.length)];
+                if (tile === 3) return EMOJIS.tree[Math.floor(Math.random() * EMOJIS.tree.length)];
+                return null;
+            }));
+
+            racers.forEach((racer, index) => {
+                 racer.x = (1.5 * TILE_SIZE) - (index * (TILE_SIZE / 5)); // Stagger start
+                 racer.y = 1.5 * TILE_SIZE;
+                 racer.pathIndex = 0;
+                 racer.progress = 0;
+                 racer.finished = false;
+                 racer.finishTime = 0;
+            });
+
+            draw();
+        }
+        
+        // --- Game Loop ---
+        function startGame() {
+            if (gameRunning) return; 
+            setupSound();
+            gameRunning = true;
+            messageOverlay.classList.add('hidden');
+            startButton.textContent = 'Restart Race';
+            gameLoop();
+        }
+
+        function endGame(winner) {
+            gameRunning = false;
+            cancelAnimationFrame(animationFrameId);
+            startButton.textContent = 'Start Race';
+
+            if(winner) {
+                messageOverlay.classList.remove('hidden');
+                messageTitle.textContent = `🎉 ${winner.name} Wins! 🎉`;
+                messageText.textContent = `They finished the race in style with their ${winner.emoji}!`;
+                playWinSound();
+            }
+        }
+
+        function update() {
+            if (!gameRunning) return;
+
+            let someoneFinished = racers.some(r => r.finished);
+
+            racers.forEach(racer => {
+                if (racer.isStopped) {
+                    if (performance.now() > racer.stopEndTime) {
+                        racer.isStopped = false; 
+                    } else { return; }
+                }
+
+                if (racer.finished) return;
+
+                const targetNode = racePath[racer.pathIndex];
+                if (!targetNode) { 
+                    if (!racer.finished) {
+                        racer.finished = true;
+                        racer.finishTime = performance.now();
+                        if (!someoneFinished) { endGame(racer); }
+                    }
+                    return;
+                }
+
+                const targetX = targetNode.x * TILE_SIZE + TILE_SIZE / 2;
+                const targetY = targetNode.y * TILE_SIZE + TILE_SIZE / 2;
+                const dx = targetX - racer.x;
+                const dy = targetY - racer.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const moveSpeed = (racer.speed * simulationSpeed) * (TILE_SIZE / 40);
+
+                if (dist < moveSpeed) {
+                    racer.x = targetX;
+                    racer.y = targetY;
+                    if (trafficLightNodes.includes(racer.pathIndex) && Math.random() < 0.50) { 
+                        racer.isStopped = true;
+                        racer.stopEndTime = performance.now() + (Math.random() * 3000 + 2000);
+                    } else {
+                        racer.pathIndex++;
+                        racer.progress = racer.pathIndex / racePath.length;
+                    }
+                } else {
+                    racer.x += (dx / dist) * moveSpeed;
+                    racer.y += (dy / dist) * moveSpeed;
+                }
+            });
+
+            updateLeaderboard();
+        }
+        
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    const tile = map[y][x];
+                    if (tile === 0 || tile === 3) {
+                        ctx.fillStyle = '#6ab04c';
+                    } else if (tile === 1 || tile === 4 || tile === 5) {
+                        ctx.fillStyle = '#7f8c8d';
+                    } else {
+                         ctx.fillStyle = '#6ab04c'; // Default for buildings under emojis
+                    }
+                    ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    
+                    ctx.font = `${TILE_SIZE * 0.8}px sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const centerX = x * TILE_SIZE + TILE_SIZE / 2;
+                    const centerY = y * TILE_SIZE + TILE_SIZE / 2;
+
+                    if (tile === 2 || tile === 3) ctx.fillText(emojiMap[y][x], centerX, centerY);
+                    else if (tile === 4) ctx.fillText(EMOJIS.start, centerX, centerY);
+                    else if (tile === 5) ctx.fillText(EMOJIS.finish, centerX, centerY);
+                }
+            }
+            
+            ctx.font = `${TILE_SIZE * 0.6}px sans-serif`;
+            ctx.textAlign = 'center';
+            trafficLightNodes.forEach(nodeIndex => {
+                const node = racePath[nodeIndex];
+                if (!node) return;
+                const lightX = node.x * TILE_SIZE + TILE_SIZE / 2;
+                const lightY = node.y * TILE_SIZE + TILE_SIZE / 2;
+                const isRed = racers.some(r => r.isStopped && r.pathIndex === nodeIndex);
+                ctx.fillText(isRed ? '🔴' : '🟢', lightX, lightY);
+            });
+            
+            racers.forEach(racer => {
+                ctx.font = `${TILE_SIZE * 0.7}px sans-serif`;
+                ctx.fillText(racer.emoji, racer.x, racer.y);
+                ctx.font = `bold ${TILE_SIZE * 0.3}px Inter`;
+                ctx.fillStyle = "black";
+                ctx.fillText(racer.name, racer.x, racer.y - TILE_SIZE * 0.6);
+            });
+        }
+        
+        function updateLeaderboard() {
+            racers.sort((a, b) => {
+                if (a.finished && !b.finished) return -1;
+                if (!a.finished && b.finished) return 1;
+                if (a.finished && b.finished) return a.finishTime - b.finishTime;
+                return b.progress - a.progress;
+            });
+            
+            leaderboardDiv.innerHTML = racers.map((r, i) => `
+                <div class="flex items-center text-xs p-1 rounded ${i === 0 ? 'bg-yellow-500 text-black' : ''} whitespace-nowrap overflow-hidden">
+                    <span class="font-bold w-5 text-center">${i + 1}.</span>
+                    <span class="mr-1">${r.emoji}</span>
+                    <span class="truncate">${r.name}</span>
+                </div>
+            `).join('');
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        // --- Event Listeners ---
+        startButton.addEventListener('click', () => {
+             if (gameRunning) {
+                endGame();
+                initializeGame();
+             }
+             startGame();
+        });
+        speedSlider.addEventListener('input', (e) => {
+            simulationSpeed = parseFloat(e.target.value);
+        });
+
+        // --- Initial Load ---
+        const resizeObserver = new ResizeObserver(entries => {
+            if(gameScreen.classList.contains('hidden')) return;
+            initializeGame();
+        });
+        resizeObserver.observe(canvas.parentElement);
+        
+        window.addEventListener('load', () => {
+             setupSelectionScreen();
+        });
+
+    </script>
+</body>
+</html>
