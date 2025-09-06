@@ -505,65 +505,194 @@
              * SpeechService v4.4 (Patched based on user feedback)
              */
             class SpeechService {
-                constructor() {
-                    this.synth = window.speechSynthesis;
-                    this.isInitialized = false;
-                    this.isTtsEnabled = true;
-                    this.voices = {};
-                    this.speechRate = 0.85;
-                    this.maleNameHints = ['john', 'mike', 'david', 'brian', 'tom', 'chris', 'alex', 'robert', 'mark', 'james', 'paul', 'leo', 'onyx', 'alloy', 'sterling', 'carter', 'daniel', 'lachlan'];
-                    this.femaleNameHints = ['mary', 'lisa', 'susan', 'jane', 'sarah', 'emma', 'eva', 'allison', 'ava', 'samantha', 'kate', 'linda', 'mia', 'sofia', 'chen', 'fable', 'shimmer', 'li', 'maria', 'sharma', 'elizabeth'];
-                }
+  constructor() {
+    this.synth = window.speechSynthesis;
+    this.isInitialized = false;
+    this.isTtsEnabled = true;
+    this.voices = [];
+    this.speechRate = 0.85;
+    this.isAndroid = /Android/i.test(navigator.userAgent);
 
-                _getBrowserVoicePriorities() {
-                    return {
-                        edge: {
-                            female: ['Microsoft Ava Online (Natural) - English (United States)', 'Microsoft Aria Online (Natural) - English (United States)'],
-                            male: ['Microsoft Brian Online (Natural) - English (United States)', 'Microsoft Guy Online (Natural) - English (United States)']
-                        },
-                        safari: { female: ['Samantha', 'Ava (Premium)', 'Allison'], male: ['Alex', 'Tom'] },
-                        chrome: { female: ['Google US English'], male: ['Google US English'] }
-                    };
-                }
+    // Explicit mapping: speaker → [preferred voices], lang
+    this.speakerVoiceMap = {
+      // English (US)
+      'alex':      { names: this.isAndroid ? ['Google US English'] : ['Microsoft Guy Online (Natural)'], lang: 'en-US' },
+      'ben':       { names: this.isAndroid ? ['Google US English'] : ['Microsoft Brian Online (Natural)'], lang: 'en-US' },
+      'sarah':     { names: this.isAndroid ? ['Google US English'] : ['Microsoft Aria Online (Natural)'], lang: 'en-US' },
+      'maria':     { names: this.isAndroid ? ['Google US English'] : ['Microsoft Aria Online (Natural)'], lang: 'en-US' },
+      'omar':      { names: this.isAndroid ? ['Google US English'] : ['Microsoft Guy Online (Natural)'], lang: 'en-US' },
+      'professor': { names: this.isAndroid ? ['Google UK English Male'] : ['Microsoft Daniel Online (Natural)'], lang: 'en-GB' },
+      'lecturer':  { names: this.isAndroid ? ['Google UK English Male'] : ['Microsoft Daniel Online (Natural)'], lang: 'en-GB' },
+      'chris':     { names: this.isAndroid ? ['Google English (Australia)'] : ['Microsoft Natasha Online (Natural)'], lang: 'en-AU' },
+      'lachlan':   { names: this.isAndroid ? ['Google English (Australia)'] : ['Microsoft Natasha Online (Natural)'], lang: 'en-AU' },
+      'elizabeth': { names: this.isAndroid ? ['Google US English'] : ['Microsoft Aria Online (Natural)'], lang: 'en-US' },
+      'daniel':    { names: this.isAndroid ? ['Google US English'] : ['Microsoft Brian Online (Natural)'], lang: 'en-US' },
+      // Multilingual
+      'seraphina': { names: this.isAndroid ? ['Google Deutsch'] : ['Seraphina'], lang: 'de-DE' },
+      'florian':   { names: this.isAndroid ? ['Google Deutsch'] : ['Florian'],   lang: 'de-DE' },
+      'sonia':     { names: this.isAndroid ? ['Google español'] : ['Sonia'], lang: 'es-ES' },
+      'nicolas':   { names: this.isAndroid ? ['Google français'] : ['Nicolas'], lang: 'fr-FR' },
+      'xiaoxiao':  { names: this.isAndroid ? ['Google 普通话', 'Google Mandarin'] : ['Xiaoxiao'], lang: 'zh-CN' }
+    };
 
-                _getBrowser() {
-                    const ua = navigator.userAgent;
-                    if (ua.includes("Edg/")) return "edge";
-                    if (ua.includes("Chrome") && !ua.includes("Chromium")) return "chrome";
-                    if (ua.includes("Safari") && !ua.includes("Chrome")) return "safari";
-                    return "other";
-                }
+    // Feedback phrases — varied for motivation
+    this.feedbackPhrases = {
+      de: {
+        correct: [
+          "Sehr gut gemacht!",
+          "Klasse Leistung!",
+          "Super, weiter so!",
+          "Das hast du toll hinbekommen!",
+          "Ausgezeichnete Arbeit!",
+          "Fantastisch, du bist spitze!",
+          "Richtig gut gelöst!"
+        ],
+        incorrect: [
+          "Das ist leider nicht richtig.",
+          "Fast, versuch es noch einmal.",
+          "Nicht ganz, probier es noch einmal.",
+          "Das war knapp daneben.",
+          "Keine Sorge, du schaffst das beim nächsten Mal!",
+          "Versuch es noch einmal, du kannst das!"
+        ]
+      },
+      en: {
+        correct: [
+          "Well done!",
+          "Great job!",
+          "Excellent work!",
+          "Fantastic, keep it up!",
+          "You nailed it!"
+        ],
+        incorrect: [
+          "That's not correct.",
+          "Almost, try again.",
+          "Not quite, give it another go.",
+          "Close, but not correct.",
+          "Don't worry, you'll get it next time!"
+        ]
+      }
+      // Add more languages here if needed
+    };
+  }
 
-                async _setupVoices() {
-                    const voicesPromise = new Promise(resolve => {
-                        if (this.synth.getVoices().length) return resolve(this.synth.getVoices());
-                        this.synth.onvoiceschanged = () => resolve(this.synth.getVoices());
-                    });
-                    const availableVoices = await voicesPromise;
-                    if (!availableVoices.length) { console.warn("No voices available."); return; }
-                    
-                    const browser = this._getBrowser();
-                    const priorities = this._getBrowserVoicePriorities();
-                    const keywordPriorities = ['natural', 'premium', 'enhanced', 'google', 'microsoft'];
-                    
-                    const usEnglish = availableVoices.filter(v => v.lang === 'en-US');
+  _findVoice(preferredNames, langCode) {
+    for (const name of preferredNames) {
+      const match = this.voices.find(v =>
+        v.lang === langCode &&
+        v.name.toLowerCase().includes(name.toLowerCase())
+      );
+      if (match) return match;
+    }
+    return this.voices.find(v => v.lang === langCode) || null;
+  }
 
-                    const findBest = (voiceList, gender) => {
-                        // --- START: CUSTOM VOICE PRIORITIES based on user request ---
-                        if (gender === 'female') {
-                            const userPriority = ['Ava', 'Emma'];
-                            for (const name of userPriority) {
-                                const found = voiceList.find(v => v.name.includes(name));
-                                if (found) return found;
-                            }
-                        }
-                        if (gender === 'male') {
-                            const userPriority = ['Brian'];
-                            for (const name of userPriority) {
-                                const found = voiceList.find(v => v.name.includes(name));
-                                if (found) return found;
-                            }
-                        }
+  _getVoiceForSpeaker(speakerName) {
+    if (!this.isInitialized) {
+      console.warn("Voices not loaded yet");
+      return null;
+    }
+    const lower = speakerName.toLowerCase().trim();
+    if (this.speakerVoiceMap[lower]) {
+      const { names, lang } = this.speakerVoiceMap[lower];
+      return this._findVoice(names, lang);
+    }
+    // Fallback: default English voice
+    return this._findVoice(
+      this.isAndroid ? ['Google US English'] : ['Microsoft Ava Online (Natural)'],
+      'en-US'
+    );
+  }
+
+  async init() {
+    if (this.isInitialized) return;
+    const voicesPromise = new Promise(resolve => {
+      if (this.synth.getVoices().length) return resolve(this.synth.getVoices());
+      this.synth.onvoiceschanged = () => resolve(this.synth.getVoices());
+    });
+    this.voices = await voicesPromise;
+    this.isInitialized = true;
+    console.log("Voices loaded:", this.voices.map(v => `${v.name} (${v.lang})`));
+  }
+
+  speak(text, { onEndCallback = null } = {}) {
+    if (!this.isInitialized || !this.isTtsEnabled || !text) {
+      if (onEndCallback) onEndCallback();
+      return;
+    }
+    this.synth.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.voice = this._findVoice(
+      this.isAndroid ? ['Google US English'] : ['Microsoft Ava Online (Natural)'],
+      'en-US'
+    );
+    utter.rate = this.speechRate;
+    if (onEndCallback) utter.onend = onEndCallback;
+    this.synth.speak(utter);
+  }
+
+  speakDialogue(text) {
+    if (!this.isInitialized || !this.isTtsEnabled || !text) return;
+    this.synth.cancel();
+    const lines = text.split('\n').filter(line => line.trim());
+    const queue = lines.map(line => {
+      const [speaker, ...dialogueParts] = line.split(':');
+      const dialogue = dialogueParts.join(':').trim();
+      if (!dialogue) return null;
+      const utter = new SpeechSynthesisUtterance(dialogue);
+      const voice = this._getVoiceForSpeaker(speaker.trim());
+      if (voice) {
+        utter.voice = voice;
+        utter.lang = voice.lang;
+      }
+      utter.rate = this.speechRate;
+      return utter;
+    }).filter(Boolean);
+
+    const playNext = () => {
+      if (queue.length > 0) {
+        const next = queue.shift();
+        next.onend = playNext;
+        this.synth.speak(next);
+      }
+    };
+    playNext();
+  }
+
+  speakFeedback(langCode, isCorrect) {
+    if (!this.isInitialized || !this.isTtsEnabled) return;
+    const options = this.feedbackPhrases[langCode]?.[isCorrect ? 'correct' : 'incorrect'];
+    if (!options || options.length === 0) return;
+    const phrase = Array.isArray(options)
+      ? options[Math.floor(Math.random() * options.length)]
+      : options;
+
+    let voice;
+    switch (langCode) {
+      case 'de':
+        voice = this._findVoice(
+          this.isAndroid ? ['Google Deutsch'] : ['Seraphina', 'Florian'],
+          'de-DE'
+        );
+        break;
+      case 'en':
+      default:
+        voice = this._findVoice(
+          this.isAndroid ? ['Google US English'] : ['Microsoft Ava Online (Natural)'],
+          'en-US'
+        );
+    }
+
+    const utter = new SpeechSynthesisUtterance(phrase);
+    if (voice) {
+      utter.voice = voice;
+      utter.lang = voice.lang;
+    }
+    utter.rate = this.speechRate;
+    this.synth.speak(utter);
+  }
+}
+
                         // --- END: CUSTOM VOICE PRIORITIES ---
 
                         const browserPriorityNames = priorities[browser]?.[gender] || [];
