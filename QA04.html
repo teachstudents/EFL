@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -89,19 +89,14 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
+<body class="bg-gray-100 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
     
     <div id="snow-container"></div>
-
-    <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 fixed top-4 right-4 z-50">
-        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 10.607a1 1 0 010-1.414l.707-.707a1 1 0 111.414 1.414l-.707-.707a1 1 0 01-1.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707z"></path></svg>
-    </button>
 
     <div id="app-container" class="w-full max-w-xl mx-auto text-center h-full">
         
         <!-- Welcome Screen -->
-        <div id="welcome-screen" class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center">
+        <div id="welcome-screen" class="bg-white dark:bg-gray-800 dark:shadow-lg p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center">
             <div id="name-entry-container">
                 <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">Joel's Speaking Practice 04</h1>
                 <input type="text" id="name-input" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 text-center text-lg text-gray-900 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600">
@@ -110,9 +105,9 @@
             <div id="topic-selection-container" class="hidden">
                  <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">Hello, <span id="user-name-display"></span>!</h1>
                  <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                     <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
-                     <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
-                     <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
+                      <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
+                      <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
+                      <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
                  </div>
                 <div id="topic-selection" class="grid grid-cols-3 gap-4">
                     <!-- Topic buttons will be injected here -->
@@ -121,7 +116,7 @@
         </div>
 
         <!-- Main Practice Screen -->
-        <div id="practice-screen" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg app-shell p-3 sm:p-4">
+        <div id="practice-screen" class="hidden bg-white dark:bg-gray-800 dark:shadow-lg rounded-2xl shadow-lg app-shell p-3 sm:p-4">
             <header class="flex-shrink-0">
                 <div class="flex justify-between items-center mb-1">
                     <button id="back-to-topics-btn" class="text-indigo-500 hover:text-indigo-700"><i class="fas fa-arrow-left mr-2"></i>Topics</button>
@@ -156,19 +151,27 @@
                     <!-- Post-Recording Controls -->
                     <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-2">
                         <audio id="audio-player" controls class="w-full max-w-xs"></audio>
-                        <div class="flex items-center justify-center space-x-2 w-full max-w-xs">
-                             <button id="download-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-colors">
-                                 <i class="fas fa-download mr-1"></i>Download
-                             </button>
-                            <a href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ" target="_blank" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md">
-                                 <i class="fas fa-upload mr-1"></i>Upload
-                             </a>
+                        <div class="flex flex-col gap-3 w-full max-w-xs">
+                          <!-- Smart Download button -->
+                          <button id="download-btn"
+                                  class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                            <i class="fas fa-download mr-1"></i>Download Recording / Open Folder
+                          </button>
+                        
+                          <!-- Upload button -->
+                          <a id="sharepoint-upload-link"
+                             href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ"
+                             target="_blank"
+                             rel="noopener noreferrer"
+                             class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-green-500/50 focus:ring-2 focus:ring-green-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                            <i class="fas fa-upload mr-1"></i>Upload to Folder
+                          </a>
                         </div>
                     </div>
                 </div>
                  <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold mb-1">
-                     <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
-                     Recording...
+                      <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
+                      Recording...
                  </div>
             </header>
             
@@ -227,211 +230,117 @@
     document.addEventListener('DOMContentLoaded', () => {
         // --- DATA: Questions and Sample Answers for Part 04 ---
         const practiceData = {
-            "Family & Home": [
+            "Academic Challenges": [
                 { 
-                    question: "Can you tell me about your family?", 
-                    starters: ["In my family, there are...", "I live with my...", "I have... siblings.", "I am an only child, so..."], 
-                    wordBank: ["parents", "grandparents", "siblings", "only child", "close-knit", "supportive", "live together", "family gatherings"], 
+                    question: "How do you plan to handle a very difficult course or a professor you find hard to understand?", 
+                    starters: ["If I find a course difficult, my first step would be to...", "I plan to form a...", "I wouldn't hesitate to visit...", "To overcome this challenge, I will..."], 
+                    wordBank: ["study group (Lerngruppe)", "professor's office hours (Sprechstunde)", "tutor", "library resources", "ask questions", "proactive", "seek help", "persevere"], 
                     samples: [
-                        "In my family, there are three people: my mother, my father, and me. We are very close and enjoy having dinner together every evening.",
-                        "I am an only child, so I have a strong relationship with my parents. For example, we often watch movies together on the weekends.",
-                        "I live with my parents and my grandparents. It's nice because my grandmother is a great cook and she often makes my favorite dishes."
-                    ] 
-                },
-                { 
-                    question: "What is your favorite room in your home and why?", 
-                    starters: ["My favorite room is my...", "I love spending time in...", "The best room in our house is...", "I feel most comfortable in..."], 
-                    wordBank: ["bedroom", "living room", "study", "balcony", "cozy", "relaxing", "sunlight", "personal space", "quiet", "view"], 
-                    samples: [
-                        "My favorite room is my bedroom because it's my own personal space where I can relax, listen to music, and read books without being disturbed.",
-                        "I love spending time in our living room because it gets a lot of sunlight in the afternoon and it has a comfortable sofa where I do my homework.",
-                        "The best room is our balcony, because I can see the city from there and it's a quiet place to sit and think, especially in the evening."
+                        "If a course is difficult, I'll form a study group with classmates because discussing the material can help everyone understand it better.",
+                        "I plan to use the professor's office hours, or Sprechstunde, to ask specific questions about topics I don't understand.",
+                        "My strategy would be to review the lecture notes immediately after class and identify areas of confusion, so I can seek help early on."
                     ] 
                 }
             ],
-            "School Day": [
+            "Health & Wellbeing": [
                 { 
-                    question: "Describe a typical day at your high school in Beijing.", 
-                    starters: ["My school day usually starts at...", "First, we have...", "After lunch, my classes are...", "School finishes at... and then I..."], 
-                    wordBank: ["morning assembly", "classes", "lunch break", "homework", "extracurricular activities", "uniform", "long day", "study hall"], 
+                    question: "What will you do to stay healthy, both physically and mentally, while living far from home?", 
+                    starters: ["To stay physically healthy, I will...", "For my mental health, it's important to...", "I plan to join a...", "I will make sure to schedule regular..."], 
+                    wordBank: ["regular exercise", "balanced diet", "university gym (Hochschulsport)", "staying in touch", "hobbies", "mindfulness", "homesickness (Heimweh)", "support system"], 
                     samples: [
-                        "A typical day starts at 7:30 AM. We have four classes in the morning, then a long lunch break, and three more classes in the afternoon before we go home.",
-                        "My school day is quite long. After my regular classes end at 5 PM, I usually stay for an evening study session to finish my homework.",
-                        "After lunch, we sometimes have physical education class, which is my favorite because we get to go outside and play basketball or run."
-                    ] 
-                },
-                { 
-                    question: "What is your favorite subject and why do you like it?", 
-                    starters: ["My favorite subject is definitely...", "I really enjoy... because...", "I am good at... so I find it...", "The subject I like most is..."], 
-                    wordBank: ["Physics", "Mathematics", "English", "History", "interesting", "challenging", "logical", "creative", "fascinating", "useful"], 
-                    samples: [
-                        "My favorite subject is Physics because I find it fascinating to learn how the universe works, from tiny atoms to huge galaxies.",
-                        "I really enjoy my English classes because learning a new language helps me understand different cultures and communicate with more people.",
-                        "I am good at Mathematics, so I like it a lot. I enjoy solving difficult problems because it feels very satisfying when I find the correct answer."
+                        "To stay physically healthy, I'll join the university sports program, which is usually very affordable, and try a new sport like volleyball.",
+                        "For my mental health, I'll schedule weekly video calls with my family to combat homesickness and stay connected.",
+                        "I believe cooking my own meals will be key, because it helps me eat a balanced diet and also reminds me of home."
                     ] 
                 }
             ],
-            "Favorite Foods": [
+            "Money & Budgeting": [
                 { 
-                    question: "What is your favorite food to eat for dinner?", 
-                    starters: ["My favorite dinner food is...", "I absolutely love eating...", "For dinner, I often like to have...", "Nothing is better than a plate of..."], 
-                    wordBank: ["dumplings (Jiaozi)", "noodles", "stir-fry", "hotpot", "homemade", "delicious", "savory", "spicy", "comfort food"], 
+                    question: "Describe your plan for managing your money and creating a budget in Germany.", 
+                    starters: ["My first step will be to open a...", "I plan to use an app to...", "To save money, I will focus on...", "I will set aside a certain amount for..."], 
+                    wordBank: ["German bank account (Girokonto)", "budgeting app", "track expenses", "cook at home", "student discounts", "public transport", "unexpected costs", "financial discipline"], 
                     samples: [
-                        "My favorite food for dinner is homemade dumplings, or Jiaozi, because my mom makes the best ones and it's a food that reminds me of family.",
-                        "I love eating spicy hotpot for dinner, especially in the winter, because it's warm and you can share it with a big group of friends.",
-                        "For dinner, I often like to have a simple bowl of beef noodles, because it's quick to make, very delicious, and always makes me feel full."
-                    ] 
-                },
-                 { 
-                    question: "Do you prefer eating at home or eating in a restaurant? Why?", 
-                    starters: ["I prefer eating at home because...", "I like going to restaurants more because...", "It depends, but I usually prefer...", "For me, restaurants are better since..."], 
-                    wordBank: ["comfortable", "healthy", "variety of choices", "no cleanup", "special occasion", "cozy atmosphere", "less expensive", "try new things"], 
-                    samples: [
-                        "I prefer eating at home because my parents' cooking is healthier and tastes better than most restaurants, and the atmosphere is more relaxing.",
-                        "I like eating in restaurants more because I love trying new dishes and there is a huge variety of choices, from Sichuan food to Japanese sushi.",
-                        "For a special occasion, like a birthday, I prefer a restaurant. But for a normal day, I prefer eating at home because it is much cheaper."
+                        "I'll use a budgeting app on my phone to track all my expenses, so I know exactly where my money is going each month.",
+                        "To save money, I will cook most of my meals at home and take advantage of student discounts at places like museums and cinemas.",
+                        "I'll create a monthly budget that separates essential costs like rent and insurance from flexible spending like travel and entertainment."
                     ] 
                 }
             ],
-            "Weekends": [
+            "Social Etiquette": [
                 { 
-                    question: "What do you usually do on a typical weekend?", 
-                    starters: ["On Saturdays, I usually...", "My weekends are a mix of...", "I spend most of my weekend...", "A typical weekend for me involves..."], 
-                    wordBank: ["finish homework", "relax", "meet friends", "play sports", "watch movies", "sleep in", "family time", "hobbies"], 
+                    question: "If a German friend invites you to their home for dinner, what is the polite thing to do?", 
+                    starters: ["If invited, it is customary to bring...", "I should make sure to arrive...", "It would be polite to offer...", "After the dinner, I should remember to..."], 
+                    wordBank: ["small gift (Gastgeschenk)", "bottle of wine", "flowers", "punctually", "offer to help", "send a thank-you message", "compliment the food", "social customs"], 
                     samples: [
-                        "On a typical weekend, I spend Saturday finishing my homework, and then on Sunday I meet up with my friends to play basketball or go to a movie.",
-                        "My weekends are usually for relaxing. I like to sleep in late, read books, and help my parents with some chores around the house.",
-                        "A typical weekend for me involves a lot of studying, but I always make sure to spend some time on my hobbies, like playing the guitar."
-                    ] 
-                },
-                { 
-                    question: "Do you prefer spending your weekend relaxing at home or going out? Why?", 
-                    starters: ["I definitely prefer to... because...", "I'm the kind of person who likes to...", "For me, going out is better since...", "After a long week of school, I prefer..."], 
-                    wordBank: ["recharge my batteries", "introvert", "extrovert", "energetic", "quiet", "explore new places", "socializing", "peace and quiet"], 
-                    samples: [
-                        "After a long and busy week of school, I prefer relaxing at home because I need some quiet time to recharge my batteries for the next week.",
-                        "I definitely prefer going out because I am an energetic person and I love exploring new cafes or parks in the city with my friends.",
-                        "For me, a perfect weekend is a balance of both. For example, I might go out with friends on Saturday and spend a quiet Sunday at home reading."
+                        "If I'm invited to someone's home, I would bring a small gift, like a bottle of wine or some chocolates, as a thank you for the invitation.",
+                        "I know punctuality is important, so I would make sure to arrive exactly on time, not too early or too late.",
+                        "During the dinner, I would offer to help with things like setting the table or clearing the dishes to show my appreciation."
                     ] 
                 }
             ],
-            "Weather & Seasons": [
+            "Exploring Germany": [
                 { 
-                    question: "What is your favorite season in Beijing and what is the weather like?", 
-                    starters: ["My favorite season is autumn because...", "I love springtime in Beijing since...", "Without a doubt, my favorite is...", "I think autumn is the best season."], 
-                    wordBank: ["autumn", "spring", "summer", "winter", "cool breeze", "clear blue sky", "not too hot", "comfortable", "colorful leaves", "pleasant"], 
+                    question: "What is one region or city in Germany, other than your own, that you really want to visit, and why?", 
+                    starters: ["I would love to visit...", "I'm really interested in seeing... because...", "My travel goal is to explore...", "I've always wanted to go to..."], 
+                    wordBank: ["Berlin", "Hamburg", "Bavarian Alps", "Black Forest (Schwarzwald)", "historical sights", "natural beauty", "weekend trip", "Deutsche Bahn (DB)", "regional ticket"], 
                     samples: [
-                        "My favorite season is autumn because the weather is perfect. It's not too hot and not too cold, and the sky is often very clear and blue.",
-                        "I love autumn in Beijing because all the leaves on the trees change color to yellow and red, which makes the city look beautiful.",
-                        "I think spring is the best season, because the weather gets warmer, all the flowers start to bloom, and you can feel a new energy everywhere."
-                    ] 
-                },
-                { 
-                    question: "What kind of weather do you like the most, and what do you do in that weather?", 
-                    starters: ["I love sunny days because...", "My favorite weather is when it snows since...", "I enjoy rainy days because...", "On a cool, sunny day, I like to..."], 
-                    wordBank: ["sunny", "rainy", "snowy", "cool", "warm", "go for a walk", "stay inside", "read a book", "cozy", "energetic"], 
-                    samples: [
-                        "I love cool and sunny days because it's the perfect weather to go outside and play sports without getting too sweaty.",
-                        "My favorite weather is when it snows, because the world looks so beautiful and quiet. I like to stay inside with a hot drink and watch the snow fall.",
-                        "I actually enjoy rainy days because it feels very cozy to be at home, listening to the sound of the rain and reading a good book."
+                        "I really want to visit Berlin to see historical sites like the Berlin Wall Memorial and experience the city's unique art scene.",
+                        "I would love to travel to the Bavarian Alps for a weekend of hiking, because I want to see Germany's beautiful natural landscapes.",
+                        "I plan to visit Hamburg because I've heard the port is incredible and I want to see the unique architecture of the Speicherstadt."
                     ] 
                 }
             ],
-            "Shopping": [
+            "German Bureaucracy": [
                 { 
-                    question: "Do you enjoy shopping? What kind of things do you like to shop for?", 
-                    starters: ["Yes, I enjoy it a lot, especially for...", "No, I don't really like shopping because...", "I like shopping for things like...", "Sometimes I enjoy it, especially when..."], 
-                    wordBank: ["clothes", "books", "electronics", "video games", "snacks", "window shopping", "saving money", "latest trends"], 
+                    question: "Dealing with German bureaucracy, like the 'Anmeldung' (city registration), can be challenging. How will you prepare for it?", 
+                    starters: ["To prepare, I will...", "I will make sure to have all my...", "I'll ask for help from...", "The key is to be..."], 
+                    wordBank: ["Anmeldung (registration)", "Ausländerbehörde (foreigners' office)", "documents", "appointment (Termin)", "organized", "patient", "university international office", "ask for help"], 
                     samples: [
-                        "Yes, I enjoy shopping, especially for new books and electronics, because I like to see and test the products before I buy them.",
-                        "I don't really like shopping for clothes because I find it hard to choose and there are always too many people in the stores.",
-                        "I like window shopping, which means just looking at things without buying them, because it's a fun way to see what is new and trendy."
-                    ] 
-                },
-                { 
-                    question: "Do you prefer shopping online or in a physical store? Why?", 
-                    starters: ["I definitely prefer shopping online because...", "I think physical stores are better because...", "It depends on what I'm buying, for example...", "Online shopping is more convenient, but..."], 
-                    wordBank: ["convenient", "more choices", "better prices", "try things on", "instant gratification", "delivery time", "social experience", "customer service"], 
-                    samples: [
-                        "I prefer shopping online because it is very convenient, and I can compare prices from many different sellers to find the best deal.",
-                        "I think physical stores are better for clothes and shoes, because you can try them on to make sure they fit perfectly before you buy them.",
-                        "It depends. For books and small electronics, I shop online. But for expensive things, like a new phone, I prefer a physical store because I can get help from the staff."
+                        "To prepare for my city registration, I will gather all the necessary documents, like my passport and rental agreement, well in advance.",
+                        "I will book my appointment online as soon as possible, because I know that waiting times can be very long.",
+                        "If I have trouble understanding the forms, I will ask for help from the international office at my university, as they have experience with these procedures."
                     ] 
                 }
             ],
-            "Favorite Holiday": [
+            "Long-Term Plans": [
                 { 
-                    question: "What is your favorite holiday and how do you celebrate it?", 
-                    starters: ["My favorite holiday is...", "I love... because our family...", "Without a doubt, it's...", "We celebrate by..."], 
-                    wordBank: ["Chinese New Year (Spring Festival)", "Mid-Autumn Festival", "National Day", "family reunion", "big dinner", "fireworks", "red envelopes (Hongbao)"], 
+                    question: "Do you hope to do an internship (Praktikum) during your studies in Germany? Why or why not?", 
+                    starters: ["Yes, I definitely want to do an internship because...", "An internship would be a great opportunity to...", "It would be valuable for my career to...", "I'm hoping to find an internship in..."], 
+                    wordBank: ["internship (Praktikum)", "practical experience", "apply knowledge", "networking", "career opportunities", "German work culture", "resume (Lebenslauf)", "valuable"], 
                     samples: [
-                        "My favorite holiday is Chinese New Year because it is the most important time for a family reunion, and we have a huge dinner together on New Year's Eve.",
-                        "I love the Spring Festival because as a child, the most exciting part is receiving red envelopes with money inside from my relatives.",
-                        "We celebrate the Mid-Autumn Festival by eating mooncakes and looking at the full moon with our family, because it symbolizes togetherness."
-                    ] 
-                },
-                { 
-                    question: "What is a special food that your family eats during that holiday?", 
-                    starters: ["During Chinese New Year, we always eat...", "A special food for that holiday is...", "We can't celebrate without eating...", "My mom always cooks..."], 
-                    wordBank: ["dumplings (Jiaozi)", "fish", "rice cakes (Niangao)", "mooncakes", "symbolize", "good fortune", "prosperity", "togetherness", "traditional"], 
-                    samples: [
-                        "During Chinese New Year, we always eat fish because the word for fish in Chinese sounds like the word for 'surplus', so it symbolizes having extra prosperity for the new year.",
-                        "We always eat dumplings, or Jiaozi, on New Year's Eve, because their shape is like old Chinese money, which means they represent wealth.",
-                        "For the Mid-Autumn Festival, we eat mooncakes. They are round like the full moon, because this shape symbolizes family reunion and happiness."
+                        "Yes, I definitely want to do an internship because it's the best way to gain practical experience in the German automotive industry.",
+                        "An internship would be a great opportunity to apply the theoretical knowledge from my lectures to real-world projects.",
+                        "I believe it would give me a competitive advantage when looking for a job after graduation, both in Germany and in China."
                     ] 
                 }
             ],
-            "Using Technology": [
+            "Language Progress": [
                 { 
-                    question: "What are your favorite apps on your smartphone and what do you use them for?", 
-                    starters: ["My favorite app is probably... because...", "I use... a lot for...", "One app I can't live without is...", "I spend a lot of time on..."], 
-                    wordBank: ["WeChat", "TikTok (Douyin)", "Bilibili", "music streaming", "social media", "watching videos", "chatting with friends", "studying"], 
+                    question: "What will you do if you feel your German language skills are not improving as fast as you want?", 
+                    starters: ["If I hit a plateau, I will...", "To immerse myself more, I could...", "I will try not to get discouraged by...", "I plan to find a..."], 
+                    wordBank: ["language tandem", "immerse", "watch German movies", "join a club", "be patient", "practice every day", "step out of my comfort zone", "conversation practice"], 
                     samples: [
-                        "My favorite app is WeChat because I use it for everything, from chatting with my friends and family to paying for things in shops.",
-                        "I use a music streaming app every day because listening to music helps me relax, especially when I am studying or traveling on the subway.",
-                        "I spend a lot of time on Bilibili because there are many interesting videos about science, history, and video games that I enjoy watching."
-                    ] 
-                },
-                { 
-                    question: "How does technology make your life easier?", 
-                    starters: ["Technology helps me a lot with...", "One way it makes life easier is...", "For example, with my phone I can...", "Life would be much harder without..."], 
-                    wordBank: ["communication", "studying", "navigation", "entertainment", "information", "convenient", "efficient", "instant access", "online learning"], 
-                    samples: [
-                        "Technology makes studying much easier because I can instantly look up any information I need for my homework on the internet.",
-                        "One big way it helps is with navigation. For example, I can use a map app on my phone to find the best route to anywhere in the city, so I never get lost.",
-                        "Communication is so much easier now. I can make video calls with relatives who live far away, because of technology it feels like they are in the same room."
+                        "If I feel my German isn't improving, I will actively seek out a language tandem partner to get more conversation practice.",
+                        "I will try to immerse myself more by watching German TV shows with subtitles instead of always using English media.",
+                        "I'll join a university club that is not specifically for internationals, forcing me to use my German skills in a social setting."
                     ] 
                 }
             ],
-            "Future Hopes": [
+            "Reflecting on Experience": [
                 { 
-                    question: "What is one thing you hope to see or do in your first month in Germany?", 
-                    starters: ["In my first month, I really want to...", "I hope I have the chance to visit...", "One of my first goals is to...", "I'm really looking forward to..."], 
-                    wordBank: ["explore my new city", "visit a museum", "try authentic food", "make one new friend", "join a club", "set up my bank account", "register my address"], 
+                    question: "In what way do you think living and studying in Germany will change you as a person?", 
+                    starters: ["I believe this experience will make me more...", "I expect to become better at...", "Living abroad will teach me to...", "I hope to grow by..."], 
+                    wordBank: ["independent", "open-minded", "resilient", "adaptable", "self-confident", "problem-solver", "global citizen", "appreciate different cultures"], 
                     samples: [
-                        "In my first month, I really want to explore my new city on a bicycle, because it seems like a great way to discover all the small streets and local shops.",
-                        "One of my first goals is to successfully register my address and set up a German bank account, because getting the bureaucracy done early will be a relief.",
-                        "I hope I can make at least one new friend, either German or international, because having someone to talk to will make the transition much easier."
-                    ] 
-                },
-                { 
-                    question: "What are you looking forward to the most about living in a new country?", 
-                    starters: ["The thing I'm looking forward to most is...", "I am most excited about...", "I can't wait to experience...", "What excites me the most is the chance to..."], 
-                    wordBank: ["independence", "new experiences", "meeting new people", "learning a new language", "personal growth", "different perspective", "travel opportunities", "freedom"], 
-                    samples: [
-                        "The thing I'm looking forward to most is the feeling of independence, because I will be responsible for myself for the first time in my life.",
-                        "I am most excited about all the new experiences I will have, from trying new foods to learning about a completely different way of life.",
-                        "What excites me the most is the chance to become fluent in another language, because being bilingual is a skill I have always wanted to have."
+                        "I believe this experience will make me much more independent because I will have to rely on myself for everything from cooking to handling paperwork.",
+                        "I expect to become more open-minded by meeting people from all over the world and learning to see things from different perspectives.",
+                        "Living abroad will teach me resilience, because there will be difficult times, and overcoming them on my own will make me a stronger person."
                     ] 
                 }
             ]
         };
 
-
         // --- DOM Elements ---
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
         const welcomeScreen = document.getElementById('welcome-screen');
         const practiceScreen = document.getElementById('practice-screen');
         const nameEntryContainer = document.getElementById('name-entry-container');
@@ -554,9 +463,9 @@
                     const parsed = JSON.parse(savedCompletedTopics);
                     // Basic validation to ensure it's an object
                     if (typeof parsed === 'object' && parsed !== null) {
-                       completedTopics = parsed;
+                        completedTopics = parsed;
                     } else {
-                        completedTopics = {};
+                         completedTopics = {};
                     }
                 } catch (e) {
                     console.error("Failed to parse saved progress:", e);
@@ -722,9 +631,9 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 
-                const isEdge = window.navigator.userAgent.includes("Edg");
+                const isMobileEdge = /Edg\/\d+.*Android/.test(navigator.userAgent);
                 let options = {};
-                if (!isEdge) {
+                if (!isMobileEdge) {
                     const mimeTypes = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/ogg'];
                     const supportedType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
                     if (supportedType) options.mimeType = supportedType;
@@ -770,7 +679,7 @@
         function startTranscription() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                console.warn("Speech recognition not supported.");
+                console.warn("Speech recognition not supported — skipping setup.");
                 return;
             }
 
@@ -848,23 +757,11 @@
             finalTranscript = '';
         }
 
-        // --- Theme Toggle Logic ---
-        const applyTheme = (theme) => {
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                themeToggleLightIcon.classList.remove('hidden');
-                themeToggleDarkIcon.classList.add('hidden');
-            } else {
-                document.documentElement.classList.remove('dark');
-                themeToggleDarkIcon.classList.remove('hidden');
-                themeToggleLightIcon.classList.add('hidden');
-            }
-        };
         
         // --- Snowfall Logic ---
         function createSnow() {
             const snowContainer = document.getElementById('snow-container');
-            const snowflakeCount = 50;
+            const snowflakeCount = window.innerWidth < 768 ? 15 : 50;
             for (let i = 0; i < snowflakeCount; i++) {
                 let snowflake = document.createElement('div');
                 snowflake.innerHTML = '❄';
@@ -921,7 +818,6 @@
                 const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
                 const sanitizedUserName = userName.replace(/\s+/g, '_');
                 const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
-                
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = URL.createObjectURL(recordedBlob);
@@ -936,10 +832,16 @@
                 downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
                 downloadBtn.classList.add('bg-green-600');
                 setTimeout(() => {
-                    downloadBtn.innerHTML = originalText;
-                    downloadBtn.classList.remove('bg-green-600');
-                    downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                  downloadBtn.innerHTML = originalText;
+                  downloadBtn.classList.remove('bg-green-600');
+                  downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
                 }, 2000);
+            } else {
+                // No recording — open the SharePoint folder
+                window.open(
+                  'https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ',
+                  '_blank'
+                );
             }
         });
 
@@ -955,24 +857,13 @@
             initializeTopics();
         });
         
-        themeToggleBtn.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
-            applyTheme(isDark ? 'dark' : 'light');
-        });
-
         // --- Initial Load ---
         async function main() {
-            // Set initial theme
-            const savedTheme = localStorage.getItem('color-theme');
-            if (savedTheme) {
-                applyTheme(savedTheme);
-            } else {
-                // If no theme saved, use system preference
-                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    applyTheme('dark');
-                } else {
-                    applyTheme('light');
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            if (isIOS) {
+                const sharepointLink = document.getElementById('sharepoint-upload-link');
+                if(sharepointLink) {
+                    sharepointLink.removeAttribute('target');
                 }
             }
             
@@ -994,6 +885,7 @@
         }
         
         main();
+
     });
     </script>
 </body>
