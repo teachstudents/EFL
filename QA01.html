@@ -110,9 +110,9 @@
             <div id="topic-selection-container" class="hidden">
                  <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">Hello, <span id="user-name-display"></span>!</h1>
                  <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                     <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
-                     <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
-                     <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
+                      <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
+                      <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
+                      <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
                  </div>
                 <div id="topic-selection" class="grid grid-cols-3 gap-4">
                     <!-- Topic buttons will be injected here -->
@@ -157,18 +157,26 @@
                     <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-2">
                         <audio id="audio-player" controls class="w-full max-w-xs"></audio>
                         <div class="flex items-center justify-center space-x-2 w-full max-w-xs">
-                             <button id="download-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-colors">
-                                 <i class="fas fa-download mr-1"></i>Download
-                             </button>
-                            <a href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ" target="_blank" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md">
-                                 <i class="fas fa-upload mr-1"></i>Upload
-                             </a>
+                          <!-- Smart Download button -->
+                          <button id="download-btn"
+                                  class="flex-1 bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-colors flex items-center justify-center">
+                            <i class="fas fa-download mr-1"></i>Download / Open
+                          </button>
+                        
+                          <!-- Upload button -->
+                          <a id="sharepoint-upload-link"
+                             href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ"
+                             target="_blank"
+                             rel="noopener noreferrer"
+                             class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md flex items-center justify-center">
+                            <i class="fas fa-upload mr-1"></i>Upload
+                          </a>
                         </div>
                     </div>
                 </div>
                  <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold mb-1">
-                     <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
-                     Recording...
+                      <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
+                      Recording...
                  </div>
             </header>
             
@@ -821,28 +829,33 @@
 
         downloadBtn.addEventListener('click', () => {
             if (recordedBlob) {
-                const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
-                const sanitizedUserName = userName.replace(/\s+/g, '_');
-                const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
-                
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = URL.createObjectURL(recordedBlob);
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-
-                // Visual feedback
-                const originalText = downloadBtn.innerHTML;
-                downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
-                downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                downloadBtn.classList.add('bg-green-600');
-                setTimeout(() => {
-                    downloadBtn.innerHTML = originalText;
-                    downloadBtn.classList.remove('bg-green-600');
-                    downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                }, 2000);
+              const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
+              const sanitizedUserName = userName.replace(/\s+/g, '_');
+              const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
+              const a = document.createElement('a');
+              a.style.display = 'none';
+              a.href = URL.createObjectURL(recordedBlob);
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+          
+              // Visual feedback
+              const originalText = downloadBtn.innerHTML;
+              downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
+              downloadBtn.classList.remove('bg-slate-600', 'hover:bg-slate-700');
+              downloadBtn.classList.add('bg-emerald-600');
+              setTimeout(() => {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.classList.remove('bg-emerald-600');
+                downloadBtn.classList.add('bg-slate-600', 'hover:bg-slate-700');
+              }, 2000);
+            } else {
+              // No recording — open the SharePoint folder
+              window.open(
+                'https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ',
+                '_blank'
+              );
             }
         });
 
@@ -879,6 +892,15 @@
                 }
             }
             
+            // iOS tweak: open SharePoint in same tab
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            if (isIOS) {
+                const sharepointLink = document.getElementById('sharepoint-upload-link');
+                if (sharepointLink) {
+                    sharepointLink.removeAttribute('target');
+                }
+            }
+            
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !SpeechRecognition) {
                 recordBtn.disabled = true;
@@ -897,6 +919,15 @@
         }
         
         main();
+
+        // iOS tweak: open SharePoint in same tab
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (isIOS) {
+            const sharepointLink = document.getElementById('sharepoint-upload-link');
+            if(sharepointLink) {
+                sharepointLink.removeAttribute('target');
+            }
+        }
     });
     </script>
 </body>
