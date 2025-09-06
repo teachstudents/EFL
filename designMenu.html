@@ -390,6 +390,10 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             border: 3px solid transparent;
         }
+        
+        .flag-emoji {
+            font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+        }
 
         .flag-item:hover {
             transform: scale(1.05);
@@ -461,6 +465,21 @@
             background: #ff6b6b;
             animation: confettiFall 3s linear infinite;
         }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff6b6b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 2000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
 
         @keyframes confettiFall {
             0% {
@@ -503,9 +522,10 @@
 </head>
 <body>
     <div id="background-emojis"></div>
+    <div id="notification" class="notification"></div>
     <div class="container">
         <div class="header">
-            <h1 class="title" id="mainTitle">🍽️ Restaurant Creator! 🎨</h1>
+            <h1 class="title" id="mainTitle">🍽️ Kids Restaurant Creator! 🎨</h1>
             <p class="subtitle" id="mainSubtitle">Create your amazing restaurant!</p>
         </div>
 
@@ -804,6 +824,7 @@
                      <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
                      <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
                      <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
                 </div>
             </div>
 
@@ -816,6 +837,7 @@
                      <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
                      <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
                      <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
                 </div>
             </div>
 
@@ -828,6 +850,7 @@
                      <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
                      <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
                      <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
                 </div>
             </div>
              <div class="staff-card">
@@ -839,6 +862,7 @@
                      <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
                      <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
                      <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
                 </div>
             </div>
              <div class="staff-card">
@@ -850,6 +874,7 @@
                      <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
                      <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
                      <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
                 </div>
             </div>
         </div>
@@ -894,12 +919,14 @@
         };
 
         let currentPage = 'setup';
+        let chosenStaffLangs = new Set();
         
         const staffScripts = {
             'de-DE': { english: "Hello from Germany!", native: "Ich liebe es, leckere Brezeln und Bratwurst zu machen." },
             'es-ES': { english: "Hello from Spain!", native: "¡Tengo muchas ganas de cocinarte una paella!" },
             'fr-FR': { english: "Bonjour from France!", native: "Je recommande les croissants et le coq au vin." },
-            'zh-CN': { english: "Nǐ hǎo from China!", native: "我们吃点饺子和北京烤鸭吧。" }
+            'zh-CN': { english: "Nǐ hǎo from China!", native: "我们吃点饺子和北京烤鸭吧。" },
+            'en-AU': { english: "G'day from Australia!", native: "How about some fish and chips, mate?" }
         };
 
         const foodDescriptions = {
@@ -947,7 +974,7 @@
         // =================================================================================
 
         let loadedVoices = [];
-        let voiceAva, voiceAndrew, voiceJenny, voiceRyan, voiceByan;
+        let voiceAva, voiceAndrew, voiceJenny, voiceRyan, voiceByan, voiceNatasha;
         let voiceSeraphina, voiceFlorian, voiceSonia, voiceRemy, voiceNicolas, voiceXiaoxiao;
 
         function getPreferredVoice(langCode, preferredNames = []) {
@@ -971,6 +998,7 @@
             voiceJenny = getPreferredVoice("en-US", ["Jenny"]);
             voiceRyan = getPreferredVoice("en-US", ["Ryan"]);
             voiceByan = getPreferredVoice("en-US", ["Byan"]);
+            voiceNatasha = getPreferredVoice("en-AU", ["Natasha"]);
             
             // Multilingual Voices
             voiceSeraphina = getPreferredVoice("de-DE", ["Seraphina"]);
@@ -1013,6 +1041,18 @@
             createFloatingEmojis();
             initDragAndDrop();
         }
+        
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            setTimeout(() => notification.style.opacity = 1, 10); // Fade in
+
+            setTimeout(() => {
+                notification.style.opacity = 0;
+                setTimeout(() => notification.style.display = 'none', 500); // Fade out
+            }, 3000);
+        }
 
         function createFloatingEmojis() {
             const container = document.getElementById('background-emojis');
@@ -1049,12 +1089,22 @@
 
             let voice;
             let textToSpeak = '';
+            
+            const pageGreetings = {
+                breakfast: "Time to make a yummy breakfast menu!",
+                lunch: "What should we have for lunch?",
+                dinner: "Let's create a delicious dinner!",
+                prices: "Let's set the prices.",
+                times: "When will your restaurant be open?",
+                staff: "Let's hire an amazing team!",
+                summary: "Wow! Look at your amazing restaurant!"
+            };
 
             switch(pageId) {
                 case 'setup':
-                    voice = voiceAva || voiceJenny;
-                    textToSpeak = "Let's get your restaurant set up!";
-                    break;
+                     voice = voiceAva || voiceJenny;
+                     textToSpeak = "Let's get your restaurant set up!";
+                     break;
                 case 'menu':
                      voice = voiceAndrew || voiceRyan;
                      const missionElement = document.getElementById('missionText');
@@ -1064,33 +1114,9 @@
                         textToSpeak = missionClone.textContent.trim().replace(/\s\s+/g, ' ');
                     }
                     break;
-                case 'breakfast':
+                default:
                     voice = voiceJenny || voiceAva;
-                    textToSpeak = "Time to make a yummy breakfast menu!";
-                    break;
-                case 'lunch':
-                    voice = voiceRyan || voiceByan;
-                    textToSpeak = "What should we have for lunch?";
-                    break;
-                case 'dinner':
-                    voice = voiceByan || voiceAndrew;
-                    textToSpeak = "Let's create a delicious dinner!";
-                    break;
-                case 'prices':
-                    voice = voiceAva || voiceJenny;
-                    textToSpeak = "Let's set the prices.";
-                    break;
-                case 'times':
-                    voice = voiceJenny || voiceAva;
-                    textToSpeak = "When will your restaurant be open?";
-                    break;
-                case 'staff':
-                    voice = voiceRyan || voiceAndrew;
-                    textToSpeak = "Let's hire an amazing team!";
-                    break;
-                case 'summary':
-                    voice = voiceByan || voiceAva;
-                    textToSpeak = "Wow! Look at your amazing restaurant!";
+                    textToSpeak = pageGreetings[pageId];
                     break;
             }
 
@@ -1202,7 +1228,13 @@
 
             const description = foodDescriptions[data.name];
             if (description) {
-                const voice = getPreferredVoice(description.lang, description.preferred);
+                const preferredVoices = {
+                    'de-DE': ['Seraphina', 'Florian'],
+                    'es-ES': ['Sonia'],
+                    'fr-FR': ['Remy', 'Nicolas'],
+                    'zh-CN': ['Xiaoxiao']
+                };
+                const voice = getPreferredVoice(description.lang, preferredVoices[description.lang]);
                 speakText(description.text, voice);
             } else {
                 const phrases = ["Great choice!", "Yummy!", "Looks delicious!", "Excellent!"];
@@ -1313,11 +1345,21 @@
         }
 
         function selectStaffCountry(element, role, lang) {
+            if (chosenStaffLangs.has(lang) && restaurant.staff[role].lang !== lang) {
+                showNotification("This country is already assigned to another staff member.");
+                return;
+            }
+
+            if (restaurant.staff[role].lang) {
+                chosenStaffLangs.delete(restaurant.staff[role].lang);
+            }
+
+            restaurant.staff[role].lang = lang;
+            chosenStaffLangs.add(lang);
+            
             const parentCard = element.closest('.staff-card');
             parentCard.querySelectorAll('.flag-item').forEach(item => item.classList.remove('selected'));
             element.classList.add('selected');
-
-            restaurant.staff[role].lang = lang;
             
             const script = staffScripts[lang];
             
@@ -1326,7 +1368,8 @@
                     'de-DE': ['Seraphina', 'Florian'],
                     'es-ES': ['Sonia'],
                     'fr-FR': ['Remy', 'Nicolas'],
-                    'zh-CN': ['Xiaoxiao']
+                    'zh-CN': ['Xiaoxiao'],
+                    'en-AU': ['Natasha']
                 };
                 const nativeVoice = getPreferredVoice(lang, preferredNativeVoices[lang]);
                 const englishVoice = voiceRyan || voiceAndrew;
