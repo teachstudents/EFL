@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍽️ Kids Restaurant Creator! 🎨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,7 +13,7 @@
         }
 
         body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-family: 'Baloo 2', 'Comic Sans MS', cursive, sans-serif;
             background: linear-gradient(45deg, #ff9a9e, #fecfef, #a8edea, #fed6e3, #d299c2, #fef9d7, #d4fc79);
             background-size: 800% 800%;
             animation: superRainbow 15s ease infinite;
@@ -40,14 +41,9 @@
         }
 
         @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-            }
-            100% {
-                transform: translateY(-10vh) rotate(360deg);
-            }
+            0% { transform: translateY(100vh) rotate(0deg); }
+            100% { transform: translateY(-10vh) rotate(360deg); }
         }
-
 
         @keyframes superRainbow {
             0% { background-position: 0% 50%; }
@@ -64,7 +60,7 @@
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px; /* Reduced margin */
             animation: bounce 2s infinite;
         }
 
@@ -101,8 +97,8 @@
         .navigation {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 10px; /* Reduced gap */
+            margin-bottom: 20px; /* Reduced margin */
             flex-wrap: wrap;
         }
 
@@ -110,9 +106,9 @@
             background: linear-gradient(45deg, #4ecdc4, #44a08d);
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 8px 16px; /* Reduced padding */
             border-radius: 20px;
-            font-size: 1rem;
+            font-size: 0.9rem; /* Reduced font size */
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -207,6 +203,7 @@
             animation: itemPop 0.5s ease;
             border: 2px solid rgba(255,255,255,0.3);
             cursor: pointer;
+            text-transform: capitalize; /* Capitalize first letter for display */
         }
 
         @keyframes itemPop {
@@ -269,6 +266,10 @@
             flex-wrap: wrap;
         }
         
+        .price-controls span:first-of-type {
+             text-transform: capitalize;
+        }
+
         .price-controls span {
              min-width: 80px;
              text-align: center;
@@ -439,6 +440,10 @@
             font-size: 1.1rem;
         }
 
+        .menu-preview div {
+            text-transform: capitalize;
+        }
+
         .celebration {
             position: fixed;
             top: 0;
@@ -473,11 +478,11 @@
                 font-size: 2.5rem;
             }
             .navigation {
-                gap: 10px;
+                gap: 5px; /* Further reduced gap */
             }
             .nav-btn {
-                padding: 10px 15px;
-                font-size: 0.9rem;
+                padding: 8px 12px; /* Further reduced padding */
+                font-size: 0.8rem; /* Further reduced font size */
             }
             .emoji-grid {
                 grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
@@ -505,15 +510,15 @@
         </div>
 
         <div class="navigation">
-            <button class="nav-btn active" onclick="showPage('setup')">🏪 Setup</button>
-            <button class="nav-btn" onclick="showPage('menu')">🏠 Menu</button>
-            <button class="nav-btn" onclick="showPage('breakfast')">🌅 Breakfast</button>
-            <button class="nav-btn" onclick="showPage('lunch')">☀️ Lunch</button>
-            <button class="nav-btn" onclick="showPage('dinner')">🌙 Dinner</button>
-            <button class="nav-btn" onclick="showPage('prices')">💰 Prices</button>
-            <button class="nav-btn" onclick="showPage('times')">⏰ Hours</button>
-            <button class="nav-btn" onclick="showPage('staff')">👥 Staff</button>
-            <button class="nav-btn" onclick="showPage('summary')">📋 Summary</button>
+            <button class="nav-btn active" onclick="showPage(event, 'setup')">🏪 Setup</button>
+            <button class="nav-btn" onclick="showPage(event, 'menu')">🏠 Menu</button>
+            <button class="nav-btn" onclick="showPage(event, 'breakfast')">🌅 Breakfast</button>
+            <button class="nav-btn" onclick="showPage(event, 'lunch')">☀️ Lunch</button>
+            <button class="nav-btn" onclick="showPage(event, 'dinner')">🌙 Dinner</button>
+            <button class="nav-btn" onclick="showPage(event, 'prices')">💰 Prices</button>
+            <button class="nav-btn" onclick="showPage(event, 'times')">⏰ Hours</button>
+            <button class="nav-btn" onclick="showPage(event, 'staff')">👥 Staff</button>
+            <button class="nav-btn" onclick="showPage(event, 'summary')">📋 Summary</button>
         </div>
 
         <!-- Restaurant Setup Page -->
@@ -579,34 +584,34 @@
                 <div class="emoji-category">
                     <h4>🍳 Foods</h4>
                     <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥞" data-name="Pancakes">🥞</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧇" data-name="Waffles">🧇</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍳" data-name="Eggs">🍳</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥓" data-name="Bacon">🥓</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥐" data-name="Croissant">🥐</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥖" data-name="Baguette">🥖</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥣" data-name="Cereal">🥣</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍞" data-name="Toast">🍞</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥑" data-name="Avocado">🥑</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥞" data-name="pancakes">🥞</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧇" data-name="waffles">🧇</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍳" data-name="eggs">🍳</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥓" data-name="bacon">🥓</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥐" data-name="croissant">🥐</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥖" data-name="baguette">🥖</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥣" data-name="cereal">🥣</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍞" data-name="toast">🍞</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥑" data-name="avocado">🥑</button>
                     </div>
                 </div>
                  <div class="emoji-category">
                     <h4>🍓 Fruits</h4>
                     <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍓" data-name="Strawberry">🍓</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍌" data-name="Banana">🍌</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍇" data-name="Grapes">🍇</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍎" data-name="Apple">🍎</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍓" data-name="strawberry">🍓</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍌" data-name="banana">🍌</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍇" data-name="grapes">🍇</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍎" data-name="apple">🍎</button>
                     </div>
                 </div>
                 <div class="emoji-category">
                     <h4>☕ Drinks</h4>
                     <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="☕" data-name="Coffee">☕</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥛" data-name="Milk">🥛</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧃" data-name="Juice">🧃</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍵" data-name="Tea">🍵</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧋" data-name="Bubble Tea">🧋</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="☕" data-name="coffee">☕</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥛" data-name="milk">🥛</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧃" data-name="juice">🧃</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍵" data-name="tea">🍵</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧋" data-name="bubble tea">🧋</button>
                     </div>
                 </div>
             </div>
@@ -632,34 +637,34 @@
                 <div class="emoji-category">
                     <h4>🍽️ Foods</h4>
                     <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍔" data-name="Burger">🍔</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍕" data-name="Pizza">🍕</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥪" data-name="Sandwich">🥪</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥗" data-name="Salad">🥗</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🌮" data-name="Taco">🌮</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍟" data-name="Fries">🍟</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥨" data-name="Pretzel">🥨</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍜" data-name="Noodles">🍜</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍙" data-name="Rice Ball">🍙</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍔" data-name="burger">🍔</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍕" data-name="pizza">🍕</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥪" data-name="sandwich">🥪</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥗" data-name="salad">🥗</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🌮" data-name="taco">🌮</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍟" data-name="fries">🍟</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥨" data-name="pretzel">🥨</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍜" data-name="noodles">🍜</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍙" data-name="rice ball">🍙</button>
                     </div>
                 </div>
                  <div class="emoji-category">
                     <h4>🍉 Fruits</h4>
                     <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍉" data-name="Watermelon">🍉</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍊" data-name="Orange">🍊</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍍" data-name="Pineapple">🍍</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥝" data-name="Kiwi">🥝</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍉" data-name="watermelon">🍉</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍊" data-name="orange">🍊</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍍" data-name="pineapple">🍍</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥝" data-name="kiwi">🥝</button>
                     </div>
                 </div>
                 <div class="emoji-category">
                     <h4>🥤 Drinks</h4>
                     <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥤" data-name="Soda">🥤</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="💧" data-name="Water">💧</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧋" data-name="Bubble Tea">🧋</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍋" data-name="Lemonade">🍋</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥥" data-name="Coconut Water">🥥</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥤" data-name="soda">🥤</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="💧" data-name="water">💧</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧋" data-name="bubble tea">🧋</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍋" data-name="lemonade">🍋</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥥" data-name="coconut water">🥥</button>
                     </div>
                 </div>
             </div>
@@ -685,33 +690,33 @@
                 <div class="emoji-category">
                     <h4>🍽️ Foods</h4>
                     <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥩" data-name="Steak">🥩</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍗" data-name="Chicken">🍗</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍝" data-name="Pasta">🍝</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍛" data-name="Curry">🍛</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍣" data-name="Sushi">🍣</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥘" data-name="Paella">🥘</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥟" data-name="Dumpling">🥟</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🦞" data-name="Lobster">🦞</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍚" data-name="Rice">🍚</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥩" data-name="steak">🥩</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍗" data-name="chicken">🍗</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍝" data-name="pasta">🍝</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍛" data-name="curry">🍛</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍣" data-name="sushi">🍣</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥘" data-name="paella">🥘</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥟" data-name="dumpling">🥟</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🦞" data-name="lobster">🦞</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍚" data-name="rice">🍚</button>
                     </div>
                 </div>
                  <div class="emoji-category">
                     <h4>🍰 Desserts</h4>
                     <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍰" data-name="Cake">🍰</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍨" data-name="Ice Cream">🍨</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍒" data-name="Cherries">🍒</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍩" data-name="Donut">🍩</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍪" data-name="Cookie">🍪</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍰" data-name="cake">🍰</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍨" data-name="ice cream">🍨</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍒" data-name="cherries">🍒</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍩" data-name="donut">🍩</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍪" data-name="cookie">🍪</button>
                     </div>
                 </div>
                 <div class="emoji-category">
                     <h4>🍷 Drinks</h4>
                     <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍷" data-name="Wine">🍷</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="💧" data-name="Water">💧</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍹" data-name="Juice">🍹</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍷" data-name="wine">🍷</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="💧" data-name="water">💧</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍹" data-name="juice">🍹</button>
                     </div>
                 </div>
             </div>
@@ -860,7 +865,10 @@
     <div class="celebration" id="celebration"></div>
 
     <script>
-        // --- DATA STORAGE ---
+        // =================================================================================
+        // --- 1. GLOBAL STATE & DATA ---
+        // =================================================================================
+        
         let restaurant = {
             breakfast: { foods: [], drinks: [] },
             lunch: { foods: [], drinks: [] },
@@ -876,17 +884,7 @@
             },
             owner: '',
             restaurantName: '',
-            pageVoices: {
-                setup: { lang: 'en-US', preferred: ["Ava", "Jenny"], greeting: "Let's get your restaurant set up!" },
-                menu: { lang: 'en-US', preferred: ["Andrew", "Ryan"] },
-                breakfast: { lang: 'en-US', preferred: ["Jenny", "Ava"], greeting: "Time to make a yummy breakfast menu!" },
-                lunch: { lang: 'en-US', preferred: ["Ryan", "Byan"], greeting: "What should we have for lunch?" },
-                dinner: { lang: 'en-US', preferred: ["Byan", "Andrew"], greeting: "Let's create a delicious dinner!" },
-                prices: { lang: 'en-US', preferred: ["Ava", "Jenny"], greeting: "Let's set the prices." },
-                times: { lang: 'en-US', preferred: ["Jenny", "Ava"], greeting: "When will your restaurant be open?" },
-                staff: { lang: 'en-US', preferred: ["Ryan", "Andrew"], greeting: "Let's hire an amazing team!" },
-                summary: { lang: 'en-US', preferred: ["Byan", "Ava"], greeting: "Wow! Look at your amazing restaurant!" }
-            },
+            openingHours: [],
             times: {
                 breakfast: { start: 360, end: 660 }, 
                 brunch: { start: 600, end: 840 },  
@@ -905,13 +903,16 @@
         };
 
         const foodDescriptions = {
-            "Baguette": { text: "Baguette fraîche et croustillante", lang: "fr-FR", preferred: ["Nicolas"] },
-            "Paella": { text: "Paella sabrosa y colorida", lang: "es-ES", preferred: ["Sonia"] },
-            "Pretzel": { text: "Frische, salzige Brezel", lang: "de-DE", preferred: ["Seraphina"] },
-            "Dumpling": { text: "新鲜美味的饺子", lang: "zh-CN", preferred: ["Xiaoxiao"] }
+            "baguette": { text: "Baguette fraîche et croustillante", lang: "fr-FR" },
+            "paella": { text: "Paella sabrosa y colorida", lang: "es-ES" },
+            "pretzel": { text: "Frische, salzige Brezel", lang: "de-DE" },
+            "dumpling": { text: "新鲜美味的饺子", lang: "zh-CN" }
         };
 
-        // --- WEB AUDIO API SOUND EFFECTS ---
+        // =================================================================================
+        // --- 2. AUDIO & SOUND EFFECTS ---
+        // =================================================================================
+        
         let audioCtx;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -941,53 +942,74 @@
             osc2.stop(audioCtx.currentTime + duration);
         }
         
-        // --- SPEECH SYNTHESIS ---
-        let voices = [];
+        // =================================================================================
+        // --- 3. SPEECH SYNTHESIS & VOICES ---
+        // =================================================================================
+
+        let loadedVoices = [];
+        let voiceAva, voiceAndrew, voiceJenny, voiceRyan, voiceByan;
+        let voiceSeraphina, voiceFlorian, voiceSonia, voiceRemy, voiceNicolas, voiceXiaoxiao;
+
         function getPreferredVoice(langCode, preferredNames = []) {
-            if (voices.length === 0) return null;
+            if (loadedVoices.length === 0) return null;
             for (const name of preferredNames) {
-                const match = voices.find(v => v.lang === langCode && v.name.toLowerCase().includes(name.toLowerCase()));
+                // Loosened the matching to catch different voice names like "Microsoft Remy Online"
+                const match = loadedVoices.find(v => v.lang === langCode && v.name.toLowerCase().includes(name.toLowerCase()));
                 if (match) return match;
             }
-            return voices.find(v => v.lang === langCode) || null;
+            // Fallback to the first available voice for the language
+            return loadedVoices.find(v => v.lang === langCode) || null;
         }
 
-        function loadVoices() {
-            function populateVoiceList() {
-                voices = speechSynthesis.getVoices();
-            }
-            populateVoiceList();
-            if (speechSynthesis.onvoiceschanged !== undefined) {
-                speechSynthesis.onvoiceschanged = populateVoiceList;
-            }
+        function loadAndAssignVoices() {
+            loadedVoices = speechSynthesis.getVoices();
+            if (loadedVoices.length === 0) return;
+
+            // English Voices
+            voiceAva = getPreferredVoice("en-US", ["Ava"]);
+            voiceAndrew = getPreferredVoice("en-US", ["Andrew"]);
+            voiceJenny = getPreferredVoice("en-US", ["Jenny"]);
+            voiceRyan = getPreferredVoice("en-US", ["Ryan"]);
+            voiceByan = getPreferredVoice("en-US", ["Byan"]);
+            
+            // Multilingual Voices
+            voiceSeraphina = getPreferredVoice("de-DE", ["Seraphina"]);
+            voiceFlorian = getPreferredVoice("de-DE", ["Florian"]);
+            voiceSonia = getPreferredVoice("es-ES", ["Sonia"]);
+            voiceRemy = getPreferredVoice("fr-FR", ["Remy"]);
+            voiceNicolas = getPreferredVoice("fr-FR", ["Nicolas"]);
+            voiceXiaoxiao = getPreferredVoice("zh-CN", ["Xiaoxiao"]);
         }
         
-        function speakText(text, lang, preferredNames = [], onEndCallback = null) {
+        function speakText(text, voice, onEndCallback = null) {
             if (!('speechSynthesis' in window)) return;
+            if (!voice) { 
+                console.warn("SpeakText called but no voice was available for the text:", text);
+                return; 
+            }
             speechSynthesis.cancel();
             
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = lang;
+            utterance.voice = voice;
+            utterance.lang = voice.lang;
             utterance.rate = 0.85; 
             utterance.pitch = 1.2;
             utterance.volume = 1;
-
-            const selectedVoice = getPreferredVoice(lang, preferredNames);
-            if (selectedVoice) {
-                utterance.voice = selectedVoice;
-            }
             
             if (onEndCallback) utterance.onend = onEndCallback;
             
             speechSynthesis.speak(utterance);
         }
+
+        // =================================================================================
+        // --- 4. CORE APPLICATION LOGIC (INIT, PAGE NAVIGATION) ---
+        // =================================================================================
         
-        // --- INITIALIZATION & PAGE SETUP ---
         function init() {
             updateProgress();
             generatePriceControls();
             updateStaff();
-            loadVoices();
+            loadAndAssignVoices();
             createFloatingEmojis();
             initDragAndDrop();
         }
@@ -1016,29 +1038,64 @@
             updateProgress();
         }
         
-        function showPage(pageId) {
+        function showPage(event, pageId) {
             initAudio();
-            playTone(880, 0.1, 'triangle'); // Click sound
+            playTone(880, 0.1, 'triangle');
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
-            event.target.classList.add('active');
+            event.currentTarget.classList.add('active');
             currentPage = pageId;
 
-            const pageVoiceInfo = restaurant.pageVoices[pageId];
-            if (pageVoiceInfo) {
-                 if (pageId === 'menu') {
-                    const missionElement = document.getElementById('missionText');
-                    if (missionElement) {
+            let voice;
+            let textToSpeak = '';
+
+            switch(pageId) {
+                case 'setup':
+                    voice = voiceAva || voiceJenny;
+                    textToSpeak = "Let's get your restaurant set up!";
+                    break;
+                case 'menu':
+                     voice = voiceAndrew || voiceRyan;
+                     const missionElement = document.getElementById('missionText');
+                     if (missionElement) {
                         const missionClone = missionElement.cloneNode(true);
                         missionClone.querySelectorAll('span').forEach(span => span.remove());
-                        const missionText = missionClone.textContent.trim().replace(/\s\s+/g, ' ');
-                        speakText(missionText, pageVoiceInfo.lang, pageVoiceInfo.preferred);
+                        textToSpeak = missionClone.textContent.trim().replace(/\s\s+/g, ' ');
                     }
-                } else {
-                     const greeting = restaurant.pageVoices[pageId].greeting;
-                     if(greeting) speakText(greeting, pageVoiceInfo.lang, pageVoiceInfo.preferred);
-                }
+                    break;
+                case 'breakfast':
+                    voice = voiceJenny || voiceAva;
+                    textToSpeak = "Time to make a yummy breakfast menu!";
+                    break;
+                case 'lunch':
+                    voice = voiceRyan || voiceByan;
+                    textToSpeak = "What should we have for lunch?";
+                    break;
+                case 'dinner':
+                    voice = voiceByan || voiceAndrew;
+                    textToSpeak = "Let's create a delicious dinner!";
+                    break;
+                case 'prices':
+                    voice = voiceAva || voiceJenny;
+                    textToSpeak = "Let's set the prices.";
+                    break;
+                case 'times':
+                    voice = voiceJenny || voiceAva;
+                    textToSpeak = "When will your restaurant be open?";
+                    break;
+                case 'staff':
+                    voice = voiceRyan || voiceAndrew;
+                    textToSpeak = "Let's hire an amazing team!";
+                    break;
+                case 'summary':
+                    voice = voiceByan || voiceAva;
+                    textToSpeak = "Wow! Look at your amazing restaurant!";
+                    break;
+            }
+
+            if (textToSpeak && voice) {
+                speakText(textToSpeak, voice);
             }
 
             if (pageId === 'prices') generatePriceControls();
@@ -1046,7 +1103,10 @@
             updateProgress();
         }
 
-        // --- DRAG AND DROP (Desktop + Touch) ---
+        // =================================================================================
+        // --- 5. DRAG & DROP FUNCTIONALITY ---
+        // =================================================================================
+        
         let draggingElement = null;
         let ghostElement = null;
         let touchOffsetX = 0;
@@ -1138,28 +1198,37 @@
             
             dropZone.querySelector('.dropped-items').appendChild(droppedItem);
             storeMenuItem(dropZone.id, data);
-            playTone(200, 0.15); // "Plop" sound
+            playTone(200, 0.15);
 
             const description = foodDescriptions[data.name];
             if (description) {
-                speakText(description.text, description.lang, description.preferred);
+                const voice = getPreferredVoice(description.lang, description.preferred);
+                speakText(description.text, voice);
             } else {
                 const phrases = ["Great choice!", "Yummy!", "Looks delicious!", "Excellent!"];
                 const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-                const voiceInfo = restaurant.pageVoices[currentPage];
-                speakText(randomPhrase, voiceInfo.lang, voiceInfo.preferred, () => {
-                    speakText(data.name, voiceInfo.lang, voiceInfo.preferred);
+                let currentVoice = voiceAva || voiceJenny; // Default voice
+                if (currentPage === 'lunch') currentVoice = voiceRyan || voiceByan || currentVoice;
+                if (currentPage === 'dinner') currentVoice = voiceByan || voiceAndrew || currentVoice;
+                
+                speakText(randomPhrase, currentVoice, () => {
+                    speakText(data.name, currentVoice);
                 });
             }
             updateProgress();
         }
 
         function removeItem(element, dropZoneId, data) {
-            playTone(880, 0.1, 'triangle'); // Click sound
+            playTone(880, 0.1, 'triangle');
             element.remove();
             removeMenuItem(dropZoneId, data);
             updateProgress();
         }
+
+        // =================================================================================
+        // --- 6. UI & DATA UPDATE FUNCTIONS (Menus, Prices, etc.) ---
+        // =================================================================================
+        
         function getMenuCategory(dropZoneId) {
             if (dropZoneId.includes('breakfast')) return restaurant.breakfast;
             if (dropZoneId.includes('lunch')) return restaurant.lunch;
@@ -1179,7 +1248,6 @@
             if (index > -1) category[type].splice(index, 1);
         }
 
-        // --- UI & DATA UPDATES ---
         function generatePriceControls() {
             const pricesList = document.getElementById('pricesList');
             pricesList.innerHTML = '';
@@ -1197,14 +1265,12 @@
         function adjustPrice(itemName, change) {
             restaurant.prices[itemName] = Math.max(1, (restaurant.prices[itemName] || 5) + change);
             const newPrice = restaurant.prices[itemName];
-            const currencySymbol = restaurant.currency.symbol;
-            document.getElementById(`price-${itemName}`).textContent = `${currencySymbol}${newPrice}`;
+            document.getElementById(`price-${itemName}`).textContent = `${restaurant.currency.symbol}${newPrice}`;
             
             playTone(523, 0.1); 
             setTimeout(() => playTone(659, 0.3), 100);
             
-            const voiceInfo = restaurant.pageVoices.prices;
-            speakText(`${itemName}, ${newPrice} ${restaurant.currency.name}`, voiceInfo.lang, voiceInfo.preferred);
+            speakText(`${itemName}, ${newPrice} ${restaurant.currency.name}`, voiceAva || voiceJenny);
         }
         
         function adjustTime(meal, type, change) {
@@ -1214,8 +1280,7 @@
             restaurant.times[meal][type] = minutes;
             const formattedTime = formatTime(minutes);
             document.getElementById(`${meal}-${type}`).textContent = formattedTime;
-            const voiceInfo = restaurant.pageVoices.times;
-            speakText(timeToSpeakableText(formattedTime), voiceInfo.lang, voiceInfo.preferred);
+            speakText(timeToSpeakableText(formattedTime), voiceJenny || voiceAva);
         }
 
         function formatTime(minutes) {
@@ -1255,18 +1320,19 @@
             restaurant.staff[role].lang = lang;
             
             const script = staffScripts[lang];
-            const voiceInfo = restaurant.pageVoices.staff;
             
-            const preferredNativeVoices = {
-                'de-DE': ['Seraphina'],
-                'es-ES': ['Sonia'],
-                'fr-FR': ['Nicolas'],
-                'zh-CN': ['Xiaoxiao']
-            };
-
             if (script) {
-                 speakText(script.english, voiceInfo.lang, voiceInfo.preferred, () => {
-                     speakText(script.native, lang, preferredNativeVoices[lang]);
+                const preferredNativeVoices = {
+                    'de-DE': ['Seraphina', 'Florian'],
+                    'es-ES': ['Sonia'],
+                    'fr-FR': ['Remy', 'Nicolas'],
+                    'zh-CN': ['Xiaoxiao']
+                };
+                const nativeVoice = getPreferredVoice(lang, preferredNativeVoices[lang]);
+                const englishVoice = voiceRyan || voiceAndrew;
+
+                 speakText(script.english, englishVoice, () => {
+                     speakText(script.native, nativeVoice);
                  });
             }
         }
@@ -1318,8 +1384,13 @@
                 summaryContainer.innerHTML += createCard('👥 Our Amazing Team', staffContent);
             }
         }
+        
+        // =================================================================================
+        // --- 7. EVENT LISTENERS ---
+        // =================================================================================
 
         document.addEventListener('DOMContentLoaded', init);
+        speechSynthesis.onvoiceschanged = loadAndAssignVoices;
     </script>
 </body>
 </html>
