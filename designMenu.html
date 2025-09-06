@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍽️ Kids Restaurant Creator! 🎨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #a8edea, #fed6e3, #d299c2, #fef9d7, #d4fc79);
+            background-size: 800% 800%;
+            animation: superRainbow 15s ease infinite;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        #background-emojis {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-emoji {
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.05; /* Reduced opacity for better visibility */
+            animation: float 25s linear infinite;
+            will-change: transform;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-10vh) rotate(360deg);
+            }
+        }
+
+
+        @keyframes superRainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .title {
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #ffd93d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleRainbow 3s ease infinite;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @keyframes titleRainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border: 3px solid transparent;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            border-color: #ff6b6b;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .page {
+            display: none;
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            border: 5px solid #ffd700;
+            min-height: 600px;
+        }
+
+        .page.active {
+            display: block;
+            animation: slideIn 0.8s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .drop-zone {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 4px dashed #ffd700;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            min-height: 200px;
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .drop-zone.drag-over {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            border-color: #2ecc71;
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .drop-zone h3 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .dropped-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .dropped-item {
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 10px 15px;
+            font-size: 1.5rem;
+            animation: itemPop 0.5s ease;
+            border: 2px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+        }
+
+        @keyframes itemPop {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .emoji-palette {
+            background: rgba(255,255,255,0.9);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .emoji-category {
+            margin-bottom: 20px;
+        }
+
+        .emoji-category h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 10px;
+        }
+
+        .emoji-item {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 2rem;
+            cursor: grab;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .emoji-item:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .emoji-item:active {
+            cursor: grabbing;
+            transform: scale(1.2);
+        }
+
+        .price-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .price-controls span {
+             min-width: 80px;
+             text-align: center;
+             font-size: 1.2rem;
+        }
+
+        .price-dial {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            border: 4px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .price-dial:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .staff-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 15px 0;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .staff-emoji {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .staff-input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            text-align: center;
+            background: rgba(255,255,255,0.9);
+            margin-top: 10px;
+            color: #333;
+        }
+
+        .time-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .time-card {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .time-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .time-card.selected {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            animation: pulse 1.5s infinite;
+        }
+
+        .country-flags {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .staff-country-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .staff-country-selector .flag-item {
+            padding: 10px;
+            background: rgba(255,255,255,0.8);
+        }
+        
+        .staff-country-selector .flag-item .flag-emoji {
+             font-size: 1.5rem;
+             margin-bottom: 5px;
+        }
+
+        .flag-item {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border: 3px solid transparent;
+        }
+
+        .flag-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .flag-item.selected {
+            border-color: #ffd700;
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+        }
+
+        .flag-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .currency-display {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 15px 0;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .summary-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .menu-preview {
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            animation: confettiFall 3s linear infinite;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            .navigation {
+                gap: 10px;
+            }
+            .nav-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+            .emoji-grid {
+                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            }
+            .emoji-item {
+                font-size: 1.5rem;
+                padding: 10px;
+            }
+            .price-dial {
+                width: 45px;
+                height: 45px;
+            }
+            .price-controls {
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="background-emojis"></div>
+    <div class="container">
+        <div class="header">
+            <h1 class="title" id="mainTitle">🍽️ Restaurant Creator! 🎨</h1>
+            <p class="subtitle" id="mainSubtitle">Create your amazing restaurant!</p>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn active" onclick="showPage('setup')">🏪 Setup</button>
+            <button class="nav-btn" onclick="showPage('menu')">🏠 Menu</button>
+            <button class="nav-btn" onclick="showPage('breakfast')">🌅 Breakfast</button>
+            <button class="nav-btn" onclick="showPage('lunch')">☀️ Lunch</button>
+            <button class="nav-btn" onclick="showPage('dinner')">🌙 Dinner</button>
+            <button class="nav-btn" onclick="showPage('prices')">💰 Prices</button>
+            <button class="nav-btn" onclick="showPage('times')">⏰ Hours</button>
+            <button class="nav-btn" onclick="showPage('staff')">👥 Staff</button>
+            <button class="nav-btn" onclick="showPage('summary')">📋 Summary</button>
+        </div>
+
+        <!-- Restaurant Setup Page -->
+        <div id="setup" class="page active">
+            <h2 class="page-title">🏪 Setup Your Restaurant</h2>
+
+            <div class="summary-card">
+                <div class="summary-title">🎯 Tell Us About You & Your Restaurant</div>
+                <div class="staff-card">
+                    <div class="staff-emoji">👤</div>
+                    <h3 style="text-align: center;">Your Name</h3>
+                    <input type="text" class="staff-input" placeholder="Enter your name" id="ownerName" oninput="updateNames()">
+                </div>
+                
+                <div class="staff-card">
+                    <div class="staff-emoji">🏪</div>
+                    <h3 style="text-align: center;">Restaurant Name</h3>
+                    <input type="text" class="staff-input" placeholder="Enter restaurant name" id="restaurantName" oninput="updateNames()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Overview Page -->
+        <div id="menu" class="page">
+            <h2 class="page-title">🏠 Welcome to Your Restaurant!</h2>
+            <div class="summary-card">
+                <div class="summary-title">🎯 Your Mission</div>
+                <p style="font-size: 1.2rem; text-align: center; line-height: 1.6;" id="missionText">
+                    Create the most amazing restaurant ever! <span aria-hidden="true">🌟</span><br>
+                    Drag and drop food emojis, set prices, pick opening hours, and hire your dream team! <span aria-hidden="true">🚀</span>
+                </p>
+            </div>
+            
+            <div class="summary-card">
+                <div class="summary-title">📊 Restaurant Progress</div>
+                <div id="progressDisplay" style="font-size: 1.1rem; line-height: 1.8;">
+                    <div>🍳 Breakfast Menu: <span id="breakfastCount">0</span> items</div>
+                    <div>🍽️ Lunch Menu: <span id="lunchCount">0</span> items</div>
+                    <div>🌙 Dinner Menu: <span id="dinnerCount">0</span> items</div>
+                    <div>👥 Staff Hired: <span id="staffCount">0</span>/5</div>
+                    <div>⏰ Hours Set: <span id="hoursCount">0</span>/4</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Breakfast Page -->
+        <div id="breakfast" class="page">
+            <h2 class="page-title">🌅 Create Breakfast Menu</h2>
+            
+            <div class="drop-zone" id="breakfastFood" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                <h3>🍳 Breakfast Foods</h3>
+                <p>Drag breakfast foods here!</p>
+                <div class="dropped-items" id="breakfastFoodItems"></div>
+            </div>
+
+            <div class="drop-zone" id="breakfastDrinks" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                <h3>☕ Breakfast Drinks</h3>
+                <p>Drag drinks here!</p>
+                <div class="dropped-items" id="breakfastDrinkItems"></div>
+            </div>
+
+            <div class="emoji-palette">
+                <div class="emoji-category">
+                    <h4>🍳 Foods</h4>
+                    <div class="emoji-grid">
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥞" data-name="Pancakes">🥞</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧇" data-name="Waffles">🧇</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍳" data-name="Eggs">🍳</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥓" data-name="Bacon">🥓</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥐" data-name="Croissant">🥐</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥖" data-name="Baguette">🥖</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥣" data-name="Cereal">🥣</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍞" data-name="Toast">🍞</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥑" data-name="Avocado">🥑</button>
+                    </div>
+                </div>
+                 <div class="emoji-category">
+                    <h4>🍓 Fruits</h4>
+                    <div class="emoji-grid">
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍓" data-name="Strawberry">🍓</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍌" data-name="Banana">🍌</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍇" data-name="Grapes">🍇</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍎" data-name="Apple">🍎</button>
+                    </div>
+                </div>
+                <div class="emoji-category">
+                    <h4>☕ Drinks</h4>
+                    <div class="emoji-grid">
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="☕" data-name="Coffee">☕</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥛" data-name="Milk">🥛</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧃" data-name="Juice">🧃</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍵" data-name="Tea">🍵</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧋" data-name="Bubble Tea">🧋</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lunch Page -->
+        <div id="lunch" class="page">
+            <h2 class="page-title">☀️ Create Lunch Menu</h2>
+            
+            <div class="drop-zone" id="lunchFood" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                <h3>🍽️ Lunch Foods</h3>
+                <p>Drag lunch foods here!</p>
+                <div class="dropped-items" id="lunchFoodItems"></div>
+            </div>
+
+            <div class="drop-zone" id="lunchDrinks" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                <h3>🥤 Lunch Drinks</h3>
+                <p>Drag drinks here!</p>
+                <div class="dropped-items" id="lunchDrinkItems"></div>
+            </div>
+
+            <div class="emoji-palette">
+                <div class="emoji-category">
+                    <h4>🍽️ Foods</h4>
+                    <div class="emoji-grid">
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍔" data-name="Burger">🍔</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍕" data-name="Pizza">🍕</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥪" data-name="Sandwich">🥪</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥗" data-name="Salad">🥗</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🌮" data-name="Taco">🌮</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍟" data-name="Fries">🍟</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥨" data-name="Pretzel">🥨</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍜" data-name="Noodles">🍜</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍙" data-name="Rice Ball">🍙</button>
+                    </div>
+                </div>
+                 <div class="emoji-category">
+                    <h4>🍉 Fruits</h4>
+                    <div class="emoji-grid">
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍉" data-name="Watermelon">🍉</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍊" data-name="Orange">🍊</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍍" data-name="Pineapple">🍍</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥝" data-name="Kiwi">🥝</button>
+                    </div>
+                </div>
+                <div class="emoji-category">
+                    <h4>🥤 Drinks</h4>
+                    <div class="emoji-grid">
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥤" data-name="Soda">🥤</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="💧" data-name="Water">💧</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧋" data-name="Bubble Tea">🧋</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍋" data-name="Lemonade">🍋</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥥" data-name="Coconut Water">🥥</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dinner Page -->
+        <div id="dinner" class="page">
+            <h2 class="page-title">🌙 Create Dinner Menu</h2>
+            
+            <div class="drop-zone" id="dinnerFood" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                <h3>🍽️ Dinner Foods</h3>
+                <p>Drag dinner foods here!</p>
+                <div class="dropped-items" id="dinnerFoodItems"></div>
+            </div>
+
+            <div class="drop-zone" id="dinnerDrinks" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                <h3>🍷 Dinner Drinks</h3>
+                <p>Drag drinks here!</p>
+                <div class="dropped-items" id="dinnerDrinkItems"></div>
+            </div>
+
+            <div class="emoji-palette">
+                <div class="emoji-category">
+                    <h4>🍽️ Foods</h4>
+                    <div class="emoji-grid">
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥩" data-name="Steak">🥩</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍗" data-name="Chicken">🍗</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍝" data-name="Pasta">🍝</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍛" data-name="Curry">🍛</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍣" data-name="Sushi">🍣</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥘" data-name="Paella">🥘</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥟" data-name="Dumpling">🥟</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🦞" data-name="Lobster">🦞</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍚" data-name="Rice">🍚</button>
+                    </div>
+                </div>
+                 <div class="emoji-category">
+                    <h4>🍰 Desserts</h4>
+                    <div class="emoji-grid">
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍰" data-name="Cake">🍰</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍨" data-name="Ice Cream">🍨</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍒" data-name="Cherries">🍒</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍩" data-name="Donut">🍩</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍪" data-name="Cookie">🍪</button>
+                    </div>
+                </div>
+                <div class="emoji-category">
+                    <h4>🍷 Drinks</h4>
+                    <div class="emoji-grid">
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍷" data-name="Wine">🍷</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="💧" data-name="Water">💧</button>
+                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍹" data-name="Juice">🍹</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prices Page -->
+        <div id="prices" class="page">
+            <h2 class="page-title">💰 Set Your Prices</h2>
+            
+            <div class="currency-display" id="currencyDisplay">
+                Currency: USD ($)
+            </div>
+
+            <div id="pricesList">
+                <!-- Price controls will be generated here -->
+            </div>
+        </div>
+
+        <!-- Times Page -->
+        <div id="times" class="page">
+            <h2 class="page-title">⏰ Set Opening Hours</h2>
+            
+            <div class="time-selector">
+                <div class="time-card" onclick="toggleTime(this, 'breakfast')">
+                    <h3>🌅 Breakfast</h3>
+                    <div class="price-controls">
+                        <div class="price-dial" onclick="adjustTime('breakfast', 'start', -5)">-</div>
+                        <span id="breakfast-start">6:00 AM</span>
+                        <div class="price-dial" onclick="adjustTime('breakfast', 'start', 5)">+</div>
+                        <span>to</span>
+                        <div class="price-dial" onclick="adjustTime('breakfast', 'end', -5)">-</div>
+                        <span id="breakfast-end">11:00 AM</span>
+                        <div class="price-dial" onclick="adjustTime('breakfast', 'end', 5)">+</div>
+                    </div>
+                </div>
+                <div class="time-card" onclick="toggleTime(this, 'brunch')">
+                    <h3>🥐 Brunch</h3>
+                    <div class="price-controls">
+                        <div class="price-dial" onclick="adjustTime('brunch', 'start', -5)">-</div>
+                        <span id="brunch-start">10:00 AM</span>
+                        <div class="price-dial" onclick="adjustTime('brunch', 'start', 5)">+</div>
+                        <span>to</span>
+                        <div class="price-dial" onclick="adjustTime('brunch', 'end', -5)">-</div>
+                        <span id="brunch-end">2:00 PM</span>
+                        <div class="price-dial" onclick="adjustTime('brunch', 'end', 5)">+</div>
+                    </div>
+                </div>
+                <div class="time-card" onclick="toggleTime(this, 'lunch')">
+                    <h3>☀️ Lunch</h3>
+                    <div class="price-controls">
+                        <div class="price-dial" onclick="adjustTime('lunch', 'start', -5)">-</div>
+                        <span id="lunch-start">11:00 AM</span>
+                        <div class="price-dial" onclick="adjustTime('lunch', 'start', 5)">+</div>
+                        <span>to</span>
+                        <div class="price-dial" onclick="adjustTime('lunch', 'end', -5)">-</div>
+                        <span id="lunch-end">4:00 PM</span>
+                        <div class="price-dial" onclick="adjustTime('lunch', 'end', 5)">+</div>
+                    </div>
+                </div>
+                <div class="time-card" onclick="toggleTime(this, 'dinner')">
+                    <h3>🌙 Dinner</h3>
+                    <div class="price-controls">
+                        <div class="price-dial" onclick="adjustTime('dinner', 'start', -5)">-</div>
+                        <span id="dinner-start">5:00 PM</span>
+                        <div class="price-dial" onclick="adjustTime('dinner', 'start', 5)">+</div>
+                        <span>to</span>
+                        <div class="price-dial" onclick="adjustTime('dinner', 'end', -5)">-</div>
+                        <span id="dinner-end">10:00 PM</span>
+                        <div class="price-dial" onclick="adjustTime('dinner', 'end', 5)">+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff Page -->
+        <div id="staff" class="page">
+            <h2 class="page-title">👥 Hire Your Dream Team</h2>
+            
+            <div class="staff-card">
+                <div class="staff-emoji">👨‍🍳</div>
+                <h3 style="text-align: center;">Head Chef</h3>
+                <input type="text" class="staff-input" placeholder="Enter chef's name" id="chefName" data-role="chef">
+                <div class="staff-country-selector">
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                </div>
+            </div>
+
+            <div class="staff-card">
+                <div class="staff-emoji">👩‍🍳</div>
+                <h3 style="text-align: center;">Cook</h3>
+                <input type="text" class="staff-input" placeholder="Enter cook's name" id="cookName" data-role="cook">
+                 <div class="staff-country-selector">
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                </div>
+            </div>
+
+            <div class="staff-card">
+                <div class="staff-emoji">👨‍💼</div>
+                <h3 style="text-align: center;">Manager</h3>
+                <input type="text" class="staff-input" placeholder="Enter manager's name" id="managerName" data-role="manager">
+                 <div class="staff-country-selector">
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                </div>
+            </div>
+             <div class="staff-card">
+                <div class="staff-emoji">🤵</div>
+                <h3 style="text-align: center;">Waiter</h3>
+                <input type="text" class="staff-input" placeholder="Enter waiter's name" id="waiterName" data-role="waiter">
+                 <div class="staff-country-selector">
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                </div>
+            </div>
+             <div class="staff-card">
+                <div class="staff-emoji">🤵‍♀️</div>
+                <h3 style="text-align: center;">Waitress</h3>
+                <input type="text" class="staff-input" placeholder="Enter waitress's name" id="waitressName" data-role="waitress">
+                 <div class="staff-country-selector">
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
+                     <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Page -->
+        <div id="summary" class="page">
+            <h2 class="page-title">📋 Your Amazing Restaurant!</h2>
+            <div id="restaurantSummary"></div>
+        </div>
+    </div>
+
+    <!-- Celebration Elements -->
+    <div class="celebration" id="celebration"></div>
+
+    <script>
+        // --- DATA STORAGE ---
+        let restaurant = {
+            breakfast: { foods: [], drinks: [] },
+            lunch: { foods: [], drinks: [] },
+            dinner: { foods: [], drinks: [] },
+            prices: {},
+            currency: { symbol: '$', code: 'USD', name: 'dollars' },
+            staff: {
+                chef: { name: '', lang: '' },
+                cook: { name: '', lang: '' },
+                manager: { name: '', lang: '' },
+                waiter: { name: '', lang: '' },
+                waitress: { name: '', lang: '' },
+            },
+            owner: '',
+            restaurantName: '',
+            pageVoices: {
+                setup: { lang: 'en-US', preferred: ["Ava", "Jenny"], greeting: "Let's get your restaurant set up!" },
+                menu: { lang: 'en-US', preferred: ["Andrew", "Ryan"] },
+                breakfast: { lang: 'en-US', preferred: ["Jenny", "Ava"], greeting: "Time to make a yummy breakfast menu!" },
+                lunch: { lang: 'en-US', preferred: ["Ryan", "Byan"], greeting: "What should we have for lunch?" },
+                dinner: { lang: 'en-US', preferred: ["Byan", "Andrew"], greeting: "Let's create a delicious dinner!" },
+                prices: { lang: 'en-US', preferred: ["Ava", "Jenny"], greeting: "Let's set the prices." },
+                times: { lang: 'en-US', preferred: ["Jenny", "Ava"], greeting: "When will your restaurant be open?" },
+                staff: { lang: 'en-US', preferred: ["Ryan", "Andrew"], greeting: "Let's hire an amazing team!" },
+                summary: { lang: 'en-US', preferred: ["Byan", "Ava"], greeting: "Wow! Look at your amazing restaurant!" }
+            },
+            times: {
+                breakfast: { start: 360, end: 660 }, 
+                brunch: { start: 600, end: 840 },  
+                lunch: { start: 660, end: 960 },   
+                dinner: { start: 1020, end: 1320 } 
+            }
+        };
+
+        let currentPage = 'setup';
+        
+        const staffScripts = {
+            'de-DE': { english: "Hello from Germany!", native: "Ich liebe es, leckere Brezeln und Bratwurst zu machen." },
+            'es-ES': { english: "Hello from Spain!", native: "¡Tengo muchas ganas de cocinarte una paella!" },
+            'fr-FR': { english: "Bonjour from France!", native: "Je recommande les croissants et le coq au vin." },
+            'zh-CN': { english: "Nǐ hǎo from China!", native: "我们吃点饺子和北京烤鸭吧。" }
+        };
+
+        const foodDescriptions = {
+            "Baguette": { text: "Baguette fraîche et croustillante", lang: "fr-FR", preferred: ["Nicolas"] },
+            "Paella": { text: "Paella sabrosa y colorida", lang: "es-ES", preferred: ["Sonia"] },
+            "Pretzel": { text: "Frische, salzige Brezel", lang: "de-DE", preferred: ["Seraphina"] },
+            "Dumpling": { text: "新鲜美味的饺子", lang: "zh-CN", preferred: ["Xiaoxiao"] }
+        };
+
+        // --- WEB AUDIO API SOUND EFFECTS ---
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playTone(freq, duration, type = 'sine') {
+            if (!audioCtx) return;
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc1.frequency.value = freq;
+            osc2.frequency.value = freq * 1.015;
+            osc1.type = osc2.type = type;
+
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            
+            osc1.connect(gain);
+            osc2.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc1.start();
+            osc2.start();
+            
+            osc1.stop(audioCtx.currentTime + duration);
+            osc2.stop(audioCtx.currentTime + duration);
+        }
+        
+        // --- SPEECH SYNTHESIS ---
+        let voices = [];
+        function getPreferredVoice(langCode, preferredNames = []) {
+            if (voices.length === 0) return null;
+            for (const name of preferredNames) {
+                const match = voices.find(v => v.lang === langCode && v.name.toLowerCase().includes(name.toLowerCase()));
+                if (match) return match;
+            }
+            return voices.find(v => v.lang === langCode) || null;
+        }
+
+        function loadVoices() {
+            function populateVoiceList() {
+                voices = speechSynthesis.getVoices();
+            }
+            populateVoiceList();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = populateVoiceList;
+            }
+        }
+        
+        function speakText(text, lang, preferredNames = [], onEndCallback = null) {
+            if (!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            utterance.rate = 0.85; 
+            utterance.pitch = 1.2;
+            utterance.volume = 1;
+
+            const selectedVoice = getPreferredVoice(lang, preferredNames);
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            }
+            
+            if (onEndCallback) utterance.onend = onEndCallback;
+            
+            speechSynthesis.speak(utterance);
+        }
+        
+        // --- INITIALIZATION & PAGE SETUP ---
+        function init() {
+            updateProgress();
+            generatePriceControls();
+            updateStaff();
+            loadVoices();
+            createFloatingEmojis();
+            initDragAndDrop();
+        }
+
+        function createFloatingEmojis() {
+            const container = document.getElementById('background-emojis');
+            const emojis = ['🥞', '🍔', '🍕', '🍓', '🍰', '🍣', '🌮', '🍩', '🍪', '🍉', '☕️', '🧋'];
+            for (let i = 0; i < 15; i++) {
+                const emoji = document.createElement('div');
+                emoji.className = 'floating-emoji';
+                emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.style.left = `${Math.random() * 100}vw`;
+                emoji.style.animationDuration = `${15 + Math.random() * 15}s`;
+                emoji.style.animationDelay = `${Math.random() * 10}s`;
+                container.appendChild(emoji);
+            }
+        }
+
+        function updateNames() {
+            restaurant.owner = document.getElementById('ownerName').value;
+            restaurant.restaurantName = document.getElementById('restaurantName').value;
+            if (restaurant.restaurantName) {
+                document.getElementById('mainTitle').textContent = `🍽️ ${restaurant.restaurantName} 🎨`;
+                document.getElementById('mainSubtitle').textContent = `${restaurant.owner}'s Amazing Restaurant!`;
+            }
+            updateProgress();
+        }
+        
+        function showPage(pageId) {
+            initAudio();
+            playTone(880, 0.1, 'triangle'); // Click sound
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+            currentPage = pageId;
+
+            const pageVoiceInfo = restaurant.pageVoices[pageId];
+            if (pageVoiceInfo) {
+                 if (pageId === 'menu') {
+                    const missionElement = document.getElementById('missionText');
+                    if (missionElement) {
+                        const missionClone = missionElement.cloneNode(true);
+                        missionClone.querySelectorAll('span').forEach(span => span.remove());
+                        const missionText = missionClone.textContent.trim().replace(/\s\s+/g, ' ');
+                        speakText(missionText, pageVoiceInfo.lang, pageVoiceInfo.preferred);
+                    }
+                } else {
+                     const greeting = restaurant.pageVoices[pageId].greeting;
+                     if(greeting) speakText(greeting, pageVoiceInfo.lang, pageVoiceInfo.preferred);
+                }
+            }
+
+            if (pageId === 'prices') generatePriceControls();
+            if (pageId === 'summary') generateSummary();
+            updateProgress();
+        }
+
+        // --- DRAG AND DROP (Desktop + Touch) ---
+        let draggingElement = null;
+        let ghostElement = null;
+        let touchOffsetX = 0;
+        let touchOffsetY = 0;
+
+        function initDragAndDrop() {
+            document.addEventListener('touchstart', handleTouchStart, { passive: false });
+            document.addEventListener('touchmove', handleTouchMove, { passive: false });
+            document.addEventListener('touchend', handleTouchEnd);
+        }
+
+        function allowDrop(ev) { ev.preventDefault(); ev.target.closest('.drop-zone').classList.add('drag-over'); }
+        function dragLeave(ev) { ev.target.closest('.drop-zone').classList.remove('drag-over'); }
+        function drag(ev) {
+            const data = { emoji: ev.target.dataset.emoji, name: ev.target.dataset.name };
+            ev.dataTransfer.setData("text/plain", JSON.stringify(data));
+        }
+        function drop(ev) {
+            ev.preventDefault();
+            const dropZone = ev.target.closest('.drop-zone');
+            dropZone.classList.remove('drag-over');
+            const data = JSON.parse(ev.dataTransfer.getData("text/plain"));
+            handleDropLogic(dropZone, data);
+        }
+
+        function handleTouchStart(e) {
+            if (e.target.classList.contains('emoji-item')) {
+                e.preventDefault();
+                draggingElement = e.target;
+                const rect = draggingElement.getBoundingClientRect();
+                touchOffsetX = e.touches[0].clientX - rect.left;
+                touchOffsetY = e.touches[0].clientY - rect.top;
+
+                ghostElement = draggingElement.cloneNode(true);
+                ghostElement.style.position = 'absolute';
+                ghostElement.style.zIndex = '1001';
+                ghostElement.style.pointerEvents = 'none';
+                ghostElement.style.opacity = '0.7';
+                ghostElement.style.transform = 'scale(1.2)';
+                document.body.appendChild(ghostElement);
+                moveGhost(e.touches[0]);
+            }
+        }
+
+        function handleTouchMove(e) {
+            if (draggingElement) {
+                e.preventDefault();
+                moveGhost(e.touches[0]);
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (draggingElement) {
+                ghostElement.style.display = 'none';
+                const elementUnder = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+                ghostElement.style.display = 'block';
+                
+                const dropZone = elementUnder ? elementUnder.closest('.drop-zone') : null;
+                if (dropZone) {
+                    const data = { emoji: draggingElement.dataset.emoji, name: draggingElement.dataset.name };
+                    handleDropLogic(dropZone, data);
+                }
+
+                document.body.removeChild(ghostElement);
+                draggingElement = null;
+                ghostElement = null;
+                document.querySelectorAll('.drop-zone').forEach(zone => zone.classList.remove('drag-over'));
+            }
+        }
+        
+        function moveGhost(touch) {
+            if (ghostElement) {
+                ghostElement.style.left = `${touch.pageX - touchOffsetX}px`;
+                ghostElement.style.top = `${touch.pageY - touchOffsetY}px`;
+                ghostElement.style.display = 'none';
+                const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+                ghostElement.style.display = 'block';
+                document.querySelectorAll('.drop-zone').forEach(zone => {
+                    zone.classList.toggle('drag-over', zone === elementUnder || zone.contains(elementUnder));
+                });
+            }
+        }
+        
+        function handleDropLogic(dropZone, data) {
+            const droppedItem = document.createElement('div');
+            droppedItem.className = 'dropped-item';
+            droppedItem.innerHTML = `${data.emoji} ${data.name}`;
+            droppedItem.onclick = () => removeItem(droppedItem, dropZone.id, data);
+            
+            dropZone.querySelector('.dropped-items').appendChild(droppedItem);
+            storeMenuItem(dropZone.id, data);
+            playTone(200, 0.15); // "Plop" sound
+
+            const description = foodDescriptions[data.name];
+            if (description) {
+                speakText(description.text, description.lang, description.preferred);
+            } else {
+                const phrases = ["Great choice!", "Yummy!", "Looks delicious!", "Excellent!"];
+                const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+                const voiceInfo = restaurant.pageVoices[currentPage];
+                speakText(randomPhrase, voiceInfo.lang, voiceInfo.preferred, () => {
+                    speakText(data.name, voiceInfo.lang, voiceInfo.preferred);
+                });
+            }
+            updateProgress();
+        }
+
+        function removeItem(element, dropZoneId, data) {
+            playTone(880, 0.1, 'triangle'); // Click sound
+            element.remove();
+            removeMenuItem(dropZoneId, data);
+            updateProgress();
+        }
+        function getMenuCategory(dropZoneId) {
+            if (dropZoneId.includes('breakfast')) return restaurant.breakfast;
+            if (dropZoneId.includes('lunch')) return restaurant.lunch;
+            if (dropZoneId.includes('dinner')) return restaurant.dinner;
+        }
+        function storeMenuItem(dropZoneId, data) {
+            const category = getMenuCategory(dropZoneId);
+            const type = dropZoneId.includes('Drinks') ? 'drinks' : 'foods';
+            if (!category[type].some(item => item.name === data.name)) {
+                category[type].push(data);
+            }
+        }
+        function removeMenuItem(dropZoneId, data) {
+            const category = getMenuCategory(dropZoneId);
+            const type = dropZoneId.includes('Drinks') ? 'drinks' : 'foods';
+            const index = category[type].findIndex(item => item.name === data.name);
+            if (index > -1) category[type].splice(index, 1);
+        }
+
+        // --- UI & DATA UPDATES ---
+        function generatePriceControls() {
+            const pricesList = document.getElementById('pricesList');
+            pricesList.innerHTML = '';
+            const allItems = [...restaurant.breakfast.foods, ...restaurant.breakfast.drinks, ...restaurant.lunch.foods, ...restaurant.lunch.drinks, ...restaurant.dinner.foods, ...restaurant.dinner.drinks];
+            const uniqueItems = [...new Map(allItems.map(item => [item.name, item])).values()];
+            uniqueItems.forEach(item => {
+                if (!restaurant.prices[item.name]) restaurant.prices[item.name] = 5;
+                const priceControl = document.createElement('div');
+                priceControl.className = 'price-controls';
+                priceControl.innerHTML = `<span style="font-size: 1.5rem; color: #333;">${item.emoji} ${item.name}</span> <div class="price-dial" onclick="adjustPrice('${item.name}', -1)">-</div> <span style="font-size: 1.3rem; font-weight: bold; color: #333;" id="price-${item.name}">${restaurant.currency.symbol}${restaurant.prices[item.name]}</span> <div class="price-dial" onclick="adjustPrice('${item.name}', 1)">+</div>`;
+                pricesList.appendChild(priceControl);
+            });
+        }
+
+        function adjustPrice(itemName, change) {
+            restaurant.prices[itemName] = Math.max(1, (restaurant.prices[itemName] || 5) + change);
+            const newPrice = restaurant.prices[itemName];
+            const currencySymbol = restaurant.currency.symbol;
+            document.getElementById(`price-${itemName}`).textContent = `${currencySymbol}${newPrice}`;
+            
+            playTone(523, 0.1); 
+            setTimeout(() => playTone(659, 0.3), 100);
+            
+            const voiceInfo = restaurant.pageVoices.prices;
+            speakText(`${itemName}, ${newPrice} ${restaurant.currency.name}`, voiceInfo.lang, voiceInfo.preferred);
+        }
+        
+        function adjustTime(meal, type, change) {
+            event.stopPropagation(); 
+            let minutes = restaurant.times[meal][type];
+            minutes = (minutes + change + 1440) % 1440;
+            restaurant.times[meal][type] = minutes;
+            const formattedTime = formatTime(minutes);
+            document.getElementById(`${meal}-${type}`).textContent = formattedTime;
+            const voiceInfo = restaurant.pageVoices.times;
+            speakText(timeToSpeakableText(formattedTime), voiceInfo.lang, voiceInfo.preferred);
+        }
+
+        function formatTime(minutes) {
+            const hours24 = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            const ampm = hours24 >= 12 ? 'PM' : 'AM';
+            let hours12 = hours24 % 12;
+            hours12 = hours12 ? hours12 : 12; 
+            const formattedMins = mins < 10 ? '0' + mins : mins;
+            return `${hours12}:${formattedMins} ${ampm}`;
+        }
+        
+        function timeToSpeakableText(timeString) {
+            let [time] = timeString.split(' ');
+            let [hour, minute] = time.split(':');
+            let minuteText = parseInt(minute) === 0 ? "o'clock" : (parseInt(minute) < 10 ? `oh ${parseInt(minute)}` : minute);
+            return `${hour} ${minuteText}`;
+        }
+
+        function toggleTime(element, timeSlot) {
+            playTone(600, 0.1, 'square');
+            element.classList.toggle('selected');
+            const index = restaurant.openingHours.indexOf(timeSlot);
+            if (element.classList.contains('selected')) {
+                if (index === -1) restaurant.openingHours.push(timeSlot);
+            } else {
+                if (index > -1) restaurant.openingHours.splice(index, 1);
+            }
+            updateProgress();
+        }
+
+        function selectStaffCountry(element, role, lang) {
+            const parentCard = element.closest('.staff-card');
+            parentCard.querySelectorAll('.flag-item').forEach(item => item.classList.remove('selected'));
+            element.classList.add('selected');
+
+            restaurant.staff[role].lang = lang;
+            
+            const script = staffScripts[lang];
+            const voiceInfo = restaurant.pageVoices.staff;
+            
+            const preferredNativeVoices = {
+                'de-DE': ['Seraphina'],
+                'es-ES': ['Sonia'],
+                'fr-FR': ['Nicolas'],
+                'zh-CN': ['Xiaoxiao']
+            };
+
+            if (script) {
+                 speakText(script.english, voiceInfo.lang, voiceInfo.preferred, () => {
+                     speakText(script.native, lang, preferredNativeVoices[lang]);
+                 });
+            }
+        }
+
+        function updateStaff() {
+            document.querySelectorAll('.staff-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const role = e.target.dataset.role;
+                    restaurant.staff[role].name = e.target.value;
+                    updateProgress();
+                });
+            });
+        }
+
+        function updateProgress() {
+            document.getElementById('breakfastCount').textContent = restaurant.breakfast.foods.length + restaurant.breakfast.drinks.length;
+            document.getElementById('lunchCount').textContent = restaurant.lunch.foods.length + restaurant.lunch.drinks.length;
+            document.getElementById('dinnerCount').textContent = restaurant.dinner.foods.length + restaurant.dinner.drinks.length;
+            const hiredStaff = Object.values(restaurant.staff).filter(s => s.name.trim() !== "").length;
+            document.getElementById('staffCount').textContent = `${hiredStaff}/5`;
+            document.getElementById('hoursCount').textContent = `${restaurant.openingHours.length}/4`;
+        }
+
+        function generateSummary() {
+            const summaryContainer = document.getElementById('restaurantSummary');
+            summaryContainer.innerHTML = ''; 
+            const createCard = (title, content) => `<div class="summary-card"><div class="summary-title">${title}</div><div class="menu-preview">${content}</div></div>`;
+            let overviewContent = `<strong>Restaurant Name:</strong> ${restaurant.restaurantName || 'N/A'}<br><strong>Owner:</strong> ${restaurant.owner || 'N/A'}<br><strong>Currency:</strong> ${restaurant.currency.code} (${restaurant.currency.symbol})<br><strong>Opening Hours:</strong> ${restaurant.openingHours.join(', ') || 'N/A'}`;
+            summaryContainer.innerHTML += createCard('🏪 Restaurant Overview', overviewContent);
+            
+            const createMenuContent = (menu) => {
+                const allItems = [...menu.foods, ...menu.drinks];
+                return allItems.length > 0 ? allItems.map(item => `<div>${item.emoji} ${item.name} - ${restaurant.currency.symbol}${restaurant.prices[item.name] || 5}</div>`).join('') : null;
+            };
+            
+            const breakfastContent = createMenuContent(restaurant.breakfast);
+            if (breakfastContent) summaryContainer.innerHTML += createCard('🌅 Breakfast Menu', breakfastContent);
+            const lunchContent = createMenuContent(restaurant.lunch);
+            if (lunchContent) summaryContainer.innerHTML += createCard('☀️ Lunch Menu', lunchContent);
+            const dinnerContent = createMenuContent(restaurant.dinner);
+            if (dinnerContent) summaryContainer.innerHTML += createCard('🌙 Dinner Menu', dinnerContent);
+
+            const staffList = Object.entries(restaurant.staff).filter(([, s]) => s.name.trim() !== "");
+            if (staffList.length > 0) {
+                const staffContent = staffList.map(([role, staff]) => {
+                    const emojiMap = { chef: '👨‍🍳', cook: '👩‍🍳', manager: '👨‍💼', waiter: '🤵', waitress: '🤵‍♀️'};
+                    return `<div>${emojiMap[role]} ${role.charAt(0).toUpperCase() + role.slice(1)}: ${staff.name}</div>`;
+                }).join('');
+                summaryContainer.innerHTML += createCard('👥 Our Amazing Team', staffContent);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
