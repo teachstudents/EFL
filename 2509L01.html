@@ -370,15 +370,14 @@
         .point-badge { font-size: 2rem; color: #ffd700; text-shadow: 0 0 10px #ff8c00; top: 15%; }
         @keyframes praise-animation { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; } 100% { transform: translate(-50%, -200%) scale(1.2); opacity: 0; } }
 
-        .encouragement-phrase {
+        .incorrect-word {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%); font-size: 1.5rem; font-weight: bold;
-            z-index: 100; pointer-events: none; animation: encouragement-animation 2s ease-out forwards;
-            color: #ffd700; text-shadow: 0 0 10px #ff8c00; text-align: center; width: 80%;
+            z-index: 100; pointer-events: none; animation: incorrect-animation 1.5s ease-out forwards;
+            text-shadow: 0 0 10px #ff8c00; text-align: center; width: 80%;
         }
-        @keyframes encouragement-animation {
+        @keyframes incorrect-animation {
             0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
-            80% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
             100% { transform: translate(-50%, -120%) scale(1); opacity: 0; }
         }
 
@@ -544,6 +543,58 @@
         const correctPhrases = ["Stellar work!", "You've got it!", "Absolutely brilliant!", "That's the one!", "Incredible!", "You're a genius!", "Keep it up!", "Outstanding!", "Perfectly done!", "You're on fire!"];
         const incorrectPhrases = ["Great attempt! Let's try another.", "Not this time, but you're getting warmer!", "Every try is a step forward. Keep going!", "Mistakes are proof that you are trying. Don't stop!", "That's not the answer, but I believe in you!", "So close! What's your next idea?", "Don't worry, the best discoveries come after a few tries.", "That's a learning opportunity! Try again.", "Your persistence is inspiring. Let's go again.", "Even experts get it wrong sometimes. You've got this!"];
 
+        // ✅ German praise phrases for correct answers
+        const germanCorrectPhrases = [
+            "Sehr gut gespielt!",
+            "Du hast großartig gearbeitet!",
+            "Weiter so, das war spitze!",
+            "Fantastische Leistung!",
+            "Du bist ein Champion!",
+            "Klasse gemacht!",
+            "Das war beeindruckend!",
+            "Toll, du hast es geschafft!",
+            "Hervorragend gespielt!",
+            "Super, du bist auf dem richtigen Weg!"
+        ];
+
+        // ❌ German feedback phrases for incorrect answers
+        const germanIncorrectPhrases = [
+            "Fast richtig, versuch es noch einmal.",
+            "Nicht ganz, probiere es erneut.",
+            "Das war knapp daneben.",
+            "Keine Sorge, du schaffst es beim nächsten Mal.",
+            "Nicht korrekt, aber du bist auf dem richtigen Weg.",
+            "Versuch es noch einmal, du kannst das!",
+            "Das war nicht richtig, aber gib nicht auf.",
+            "Knapp verfehlt, weiter so!",
+            "Leider falsch, aber du lernst dazu.",
+            "Nicht ganz richtig, bleib dran!"
+        ];
+
+        // 🎤 Speak a random German phrase (correct or incorrect)
+        function speakGermanFeedback(isCorrect) {
+            const phrases = isCorrect ? germanCorrectPhrases : germanIncorrectPhrases;
+            const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+
+            const utter = new SpeechSynthesisUtterance(phrase);
+            utter.lang = "de-DE";
+
+            const voices = speechSynthesis.getVoices();
+            // Find the preferred high-quality voices, as requested for Microsoft Edge.
+            let germanVoice = voices.find(v => v.name === "SeraphinaMultilingualNeural" && v.lang === "de-DE");
+            if (!germanVoice) {
+                germanVoice = voices.find(v => v.name === "FlorianMultilingualNeural" && v.lang === "de-DE");
+            }
+
+            // If a preferred German voice is found, use it.
+            if (germanVoice) {
+                utter.voice = germanVoice;
+            }
+
+            speechSynthesis.cancel();
+            speechSynthesis.speak(utter);
+        }
+
         const TEAM_REVEAL_TIME = 5000; // Adjustable reveal time for teams
 
         // Game State
@@ -572,6 +623,8 @@
         function loadVoices() {
             const voices = speechSynthesis.getVoices();
             if (voices.length === 0) return; 
+
+            console.log("Available voices:", voices.map(v => v.name));
 
             const naturalVoices = voices.filter(v => v.name.includes('Natural') && v.lang.startsWith('en-'));
             const requestedVoiceNames = ['Ava', 'Emma', 'Brian'];
@@ -858,21 +911,43 @@
         function showPraise(playerNum) {
             const text = correctPhrases[Math.floor(Math.random() * correctPhrases.length)];
             const el = document.createElement('div');
-            el.className = 'praise-word'; el.textContent = text;
+            el.className = 'praise-word';
+            el.textContent = text;
             el.style.color = playerNum === 1 ? '#ff6b6b' : '#4ecdc4';
+
             const badge = document.createElement('div');
-            badge.className = 'point-badge'; badge.textContent = "+1";
+            badge.className = 'point-badge';
+            badge.textContent = "+1";
+
             const container = document.getElementById(`team${playerNum}GameArea`);
-            container.appendChild(el); container.appendChild(badge);
-            setTimeout(() => { el.remove(); badge.remove(); }, 1500);
+            container.appendChild(el);
+            container.appendChild(badge);
+
+            // 🔊 Speak German praise at the same time as animation
+            speakGermanFeedback(true);
+
+            setTimeout(() => {
+                el.remove();
+                badge.remove();
+            }, 1500);
         }
 
-        function showEncouragement(playerNum) {
-            const phrase = incorrectPhrases[Math.floor(Math.random() * incorrectPhrases.length)];
+        function showIncorrect(playerNum) {
+            const text = incorrectPhrases[Math.floor(Math.random() * incorrectPhrases.length)];
             const el = document.createElement('div');
-            el.className = 'encouragement-phrase'; el.textContent = phrase;
-            document.getElementById(`team${playerNum}GameArea`).appendChild(el);
-            setTimeout(() => el.remove(), 2000);
+            el.className = 'incorrect-word';
+            el.textContent = text;
+            el.style.color = '#999';
+
+            const container = document.getElementById(`team${playerNum}GameArea`);
+            container.appendChild(el);
+
+            // 🔊 Speak German incorrect feedback in sync
+            speakGermanFeedback(false);
+
+            setTimeout(() => {
+                el.remove();
+            }, 1500);
         }
 
         // Logic no longer advances the game; it only provides feedback.
@@ -889,7 +964,7 @@
                 showPraise(playerNum); createFireworks();
             } else {
                 if (playerNum === 1) gameState.team2Score++; else gameState.team1Score++;
-                showEncouragement(playerNum);
+                showIncorrect(playerNum);
             }
             document.getElementById('team1Score').textContent = gameState.team1Score;
             document.getElementById('team2Score').textContent = gameState.team2Score;
