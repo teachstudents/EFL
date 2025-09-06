@@ -633,9 +633,9 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 
-                const isEdge = window.navigator.userAgent.includes("Edg");
+                const isMobileEdge = /Edg\/\d+.*Android/.test(navigator.userAgent);
                 let options = {};
-                if (!isEdge) {
+                if (!isMobileEdge) {
                     const mimeTypes = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/ogg'];
                     const supportedType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
                     if (supportedType) options.mimeType = supportedType;
@@ -681,14 +681,13 @@
         function startTranscription() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                console.warn("Speech recognition not supported.");
+                console.warn("Speech recognition not supported — skipping setup.");
                 return;
             }
 
             speechRecognition = new SpeechRecognition();
             speechRecognition.continuous = true;
             speechRecognition.interimResults = true;
-            speechRecognition.lang = 'en-US';
             finalTranscript = '';
 
             speechRecognition.onresult = (event) => {
@@ -775,7 +774,7 @@
         // --- Snowfall Logic ---
         function createSnow() {
             const snowContainer = document.getElementById('snow-container');
-            const snowflakeCount = 50;
+            const snowflakeCount = window.innerWidth < 768 ? 15 : 50;
             for (let i = 0; i < snowflakeCount; i++) {
                 let snowflake = document.createElement('div');
                 snowflake.innerHTML = '❄';
