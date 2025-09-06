@@ -110,9 +110,9 @@
             <div id="topic-selection-container" class="hidden">
                  <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">Hello, <span id="user-name-display"></span>!</h1>
                  <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                     <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
-                     <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
-                     <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
+                      <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
+                      <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
+                      <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
                  </div>
                 <div id="topic-selection" class="grid grid-cols-3 gap-4">
                     <!-- Topic buttons will be injected here -->
@@ -156,19 +156,27 @@
                     <!-- Post-Recording Controls -->
                     <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-2">
                         <audio id="audio-player" controls class="w-full max-w-xs"></audio>
-                        <div class="flex items-center justify-center space-x-2 w-full max-w-xs">
-                             <button id="download-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-colors">
-                                 <i class="fas fa-download mr-1"></i>Download
-                             </button>
-                            <a href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ" target="_blank" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md">
-                                 <i class="fas fa-upload mr-1"></i>Upload
-                             </a>
+                        <div class="flex flex-col gap-3 w-full max-w-xs">
+                          <!-- Smart Download button -->
+                          <button id="download-btn"
+                                  class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                            <i class="fas fa-download mr-1"></i>Download Recording / Open Folder
+                          </button>
+                        
+                          <!-- Upload button -->
+                          <a id="sharepoint-upload-link"
+                             href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ"
+                             target="_blank"
+                             rel="noopener noreferrer"
+                             class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-green-500/50 focus:ring-2 focus:ring-green-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                            <i class="fas fa-upload mr-1"></i>Upload to Folder
+                          </a>
                         </div>
                     </div>
                 </div>
                  <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold mb-1">
-                     <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
-                     Recording...
+                      <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
+                      Recording...
                  </div>
             </header>
             
@@ -553,9 +561,9 @@
                     const parsed = JSON.parse(savedCompletedTopics);
                     // Basic validation to ensure it's an object
                     if (typeof parsed === 'object' && parsed !== null) {
-                       completedTopics = parsed;
+                        completedTopics = parsed;
                     } else {
-                        completedTopics = {};
+                         completedTopics = {};
                     }
                 } catch (e) {
                     console.error("Failed to parse saved progress:", e);
