@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -89,19 +89,14 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
+<body class="bg-gray-100 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
     
     <div id="snow-container"></div>
-
-    <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 fixed top-4 right-4 z-50">
-        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 10.607a1 1 0 010-1.414l.707-.707a1 1 0 111.414 1.414l-.707-.707a1 1 0 01-1.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707z"></path></svg>
-    </button>
 
     <div id="app-container" class="w-full max-w-xl mx-auto text-center h-full">
         
         <!-- Welcome Screen -->
-        <div id="welcome-screen" class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center">
+        <div id="welcome-screen" class="bg-white dark:bg-gray-800 dark:shadow-lg p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center">
             <div id="name-entry-container">
                 <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">Joel's Speaking Practice 06</h1>
                 <input type="text" id="name-input" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 text-center text-lg text-gray-900 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600">
@@ -110,9 +105,9 @@
             <div id="topic-selection-container" class="hidden">
                  <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">Hello, <span id="user-name-display"></span>!</h1>
                  <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                     <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
-                     <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
-                     <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
+                      <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
+                      <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
+                      <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
                  </div>
                 <div id="topic-selection" class="grid grid-cols-3 gap-4">
                     <!-- Topic buttons will be injected here -->
@@ -121,7 +116,7 @@
         </div>
 
         <!-- Main Practice Screen -->
-        <div id="practice-screen" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg app-shell p-3 sm:p-4">
+        <div id="practice-screen" class="hidden bg-white dark:bg-gray-800 dark:shadow-lg rounded-2xl shadow-lg app-shell p-3 sm:p-4">
             <header class="flex-shrink-0">
                 <div class="flex justify-between items-center mb-1">
                     <button id="back-to-topics-btn" class="text-indigo-500 hover:text-indigo-700"><i class="fas fa-arrow-left mr-2"></i>Topics</button>
@@ -156,19 +151,27 @@
                     <!-- Post-Recording Controls -->
                     <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-2">
                         <audio id="audio-player" controls class="w-full max-w-xs"></audio>
-                        <div class="flex items-center justify-center space-x-2 w-full max-w-xs">
-                             <button id="download-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-colors">
-                                 <i class="fas fa-download mr-1"></i>Download
-                             </button>
-                            <a href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ" target="_blank" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md">
-                                 <i class="fas fa-upload mr-1"></i>Upload
-                             </a>
+                        <div class="flex flex-col gap-3 w-full max-w-xs">
+                           <!-- Smart Download button -->
+                           <button id="download-btn"
+                                   class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                               <i class="fas fa-download mr-1"></i>Download Recording / Open Folder
+                           </button>
+                           
+                           <!-- Upload button -->
+                           <a id="sharepoint-upload-link"
+                                 href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ"
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-green-500/50 focus:ring-2 focus:ring-green-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                               <i class="fas fa-upload mr-1"></i>Upload to Folder
+                           </a>
                         </div>
                     </div>
                 </div>
                  <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold mb-1">
-                     <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
-                     Recording...
+                      <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
+                      Recording...
                  </div>
             </header>
             
@@ -227,211 +230,117 @@
     document.addEventListener('DOMContentLoaded', () => {
         // --- DATA: Questions and Sample Answers for Part 06 ---
         const practiceData = {
-            "Your Room": [
+            "A Memorable Teacher": [
                 { 
-                    question: "Describe your bedroom. What furniture is in it?", 
-                    starters: ["My bedroom is quite...", "In my room, there is a...", "I have a desk where I...", "The walls are decorated with..."], 
-                    wordBank: ["bed", "desk", "chair", "wardrobe", "bookshelf", "window", "posters", "lamp", "tidy", "messy"], 
+                    question: "Think about a teacher who has had a positive impact on you. What made them a good teacher?", 
+                    starters: ["I'll always remember my... teacher because...", "What made them so great was...", "They taught me the importance of...", "Unlike other teachers, they..."], 
+                    wordBank: ["passionate", "patient", "inspiring", "encouraging", "made learning fun", "cared about students", "explained clearly", "supportive", "mentor"], 
                     samples: [
-                        "My bedroom is not very big, but it's cozy. It has a bed, a desk for studying, and a large bookshelf because I love to read.",
-                        "In my room, I have a big window, so it gets a lot of natural light. I also have a comfortable chair where I can sit and relax.",
-                        "The walls in my room are decorated with posters of my favorite movies and bands, because it makes the space feel more personal to me."
-                    ] 
-                },
-                { 
-                    question: "How do you keep your room tidy? Or is it usually messy?", 
-                    starters: ["I try to keep my room...", "To be honest, it's usually...", "I clean my room every...", "My parents always tell me to..."], 
-                    wordBank: ["tidy", "organized", "messy", "clean up", "put things away", "once a week", "a bit chaotic", "neat"], 
-                    samples: [
-                        "I try my best to keep my room tidy. For example, I make my bed every morning and put my books back on the shelf after I finish studying.",
-                        "To be honest, my room is usually a bit messy during the week because I'm so busy with school, but I always clean it up on the weekend.",
-                        "I think it's important to have an organized desk, because a tidy space helps me to focus better when I'm doing my homework."
+                        "I'll always remember my history teacher because he was so passionate about the subject. He told stories instead of just listing facts, which made the class so much more interesting.",
+                        "What made my English teacher so great was her patience. I used to be afraid to speak, but she was always very encouraging and created a supportive atmosphere in class.",
+                        "My physics teacher had a positive impact on me because he explained difficult concepts very clearly and showed us how they applied to the real world."
                     ] 
                 }
             ],
-            "Getting Around": [
+            "Learning from Mistakes": [
                 { 
-                    question: "How do you usually travel to school?", 
-                    starters: ["I usually go to school by...", "My school is close, so I...", "Every morning, my dad...", "I take the... to get to school."], 
-                    wordBank: ["subway", "bus", "bicycle", "walking", "by car", "commute", "takes about...", "convenient", "crowded"], 
+                    question: "Imagine you accidentally said something slightly offensive to a new German friend because of a cultural misunderstanding. What would you do?", 
+                    starters: ["If that happened, the first thing I would do is...", "I would try to explain that...", "I think the most important thing is to...", "To fix the situation, I would..."], 
+                    wordBank: ["apologize sincerely", "explain the misunderstanding", "cultural difference", "didn't mean to offend", "ask for clarification", "learn from it", "be open", "honest communication", "rectify"], 
                     samples: [
-                        "I usually take the subway to school. It's very convenient because the station is close to my home, but it can be very crowded in the morning.",
-                        "My school is not far from my home, so I ride my bicycle to school every day. It's good exercise and it's environmentally friendly.",
-                        "I usually walk to school with my friend who lives nearby. It takes about 15 minutes, and it's a nice way to chat before our classes start."
-                    ] 
-                },
-                { 
-                    question: "What is your favorite way to travel (e.g., by train, car, plane, bicycle)? Why?", 
-                    starters: ["My favorite way to travel is by...", "I really enjoy traveling by... because...", "For long distances, I prefer...", "I think... is the best way to travel."], 
-                    wordBank: ["train", "plane", "car", "bicycle", "scenery", "fast", "relaxing", "adventurous", "road trip", "comfortable"], 
-                    samples: [
-                        "My favorite way to travel is by train, because you can look out the window and see the beautiful scenery of the countryside passing by.",
-                        "I enjoy traveling by plane because it is the fastest way to get to faraway places, and I love the feeling of being up in the clouds.",
-                        "I think traveling by car is the best, because you have more freedom. For example, you can stop anywhere you want to take pictures or explore a small town."
+                        "If that happened, I would immediately apologize sincerely. I'd explain that I'm still learning about German culture and that I didn't mean to be offensive at all.",
+                        "I would try to explain what is common in my own culture, so they could understand where the misunderstanding came from. Honest communication is key.",
+                        "After apologizing, I would ask them to explain their perspective so I could learn from the mistake and avoid making it again in the future."
                     ] 
                 }
             ],
-            "Birthdays": [
+            "Ideal Weekend in Germany": [
                 { 
-                    question: "How do you usually celebrate your birthday?", 
-                    starters: ["For my birthday, I usually...", "My family and I always...", "I like to celebrate with...", "A typical birthday for me is..."], 
-                    wordBank: ["have a party", "go out for dinner", "eat a birthday cake", "get presents", "spend time with family", "celebrate with friends", "special meal"], 
+                    question: "If you had a free weekend and a small budget in Germany, how would you plan your ideal trip to a nearby city?", 
+                    starters: ["My ideal trip would be to...", "To save money, I would plan to...", "First, I would research...", "I would want to visit... and try..."], 
+                    wordBank: ["regional train", "youth hostel", "free walking tour", "local market", "picnic", "explore by foot", "research online", "budget", "itinerary"], 
                     samples: [
-                        "For my birthday, my family and I always go out for a special dinner at my favorite restaurant. Afterwards, we go home and eat a big birthday cake.",
-                        "I usually celebrate my birthday with a small group of my closest friends. For example, last year we went to see a movie and then played video games at my house.",
-                        "My favorite way to celebrate is just having a quiet day with my family. My mom usually cooks a big meal with all my favorite dishes."
+                        "I would plan a trip to a nearby city like Cologne. To save money, I'd take a regional train and maybe stay in a youth hostel.",
+                        "First, I would research free attractions, like walking around the old town or visiting the cathedral. I'd also look for a local market to try some affordable food.",
+                        "My itinerary would be to explore the city by foot to save on transport, maybe have a picnic in a park for lunch, and just soak in the atmosphere."
                     ] 
-                },
+                }
+            ],
+            "Homesickness Scenario": [
                  { 
-                    question: "What is the best birthday gift you have ever received?", 
-                    starters: ["The best gift I ever got was...", "I was so happy when I received...", "One year, my parents gave me...", "It was special because..."], 
-                    wordBank: ["surprise", "thoughtful", "exactly what I wanted", "memorable", "valuable", "sentimental", "unexpected", "special"], 
+                    question: "It's normal to feel homesick. Imagine you are feeling very lonely one evening in your dorm room. What are some positive things you could do to feel better?", 
+                    starters: ["If I felt homesick, the first thing I'd do is...", "Instead of staying alone, I would try to...", "A positive step would be to...", "To distract myself, I could..."], 
+                    wordBank: ["call family/friends", "cook comfort food", "go to a common area", "plan a small trip", "join a club activity", "exercise", "watch a funny movie", "reach out", "stay busy"], 
                     samples: [
-                        "The best gift I ever received was my first bicycle, because it gave me a new sense of freedom and I could explore my neighborhood by myself.",
-                        "One year, my best friend made me a photo album with all our pictures together. It was the best gift because it was so thoughtful and personal.",
-                        "I was so happy when my parents gave me a new computer for my birthday, because my old one was very slow and it made doing homework much easier."
+                        "If I was feeling homesick, I would probably call my family for a video chat. Seeing their faces and hearing their voices always makes me feel better.",
+                        "Instead of staying alone in my room, I might go to the student common area to be around other people, even if I don't talk to them.",
+                        "A positive thing to do would be to cook some comfort food from home, like stir-fried tomatoes and eggs. The familiar smell and taste would be comforting."
                     ] 
                 }
             ],
-            "Learning": [
+            "Designing a Course": [
                 { 
-                    question: "What is the most difficult thing about learning English for you?", 
-                    starters: ["For me, the hardest part is...", "I find... to be very challenging.", "I always struggle with...", "The most difficult thing is probably..."], 
-                    wordBank: ["pronunciation", "grammar", "vocabulary", "listening", "speaking", "memorizing words", "confidence", "confusing rules", "tenses"], 
+                    question: "If you could design a new, fun course for your high school, what would it be and what would students learn?", 
+                    starters: ["I would create a course called...", "In this class, students would learn how to...", "The goal of the course would be to...", "I think it would be popular because..."],
+                    wordBank: ["practical skills", "financial literacy", "public speaking", "creative writing", "digital art", "hands-on projects", "collaboration", "real-world application", "engaging"],
                     samples: [
-                        "For me, the hardest part of learning English is the pronunciation, because some sounds are very different from Chinese and are difficult for me to make.",
-                        "I find grammar to be very challenging, especially all the different verb tenses, because there are so many rules and also many exceptions.",
-                        "The most difficult thing is building my vocabulary. It's hard to memorize so many new words and then remember to use them when I'm speaking."
-                    ] 
-                },
-                { 
-                    question: "Besides school, how do you practice English?", 
-                    starters: ["Outside of class, I practice by...", "To improve my English, I like to...", "One thing I do is...", "I try to... every day."], 
-                    wordBank: ["watching movies", "listening to music", "reading books", "language apps", "talking to foreigners", "practicing with friends", "subtitles", "online videos"], 
-                    samples: [
-                        "To improve my English, I like to watch American movies with English subtitles. It helps my listening skills and I learn a lot of new slang and idioms.",
-                        "I use a language app on my phone for a few minutes every day to learn new vocabulary words, because it's a very convenient way to practice.",
-                        "I try to listen to English songs and I look up the lyrics, because it's a fun way to learn new phrases and improve my pronunciation."
+                        "I would design a course on practical life skills, where students learn things like basic cooking, how to manage a budget, and simple home repairs.",
+                        "I'd create a public speaking and debate class. The goal would be to help students build confidence and learn how to express their ideas clearly.",
+                        "A course in digital art and media would be very popular. Students would learn skills like graphic design and video editing, which are very useful in the real world."
                     ] 
                 }
             ],
-            "Daily Life": [
+            "A Favorite App": [
                 { 
-                    question: "What is the biggest difference between your life on a weekday and on a weekend?", 
-                    starters: ["The biggest difference is...", "On weekdays, I have to..., but on weekends, I can...", "My schedule is much more... on weekdays.", "During the week, I focus on..."], 
-                    wordBank: ["schedule", "free time", "relax", "wake up early", "busy", "structured", "flexible", "schoolwork", "hobbies"], 
+                    question: "Besides social media, what is one app on your phone that you find very useful or fun? Explain what it does.", 
+                    starters: ["An app I find really useful is...", "It helps me to...", "The main feature I like is...", "I would recommend it because..."],
+                    wordBank: ["utility", "productivity", "language learning", "photo editing", "note-taking", "organize", "efficient", "user-friendly", "feature"],
                     samples: [
-                        "The biggest difference is my schedule. On weekdays, my day is very structured with school and homework, but on weekends, I have the freedom to be more flexible.",
-                        "On weekdays, I have to wake up very early for school, but on weekends, I can sleep in late, which is something I always look forward to.",
-                        "During the week, my main focus is on studying, but on the weekend, I have more free time to spend on my hobbies and with my friends and family."
-                    ] 
-                },
-                { 
-                    question: "If you had one extra hour every day, what would you do?", 
-                    starters: ["If I had an extra hour, I would...", "I would use that time to...", "With one more hour, I could finally...", "I would definitely spend it on..."], 
-                    wordBank: ["read more", "get more sleep", "exercise", "learn something new", "practice a hobby", "relax", "spend time with family", "less stress"], 
-                    samples: [
-                        "If I had an extra hour every day, I would use it to read more books for fun, because I love reading but I often don't have enough time.",
-                        "I would definitely use that extra hour to get more sleep, because I often feel tired during the week and I think more sleep would help me concentrate better in class.",
-                        "I would use that time to learn a new skill, for example, practicing the guitar, because an hour a day would help me improve quickly."
+                        "I find my dictionary app, Pleco, extremely useful. It's great for looking up English words but also has features like a flashcard system to help me study.",
+                        "An app I use a lot is a note-taking app called Notion. It helps me organize all my school notes and personal projects in one place, which keeps me from getting messy.",
+                        "I really enjoy a language learning app called Duolingo for my German studies. The gamification makes it fun to practice every day, even for just a few minutes."
                     ] 
                 }
             ],
-            "Your Country": [
-                { 
-                    question: "What is one thing you think is beautiful about China?", 
-                    starters: ["One of the most beautiful things is...", "I think our country's... is amazing.", "I'm very proud of...", "Something truly beautiful is..."], 
-                    wordBank: ["long history", "beautiful landscapes", "delicious food", "culture", "diversity", "ancient architecture", "mountains", "rivers"], 
+            "Future Innovations": [
+                {
+                    question: "What is one invention or technology that doesn't exist yet, but you wish it did?",
+                    starters: ["I wish someone would invent...", "It would be amazing if we had...", "The technology I dream of is...", "This invention would help by..."],
+                    wordBank: ["instant translator", "flying cars", "teleportation device", "dream recorder", "eco-friendly energy", "solve a problem", "convenient", "futuristic", "impact society"],
                     samples: [
-                        "One of the most beautiful things about China is its long and rich history. For example, you can visit ancient places like the Great Wall and feel connected to the past.",
-                        "I think our country's diverse landscapes are amazing. You can find everything from tall mountains in the west to beautiful beaches in the south.",
-                        "Something truly beautiful is the variety of delicious food. Every province has its own special dishes, so you can always try something new and exciting."
-                    ] 
-                },
-                { 
-                    question: "If a tourist visited your city for only one day, what should they see?", 
-                    starters: ["They should definitely visit...", "I would recommend going to...", "The most important place to see is...", "They can't leave without trying..."], 
-                    wordBank: ["famous landmark", "local market", "museum", "historic site", "try the local food", "experience", "must-see", "recommendation"], 
-                    samples: [
-                        "If a tourist visited Beijing for one day, they should definitely visit the Forbidden City because it is the most famous landmark and it's full of history.",
-                        "I would recommend they go to a traditional market to experience the local life and try some authentic street food, like Jianbing.",
-                        "The most important place to see is the Great Wall. Even though it's outside the city, it's an unforgettable experience and a true symbol of China."
-                    ] 
+                        "I wish we had a perfect, real-time universal translator that you could wear in your ear. It would make communicating with people anywhere in the world so easy.",
+                        "It would be amazing to have a technology that could capture and replay dreams. I'm always so curious about the dreams I can't remember when I wake up.",
+                        "I dream of a truly efficient and cheap source of clean energy. An invention like that would have a huge positive impact on our planet and solve climate change."
+                    ]
                 }
             ],
-            "Friendship": [
-                { 
-                    question: "Who is your best friend? Can you describe them?", 
-                    starters: ["My best friend's name is...", "He/She is very...", "We became friends because...", "I like him/her because..."], 
-                    wordBank: ["funny", "kind", "supportive", "loyal", "smart", "same interests", "good listener", "always there for me", "sense of humor"], 
+            "Giving Directions Scenario": [
+                {
+                    question: "Imagine someone stops you on the street in Beijing and asks for directions in simple English to the nearest subway station. How would you explain it to them?",
+                    starters: ["Of course, I can help! First, you need to...", "You should go straight down this road until...", "When you see the big..., you need to turn...", "It's not far, just about a... minute walk."],
+                    wordBank: ["go straight", "turn left/right", "at the corner", "cross the street", "landmark", "intersection", "you can't miss it", "on your right side", "walk for... minutes"],
                     samples: [
-                        "My best friend is very funny and always makes me laugh, even when I'm having a bad day. We have the same sense of humor.",
-                        "Her name is Li Mei, and she is very kind and supportive. For example, if I have a problem with my homework, she always helps me.",
-                        "We became friends because we have a lot of common interests, especially our love for science fiction movies and books."
-                    ] 
-                },
-                { 
-                    question: "What activities do you enjoy doing with your friends?", 
-                    starters: ["My friends and I often...", "We love to...", "One of our favorite things to do is...", "When we hang out, we usually..."], 
-                    wordBank: ["play basketball", "go to the movies", "play video games", "just talk", "get bubble tea", "study together", "hang out", "have fun"], 
-                    samples: [
-                        "My friends and I love to play basketball together at the park on weekends. It's a fun way to get some exercise and be competitive.",
-                        "One of our favorite things to do is go to a cafe, get some bubble tea, and just talk for hours about school, music, and our plans for the future.",
-                        "When we hang out, we often study together. It's helpful because we can explain difficult concepts to each other and prepare for exams as a team."
-                    ] 
+                        "I would say: 'Sure. You need to go straight down this street for about two blocks. When you see the big bank on the corner, you should turn right.'",
+                        "'You can walk straight ahead until you get to the next big intersection. Cross the street, and the subway entrance will be right in front of you.'",
+                        "'It's very close. Just walk that way for about five minutes. You will see the big 'M' sign for the subway on your left side. You can't miss it.'"
+                    ]
                 }
             ],
-            "Goals": [
-                { 
-                    question: "What are you looking forward to in the next school year?", 
-                    starters: ["Next year, I'm looking forward to...", "I'm excited about...", "I hope that I can...", "One thing I'm excited for is..."], 
-                    wordBank: ["new classes", "making new friends", "learning new things", "school trip", "more challenging", "improving my grades", "joining a club"], 
+            "Message to Your Past Self": [
+                {
+                    question: "If you could send a one-sentence piece of advice to yourself from three years ago, what would you say?",
+                    starters: ["I would tell my younger self to...", "The advice I would give is...", "If I could say one thing, it would be...", "I would remind myself that..."],
+                    wordBank: ["don't worry so much", "be more confident", "start learning German earlier", "enjoy the moment", "it's okay to make mistakes", "cherish time with friends", "be brave", "work hard"],
                     samples: [
-                        "I'm excited about taking new classes, especially the advanced physics class, because I think it will be very challenging and interesting.",
-                        "Next school year, I'm looking forward to our school's arts festival, because I am planning to join the music club and perform on stage.",
-                        "I hope that I can improve my grades in history next year, because I plan to spend more time studying and reviewing the material."
-                    ] 
-                },
-                { 
-                    question: "What is a simple goal you have for yourself for this year?", 
-                    starters: ["A simple goal I have is to...", "This year, I want to try to...", "I'm aiming to...", "My goal is to make a habit of..."], 
-                    wordBank: ["read one book a month", "exercise more", "learn to cook a new dish", "get better grades", "be more organized", "save money", "simple goal"], 
-                    samples: [
-                        "A simple goal I have for this year is to read at least one book every month that is not for school, just for my own enjoyment.",
-                        "This year, I want to try to go to bed earlier on school nights, because I know that getting enough sleep is very important for my health and concentration.",
-                        "My goal is to learn how to cook three new dishes by myself, because I want to be able to help my parents more in the kitchen."
-                    ] 
-                }
-            ],
-            "Food & Drink": [
-                { 
-                    question: "What is your favorite drink? (e.g., tea, juice, soda) Why?", 
-                    starters: ["My favorite drink is...", "I love drinking... because...", "On a hot day, I like to have...", "I usually drink... with my meals."], 
-                    wordBank: ["tea", "juice", "soda", "water", "milk tea (bubble tea)", "refreshing", "healthy", "sweet", "thirst-quenching", "tasty"], 
-                    samples: [
-                        "My favorite drink is green tea because it has a very clean and refreshing taste, and my grandpa says it is very healthy for you.",
-                        "I love drinking bubble tea, especially the classic one with tapioca pearls. I like it because it's sweet and the pearls are fun to chew.",
-                        "On a hot summer day, my favorite drink is a cold glass of watermelon juice because it is very sweet and quenches my thirst perfectly."
-                    ] 
-                },
-                { 
-                    question: "Do you know how to cook? If yes, what can you cook? If no, what would you like to learn to cook?", 
-                    starters: ["Yes, I know how to cook some simple things, like...", "No, I'm not a very good cook, but I want to learn...", "I can make...", "I would love to learn how to cook..."], 
-                    wordBank: ["fried rice", "scrambled eggs", "noodles", "simple dish", "follow a recipe", "basic skills", "delicious meal", "favorite dish", "practice"], 
-                    samples: [
-                        "Yes, I know how to cook some simple dishes. For example, I can make pretty good scrambled eggs with tomatoes, which is a classic Chinese home-style dish.",
-                        "No, I don't know how to cook much besides instant noodles. I would love to learn how to cook my favorite dish, which is Kung Pao Chicken.",
-                        "I can follow a recipe to cook, but I'm not very creative. The dish I can make best is a simple fried rice with eggs and vegetables."
-                    ] 
+                        "I would tell my younger self: 'Don't worry so much about what other people think of you.'",
+                        "My advice would be: 'Start learning German a little bit every day; it will make the future much easier!'",
+                        "I would remind myself that it's okay to make mistakes, because that's the best way to learn and grow."
+                    ]
                 }
             ]
         };
 
-
         // --- DOM Elements ---
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
         const welcomeScreen = document.getElementById('welcome-screen');
         const practiceScreen = document.getElementById('practice-screen');
         const nameEntryContainer = document.getElementById('name-entry-container');
@@ -554,9 +463,9 @@
                     const parsed = JSON.parse(savedCompletedTopics);
                     // Basic validation to ensure it's an object
                     if (typeof parsed === 'object' && parsed !== null) {
-                       completedTopics = parsed;
+                        completedTopics = parsed;
                     } else {
-                        completedTopics = {};
+                         completedTopics = {};
                     }
                 } catch (e) {
                     console.error("Failed to parse saved progress:", e);
@@ -722,9 +631,9 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 
-                const isEdge = window.navigator.userAgent.includes("Edg");
+                const isMobileEdge = /Edg\/\d+.*Android/.test(navigator.userAgent);
                 let options = {};
-                if (!isEdge) {
+                if (!isMobileEdge) {
                     const mimeTypes = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/ogg'];
                     const supportedType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
                     if (supportedType) options.mimeType = supportedType;
@@ -770,7 +679,7 @@
         function startTranscription() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                console.warn("Speech recognition not supported.");
+                console.warn("Speech recognition not supported — skipping setup.");
                 return;
             }
 
@@ -848,23 +757,11 @@
             finalTranscript = '';
         }
 
-        // --- Theme Toggle Logic ---
-        const applyTheme = (theme) => {
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                themeToggleLightIcon.classList.remove('hidden');
-                themeToggleDarkIcon.classList.add('hidden');
-            } else {
-                document.documentElement.classList.remove('dark');
-                themeToggleDarkIcon.classList.remove('hidden');
-                themeToggleLightIcon.classList.add('hidden');
-            }
-        };
         
         // --- Snowfall Logic ---
         function createSnow() {
             const snowContainer = document.getElementById('snow-container');
-            const snowflakeCount = 50;
+            const snowflakeCount = window.innerWidth < 768 ? 15 : 50;
             for (let i = 0; i < snowflakeCount; i++) {
                 let snowflake = document.createElement('div');
                 snowflake.innerHTML = '❄';
@@ -900,14 +797,28 @@
         recordBtn.addEventListener('click', startRecording);
         stopRecordBtn.addEventListener('click', stopRecording);
         
+        // --- Certificate Download ---
         downloadCertificateBtn.addEventListener('click', () => {
-            const certificateNode = document.getElementById('certificate-to-download');
-            html2canvas(certificateNode, { scale: 2 }).then(canvas => {
+          const certificateNode = document.getElementById('certificate-to-download');
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+          const newTab = isIOS ? window.open() : null;
+
+          html2canvas(certificateNode, { scale: 2 }).then(canvas => {
+            canvas.toBlob(blob => {
+              const url = URL.createObjectURL(blob);
+              if (isIOS && newTab) {
+                newTab.location = url;
+              } else {
                 const a = document.createElement('a');
-                a.href = canvas.toDataURL('image/png');
+                a.href = url;
                 a.download = `Certificate_of_Completion_${userName.replace(/\s+/g, '_')}.png`;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
+              }
+              URL.revokeObjectURL(url);
             });
+          });
         });
 
         backToMainMenuBtn.addEventListener('click', () => {
@@ -916,31 +827,47 @@
             initializeTopics();
         });
 
+        // --- Recording Download ---
         downloadBtn.addEventListener('click', () => {
-            if (recordedBlob) {
-                const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
-                const sanitizedUserName = userName.replace(/\s+/g, '_');
-                const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
-                
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = URL.createObjectURL(recordedBlob);
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+          if (recordedBlob) {
+            const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
+            const sanitizedUserName = userName.replace(/\s+/g, '_');
+            const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
+            const blobUrl = URL.createObjectURL(recordedBlob);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-                // Visual feedback
-                const originalText = downloadBtn.innerHTML;
-                downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
-                downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                downloadBtn.classList.add('bg-green-600');
-                setTimeout(() => {
-                    downloadBtn.innerHTML = originalText;
-                    downloadBtn.classList.remove('bg-green-600');
-                    downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                }, 2000);
+            if (isIOS) {
+              // Open tab immediately to avoid Safari popup block
+              const newTab = window.open();
+              if (newTab) newTab.location = blobUrl;
+            } else {
+              const a = document.createElement('a');
+              a.style.display = 'none';
+              a.href = blobUrl;
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
             }
+
+            // Visual feedback
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
+            downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            downloadBtn.classList.add('bg-green-600');
+            setTimeout(() => {
+              downloadBtn.innerHTML = originalText;
+              downloadBtn.classList.remove('bg-green-600');
+              downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }, 2000);
+
+          } else {
+            // No recording — open SharePoint folder
+            window.open(
+              'https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ',
+              '_blank'
+            );
+          }
         });
 
         nextBtn.addEventListener('click', () => {
@@ -955,24 +882,13 @@
             initializeTopics();
         });
         
-        themeToggleBtn.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
-            applyTheme(isDark ? 'dark' : 'light');
-        });
-
         // --- Initial Load ---
         async function main() {
-            // Set initial theme
-            const savedTheme = localStorage.getItem('color-theme');
-            if (savedTheme) {
-                applyTheme(savedTheme);
-            } else {
-                // If no theme saved, use system preference
-                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    applyTheme('dark');
-                } else {
-                    applyTheme('light');
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            if (isIOS) {
+                const sharepointLink = document.getElementById('sharepoint-upload-link');
+                if(sharepointLink) {
+                    sharepointLink.removeAttribute('target');
                 }
             }
             
@@ -994,6 +910,14 @@
         }
         
         main();
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (isIOS) {
+            const sharepointLink = document.getElementById('sharepoint-upload-link');
+            if (sharepointLink) {
+                sharepointLink.removeAttribute('target');
+            }
+        }
     });
     </script>
 </body>
