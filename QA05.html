@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -89,19 +89,14 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
+<body class="bg-gray-100 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
     
     <div id="snow-container"></div>
-
-    <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 fixed top-4 right-4 z-50">
-        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 10.607a1 1 0 010-1.414l.707-.707a1 1 0 111.414 1.414l-.707-.707a1 1 0 01-1.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707z"></path></svg>
-    </button>
 
     <div id="app-container" class="w-full max-w-xl mx-auto text-center h-full">
         
         <!-- Welcome Screen -->
-        <div id="welcome-screen" class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center">
+        <div id="welcome-screen" class="bg-white dark:bg-gray-800 dark:shadow-lg p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center">
             <div id="name-entry-container">
                 <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">Joel's Speaking Practice 05</h1>
                 <input type="text" id="name-input" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 text-center text-lg text-gray-900 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600">
@@ -110,9 +105,9 @@
             <div id="topic-selection-container" class="hidden">
                  <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">Hello, <span id="user-name-display"></span>!</h1>
                  <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                     <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
-                     <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
-                     <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
+                      <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
+                      <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
+                      <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
                  </div>
                 <div id="topic-selection" class="grid grid-cols-3 gap-4">
                     <!-- Topic buttons will be injected here -->
@@ -121,7 +116,7 @@
         </div>
 
         <!-- Main Practice Screen -->
-        <div id="practice-screen" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg app-shell p-3 sm:p-4">
+        <div id="practice-screen" class="hidden bg-white dark:bg-gray-800 dark:shadow-lg rounded-2xl shadow-lg app-shell p-3 sm:p-4">
             <header class="flex-shrink-0">
                 <div class="flex justify-between items-center mb-1">
                     <button id="back-to-topics-btn" class="text-indigo-500 hover:text-indigo-700"><i class="fas fa-arrow-left mr-2"></i>Topics</button>
@@ -156,19 +151,27 @@
                     <!-- Post-Recording Controls -->
                     <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-2">
                         <audio id="audio-player" controls class="w-full max-w-xs"></audio>
-                        <div class="flex items-center justify-center space-x-2 w-full max-w-xs">
-                             <button id="download-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-colors">
-                                 <i class="fas fa-download mr-1"></i>Download
-                             </button>
-                            <a href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ" target="_blank" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md">
-                                 <i class="fas fa-upload mr-1"></i>Upload
-                             </a>
+                        <div class="flex flex-col gap-3 w-full max-w-xs">
+                           <!-- Smart Download button -->
+                           <button id="download-btn"
+                                   class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                               <i class="fas fa-download mr-1"></i>Download Recording / Open Folder
+                           </button>
+                           
+                           <!-- Upload button -->
+                           <a id="sharepoint-upload-link"
+                                 href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ"
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-green-500/50 focus:ring-2 focus:ring-green-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                               <i class="fas fa-upload mr-1"></i>Upload to Folder
+                           </a>
                         </div>
                     </div>
                 </div>
                  <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold mb-1">
-                     <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
-                     Recording...
+                      <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
+                      Recording...
                  </div>
             </header>
             
@@ -227,211 +230,117 @@
     document.addEventListener('DOMContentLoaded', () => {
         // --- DATA: Questions and Sample Answers for Part 05 ---
         const practiceData = {
-            "Routines": [
+            "A Special Place": [
                 { 
-                    question: "What is your morning routine like on a school day?", 
-                    starters: ["On a typical school day, I wake up at...", "The first thing I do is...", "Before I leave for school, I always...", "My morning is usually quite..."], 
-                    wordBank: ["wake up", "get dressed", "have breakfast", "brush my teeth", "pack my bag", "rush", "alarm clock", "early"], 
+                    question: "Describe a place in Beijing that is special to you, but that most tourists don't know about.", 
+                    starters: ["A place that's special to me is...", "It's not a famous tourist spot, but I love...", "I often go there to...", "This place makes me feel..."], 
+                    wordBank: ["hidden gem", "local", "quiet", "escape the city", "relaxing atmosphere", "personal memory", "peaceful", "off the beaten path", "nostalgic"], 
                     samples: [
-                        "On a school day, I wake up at 6:30 AM. The first thing I do is drink a glass of water, and then I get dressed and have a quick breakfast with my family.",
-                        "My morning routine is a bit of a rush. I try to wake up early, but I often press the snooze button, so I have to get ready very quickly.",
-                        "Before I leave for school, I always double-check my bag to make sure I have all my homework and books, because I don't want to forget anything."
-                    ] 
-                },
-                { 
-                    question: "How do you like to relax in the evening after a busy day?", 
-                    starters: ["To relax, I usually...", "After finishing my homework, I like to...", "My favorite way to unwind is...", "In the evening, I enjoy..."], 
-                    wordBank: ["listen to music", "watch videos", "read a book", "chat with friends", "play games", "unwind", "take a walk", "relaxing"], 
-                    samples: [
-                        "After I finish all my homework, I like to relax by listening to some quiet music because it helps me clear my mind before I go to sleep.",
-                        "My favorite way to unwind is by watching a funny TV show or some interesting videos online, because laughing helps me forget about school stress.",
-                        "To relax, I usually chat with my best friend on WeChat for a little while, because it's nice to share stories about our day."
+                        "A special place for me is a small, quiet park near my home. It's not famous, but I go there to read and escape the busy city for a while.",
+                        "I love a specific old bookstore hidden in a hutong. It has a nostalgic feeling, and I have a personal memory of finding my favorite book there.",
+                        "There's a section of the old city wall that's not part of the main tourist route. It's peaceful, and you can see the local life happening around it."
                     ] 
                 }
             ],
-            "Music": [
+            "Music Tastes": [
                 { 
-                    question: "What kind of music do you enjoy listening to?", 
-                    starters: ["I mostly listen to...", "My favorite genre of music is...", "I enjoy a variety of music, but I especially like...", "I'm a big fan of..."], 
-                    wordBank: ["pop", "rock", "classical", "hip-hop", "soundtracks", "upbeat", "calming", "lyrics", "melody", "energetic"], 
+                    question: "What kind of music do you like to listen to? Is there a Chinese artist or band you would recommend to a German friend?", 
+                    starters: ["I mostly listen to...", "My favorite genre is... because...", "I would definitely recommend... to a friend.", "Their music is unique because..."], 
+                    wordBank: ["C-pop (Mandopop)", "rock", "hip-hop", "indie music", "lyrics", "melody", "energetic", "relaxing", "talented artist", "live performance"], 
                     samples: [
-                        "I'm a big fan of pop music because the songs are usually very catchy and have an energetic beat that makes me feel happy.",
-                        "My favorite genre is classical music, especially piano pieces by Chopin, because I find it very beautiful and relaxing to listen to while I study.",
-                        "I mostly listen to movie soundtracks because I love how the music can tell a story and create a powerful atmosphere."
-                    ] 
-                },
-                { 
-                    question: "Who is your favorite singer or band, and why do you like them?", 
-                    starters: ["My favorite singer is... because...", "I really like the band... since...", "I'm a huge fan of...", "The artist I listen to the most is..."], 
-                    wordBank: ["talented", "powerful voice", "meaningful lyrics", "great melodies", "inspiring", "unique style", "concert", "musician"], 
-                    samples: [
-                        "My favorite singer is Taylor Swift because her songs have very meaningful lyrics that tell stories I can relate to.",
-                        "I really like the band Queen because their music is so powerful and unique. For example, the song 'Bohemian Rhapsody' is a masterpiece.",
-                        "I am a huge fan of Jay Chou. I grew up listening to his music, and I love his unique style that blends pop music with traditional Chinese elements."
+                        "I mostly listen to indie rock music. I would recommend the band 'Carsick Cars' because their music is really energetic and has a unique sound.",
+                        "My favorite genre is C-pop. I'd suggest they listen to Jay Chou, because he is a very talented artist whose melodies are beautiful and lyrics are like poetry.",
+                        "I'm a big fan of Chinese hip-hop. A rapper I like is GAI, whose style mixes modern beats with traditional Chinese elements, which is very cool."
                     ] 
                 }
             ],
-            "Movies & TV": [
+            "A Good Book/Movie": [
                 { 
-                    question: "What is your favorite type of movie? (e.g., comedy, action, sci-fi)", 
-                    starters: ["My favorite movie genre is...", "I really love watching... movies.", "I'm a big fan of... because...", "I prefer... films over others since..."], 
-                    wordBank: ["science fiction (sci-fi)", "comedy", "action", "fantasy", "animation", "exciting", "thought-provoking", "funny", "special effects"], 
+                    question: "Tell me about the last book you read or movie you watched that you really enjoyed.", 
+                    starters: ["Recently, I watched a movie called...", "The story was about...", "What I liked most about it was...", "It made me think about..."], 
+                    wordBank: ["science fiction", "historical drama", "comedy", "plot twist", "character development", "thought-provoking", "visually stunning", "emotional", "memorable"], 
                     samples: [
-                        "My favorite movie genre is science fiction because I love stories about the future, space travel, and new technologies. For example, 'Interstellar' is one of my favorites.",
-                        "I'm a big fan of animated movies, like the ones from Studio Ghibli, because they have beautiful art and very touching stories.",
-                        "I really love watching action movies because they are so exciting and have amazing special effects that are best to see on a big screen."
+                        "I recently watched the Chinese science fiction movie 'The Wandering Earth'. The special effects were visually stunning and the story was very grand and emotional.",
+                        "The last book I enjoyed was 'To Live' by Yu Hua. It's a historical story, and even though it's sad, the character development is incredible and it made me think a lot about life.",
+                        "I saw a comedy called 'Dying to Survive'. It was very funny, but it also had a serious and thought-provoking message about a real social issue."
                     ] 
-                },
+                }
+            ],
+            "Dealing with Stress": [
                  { 
-                    question: "Can you describe a TV show that you are currently watching?", 
-                    starters: ["Right now, I'm watching a show called...", "It's a... show about...", "The main characters are...", "I like it because..."], 
-                    wordBank: ["series", "episode", "plot", "character", "drama", "comedy", "interesting", "suspenseful", "addictive", "recommend"], 
+                    question: "High school can be stressful. What's your favorite way to de-stress and relax after a long week of studying?", 
+                    starters: ["When I feel stressed, I like to...", "My favorite way to relax is...", "Something that always helps me clear my mind is...", "To de-stress, I..."], 
+                    wordBank: ["listen to music", "play sports", "go for a walk", "talk to friends", "play video games", "watch a movie", "take a break", "clear my head", "recharge"], 
                     samples: [
-                        "Right now, I'm watching a TV series called 'Sherlock'. It's a modern detective show about Sherlock Holmes solving crimes in London, and it's very clever.",
-                        "I'm currently watching 'The Big Bang Theory'. It's a comedy about a group of very smart but socially awkward scientists, and it always makes me laugh.",
-                        "The show I'm watching is a historical drama. It's about life in ancient China, and I like it because the costumes are beautiful and I learn about history."
+                        "My favorite way to de-stress is by playing basketball with my friends. The physical activity helps me get rid of any frustration from studying.",
+                        "When I feel stressed, I like to put on my headphones and listen to some relaxing music. It helps me clear my head and forget about exams for a while.",
+                        "For me, just talking to my best friend is a great way to relax. We can complain about homework and just laugh, which makes me feel much better."
                     ] 
                 }
             ],
-            "Reading": [
+            "Cultural Exchange": [
                 { 
-                    question: "Do you enjoy reading books? What kind of books do you like?", 
-                    starters: ["Yes, I love reading, especially...", "I'm not a big reader, but I sometimes read...", "I enjoy reading books about...", "My favorite genre is..."], 
-                    wordBank: ["fiction", "non-fiction", "fantasy", "mystery", "history", "novels", "comics (manga)", "imagination", "learn new things"], 
+                    question: "What is one aspect of Chinese culture (like a philosophy, a type of art, or a custom) that you would be excited to explain to your new friends in Germany?", 
+                    starters: ["I would be excited to share...", "One interesting custom is...", "I think they would find... fascinating because...", "I'd like to explain the concept of..."],
+                    wordBank: ["calligraphy", "tea ceremony", "Confucianism", "Guanxi (relationships)", "dumpling making", "philosophy", "tradition", "meaning behind it", "unique"],
                     samples: [
-                        "Yes, I love reading, especially fantasy novels like 'Harry Potter', because they take me to a different world with magic and adventure.",
-                        "I enjoy reading non-fiction books about history because I think it's very interesting to learn about what happened in the past.",
-                        "I'm not a huge fan of long novels, but I really enjoy reading comics, or manga, because I like the combination of storytelling and art."
-                    ] 
-                },
-                { 
-                    question: "Tell me about the last book you read.", 
-                    starters: ["The last book I read was called...", "It was about...", "The main character was...", "I liked/disliked it because..."], 
-                    wordBank: ["plot", "character", "setting", "author", "interesting", "boring", "exciting", "well-written", "recommend"], 
-                    samples: [
-                        "The last book I read was 'The Three-Body Problem'. It's a science fiction novel by a Chinese author, and it had a very interesting and complex plot.",
-                        "I just finished reading a mystery novel. It was about a detective trying to solve a crime on a train, and the ending was a complete surprise.",
-                        "The last book I read was for my English class. It was a classic novel, and to be honest, I found the language a bit difficult and the story a little boring."
+                        "I would be excited to explain the importance of the tea ceremony. It's not just about drinking tea; it's a form of art and a way to show respect and find peace.",
+                        "I think they would find the art of calligraphy fascinating because each character is like a small painting with its own meaning and history.",
+                        "I'd like to share the tradition of making dumplings together as a family during Spring Festival, because it's a custom that's all about togetherness and good fortune."
                     ] 
                 }
             ],
-            "Sports": [
+            "Future Home": [
                 { 
-                    question: "Do you play any sports or do any physical activities?", 
-                    starters: ["Yes, I play... regularly.", "I don't play on a team, but I enjoy...", "I'm a member of the school's... team.", "To stay active, I like to..."], 
-                    wordBank: ["basketball", "badminton", "table tennis", "running", "swimming", "stay active", "good exercise", "team sport", "hobby"], 
+                    question: "After you finish your studies, do you see yourself living in Germany, returning to China, or perhaps somewhere else?", 
+                    starters: ["It's hard to say for sure, but right now I'm thinking...", "My current plan is to...", "I could see myself... because...", "It depends on... but ideally..."],
+                    wordBank: ["career opportunities", "family ties", "lifestyle", "international experience", "personal preference", "long-term plan", "gain experience", "contribute", "open-minded"],
                     samples: [
-                        "Yes, I play basketball with my friends almost every weekend. I like it because it's a fast and exciting game.",
-                        "I don't play any team sports, but I enjoy going for a run in the park near my home because it helps me relax and clear my head.",
-                        "I'm on my school's badminton team. We practice twice a week, and I enjoy it because it's a good way to be active and socialize with my teammates."
-                    ] 
-                },
-                { 
-                    question: "Do you prefer playing in a team or doing individual sports? Why?", 
-                    starters: ["I prefer team sports because...", "I think individual sports are better for me since...", "I enjoy both, but I slightly prefer...", "For me, team sports are more fun because..."], 
-                    wordBank: ["teamwork", "cooperation", "rely on yourself", "competition", "social", "focus", "strategy", "personal challenge"], 
-                    samples: [
-                        "I prefer team sports like basketball because I enjoy the feeling of working together with my teammates to achieve a common goal.",
-                        "I think individual sports like swimming are better for me, because I can focus on my own performance and try to beat my own personal best time.",
-                        "For me, team sports are more fun because it's a social activity. You can celebrate together when you win and support each other when you lose."
+                        "My current plan is to work in Germany for a few years after graduation to gain some international experience, and then decide whether to stay or return to China.",
+                        "Ultimately, I think I will return to China because my family ties are very strong, and I want to be closer to them in the long term.",
+                        "I'm open-minded. It really depends on the career opportunities I find. If I get a great job in Germany and enjoy the lifestyle, I could see myself staying there."
                     ] 
                 }
             ],
-            "Dreams": [
-                { 
-                    question: "What is a skill you would like to learn in the future?", 
-                    starters: ["In the future, I would love to learn how to...", "One skill I've always wanted to learn is...", "I hope to learn... because...", "It would be cool to know how to..."], 
-                    wordBank: ["play the guitar", "speak another language", "cook", "code", "draw", "useful", "creative", "fun", "challenging"], 
+            "A Proud Moment": [
+                {
+                    question: "Describe something you have done that made you feel really proud of yourself.",
+                    starters: ["One time, I felt really proud when I...", "I was proud of myself for...", "A moment that stands out is when...", "It wasn't a big thing, but..."],
+                    wordBank: ["overcame a challenge", "helped someone", "achieved a goal", "worked hard", "learned a new skill", "stepped out of my comfort zone", "perseverance", "accomplishment", "dedicated"],
                     samples: [
-                        "I would love to learn how to play the guitar because I think it's a very cool instrument and I could play my favorite songs.",
-                        "One skill I want to learn is how to cook well, because it's a very useful life skill, especially since I will be living alone in Germany.",
-                        "I hope to learn how to code, because I think it is a very important skill for the future and it would be useful for many different jobs."
-                    ] 
-                },
-                { 
-                    question: "What did you want to be when you were a child?", 
-                    starters: ["When I was a little kid, I wanted to be...", "My childhood dream was to become...", "I used to dream of being...", "I remember wanting to be... because..."], 
-                    wordBank: ["astronaut", "scientist", "teacher", "doctor", "pilot", "artist", "dream job", "imagination", "fascinating"], 
-                    samples: [
-                        "When I was a child, I wanted to be an astronaut because I was fascinated by space, the stars, and the idea of exploring other planets.",
-                        "My childhood dream was to become a scientist, because I loved doing experiments and I wanted to discover something new that could help the world.",
-                        "I remember wanting to be a teacher, because my primary school teacher was very kind and I wanted to be just like her and help children learn."
-                    ] 
+                        "I felt really proud when I finally solved a very difficult physics problem that I had been working on for a week. It showed me that perseverance pays off.",
+                        "I was proud of myself for volunteering at a local community event. It felt good to help others and be a part of something positive.",
+                        "I learned how to cook a few complex dishes by myself to surprise my parents, and seeing their happy reaction made me feel a great sense of accomplishment."
+                    ]
                 }
             ],
-            "Favorite Places": [
-                { 
-                    question: "What is your favorite place in your hometown, and why do you like it?", 
-                    starters: ["My favorite place is... because...", "I love going to...", "There's a place called... that I really like.", "The best spot in my city is..."], 
-                    wordBank: ["park", "library", "museum", "cafe", "bookstore", "peaceful", "interesting", "relaxing", "atmosphere", "memories"], 
+            "Advice to a Visitor": [
+                {
+                    question: "What is one piece of advice you would give to a foreign teenager visiting Beijing for the first time?",
+                    starters: ["My first piece of advice would be...", "I would tell them to make sure they...", "Don't be afraid to...", "The most important thing to remember is..."],
+                    wordBank: ["use the subway", "try the street food", "explore the hutongs", "learn basic phrases", "be prepared for crowds", "use a translation app", "be open-minded", "bargain at markets"],
                     samples: [
-                        "My favorite place in Beijing is the National Library, because it's very quiet and I can spend a whole day there reading books and studying.",
-                        "I love going to Beihai Park, especially in the summer. It's a beautiful, large park with a lake, and it's a great place to go for a walk and relax.",
-                        "There is a small, quiet cafe near my home that I really like because they have comfortable chairs and it's a perfect place to do homework with a friend."
-                    ] 
-                },
-                { 
-                    question: "If you could travel to any one city in the world, where would you go?", 
-                    starters: ["I would love to visit... because...", "My dream is to travel to...", "If I had the chance, I would go to...", "The city I want to see most is..."], 
-                    wordBank: ["Paris", "Tokyo", "New York", "Rome", "landmarks", "culture", "food", "history", "vibrant", "beautiful"], 
-                    samples: [
-                        "If I could travel to any city, I would go to Rome because I am fascinated by ancient Roman history and I want to see the Colosseum in person.",
-                        "My dream is to travel to Tokyo, because I am a big fan of Japanese animation and I would love to experience the vibrant and modern culture there.",
-                        "I would love to visit Paris because it seems like a very beautiful and romantic city, and I want to see famous landmarks like the Eiffel Tower."
-                    ] 
+                        "My advice would be to use the subway system. It's the easiest and fastest way to get around the huge city, and it's very affordable.",
+                        "I would tell them to be adventurous and try the local street food, because it's some of the most delicious and authentic food you can find.",
+                        "Don't be afraid to wander into the old hutong alleyways. That's where you can see the real, traditional side of Beijing life, away from the big tourist sites."
+                    ]
                 }
             ],
-            "Animals": [
-                { 
-                    question: "Do you have any pets? If not, would you like to have one?", 
-                    starters: ["Yes, I have a...", "No, I don't have any pets, but I would love to have a...", "My family has a...", "I wish I could have a... because..."], 
-                    wordBank: ["dog", "cat", "hamster", "fish", "loyal", "playful", "cute", "responsibility", "good companion", "fluffy"], 
+            "Looking Ahead": [
+                {
+                    question: "Imagine yourself one year from now, living in Germany. What do you hope you will have learned or experienced?",
+                    starters: ["One year from now, I hope I will have...", "I'm looking forward to experiencing...", "I hope I will be more confident in...", "My goal for the first year is to..."],
+                    wordBank: ["made new friends", "improved my German", "adapted to the culture", "traveled to other cities", "managed my time well", "become more independent", "explored", "settled in", "learned"],
                     samples: [
-                        "No, I don't have any pets because our apartment is too small, but I would love to have a dog in the future because they are so loyal and playful.",
-                        "Yes, I have a cat named Mimi. She is very fluffy and cute, but also very independent. She likes to sleep on my books when I am studying.",
-                        "I wish I could have a dog, because a dog would be a great companion for going on walks and it would encourage me to be more active."
-                    ] 
-                },
-                { 
-                    question: "What is your favorite animal and why?", 
-                    starters: ["My favorite animal is the... because...", "I've always loved...", "I think... are amazing animals.", "If I could be any animal, I would be a..."], 
-                    wordBank: ["panda", "tiger", "dolphin", "eagle", "wolf", "intelligent", "majestic", "graceful", "powerful", "free"], 
-                    samples: [
-                        "My favorite animal is the panda because they are a symbol of China and they look so cute and peaceful when they are eating bamboo.",
-                        "I think dolphins are amazing animals because they are very intelligent and playful, and they seem so free when they are swimming in the ocean.",
-                        "My favorite animal is the wolf because they are beautiful and I admire their intelligence and how they work together in a pack."
-                    ] 
-                }
-            ],
-            "The Internet": [
-                { 
-                    question: "Besides studying, what do you usually do on the internet?", 
-                    starters: ["On the internet, I mostly...", "I spend a lot of my online time...", "Besides schoolwork, I use the internet to...", "My favorite online activity is..."], 
-                    wordBank: ["watch videos", "play online games", "chat with friends", "browse social media", "listen to music", "learn new things", "entertainment"], 
-                    samples: [
-                        "Besides studying, I spend a lot of my time on the internet watching videos on sites like Bilibili, especially videos about science and history.",
-                        "I use the internet to play online games with my friends. It's a fun way for us to hang out together, even when we are all at our own homes.",
-                        "I mostly use the internet for entertainment, like streaming music or browsing social media to see what my friends are doing."
-                    ] 
-                },
-                { 
-                    question: "What is one positive and one negative thing about the internet?", 
-                    starters: ["A big positive is that...", "On the negative side, the internet can be...", "One good thing is..., but a bad thing is...", "The internet is great for..., however..."], 
-                    wordBank: ["access to information", "connecting people", "distraction", "addictive", "fake news", "cyberbullying", "convenient", "time-consuming"], 
-                    samples: [
-                        "A huge positive is the easy access to information. For example, you can learn about any topic you want just by searching for it online.",
-                        "On the negative side, the internet can be a big distraction. It's very easy to start watching videos and then realize that hours have passed.",
-                        "One good thing is that it connects people from all over the world. But a bad thing is that it can be very addictive and time-consuming."
-                    ] 
+                        "One year from now, I hope I will have made a few good friends, both German and international, and feel settled in my new life.",
+                        "I really hope that my German language skills will have improved a lot, so that I can feel more confident having conversations every day.",
+                        "My goal for the first year is to not only do well in my university courses, but also to have traveled to at least one other German city to explore."
+                    ]
                 }
             ]
         };
 
-
         // --- DOM Elements ---
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
         const welcomeScreen = document.getElementById('welcome-screen');
         const practiceScreen = document.getElementById('practice-screen');
         const nameEntryContainer = document.getElementById('name-entry-container');
@@ -554,9 +463,9 @@
                     const parsed = JSON.parse(savedCompletedTopics);
                     // Basic validation to ensure it's an object
                     if (typeof parsed === 'object' && parsed !== null) {
-                       completedTopics = parsed;
+                        completedTopics = parsed;
                     } else {
-                        completedTopics = {};
+                         completedTopics = {};
                     }
                 } catch (e) {
                     console.error("Failed to parse saved progress:", e);
@@ -722,9 +631,9 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 
-                const isEdge = window.navigator.userAgent.includes("Edg");
+                const isMobileEdge = /Edg\/\d+.*Android/.test(navigator.userAgent);
                 let options = {};
-                if (!isEdge) {
+                if (!isMobileEdge) {
                     const mimeTypes = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/ogg'];
                     const supportedType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
                     if (supportedType) options.mimeType = supportedType;
@@ -770,7 +679,7 @@
         function startTranscription() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                console.warn("Speech recognition not supported.");
+                console.warn("Speech recognition not supported — skipping setup.");
                 return;
             }
 
@@ -848,23 +757,11 @@
             finalTranscript = '';
         }
 
-        // --- Theme Toggle Logic ---
-        const applyTheme = (theme) => {
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                themeToggleLightIcon.classList.remove('hidden');
-                themeToggleDarkIcon.classList.add('hidden');
-            } else {
-                document.documentElement.classList.remove('dark');
-                themeToggleDarkIcon.classList.remove('hidden');
-                themeToggleLightIcon.classList.add('hidden');
-            }
-        };
         
         // --- Snowfall Logic ---
         function createSnow() {
             const snowContainer = document.getElementById('snow-container');
-            const snowflakeCount = 50;
+            const snowflakeCount = window.innerWidth < 768 ? 15 : 50;
             for (let i = 0; i < snowflakeCount; i++) {
                 let snowflake = document.createElement('div');
                 snowflake.innerHTML = '❄';
@@ -900,14 +797,28 @@
         recordBtn.addEventListener('click', startRecording);
         stopRecordBtn.addEventListener('click', stopRecording);
         
+        // --- Certificate Download ---
         downloadCertificateBtn.addEventListener('click', () => {
-            const certificateNode = document.getElementById('certificate-to-download');
-            html2canvas(certificateNode, { scale: 2 }).then(canvas => {
+          const certificateNode = document.getElementById('certificate-to-download');
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+          const newTab = isIOS ? window.open() : null;
+
+          html2canvas(certificateNode, { scale: 2 }).then(canvas => {
+            canvas.toBlob(blob => {
+              const url = URL.createObjectURL(blob);
+              if (isIOS && newTab) {
+                newTab.location = url;
+              } else {
                 const a = document.createElement('a');
-                a.href = canvas.toDataURL('image/png');
+                a.href = url;
                 a.download = `Certificate_of_Completion_${userName.replace(/\s+/g, '_')}.png`;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
+              }
+              URL.revokeObjectURL(url);
             });
+          });
         });
 
         backToMainMenuBtn.addEventListener('click', () => {
@@ -916,31 +827,47 @@
             initializeTopics();
         });
 
+        // --- Recording Download ---
         downloadBtn.addEventListener('click', () => {
-            if (recordedBlob) {
-                const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
-                const sanitizedUserName = userName.replace(/\s+/g, '_');
-                const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
-                
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = URL.createObjectURL(recordedBlob);
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+          if (recordedBlob) {
+            const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
+            const sanitizedUserName = userName.replace(/\s+/g, '_');
+            const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
+            const blobUrl = URL.createObjectURL(recordedBlob);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-                // Visual feedback
-                const originalText = downloadBtn.innerHTML;
-                downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
-                downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                downloadBtn.classList.add('bg-green-600');
-                setTimeout(() => {
-                    downloadBtn.innerHTML = originalText;
-                    downloadBtn.classList.remove('bg-green-600');
-                    downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                }, 2000);
+            if (isIOS) {
+              // Open tab immediately to avoid Safari popup block
+              const newTab = window.open();
+              if (newTab) newTab.location = blobUrl;
+            } else {
+              const a = document.createElement('a');
+              a.style.display = 'none';
+              a.href = blobUrl;
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
             }
+
+            // Visual feedback
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
+            downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            downloadBtn.classList.add('bg-green-600');
+            setTimeout(() => {
+              downloadBtn.innerHTML = originalText;
+              downloadBtn.classList.remove('bg-green-600');
+              downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }, 2000);
+
+          } else {
+            // No recording — open SharePoint folder
+            window.open(
+              'https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ',
+              '_blank'
+            );
+          }
         });
 
         nextBtn.addEventListener('click', () => {
@@ -955,24 +882,13 @@
             initializeTopics();
         });
         
-        themeToggleBtn.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
-            applyTheme(isDark ? 'dark' : 'light');
-        });
-
         // --- Initial Load ---
         async function main() {
-            // Set initial theme
-            const savedTheme = localStorage.getItem('color-theme');
-            if (savedTheme) {
-                applyTheme(savedTheme);
-            } else {
-                // If no theme saved, use system preference
-                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    applyTheme('dark');
-                } else {
-                    applyTheme('light');
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            if (isIOS) {
+                const sharepointLink = document.getElementById('sharepoint-upload-link');
+                if(sharepointLink) {
+                    sharepointLink.removeAttribute('target');
                 }
             }
             
@@ -994,6 +910,14 @@
         }
         
         main();
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (isIOS) {
+            const sharepointLink = document.getElementById('sharepoint-upload-link');
+            if (sharepointLink) {
+                sharepointLink.removeAttribute('target');
+            }
+        }
     });
     </script>
 </body>
