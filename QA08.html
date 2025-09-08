@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -89,19 +89,14 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
+<body class="bg-gray-100 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
     
     <div id="snow-container"></div>
-
-    <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 fixed top-4 right-4 z-50">
-        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 10.607a1 1 0 010-1.414l.707-.707a1 1 0 111.414 1.414l-.707-.707a1 1 0 01-1.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707z"></path></svg>
-    </button>
 
     <div id="app-container" class="w-full max-w-xl mx-auto text-center h-full">
         
         <!-- Welcome Screen -->
-        <div id="welcome-screen" class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center">
+        <div id="welcome-screen" class="bg-white dark:bg-gray-800 dark:shadow-lg p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center">
             <div id="name-entry-container">
                 <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">Joel's Speaking Practice 08</h1>
                 <input type="text" id="name-input" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 text-center text-lg text-gray-900 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600">
@@ -110,9 +105,9 @@
             <div id="topic-selection-container" class="hidden">
                  <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">Hello, <span id="user-name-display"></span>!</h1>
                  <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                     <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
-                     <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
-                     <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
+                      <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
+                      <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
+                      <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
                  </div>
                 <div id="topic-selection" class="grid grid-cols-3 gap-4">
                     <!-- Topic buttons will be injected here -->
@@ -121,7 +116,7 @@
         </div>
 
         <!-- Main Practice Screen -->
-        <div id="practice-screen" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg app-shell p-3 sm:p-4">
+        <div id="practice-screen" class="hidden bg-white dark:bg-gray-800 dark:shadow-lg rounded-2xl shadow-lg app-shell p-3 sm:p-4">
             <header class="flex-shrink-0">
                 <div class="flex justify-between items-center mb-1">
                     <button id="back-to-topics-btn" class="text-indigo-500 hover:text-indigo-700"><i class="fas fa-arrow-left mr-2"></i>Topics</button>
@@ -156,19 +151,27 @@
                     <!-- Post-Recording Controls -->
                     <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-2">
                         <audio id="audio-player" controls class="w-full max-w-xs"></audio>
-                        <div class="flex items-center justify-center space-x-2 w-full max-w-xs">
-                             <button id="download-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-colors">
-                                 <i class="fas fa-download mr-1"></i>Download
-                             </button>
-                            <a href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ" target="_blank" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md">
-                                 <i class="fas fa-upload mr-1"></i>Upload
-                             </a>
+                        <div class="flex flex-col gap-3 w-full max-w-xs">
+                           <!-- Smart Download button -->
+                           <button id="download-btn"
+                                   class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                               <i class="fas fa-download mr-1"></i>Download Recording / Open Folder
+                           </button>
+                           
+                           <!-- Upload button -->
+                           <a id="sharepoint-upload-link"
+                                 href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ"
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-green-500/50 focus:ring-2 focus:ring-green-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                               <i class="fas fa-upload mr-1"></i>Upload to Folder
+                           </a>
                         </div>
                     </div>
                 </div>
                  <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold mb-1">
-                     <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
-                     Recording...
+                      <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
+                      Recording...
                  </div>
             </header>
             
@@ -227,211 +230,117 @@
     document.addEventListener('DOMContentLoaded', () => {
         // --- DATA: Questions and Sample Answers for Part 08 ---
         const practiceData = {
-            "Daily Choices": [
-                {
-                    question: "Are you a morning person or a night person? Why?",
-                    starters: ["I am definitely a... person because...", "I think I'm more of a...", "In the morning, I feel...", "At night, I am more..."],
-                    wordBank: ["morning person", "night owl", "productive", "energetic", "creative", "focused", "wake up early", "stay up late"],
+            "A Difficult Decision": [
+                { 
+                    question: "Describe a time you had to make a difficult decision. What was the situation and what did you choose to do?", 
+                    starters: ["I had to make a tough choice when...", "It was difficult because...", "After thinking about it, I decided to...", "The outcome was..."], 
+                    wordBank: ["weigh the pros and cons", "consequences", "responsibility", "tough choice", "listened to advice", "followed my gut", "the right thing", "outcome", "lesson learned"], 
                     samples: [
-                        "I am definitely a morning person. I like to wake up early because the morning is very quiet and I can focus on my studying without any distractions.",
-                        "I am a night owl. I feel more creative and energetic in the evening, so I often do my homework or work on personal projects late at night.",
-                        "I think I am more of a morning person because I love the feeling of a fresh start to the day and watching the sunrise."
-                    ]
-                },
-                {
-                    question: "When you have free time, do you prefer to be active or to relax?",
-                    starters: ["I usually prefer to be... because...", "It depends on my mood, but I often...", "After a long week, I like to...", "For me, relaxing is..."],
-                    wordBank: ["active", "relax", "go outside", "play sports", "watch a movie", "read a book", "recharge", "unwind", "energetic"],
+                        "I had to decide between joining the school's basketball team, which I love, or focusing on an important academic competition. I chose the competition because it was more important for my future, and I learned about prioritizing goals.",
+                        "A difficult decision was whether to tell my teacher that my friend had cheated on a test. I decided to talk to my friend first, and we went to the teacher together. It taught me that honesty is important, even when it's hard.",
+                        "Choosing which university major to apply for was a tough choice. I had to weigh the pros and cons of my passion versus a more practical career path."
+                    ] 
+                }
+            ],
+            "Handling Criticism": [
+                { 
+                    question: "Imagine your German professor gives you some direct, negative feedback on your work. How would you react in that moment and what would you do afterwards?", 
+                    starters: ["My initial reaction might be to feel...", "It's important to remember that...", "I would listen carefully and then...", "Afterwards, I would use the feedback to..."], 
+                    wordBank: ["constructive criticism", "don't take it personally", "ask for clarification", "feedback for improvement", "professional", "learn from it", "make a plan to improve", "thank them for the feedback", "objective"], 
                     samples: [
-                        "I usually prefer to be active because I sit in a classroom all day. For example, I like to go for a bike ride or play basketball to get some energy out.",
-                        "After a long week of school, I definitely prefer to relax. My favorite way to do this is by watching a movie at home with some snacks.",
-                        "It depends on my mood. If I feel energetic, I will go out with friends, but if I feel tired, I prefer to stay home and read a book."
+                        "My initial reaction might be to feel a little disappointed, but I would try not to take it personally. I would listen carefully to understand what I need to improve.",
+                        "I would thank the professor for their feedback and maybe ask for specific examples or suggestions on how to do better next time.",
+                        "Afterwards, I would review their comments carefully and make a plan to improve my work for the next assignment. I know the feedback is meant to help me learn."
+                    ] 
+                }
+            ],
+            "A Childhood Memory": [
+                { 
+                    question: "What is one of your favorite memories from when you were a young child in Beijing?", 
+                    starters: ["One of my fondest memories is...", "I remember when...", "It makes me happy to think about...", "This memory is special because..."], 
+                    wordBank: ["nostalgic", "carefree", "playing in the hutongs", "family gathering", "Spring Festival", "childhood snack", "simple times", "vivid memory", "innocent"], 
+                    samples: [
+                        "One of my favorite childhood memories is flying kites with my grandpa in the park near the Temple of Heaven on a sunny afternoon.",
+                        "I have a very vivid memory of the whole family getting together at my grandparents' house to make dumplings for Chinese New Year. It was always so lively and fun.",
+                        "I remember playing hide-and-seek with my friends in the local hutongs after school. Those were such simple and carefree times."
+                    ] 
+                }
+            ],
+            "Dream Vacation": [
+                 { 
+                    question: "If you could travel anywhere in the world for two weeks, where would you go and what would you do?", 
+                    starters: ["My dream vacation would be to...", "I have always wanted to see...", "I would spend my time...", "The reason I chose this place is..."], 
+                    wordBank: ["explore nature", "visit historical sites", "experience a new culture", "try local food", "adventure", "relax on a beach", "itinerary", "backpacking", "landmarks"], 
+                    samples: [
+                        "My dream vacation would be to visit Egypt. I've always wanted to see the pyramids and learn about ancient history, and I would love to take a cruise on the Nile river.",
+                        "I would love to go backpacking through New Zealand. I would spend my time hiking in the mountains, exploring the beautiful landscapes, and maybe trying some adventure sports.",
+                        "I'd choose to go to Italy to experience the culture. I would visit historical sites in Rome, try all the different kinds of pasta, and see the art in Florence."
+                    ] 
+                }
+            ],
+            "Financial Scenario": [
+                { 
+                    question: "Imagine you've set a monthly budget for yourself in Germany, but an unexpected expense comes up, like your laptop breaking. How would you manage your finances for the rest of the month?", 
+                    starters: ["If that happened, the first thing I would do is...", "I would have to adjust my budget by...", "To save money, I would...", "It would be a challenge, but I would..."],
+                    wordBank: ["emergency fund", "cut back on non-essentials", "cook at home", "track my spending", "prioritize needs vs. wants", "budgeting app", "unexpected expense", "be disciplined", "financial responsibility"],
+                    samples: [
+                        "First, I would see if I had any money in my emergency fund. If not, I would have to adjust my budget by cutting back on non-essential spending like eating out or going to the movies.",
+                        "To save money, I would cook all my meals at home for the rest of the month and look for free student activities instead of ones that cost money.",
+                        "It would be a lesson in financial responsibility. I would need to be very disciplined, track all my spending, and prioritize what is an absolute necessity."
+                    ] 
+                }
+            ],
+            "A Role Model": [
+                { 
+                    question: "Who is a person you admire, either someone you know personally or a public figure? What qualities do you admire about them?", 
+                    starters: ["A person I really look up to is...", "I admire them because they are...", "One quality they have that inspires me is...", "They have taught me that..."],
+                    wordBank: ["role model", "inspires me", "hard-working", "resilient", "kind", "intelligent", "achievements", "overcame adversity", "humble", "integrity"],
+                    samples: [
+                        "I really admire my grandfather. He has worked hard his whole life, is always kind to everyone, and has taught me the importance of family and integrity.",
+                        "A public figure I admire is the scientist Tu Youyou. Her dedication to her research, which saved millions of lives, is incredibly inspiring to me as someone who wants to study science.",
+                        "I look up to an older student from my high school. She was very intelligent but also very humble and always willing to help others who were struggling with their studies."
+                    ] 
+                }
+            ],
+            "Weekend Plans": [
+                {
+                    question: "You and a new German friend want to do something fun this weekend, but you have different ideas. You want to visit a museum, and they want to go hiking. How would you decide what to do?",
+                    starters: ["To decide, I would suggest...", "Maybe we could find a compromise, like...", "We could take turns choosing...", "The fair thing to do would be to..."],
+                    wordBank: ["compromise", "take turns", "do both", "find an alternative", "discuss the options", "fair solution", "see what's more practical", "check the weather", "make a plan together"],
+                    samples: [
+                        "I would suggest we find a compromise. Maybe we could go to the museum on Saturday and then go hiking for a few hours on Sunday, so we can do both.",
+                        "We could take turns. I could say, 'Let's go to the museum this weekend, and I promise next weekend we can go hiking, and I'll be really excited for it.'",
+                        "A fair solution would be to look at the options. Maybe the weather forecast is bad, so hiking isn't a good idea. Or maybe the museum has a special event that we both would find interesting."
                     ]
                 }
             ],
-            "Memories": [
+            "Favorite Season in Beijing": [
                 {
-                    question: "What is a happy memory you have from primary school?",
-                    starters: ["I remember one time in primary school when...", "A very happy memory for me is...", "I'll always remember my... grade teacher because...", "One of my favorite memories is..."],
-                    wordBank: ["school trip", "sports day", "favorite teacher", "best friend", "class party", "funny moment", "learning something new", "proud"],
+                    question: "What is your favorite season in Beijing and why? Describe what it looks, feels, and smells like.",
+                    starters: ["My favorite season in Beijing is definitely...", "I love it because...", "During that time, the city looks...", "The feeling in the air is..."],
+                    wordBank: ["autumn", "crisp air", "golden ginkgo leaves", "blue skies", "comfortable temperature", "roasted chestnuts", "less crowded", "spring blossoms", "summer nights", "winter snow"],
                     samples: [
-                        "A happy memory is from our school sports day. My class won the relay race, and we all felt so proud and excited.",
-                        "I'll always remember my third-grade science teacher. She made learning so much fun with interesting experiments, like making a small volcano.",
-                        "I remember a school trip to the Beijing Aquarium. It was my first time seeing a shark, and I was so amazed and a little bit scared."
-                    ]
-                },
-                {
-                    question: "Describe a time you felt very proud of yourself.",
-                    starters: ["I felt very proud when I...", "A moment I was proud of was...", "It was a great feeling when...", "I worked really hard on..."],
-                    wordBank: ["passed an exam", "won a competition", "learned a new skill", "helped someone", "achieved a goal", "hard work paid off", "proud", "accomplishment"],
-                    samples: [
-                        "I felt very proud when I finally learned how to play a difficult song on the piano after practicing for many weeks. It showed that my hard work paid off.",
-                        "A moment I was proud of was when I got a very good grade on my physics exam, because it was a subject I used to find very difficult.",
-                        "I felt proud when I helped organize a small charity event at my school. We raised money for a local animal shelter, and it felt good to help."
+                        "My favorite season is autumn. I love it because the air feels so crisp and clean, and the skies are often a beautiful, clear blue.",
+                        "In autumn, the city looks golden because of all the ginkgo tree leaves turning yellow. It's beautiful to walk or bike through the streets.",
+                        "You can also smell the scent of roasted chestnuts and sweet potatoes from street vendors everywhere, which is a smell that always reminds me of my favorite time of year."
                     ]
                 }
             ],
-            "Food Opinions": [
+            "A Future Goal": [
                 {
-                    question: "What is a food that you really dislike?",
-                    starters: ["I really can't stand...", "One food I don't like at all is...", "I've tried..., but I just don't like it.", "The taste of... is not for me."],
-                    wordBank: ["bitter", "sour", "slimy", "texture", "smell", "too spicy", "weird flavor", "vegetable", "unpleasant"],
+                    question: "Besides your career, what is one important personal goal you want to achieve in the next ten years?",
+                    starters: ["In the next ten years, I hope to...", "A personal goal of mine is to...", "It's important to me that I...", "I want to challenge myself to..."],
+                    wordBank: ["learn a new language fluently", "run a marathon", "travel to a new continent", "master an instrument", "volunteer for a cause", "read 100 books", "personal project", "self-improvement", "lifelong goal"],
                     samples: [
-                        "One food I really dislike is bitter melon. My parents say it's healthy, but I just can't stand the bitter taste.",
-                        "I don't like the texture of mushrooms. I think they feel a bit slimy and strange in my mouth.",
-                        "I have tried cilantro many times, but I just don't like it. To me, it tastes like soap, so I always ask for my food without it."
-                    ]
-                },
-                {
-                    question: "If you could only eat one type of food for the rest of your life, what would you choose?",
-                    starters: ["I would definitely choose... because...", "If I had to pick one, it would be...", "That's a tough question, but I think I'd choose...", "I could never get tired of..."],
-                    wordBank: ["noodles", "dumplings", "rice", "pizza", "versatile", "many varieties", "comfort food", "delicious", "favorite"],
-                    samples: [
-                        "I would definitely choose noodles, because there are so many different kinds. You can have them in soup, fried, with different sauces... I would never get bored.",
-                        "That's a difficult question, but I think I would choose rice. It's a simple food, but it's the perfect base for thousands of different delicious dishes.",
-                        "I would choose dumplings. They are my ultimate comfort food, and you can fill them with anything you like, from pork and cabbage to shrimp and chives."
-                    ]
-                }
-            ],
-            "Hypothetical Dilemma": [
-                {
-                    question: "Imagine you found a wallet on the street with a lot of money inside but no ID card. What would you do?",
-                    starters: ["If I found a wallet, the first thing I would do is...", "I would try to...", "I think the right thing to do is...", "My conscience would tell me to..."],
-                    wordBank: ["look for an ID", "take it to the police", "honest", "the right thing to do", "lost and found", "return it", "someone's hard-earned money", "imagine how they feel"],
-                    samples: [
-                        "First, I would look carefully through the wallet one more time to see if there is any clue about the owner, like a business card or a receipt.",
-                        "I think the right thing to do is to take it to the nearest police station. They have a lost and found, and the owner might go there to look for it.",
-                        "I would not take the money because it's someone's hard-earned money. I would feel very guilty if I kept it, so I would definitely try to return it."
-                    ]
-                },
-                {
-                    question: "If you could give one piece of advice to your younger self, what would it be?",
-                    starters: ["I would tell my younger self to...", "The advice I would give is...", "If I could go back in time, I would say...", "I would advise myself to not..."],
-                    wordBank: ["don't be afraid to make mistakes", "worry less", "be more confident", "read more books", "practice more", "enjoy being a kid", "advice"],
-                    samples: [
-                        "I would tell my younger self not to be so afraid of making mistakes, because mistakes are a natural part of learning and growing.",
-                        "The advice I would give is to be more confident and speak up more in class, and not to be shy about sharing my ideas.",
-                        "If I could go back in time, I would tell myself to spend less time playing video games and more time reading books, because reading opens up your mind."
-                    ]
-                }
-            ],
-            "People": [
-                {
-                    question: "Describe a person you admire. This can be a family member, a teacher, or a famous person.",
-                    starters: ["The person I admire most is...", "I really look up to... because...", "Someone I admire is...", "He/She is a great role model because..."],
-                    wordBank: ["role model", "inspiring", "hard-working", "kind", "intelligent", "determined", "my father", "my teacher", "a scientist"],
-                    samples: [
-                        "The person I admire most is my father. He works very hard to support our family, but he always has time to help me with my homework and talk to me.",
-                        "I really look up to my English teacher. She is very passionate about her subject, and she inspires me to study harder and be curious.",
-                        "I admire the scientist Tu Youyou because she was very determined and never gave up on her research, which eventually saved millions of lives."
-                    ]
-                },
-                {
-                    question: "What qualities do you think are important in a good leader?",
-                    starters: ["I think a good leader needs to be...", "The most important quality is...", "A good leader should also...", "To be a good leader, you must..."],
-                    wordBank: ["honest", "confident", "good communicator", "inspiring", "responsible", "decisive", "listen to others", "lead by example", "supportive"],
-                    samples: [
-                        "I think a good leader needs to be a great communicator, because they must be able to clearly explain their ideas and inspire their team.",
-                        "The most important quality is honesty. A good leader must be trustworthy, so that people will follow them and believe in their vision.",
-                        "A good leader should also know how to listen to others. The best ideas can come from anyone in the team, and a leader should respect that."
-                    ]
-                }
-            ],
-            "Learning Skills": [
-                {
-                    question: "Do you prefer studying alone or in a group? Why?",
-                    starters: ["I definitely prefer studying... because...", "For me, studying in a group is better since...", "It depends on the subject. For example...", "I find that I can focus more when..."],
-                    wordBank: ["alone", "in a group", "focus better", "no distractions", "share ideas", "motivate each other", "ask questions", "explain concepts"],
-                    samples: [
-                        "I prefer studying alone because I can focus much better without any distractions. I can work at my own pace and really concentrate on the material.",
-                        "For me, studying in a group is better, especially for subjects like history, because we can discuss the topics and share different ideas and perspectives.",
-                        "I find that studying in a group helps me to stay motivated. When I see my friends working hard, it encourages me to work hard too."
-                    ]
-                },
-                {
-                    question: "What is a good way to remember new information? Describe a study technique you use.",
-                    starters: ["A good technique I use is...", "To remember new things, I like to...", "One method that works for me is...", "I find it helpful to..."],
-                    wordBank: ["flashcards", "making notes", "mind maps", "explaining it to someone", "practice tests", "repetition", "visual aids", "study technique"],
-                    samples: [
-                        "A good technique I use for remembering vocabulary is making flashcards. I write the word on one side and the definition on the other, and then I test myself.",
-                        "One method that works for me is to create mind maps. It helps me to see the connections between different ideas and organize the information visually.",
-                        "I find it very helpful to try to explain the new information to someone else, like my parents. If I can teach it, it means I really understand it."
-                    ]
-                }
-            ],
-            "Your City": [
-                {
-                    question: "What is one thing you would change about your city if you could?",
-                    starters: ["If I could change one thing, I would...", "I wish my city had more...", "The biggest problem is..., so I would change that.", "It would be better if..."],
-                    wordBank: ["less traffic", "more green spaces", "cleaner air", "less noise", "public parks", "improve public transport", "pollution", "crowded"],
-                    samples: [
-                        "If I could change one thing about Beijing, I would want it to have cleaner air. The air pollution is sometimes a big problem for our health.",
-                        "I wish my city had more green spaces, like big public parks. It would be nice to have more quiet places to relax and enjoy nature.",
-                        "The biggest problem is the traffic. If I could, I would improve the public transportation system even more, so that fewer people would need to drive their cars."
-                    ]
-                },
-                {
-                    question: "What is the most famous landmark in your city?",
-                    starters: ["The most famous landmark is definitely...", "Everyone knows about...", "A place every tourist visits is...", "It's famous for..."],
-                    wordBank: ["The Great Wall", "The Forbidden City", "The Temple of Heaven", "The Summer Palace", "historic", "ancient", "magnificent", "symbol of China"],
-                    samples: [
-                        "The most famous landmark near Beijing is the Great Wall of China. It is an incredible structure with a very long and important history.",
-                        "In the center of Beijing, the most famous landmark is the Forbidden City. It was the palace for the emperors for many centuries and it's a magnificent example of ancient Chinese architecture.",
-                        "A place every tourist visits is the Temple of Heaven. It's a beautiful complex of religious buildings where emperors used to pray for a good harvest."
-                    ]
-                }
-            ],
-            "Personal Style": [
-                {
-                    question: "How would you describe your personal style? What kind of clothes do you like to wear?",
-                    starters: ["My personal style is quite...", "I like to wear clothes that are...", "I usually wear...", "Comfort is important to me, so..."],
-                    wordBank: ["casual", "comfortable", "sporty", "simple", "colorful", "jeans and t-shirt", "hoodies", "sneakers", "fashionable"],
-                    samples: [
-                        "My personal style is very casual and comfortable. On most days, you will see me wearing a simple t-shirt, jeans, and sneakers.",
-                        "I like to wear sporty clothes, like hoodies and track pants, because they are easy to move in and I feel relaxed in them.",
-                        "I don't really have a specific style, I just wear whatever I feel good in. Sometimes I like colorful clothes, and other times I prefer simple black or white."
-                    ]
-                },
-                {
-                    question: "Do you think it is important to follow fashion trends?",
-                    starters: ["I think it's... to follow trends.", "In my opinion, it's more important to...", "I don't really pay attention to...", "Some people think it's important, but I..."],
-                    wordBank: ["express your personality", "be comfortable", "individuality", "trends change quickly", "waste of money", "have your own style", "fun to try"],
-                    samples: [
-                        "In my opinion, it's more important to have your own style and wear what makes you feel confident, rather than just following trends.",
-                        "I don't think it's very important, because fashion trends change so quickly. It seems like a waste of money to always buy new things.",
-                        "I think it can be fun to try some fashion trends, but you shouldn't feel pressured to follow them. The most important thing is to be comfortable in your clothes."
-                    ]
-                }
-            ],
-            "Happiness": [
-                {
-                    question: "What is one small thing that always makes you happy?",
-                    starters: ["A small thing that makes me happy is...", "I always feel happy when...", "It's a simple thing, but... always cheers me up.", "It might sound silly, but..."],
-                    wordBank: ["a sunny day", "listening to my favorite song", "a delicious meal", "a compliment", "laughing with friends", "a good book", "simple pleasures"],
-                    samples: [
-                        "A small thing that always makes me happy is listening to my favorite song. It can instantly change my mood and give me more energy.",
-                        "I always feel happy when I see a really beautiful sunset. It's a simple pleasure, but the colors are amazing.",
-                        "It might sound silly, but getting a good seat on a crowded subway train is a small thing that makes my day a little bit better."
-                    ]
-                },
-                {
-                    question: "What does the word 'success' mean to you?",
-                    starters: ["For me, success means...", "I would feel successful if I...", "Success is not just about money, it's about...", "To me, success is..."],
-                    wordBank: ["achieving your goals", "being happy", "making a difference", "having good relationships", "learning new things", "personal growth", "helping others"],
-                    samples: [
-                        "For me, success means achieving the personal goals that I set for myself, whether they are big or small.",
-                        "Success is not just about having a good job or a lot of money. To me, it's about being happy, healthy, and having strong relationships with my family and friends.",
-                        "I would feel successful if I could use my skills and knowledge to make a positive difference in the world, even in a small way."
+                        "In the next ten years, a personal goal of mine is to become fluent in a third language, maybe Spanish or French, just for the love of learning.",
+                        "I want to challenge myself to run a full marathon. It would require a lot of dedication and training, and I think the accomplishment would be very rewarding.",
+                        "I hope to have traveled to a completely new continent, like South America or Africa, to experience a culture that is totally different from my own."
                     ]
                 }
             ]
         };
 
-
         // --- DOM Elements ---
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
         const welcomeScreen = document.getElementById('welcome-screen');
         const practiceScreen = document.getElementById('practice-screen');
         const nameEntryContainer = document.getElementById('name-entry-container');
@@ -554,9 +463,9 @@
                     const parsed = JSON.parse(savedCompletedTopics);
                     // Basic validation to ensure it's an object
                     if (typeof parsed === 'object' && parsed !== null) {
-                       completedTopics = parsed;
+                        completedTopics = parsed;
                     } else {
-                        completedTopics = {};
+                         completedTopics = {};
                     }
                 } catch (e) {
                     console.error("Failed to parse saved progress:", e);
@@ -722,9 +631,9 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 
-                const isEdge = window.navigator.userAgent.includes("Edg");
+                const isMobileEdge = /Edg\/\d+.*Android/.test(navigator.userAgent);
                 let options = {};
-                if (!isEdge) {
+                if (!isMobileEdge) {
                     const mimeTypes = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/ogg'];
                     const supportedType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
                     if (supportedType) options.mimeType = supportedType;
@@ -770,7 +679,7 @@
         function startTranscription() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                console.warn("Speech recognition not supported.");
+                console.warn("Speech recognition not supported — skipping setup.");
                 return;
             }
 
@@ -848,23 +757,11 @@
             finalTranscript = '';
         }
 
-        // --- Theme Toggle Logic ---
-        const applyTheme = (theme) => {
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                themeToggleLightIcon.classList.remove('hidden');
-                themeToggleDarkIcon.classList.add('hidden');
-            } else {
-                document.documentElement.classList.remove('dark');
-                themeToggleDarkIcon.classList.remove('hidden');
-                themeToggleLightIcon.classList.add('hidden');
-            }
-        };
         
         // --- Snowfall Logic ---
         function createSnow() {
             const snowContainer = document.getElementById('snow-container');
-            const snowflakeCount = 50;
+            const snowflakeCount = window.innerWidth < 768 ? 15 : 50;
             for (let i = 0; i < snowflakeCount; i++) {
                 let snowflake = document.createElement('div');
                 snowflake.innerHTML = '❄';
@@ -900,14 +797,28 @@
         recordBtn.addEventListener('click', startRecording);
         stopRecordBtn.addEventListener('click', stopRecording);
         
+        // --- Certificate Download ---
         downloadCertificateBtn.addEventListener('click', () => {
-            const certificateNode = document.getElementById('certificate-to-download');
-            html2canvas(certificateNode, { scale: 2 }).then(canvas => {
+          const certificateNode = document.getElementById('certificate-to-download');
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+          const newTab = isIOS ? window.open() : null;
+
+          html2canvas(certificateNode, { scale: 2 }).then(canvas => {
+            canvas.toBlob(blob => {
+              const url = URL.createObjectURL(blob);
+              if (isIOS && newTab) {
+                newTab.location = url;
+              } else {
                 const a = document.createElement('a');
-                a.href = canvas.toDataURL('image/png');
+                a.href = url;
                 a.download = `Certificate_of_Completion_${userName.replace(/\s+/g, '_')}.png`;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
+              }
+              URL.revokeObjectURL(url);
             });
+          });
         });
 
         backToMainMenuBtn.addEventListener('click', () => {
@@ -916,31 +827,47 @@
             initializeTopics();
         });
 
+        // --- Recording Download ---
         downloadBtn.addEventListener('click', () => {
-            if (recordedBlob) {
-                const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
-                const sanitizedUserName = userName.replace(/\s+/g, '_');
-                const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
-                
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = URL.createObjectURL(recordedBlob);
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+          if (recordedBlob) {
+            const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
+            const sanitizedUserName = userName.replace(/\s+/g, '_');
+            const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
+            const blobUrl = URL.createObjectURL(recordedBlob);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-                // Visual feedback
-                const originalText = downloadBtn.innerHTML;
-                downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
-                downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                downloadBtn.classList.add('bg-green-600');
-                setTimeout(() => {
-                    downloadBtn.innerHTML = originalText;
-                    downloadBtn.classList.remove('bg-green-600');
-                    downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                }, 2000);
+            if (isIOS) {
+              // Open tab immediately to avoid Safari popup block
+              const newTab = window.open();
+              if (newTab) newTab.location = blobUrl;
+            } else {
+              const a = document.createElement('a');
+              a.style.display = 'none';
+              a.href = blobUrl;
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
             }
+
+            // Visual feedback
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
+            downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            downloadBtn.classList.add('bg-green-600');
+            setTimeout(() => {
+              downloadBtn.innerHTML = originalText;
+              downloadBtn.classList.remove('bg-green-600');
+              downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }, 2000);
+
+          } else {
+            // No recording — open SharePoint folder
+            window.open(
+              'https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ',
+              '_blank'
+            );
+          }
         });
 
         nextBtn.addEventListener('click', () => {
@@ -955,24 +882,13 @@
             initializeTopics();
         });
         
-        themeToggleBtn.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
-            applyTheme(isDark ? 'dark' : 'light');
-        });
-
         // --- Initial Load ---
         async function main() {
-            // Set initial theme
-            const savedTheme = localStorage.getItem('color-theme');
-            if (savedTheme) {
-                applyTheme(savedTheme);
-            } else {
-                // If no theme saved, use system preference
-                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    applyTheme('dark');
-                } else {
-                    applyTheme('light');
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            if (isIOS) {
+                const sharepointLink = document.getElementById('sharepoint-upload-link');
+                if(sharepointLink) {
+                    sharepointLink.removeAttribute('target');
                 }
             }
             
@@ -994,6 +910,14 @@
         }
         
         main();
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (isIOS) {
+            const sharepointLink = document.getElementById('sharepoint-upload-link');
+            if (sharepointLink) {
+                sharepointLink.removeAttribute('target');
+            }
+        }
     });
     </script>
 </body>
