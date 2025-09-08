@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Joel's Speaking Practice 03</title>
+    <title>Joel's Speaking Practice 02</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -152,20 +152,20 @@
                     <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-2">
                         <audio id="audio-player" controls class="w-full max-w-xs"></audio>
                         <div class="flex flex-col gap-3 w-full max-w-xs">
-                          <!-- Smart Download button -->
-                          <button id="download-btn"
-                                  class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
-                            <i class="fas fa-download mr-1"></i>Download Recording / Open Folder
-                          </button>
-                        
-                          <!-- Upload button -->
-                          <a id="sharepoint-upload-link"
-                             href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ"
-                             target="_blank"
-                             rel="noopener noreferrer"
-                             class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-green-500/50 focus:ring-2 focus:ring-green-400 focus:outline-none active:scale-95 flex items-center justify-center">
-                            <i class="fas fa-upload mr-1"></i>Upload to Folder
-                          </a>
+                           <!-- Smart Download button -->
+                           <button id="download-btn"
+                                   class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                               <i class="fas fa-download mr-1"></i>Download Recording / Open Folder
+                           </button>
+                           
+                           <!-- Upload button -->
+                           <a id="sharepoint-upload-link"
+                                 href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ"
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-green-500/50 focus:ring-2 focus:ring-green-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                               <i class="fas fa-upload mr-1"></i>Upload to Folder
+                           </a>
                         </div>
                     </div>
                 </div>
@@ -228,204 +228,134 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- DATA: Questions and Sample Answers for Part 02 ---
+        // --- DATA: Questions and Sample Answers for Part 03 ---
         const practiceData = {
-            "University Life": [
+            "Technology's Impact": [
                 { 
-                    question: "What are you most excited or nervous about when you think about attending a German university?", 
-                    starters: ["I'm most excited about...", "What makes me a bit nervous is...", "I'm looking forward to...", "On one hand, I'm excited for..., but on the other hand..."], 
-                    wordBank: ["independence", "new environment", "lecture halls", "seminars", "research", "international students", "language barrier", "challenging", "academic rigor"], 
+                    question: "How has social media changed the way we communicate with each other?", 
+                    starters: ["I think social media has made it easier to...", "On one hand..., but on the other hand...", "A major change is...", "Compared to before, we now..."], 
+                    wordBank: ["stay connected", "superficial", "misunderstanding", "instant communication", "less face-to-face", "global", "pressure", "curated", "authentic"], 
                     samples: [
-                        "I'm most excited about the academic freedom because I will get to choose my own courses and focus on subjects I'm truly passionate about, like robotics.",
-                        "What makes me a bit nervous is the language barrier, because even if I pass the language exams, speaking in a real university seminar will be very challenging at first.",
-                        "I am really looking forward to meeting people from all over the world, because a German university has many international students and I want to learn about their cultures."
+                        "I think social media has made it easier to stay connected with friends who live far away, because you can see what they are doing instantly.",
+                        "On one hand, communication is faster, but on the other hand, it can feel more superficial because you're just liking a photo instead of having a real conversation.",
+                        "A major change is that there's more pressure to present a perfect life online, which isn't always authentic and can make others feel bad."
                     ] 
                 },
                 { 
-                    question: "How do you think the teaching style in Germany will be different from your high school in Beijing?", 
-                    starters: ["I believe the teaching style will be more...", "Compared to my high school, I expect...", "One major difference might be...", "I've heard that German professors encourage..."], 
-                    wordBank: ["independent study", "interactive", "less homework", "more reading", "critical thinking", "self-discipline", "theoretical", "practical application", "student-led"], 
+                    question: "Are you excited or worried about the future of Artificial Intelligence (AI)? Why?", 
+                    starters: ["I'm mostly excited about AI because...", "What worries me about AI is...", "I think AI could be very helpful for...", "The biggest risk, in my opinion, is..."], 
+                    wordBank: ["automation", "efficiency", "job displacement", "creativity", "problem-solving", "ethical concerns", "potential", "tool", "unpredictable"], 
                     samples: [
-                        "I believe the teaching style will be more focused on independent study, because in my high school we are guided a lot by teachers, but in Germany I'll have to manage my own learning.",
-                        "Compared to my high school, I expect there will be less regular homework but more emphasis on final exams, which means I need a lot of self-discipline.",
-                        "I've heard that German professors encourage more critical thinking and discussion in seminars, because they want students to question ideas, not just memorize them."
+                        "I'm mostly excited about AI because it has the potential to solve big problems, for example, in medicine and scientific research.",
+                        "What worries me about AI is job displacement, because many routine tasks could be automated, and people will need to learn new skills.",
+                        "I see AI as a powerful tool that can help human creativity, for instance, by generating ideas or handling boring tasks so we can focus on more interesting work."
                     ] 
                 }
             ],
-            "German Culture": [
+            "Environmental Issues": [
                 { 
-                    question: "Besides punctuality, what other German cultural trait have you heard about and what do you think of it?", 
-                    starters: ["Another trait I've heard about is...", "I'm curious about the German emphasis on...", "I find it interesting that...", "I think I will appreciate..."], 
-                    wordBank: ["directness", "efficiency", "rule-following", "recycling (Mülltrennung)", "privacy", "formality (Sie/du)", "work-life balance", "respectful", "organized"], 
+                    question: "What is one environmental problem you are concerned about, and why?", 
+                    starters: ["The environmental issue that concerns me most is...", "I'm worried about... because it affects...", "One problem I've learned about is...", "It's important to address... because..."], 
+                    wordBank: ["plastic pollution", "climate change", "deforestation", "loss of biodiversity", "sustainability", "impact", "future generations", "consequences", "urgent"], 
                     samples: [
-                        "I've heard about the German habit of separating trash, called Mülltrennung, and I think it's great because it shows a strong respect for the environment.",
-                        "Another trait is their directness in communication. I think it will be helpful because it avoids misunderstandings, even if it feels a little blunt at first.",
-                        "I find their strong sense of privacy interesting because in China we are often more open in groups, but I think I'll appreciate the personal space in Germany."
-                    ] 
-                },
-                { 
-                    question: "Are there any German holidays or traditions, like Oktoberfest or Christmas markets, that you are curious to experience?", 
-                    starters: ["I would love to experience...", "I'm really curious about...", "I've seen pictures of... and I want to...", "It would be amazing to see..."], 
-                    wordBank: ["Christmas markets (Weihnachtsmärkte)", "Oktoberfest", "Carnival (Karneval)", "Easter", "New Year's Eve (Silvester)", "traditions", "atmosphere", "celebration", "local culture"], 
-                    samples: [
-                        "I would love to experience the Christmas markets because they look so magical in the pictures, with all the lights, food, and handmade crafts.",
-                        "I am really curious about Carnival in cities like Cologne, because the tradition of dressing up in costumes and having big parades seems very fun and energetic.",
-                        "While Oktoberfest is famous, I am more interested in experiencing a German New Year's Eve, because I have heard they have huge fireworks displays."
-                    ] 
-                }
-            ],
-            "Making Friends": [
-                { 
-                    question: "How do you plan to meet new people and make friends in Germany, both German and international students?", 
-                    starters: ["My plan is to join...", "I think a good way to meet people is...", "I will try to be more...", "I hope to connect with people by..."], 
-                    wordBank: ["university clubs (Hochschulgruppen)", "sports teams", "language tandem", "student events", "classmates", "shared interests", "open-minded", "approachable", "socialize"], 
-                    samples: [
-                        "My plan is to join a university sports club, maybe for basketball, because it's a great way to meet people who share the same interests.",
-                        "I think a good way to meet German students is to find a language tandem partner, because we can help each other with language skills and also become friends.",
-                        "I will try to be more open and proactive in class, for example, by suggesting a study group, because it is an easy way to get to know my classmates."
+                        "The environmental issue that concerns me most is plastic pollution in the oceans, because it harms marine life and can take hundreds of years to break down.",
+                        "I'm worried about climate change because the consequences, like extreme weather events, are becoming more and more common around the world.",
+                        "I think the loss of biodiversity is a serious problem, because every species plays a role in the ecosystem, and losing them can have unpredictable effects."
                     ] 
                 },
                  { 
-                    question: "What qualities do you look for in a good friend?", 
-                    starters: ["For me, a good friend is someone who is...", "The most important quality in a friend is...", "I value friends who are...", "I think it's important that a friend is..."], 
-                    wordBank: ["trustworthy", "supportive", "honest", "good listener", "sense of humor", "reliable", "kind", "common interests", "understanding"], 
+                    question: "What is a small change people can make in their daily lives to be more environmentally friendly?", 
+                    starters: ["A simple change is to...", "People could try to... because...", "One effective habit is...", "Instead of..., we could..."], 
+                    wordBank: ["reduce, reuse, recycle", "reusable bags", "save energy", "public transport", "less meat", "conscious consumer", "small steps", "collective action", "make a difference"], 
                     samples: [
-                        "For me, a good friend is someone who is trustworthy, because it's important to know you can share your secrets and feelings with them without worry.",
-                        "I value friends who are supportive, because when you are living abroad, you will face challenges, and having someone who encourages you is very important.",
-                        "The most important quality is a good sense of humor, because I love to laugh and I think sharing funny moments is a great way to build a strong connection."
+                        "A simple change is to carry a reusable water bottle and coffee cup, because this can significantly reduce single-use plastic waste.",
+                        "People could try to use public transport or ride a bike more often, because it reduces carbon emissions from cars.",
+                        "One effective habit is to be more conscious about saving energy at home, for example, by turning off lights when leaving a room."
                     ] 
                 }
             ],
-            "Part-time Jobs": [
+            "The World of Work": [
                 { 
-                    question: "Have you considered getting a part-time job (HiWi or Minijob) while studying? What kind of job would you be interested in?", 
-                    starters: ["Yes, I have thought about it because...", "I'm interested in finding a job as a...", "A 'HiWi' job at the university seems ideal because...", "I think a job in a... would be good experience."], 
-                    wordBank: ["HiWi (research assistant)", "Minijob", "waiter/waitress", "tutor", "practical experience", "earn money", "improve German", "flexible hours", "relevant to my studies"], 
+                    question: "What is more important in a job: a high salary or job satisfaction?", 
+                    starters: ["I believe job satisfaction is more important because...", "Although a high salary is nice, I think...", "For me, the most important thing is...", "It's a balance, but I would prioritize..."], 
+                    wordBank: ["passion", "fulfillment", "work-life balance", "financial security", "motivation", "stress", "long-term happiness", "career growth", "purpose"], 
                     samples: [
-                        "Yes, I would like a 'HiWi' job at my university because it would be directly related to my engineering studies and would be great practical experience.",
-                        "I think working in a café or restaurant would be a good minijob because it would force me to practice my German with customers every day.",
-                        "I'm interested in being a tutor for younger students, for example in mathematics, because I am good at the subject and I enjoy helping others learn."
-                    ] 
-                },
-                { 
-                    question: "What skills do you have that would be useful for a part-time job?", 
-                    starters: ["One skill I have is...", "I am quite good at...", "I believe my ability to... would be useful.", "In my previous experiences, I have learned to..."], 
-                    wordBank: ["organized", "responsible", "programming languages", "communication skills", "patient", "quick learner", "teamwork", "problem-solving", "language skills (Chinese/English)"], 
-                    samples: [
-                        "I am very patient and organized, which I think would be very useful for a job as a research assistant or 'HiWi' because that work requires attention to detail.",
-                        "My language skills would be an asset, because I can speak Chinese and English fluently, which might be helpful in a shop or cafe in a tourist area.",
-                        "I am a quick learner, especially with software. For example, I taught myself how to use Photoshop, so I could easily adapt to new systems in an office job."
+                        "I believe job satisfaction is more important because if you enjoy what you do, you will be more motivated and less stressed every day.",
+                        "Although a high salary is important for financial security, I think long-term happiness comes from feeling a sense of purpose in your work.",
+                        "For me, it's about finding a balance, but I would prioritize a job that offers good work-life balance over a high-paying but extremely stressful one."
                     ] 
                 }
             ],
-            "Transportation": [
+            "Defining Success": [
                 { 
-                    question: "How do you plan to get around in your new German city?", 
-                    starters: ["I plan to rely mostly on...", "I think buying a... would be a good idea because...", "I will probably use the...", "My main mode of transport will be..."], 
-                    wordBank: ["public transport (ÖPNV)", "bicycle (Fahrrad)", "semester ticket", "train (Zug)", "bus", "tram (Straßenbahn)", "environmentally friendly", "convenient", "affordable"], 
+                    question: "How do you personally define success in life?", 
+                    starters: ["For me, success isn't just about...", "I would feel successful if I...", "Success means having the freedom to...", "My definition of success is..."], 
+                    wordBank: ["happiness", "strong relationships", "making a difference", "personal growth", "achieving goals", "financial stability", "contentment", "learning", "contribution"], 
                     samples: [
-                        "I plan to buy a used bicycle because I've heard it's a very common and cheap way for students to get to university and explore the city.",
-                        "I will definitely use the public transport system because the university provides a semester ticket that allows for unlimited travel in the local area.",
-                        "I think I will mostly use the tram and bus, because the system in Germany is very efficient and it will be a good way to discover different parts of the city."
-                    ] 
-                },
-                { 
-                    question: "Describe a time you used public transportation in a big city, like Beijing.", 
-                    starters: ["I remember one time when...", "The Beijing subway is...", "Once, I had to take a bus to...", "A typical experience on public transport for me is..."], 
-                    wordBank: ["crowded", "efficient", "subway", "bus", "rush hour", "commute", "navigation app", "transfer lines", "packed", "convenient"], 
-                    samples: [
-                        "The Beijing subway during rush hour is an unforgettable experience because it's so crowded that you don't need to hold on, the people around you hold you up.",
-                        "I remember one time I used a navigation app to take the bus to a museum, and it was very convenient because the app told me exactly when the bus would arrive.",
-                        "I often take the subway to go to the city center, and it is very efficient. For example, you can get from the west side to the east side in under an hour, which is impossible by car."
+                        "For me, success isn't just about money or a fancy title; it's about having strong relationships with family and friends.",
+                        "I would feel successful if I could make a positive contribution to my community through my work or actions.",
+                        "My definition of success is continuous personal growth, always learning new things and challenging myself to be a better person."
                     ] 
                 }
             ],
-            "Daily Life": [
+            "Media Influence": [
                 { 
-                    question: "German stores are usually closed on Sundays. How do you think you will adapt to this?", 
-                    starters: ["I will have to plan my...", "I think I will adapt by...", "It will be different from China because...", "I'll need to remember to..."], 
-                    wordBank: ["plan ahead", "grocery shopping", "get used to it", "weekly schedule", "Saturday", "relaxing Sunday", "culture shock", "prepare", "organize"], 
+                    question: "In what ways can movies or TV shows influence our opinions and beliefs?", 
+                    starters: ["Movies can shape our views by...", "They often influence us subconsciously by...", "One powerful way is through...", "By watching..., we might start to believe..."],
+                    wordBank: ["shaping perceptions", "stereotypes", "empathy", "raising awareness", "perspectives", "glamorize", "social commentary", "subtle messages", "character portrayal"],
                     samples: [
-                        "I will have to plan my grocery shopping carefully, because I need to make sure I buy everything I need for the weekend on Saturday.",
-                        "I think I will adapt by treating Sunday as a real day for rest, for example, I can use it to study, meet friends in a park, or just relax at home.",
-                        "It will be a big change because in Beijing, stores are open every day. I'll need to get used to organizing my week differently."
-                    ] 
-                },
-                { 
-                    question: "What is one household chore you are good at, and one you need to improve on before living alone?", 
-                    starters: ["I'm quite good at... because...", "One thing I need to get better at is...", "I don't mind doing..., but I dislike...", "I have experience with..."], 
-                    wordBank: ["cooking", "cleaning", "doing laundry", "washing dishes", "organized", "messy", "improve", "practice", "independent", "responsible"], 
-                    samples: [
-                        "I'm quite good at keeping my room organized because I like everything to be in its place, which helps me focus when I study.",
-                        "One thing I really need to improve on is cooking, because right now I only know how to make instant noodles and I want to eat healthier food.",
-                        "I am good at washing dishes because I find it relaxing, but I need to get better at doing laundry because I always forget to separate the colors."
+                        "Movies can shape our perceptions of different cultures or historical events, especially if we don't have other sources of information.",
+                        "They can create empathy by allowing us to see the world from another person's perspective, which can make us more understanding.",
+                        "Sometimes, movies can reinforce negative stereotypes, because the way characters are portrayed can influence how we see real groups of people."
                     ] 
                 }
             ],
-            "German Food": [
+            "Learning & Growth": [
                 { 
-                    question: "Besides sausages and beer, what other German foods are you interested in trying?", 
-                    starters: ["I would love to try...", "I've heard that... is really good.", "I'm curious about a dish called...", "I'm looking forward to trying some German..."], 
-                    wordBank: ["Schnitzel", "Spätzle", "Pretzels (Brezeln)", "Black Forest Cake (Schwarzwälder Kirschtorte)", "Döner Kebab", "pastries", "bakeries (Bäckerei)", "regional dishes"], 
+                    question: "Describe a time you failed at something and what you learned from the experience.", 
+                    starters: ["I remember one time when I tried to...", "It was a failure, but I learned...", "Although I didn't succeed, the experience taught me...", "Failing at... helped me realize..."],
+                    wordBank: ["resilience", "perseverance", "valuable lesson", "don't give up", "new approach", "humility", "not the end of the world", "try again", "valuable feedback"],
                     samples: [
-                        "I would love to try Schnitzel because it looks like a very crispy and satisfying meal, especially with potatoes on the side.",
-                        "I've heard that German bakeries are amazing, so I want to try all the different kinds of bread and pastries, like Pretzels.",
-                        "I am curious to try Döner Kebab, because even though it's originally Turkish, I hear it's one of the most popular street foods in Germany."
-                    ] 
-                },
-                { 
-                    question: "What Chinese dish will you miss the most, and will you try to cook it yourself in Germany?", 
-                    starters: ["The dish I will miss the most is definitely...", "I think it will be hard to find authentic...", "I will definitely try to learn how to cook... because...", "My favorite food from home is..."], 
-                    wordBank: ["Hotpot (Feuertopf)", "dumplings (Jiaozi)", "Kung Pao Chicken", "Mapo Tofu", "miss the taste", "authentic ingredients", "learn the recipe", "hometown flavor", "share with friends"], 
-                    samples: [
-                        "The dish I will miss the most is hotpot, because it's not just food, it's a social event with family and friends that I will miss dearly.",
-                        "I will definitely try to learn how to make dumplings, or Jiaozi, from my mom before I leave because they are my favorite comfort food.",
-                        "I think I will really miss authentic Mapo Tofu, and I will try to cook it because I can probably find the special Sichuan peppercorns in an Asian supermarket."
+                        "I once failed an important math exam, and it taught me the importance of consistent study instead of cramming at the last minute.",
+                        "Although our team lost the final match, the experience taught me that teamwork and communication are more important than individual skill.",
+                        "Failing to get into the school band helped me realize that it's okay to not be good at everything, and it encouraged me to find other hobbies I enjoyed more."
                     ] 
                 }
             ],
-            "Future Career": [
-                { 
-                    question: "What kind of company or industry would you like to work in after you graduate from university in Germany?", 
-                    starters: ["I hope to work for a... company.", "My goal is to get a job in the... industry.", "I'm particularly interested in working at...", "I would like to be a..."], 
-                    wordBank: ["automotive industry", "tech company", "research and development", "engineering firm", "renewable energy", "multinational corporation", "start-up", "innovative"], 
+            "Global Citizenship": [
+                {
+                    question: "Why is it important for people to learn about different cultures?",
+                    starters: ["Learning about other cultures is important because...", "It helps us to develop...", "By understanding different perspectives, we can...", "It promotes..."],
+                    wordBank: ["tolerance", "empathy", "global perspective", "reduce prejudice", "mutual respect", "interconnected world", "communication", "open-mindedness", "avoid misunderstandings"],
                     samples: [
-                        "I hope to work for a German automotive company like BMW or Mercedes-Benz, because that is the main reason I want to study automotive engineering.",
-                        "My goal is to get a job in the renewable energy sector because I believe it is a very important industry for the future of our planet.",
-                        "I would like to work in a research and development department, because I enjoy solving complex problems and creating new technologies."
-                    ] 
-                },
-                { 
-                    question: "Why is getting international experience in Germany important for your future career goals?", 
-                    starters: ["International experience is crucial because...", "Working in Germany will give me...", "It's important for my career because it will show...", "This experience will help me to..."], 
-                    wordBank: ["global perspective", "cross-cultural communication", "language skills", "competitive advantage", "networking", "adaptability", "broader mindset", "valuable skills"], 
-                    samples: [
-                        "International experience is crucial because it gives you a global perspective, which is very valuable in today's interconnected world.",
-                        "It's important for my career because it will show future employers that I am adaptable and can work in a multicultural environment.",
-                        "Working in Germany will improve my language and cross-cultural communication skills, because I will have to collaborate with people from many different backgrounds."
-                    ] 
+                        "Learning about other cultures is important because it promotes tolerance and reduces prejudice that comes from ignorance.",
+                        "It helps us develop a more global perspective and understand that our own way of seeing things is not the only one.",
+                        "By understanding different cultural norms, we can communicate more effectively and avoid misunderstandings when interacting with people from other countries."
+                    ]
                 }
             ],
-            "Personal Growth": [
-                { 
-                    question: "What is a personal goal, not related to academics, that you want to achieve while living in Germany?", 
-                    starters: ["A personal goal of mine is to learn...", "I want to challenge myself to...", "Besides my studies, I hope to...", "I want to take the opportunity to..."], 
-                    wordBank: ["learn an instrument", "travel around Europe", "become more confident", "join a hiking club", "learn photography", "personal hobby", "new skill", "step out of my comfort zone"], 
+            "Creative Expression": [
+                {
+                    question: "Do you think art, like music, painting, or literature, is important for society? Why?",
+                    starters: ["Yes, I believe art is essential because...", "Art plays a crucial role in...", "Without art, society would be...", "It's important because it allows for..."],
+                    wordBank: ["self-expression", "emotional outlet", "social commentary", "cultural heritage", "inspires creativity", "connects people", "challenges thinking", "beauty", "human experience"],
                     samples: [
-                        "A personal goal is to learn how to ski, because Germany has beautiful mountains and it's a popular sport that I've never had the chance to try.",
-                        "I want to take the opportunity to travel to at least five other European countries because Germany's central location makes it very easy to explore.",
-                        "Besides my studies, I hope to become more confident in speaking up and sharing my own ideas, because I am sometimes a bit shy in groups."
-                    ] 
-                },
-                { 
-                    question: "How do you think living abroad by yourself will help you become more independent?", 
-                    starters: ["Living alone will force me to...", "I will have to learn how to...", "It will help me become more independent by...", "I believe I will grow as a person because..."], 
-                    wordBank: ["self-reliant", "problem-solving", "manage my own finances", "make decisions", "responsible", "mature", "handle challenges", "cook for myself", "resilience"], 
+                        "Yes, I believe art is essential because it provides a way for people to express emotions and ideas that can't be put into simple words.",
+                        "Art plays a crucial role in preserving cultural heritage and telling the stories of our past for future generations.",
+                        "It challenges us to think differently and see the world from new perspectives, which is important for a healthy society."
+                    ]
+                }
+            ],
+            "Hypothetical Challenges": [
+                {
+                    question: "If you could have any superpower, what would it be and how would you use it?",
+                    starters: ["If I had a superpower, I would choose...", "I would want the ability to... because...", "The superpower I'd pick is... and I would use it to...", "It would be amazing to be able to..."],
+                    wordBank: ["teleportation", "invisibility", "mind-reading", "super strength", "flying", "healing", "help others", "solve problems", "explore", "for good"],
                     samples: [
-                        "Living alone will force me to manage my own finances, because I will have a budget and I must be responsible for paying rent and buying food.",
-                        "I will have to learn how to solve problems on my own, for example, if something in my apartment breaks, because my parents won't be there to help.",
-                        "I believe I will grow as a person because making all my own daily decisions, from what to eat to how to schedule my day, will make me much more self-reliant."
-                    ] 
+                        "If I had a superpower, I would choose teleportation because I could travel the world instantly and visit my family whenever I wanted.",
+                        "I would want the ability to heal people, because I could help those who are sick or injured in hospitals or disaster areas.",
+                        "I think mind-reading would be interesting, but I would only use it to better understand people's feelings and help them when they are sad."
+                    ]
                 }
             ]
         };
@@ -887,14 +817,28 @@
         recordBtn.addEventListener('click', startRecording);
         stopRecordBtn.addEventListener('click', stopRecording);
         
+        // --- Certificate Download ---
         downloadCertificateBtn.addEventListener('click', () => {
-            const certificateNode = document.getElementById('certificate-to-download');
-            html2canvas(certificateNode, { scale: 2 }).then(canvas => {
+          const certificateNode = document.getElementById('certificate-to-download');
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+          const newTab = isIOS ? window.open() : null;
+
+          html2canvas(certificateNode, { scale: 2 }).then(canvas => {
+            canvas.toBlob(blob => {
+              const url = URL.createObjectURL(blob);
+              if (isIOS && newTab) {
+                newTab.location = url;
+              } else {
                 const a = document.createElement('a');
-                a.href = canvas.toDataURL('image/png');
+                a.href = url;
                 a.download = `Certificate_of_Completion_${userName.replace(/\s+/g, '_')}.png`;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
+              }
+              URL.revokeObjectURL(url);
             });
+          });
         });
 
         backToMainMenuBtn.addEventListener('click', () => {
@@ -903,36 +847,47 @@
             initializeTopics();
         });
 
+        // --- Recording Download ---
         downloadBtn.addEventListener('click', () => {
-            if (recordedBlob) {
-                const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
-                const sanitizedUserName = userName.replace(/\s+/g, '_');
-                const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = URL.createObjectURL(recordedBlob);
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+          if (recordedBlob) {
+            const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
+            const sanitizedUserName = userName.replace(/\s+/g, '_');
+            const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
+            const blobUrl = URL.createObjectURL(recordedBlob);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-                // Visual feedback
-                const originalText = downloadBtn.innerHTML;
-                downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
-                downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                downloadBtn.classList.add('bg-green-600');
-                setTimeout(() => {
-                  downloadBtn.innerHTML = originalText;
-                  downloadBtn.classList.remove('bg-green-600');
-                  downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                }, 2000);
+            if (isIOS) {
+              // Open tab immediately to avoid Safari popup block
+              const newTab = window.open();
+              if (newTab) newTab.location = blobUrl;
             } else {
-                // No recording — open the SharePoint folder
-                window.open(
-                  'https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ',
-                  '_blank'
-                );
+              const a = document.createElement('a');
+              a.style.display = 'none';
+              a.href = blobUrl;
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
             }
+
+            // Visual feedback
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
+            downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            downloadBtn.classList.add('bg-green-600');
+            setTimeout(() => {
+              downloadBtn.innerHTML = originalText;
+              downloadBtn.classList.remove('bg-green-600');
+              downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }, 2000);
+
+          } else {
+            // No recording — open SharePoint folder
+            window.open(
+              'https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ',
+              '_blank'
+            );
+          }
         });
 
         nextBtn.addEventListener('click', () => {
@@ -976,6 +931,13 @@
         
         main();
 
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (isIOS) {
+            const sharepointLink = document.getElementById('sharepoint-upload-link');
+            if (sharepointLink) {
+                sharepointLink.removeAttribute('target');
+            }
+        }
     });
     </script>
 </body>
