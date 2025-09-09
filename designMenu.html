@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍽️ Kids Restaurant Creator! 🎨</title>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
+    <link href="[https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap](https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap)" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -150,7 +150,7 @@
             border: 4px dashed #ffd700;
             border-radius: 20px;
             padding: 20px; /* was 30px */
-            margin-bottom: 15px; /* was 20px */
+            margin-bottom: 0; /* remove extra gap */
             min-height: 150px; /* was 200px */
             text-align: center;
             color: white;
@@ -158,6 +158,7 @@
             font-weight: bold;
             transition: all 0.3s ease;
             position: relative;
+            flex: 1;
         }
 
         .drop-zone.drag-over {
@@ -206,8 +207,17 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
+        .emoji-categories-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
         .emoji-category {
             margin-bottom: 10px; /* was 20px */
+            flex: 1;
+            min-width: 200px;
         }
 
         .emoji-category h4 {
@@ -284,12 +294,22 @@
             transform: scale(1.1) rotate(10deg);
             box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
+        
+        .staff-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .staff-container > .summary-card {
+            margin: 0;
+        }
 
         .staff-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 20px;
             padding: 20px;
-            margin: 15px 0;
+            margin: 0;
             color: #fff;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
@@ -480,6 +500,15 @@
                 opacity: 0;
             }
         }
+        
+        /* ====== Side-by-side drop zones ====== */
+        .drop-zone-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
 
         @media (max-width: 768px) {
             .title {
@@ -505,6 +534,9 @@
             }
             .price-controls {
                 gap: 5px;
+            }
+            .drop-zone-container {
+                flex-direction: column;
             }
         }
     </style>
@@ -536,16 +568,18 @@
 
             <div class="summary-card">
                 <div class="summary-title">🎯 Tell Us About You & Your Restaurant</div>
-                <div class="staff-card">
-                    <div class="staff-emoji">👤</div>
-                    <h3 style="text-align: center;">Your Name</h3>
-                    <input type="text" class="staff-input" placeholder="Enter your name" id="ownerName" oninput="updateNames()">
-                </div>
-                
-                <div class="staff-card">
-                    <div class="staff-emoji">🏪</div>
-                    <h3 style="text-align: center;">Restaurant Name</h3>
-                    <input type="text" class="staff-input" placeholder="Enter restaurant name" id="restaurantName" oninput="updateNames()">
+                <div class="staff-container">
+                    <div class="staff-card">
+                        <div class="staff-emoji">👤</div>
+                        <h3 style="text-align: center;">Your Name</h3>
+                        <input type="text" class="staff-input" placeholder="Enter your name" id="ownerName" oninput="updateNames()">
+                    </div>
+                    
+                    <div class="staff-card">
+                        <div class="staff-emoji">🏪</div>
+                        <h3 style="text-align: center;">Restaurant Name</h3>
+                        <input type="text" class="staff-input" placeholder="Enter restaurant name" id="restaurantName" oninput="updateNames()">
+                    </div>
                 </div>
             </div>
         </div>
@@ -553,22 +587,24 @@
         <!-- Menu Overview Page -->
         <div id="menu" class="page">
             <h2 class="page-title">🏠 Welcome to Your Restaurant!</h2>
-            <div class="summary-card">
-                <div class="summary-title">🎯 Your Mission</div>
-                <p style="font-size: 1.2rem; text-align: center; line-height: 1.6;" id="missionText">
-                    Create the most amazing restaurant ever! <span aria-hidden="true">🌟</span><br>
-                    Drag and drop food emojis, set prices, pick opening hours, and hire your dream team! <span aria-hidden="true">🚀</span>
-                </p>
-            </div>
-            
-            <div class="summary-card">
-                <div class="summary-title">📊 Restaurant Progress</div>
-                <div id="progressDisplay" style="font-size: 1.1rem; line-height: 1.8;">
-                    <div>🍳 Breakfast Menu: <span id="breakfastCount">0</span> items</div>
-                    <div>🍽️ Lunch Menu: <span id="lunchCount">0</span> items</div>
-                    <div>🌙 Dinner Menu: <span id="dinnerCount">0</span> items</div>
-                    <div>👥 Staff Hired: <span id="staffCount">0</span>/5</div>
-                    <div>⏰ Hours Set: <span id="hoursCount">0</span>/4</div>
+            <div class="staff-container">
+                <div class="summary-card">
+                    <div class="summary-title">🎯 Your Mission</div>
+                    <p style="font-size: 1.2rem; text-align: center; line-height: 1.6;" id="missionText">
+                        Create the most amazing restaurant ever! <span aria-hidden="true">🌟</span><br>
+                        Drag and drop food emojis, set prices, pick opening hours, and hire your dream team! <span aria-hidden="true">🚀</span>
+                    </p>
+                </div>
+                
+                <div class="summary-card">
+                    <div class="summary-title">📊 Restaurant Progress</div>
+                    <div id="progressDisplay" style="font-size: 1.1rem; line-height: 1.8;">
+                        <div>🍳 Breakfast Menu: <span id="breakfastCount">0</span> items</div>
+                        <div>🍽️ Lunch Menu: <span id="lunchCount">0</span> items</div>
+                        <div>🌙 Dinner Menu: <span id="dinnerCount">0</span> items</div>
+                        <div>👥 Staff Hired: <span id="staffCount">0</span>/5</div>
+                        <div>⏰ Hours Set: <span id="hoursCount">0</span>/4</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -577,50 +613,54 @@
         <div id="breakfast" class="page">
             <h2 class="page-title">🌅 Create Breakfast Menu</h2>
             
-            <div class="drop-zone" id="breakfastFood" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
-                <h3>🍳 Breakfast Foods</h3>
-                <p>Drag breakfast foods here!</p>
-                <div class="dropped-items" id="breakfastFoodItems"></div>
-            </div>
+            <div class="drop-zone-container">
+                <div class="drop-zone" id="breakfastFood" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                    <h3>🍳 Breakfast Foods</h3>
+                    <p>Drag breakfast foods here!</p>
+                    <div class="dropped-items" id="breakfastFoodItems"></div>
+                </div>
 
-            <div class="drop-zone" id="breakfastDrinks" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
-                <h3>☕ Breakfast Drinks</h3>
-                <p>Drag drinks here!</p>
-                <div class="dropped-items" id="breakfastDrinkItems"></div>
+                <div class="drop-zone" id="breakfastDrinks" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                    <h3>☕ Breakfast Drinks</h3>
+                    <p>Drag drinks here!</p>
+                    <div class="dropped-items" id="breakfastDrinkItems"></div>
+                </div>
             </div>
 
             <div class="emoji-palette">
-                <div class="emoji-category">
-                    <h4>🍳 Foods</h4>
-                    <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥞" data-name="pancakes" onclick="handleTap(event)">🥞</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧇" data-name="waffles" onclick="handleTap(event)">🧇</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍳" data-name="eggs" onclick="handleTap(event)">🍳</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥓" data-name="bacon" onclick="handleTap(event)">🥓</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥐" data-name="croissant" onclick="handleTap(event)">🥐</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥖" data-name="baguette" onclick="handleTap(event)">🥖</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥣" data-name="cereal" onclick="handleTap(event)">🥣</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍞" data-name="toast" onclick="handleTap(event)">🍞</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥑" data-name="avocado" onclick="handleTap(event)">🥑</button>
+                <div class="emoji-categories-container">
+                    <div class="emoji-category">
+                        <h4>🍳 Foods</h4>
+                        <div class="emoji-grid">
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥞" data-name="pancakes" onclick="handleTap(event)">🥞</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧇" data-name="waffles" onclick="handleTap(event)">🧇</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍳" data-name="eggs" onclick="handleTap(event)">🍳</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥓" data-name="bacon" onclick="handleTap(event)">🥓</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥐" data-name="croissant" onclick="handleTap(event)">🥐</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥖" data-name="baguette" onclick="handleTap(event)">🥖</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥣" data-name="cereal" onclick="handleTap(event)">🥣</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍞" data-name="toast" onclick="handleTap(event)">🍞</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥑" data-name="avocado" onclick="handleTap(event)">🥑</button>
+                        </div>
                     </div>
-                </div>
-                 <div class="emoji-category">
-                    <h4>🍓 Fruits</h4>
-                    <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍓" data-name="strawberry" onclick="handleTap(event)">🍓</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍌" data-name="banana" onclick="handleTap(event)">🍌</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍇" data-name="grapes" onclick="handleTap(event)">🍇</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍎" data-name="apple" onclick="handleTap(event)">🍎</button>
+                     <div class="emoji-category">
+                        <h4>🍓 Fruits</h4>
+                        <div class="emoji-grid">
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍓" data-name="strawberry" onclick="handleTap(event)">🍓</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍌" data-name="banana" onclick="handleTap(event)">🍌</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍇" data-name="grapes" onclick="handleTap(event)">🍇</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍎" data-name="apple" onclick="handleTap(event)">🍎</button>
+                        </div>
                     </div>
-                </div>
-                <div class="emoji-category">
-                    <h4>☕ Drinks</h4>
-                    <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="☕" data-name="coffee" onclick="handleTap(event)">☕</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥛" data-name="milk" onclick="handleTap(event)">🥛</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧃" data-name="juice" onclick="handleTap(event)">🧃</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍵" data-name="tea" onclick="handleTap(event)">🍵</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧋" data-name="bubble tea" onclick="handleTap(event)">🧋</button>
+                    <div class="emoji-category">
+                        <h4>☕ Drinks</h4>
+                        <div class="emoji-grid">
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="☕" data-name="coffee" onclick="handleTap(event)">☕</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥛" data-name="milk" onclick="handleTap(event)">🥛</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧃" data-name="juice" onclick="handleTap(event)">🧃</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍵" data-name="tea" onclick="handleTap(event)">🍵</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧋" data-name="bubble tea" onclick="handleTap(event)">🧋</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -630,50 +670,54 @@
         <div id="lunch" class="page">
             <h2 class="page-title">☀️ Create Lunch Menu</h2>
             
-            <div class="drop-zone" id="lunchFood" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
-                <h3>🍽️ Lunch Foods</h3>
-                <p>Drag lunch foods here!</p>
-                <div class="dropped-items" id="lunchFoodItems"></div>
-            </div>
+            <div class="drop-zone-container">
+                <div class="drop-zone" id="lunchFood" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                    <h3>🍽️ Lunch Foods</h3>
+                    <p>Drag lunch foods here!</p>
+                    <div class="dropped-items" id="lunchFoodItems"></div>
+                </div>
 
-            <div class="drop-zone" id="lunchDrinks" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
-                <h3>🥤 Lunch Drinks</h3>
-                <p>Drag drinks here!</p>
-                <div class="dropped-items" id="lunchDrinkItems"></div>
+                <div class="drop-zone" id="lunchDrinks" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                    <h3>🥤 Lunch Drinks</h3>
+                    <p>Drag drinks here!</p>
+                    <div class="dropped-items" id="lunchDrinkItems"></div>
+                </div>
             </div>
 
             <div class="emoji-palette">
-                <div class="emoji-category">
-                    <h4>🍽️ Foods</h4>
-                    <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍔" data-name="burger" onclick="handleTap(event)">🍔</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍕" data-name="pizza" onclick="handleTap(event)">🍕</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥪" data-name="sandwich" onclick="handleTap(event)">🥪</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥗" data-name="salad" onclick="handleTap(event)">🥗</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🌮" data-name="taco" onclick="handleTap(event)">🌮</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍟" data-name="fries" onclick="handleTap(event)">🍟</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥨" data-name="pretzel" onclick="handleTap(event)">🥨</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍜" data-name="noodles" onclick="handleTap(event)">🍜</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍙" data-name="rice ball" onclick="handleTap(event)">🍙</button>
+                <div class="emoji-categories-container">
+                    <div class="emoji-category">
+                        <h4>🍽️ Foods</h4>
+                        <div class="emoji-grid">
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍔" data-name="burger" onclick="handleTap(event)">🍔</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍕" data-name="pizza" onclick="handleTap(event)">🍕</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥪" data-name="sandwich" onclick="handleTap(event)">🥪</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥗" data-name="salad" onclick="handleTap(event)">🥗</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🌮" data-name="taco" onclick="handleTap(event)">🌮</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍟" data-name="fries" onclick="handleTap(event)">🍟</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥨" data-name="pretzel" onclick="handleTap(event)">🥨</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍜" data-name="noodles" onclick="handleTap(event)">🍜</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍙" data-name="rice ball" onclick="handleTap(event)">🍙</button>
+                        </div>
                     </div>
-                </div>
-                 <div class="emoji-category">
-                    <h4>🍉 Fruits</h4>
-                    <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍉" data-name="watermelon" onclick="handleTap(event)">🍉</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍊" data-name="orange" onclick="handleTap(event)">🍊</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍍" data-name="pineapple" onclick="handleTap(event)">🍍</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥝" data-name="kiwi" onclick="handleTap(event)">🥝</button>
+                     <div class="emoji-category">
+                        <h4>🍉 Fruits</h4>
+                        <div class="emoji-grid">
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍉" data-name="watermelon" onclick="handleTap(event)">🍉</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍊" data-name="orange" onclick="handleTap(event)">🍊</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍍" data-name="pineapple" onclick="handleTap(event)">🍍</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥝" data-name="kiwi" onclick="handleTap(event)">🥝</button>
+                        </div>
                     </div>
-                </div>
-                <div class="emoji-category">
-                    <h4>🥤 Drinks</h4>
-                    <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥤" data-name="soda" onclick="handleTap(event)">🥤</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="💧" data-name="water" onclick="handleTap(event)">💧</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧋" data-name="bubble tea" onclick="handleTap(event)">🧋</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍋" data-name="lemonade" onclick="handleTap(event)">🍋</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥥" data-name="coconut water" onclick="handleTap(event)">🥥</button>
+                    <div class="emoji-category">
+                        <h4>🥤 Drinks</h4>
+                        <div class="emoji-grid">
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥤" data-name="soda" onclick="handleTap(event)">🥤</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="💧" data-name="water" onclick="handleTap(event)">💧</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🧋" data-name="bubble tea" onclick="handleTap(event)">🧋</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍋" data-name="lemonade" onclick="handleTap(event)">🍋</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥥" data-name="coconut water" onclick="handleTap(event)">🥥</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -683,49 +727,53 @@
         <div id="dinner" class="page">
             <h2 class="page-title">🌙 Create Dinner Menu</h2>
             
-            <div class="drop-zone" id="dinnerFood" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
-                <h3>🍽️ Dinner Foods</h3>
-                <p>Drag dinner foods here!</p>
-                <div class="dropped-items" id="dinnerFoodItems"></div>
-            </div>
+            <div class="drop-zone-container">
+                <div class="drop-zone" id="dinnerFood" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                    <h3>🍽️ Dinner Foods</h3>
+                    <p>Drag dinner foods here!</p>
+                    <div class="dropped-items" id="dinnerFoodItems"></div>
+                </div>
 
-            <div class="drop-zone" id="dinnerDrinks" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
-                <h3>🍷 Dinner Drinks</h3>
-                <p>Drag drinks here!</p>
-                <div class="dropped-items" id="dinnerDrinkItems"></div>
+                <div class="drop-zone" id="dinnerDrinks" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                    <h3>🍷 Dinner Drinks</h3>
+                    <p>Drag drinks here!</p>
+                    <div class="dropped-items" id="dinnerDrinkItems"></div>
+                </div>
             </div>
 
             <div class="emoji-palette">
-                <div class="emoji-category">
-                    <h4>🍽️ Foods</h4>
-                    <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥩" data-name="steak" onclick="handleTap(event)">🥩</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍗" data-name="chicken" onclick="handleTap(event)">🍗</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍝" data-name="pasta" onclick="handleTap(event)">🍝</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍛" data-name="curry" onclick="handleTap(event)">🍛</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍣" data-name="sushi" onclick="handleTap(event)">🍣</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥘" data-name="paella" onclick="handleTap(event)">🥘</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥟" data-name="dumpling" onclick="handleTap(event)">🥟</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🦞" data-name="lobster" onclick="handleTap(event)">🦞</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍚" data-name="rice" onclick="handleTap(event)">🍚</button>
+                <div class="emoji-categories-container">
+                    <div class="emoji-category">
+                        <h4>🍽️ Foods</h4>
+                        <div class="emoji-grid">
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥩" data-name="steak" onclick="handleTap(event)">🥩</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍗" data-name="chicken" onclick="handleTap(event)">🍗</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍝" data-name="pasta" onclick="handleTap(event)">🍝</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍛" data-name="curry" onclick="handleTap(event)">🍛</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍣" data-name="sushi" onclick="handleTap(event)">🍣</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥘" data-name="paella" onclick="handleTap(event)">🥘</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🥟" data-name="dumpling" onclick="handleTap(event)">🥟</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🦞" data-name="lobster" onclick="handleTap(event)">🦞</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍚" data-name="rice" onclick="handleTap(event)">🍚</button>
+                        </div>
                     </div>
-                </div>
-                 <div class="emoji-category">
-                    <h4>🍰 Desserts</h4>
-                    <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍰" data-name="cake" onclick="handleTap(event)">🍰</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍨" data-name="ice cream" onclick="handleTap(event)">🍨</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍒" data-name="cherries" onclick="handleTap(event)">🍒</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍩" data-name="donut" onclick="handleTap(event)">🍩</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍪" data-name="cookie" onclick="handleTap(event)">🍪</button>
+                     <div class="emoji-category">
+                        <h4>🍰 Desserts</h4>
+                        <div class="emoji-grid">
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍰" data-name="cake" onclick="handleTap(event)">🍰</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍨" data-name="ice cream" onclick="handleTap(event)">🍨</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍒" data-name="cherries" onclick="handleTap(event)">🍒</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍩" data-name="donut" onclick="handleTap(event)">🍩</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍪" data-name="cookie" onclick="handleTap(event)">🍪</button>
+                        </div>
                     </div>
-                </div>
-                <div class="emoji-category">
-                    <h4>🍷 Drinks</h4>
-                    <div class="emoji-grid">
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍷" data-name="wine" onclick="handleTap(event)">🍷</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="💧" data-name="water" onclick="handleTap(event)">💧</button>
-                        <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍹" data-name="juice" onclick="handleTap(event)">🍹</button>
+                    <div class="emoji-category">
+                        <h4>🍷 Drinks</h4>
+                        <div class="emoji-grid">
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍷" data-name="wine" onclick="handleTap(event)">🍷</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="💧" data-name="water" onclick="handleTap(event)">💧</button>
+                            <button class="emoji-item" draggable="true" ondragstart="drag(event)" data-emoji="🍹" data-name="juice" onclick="handleTap(event)">🍹</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -804,66 +852,68 @@
         <div id="staff" class="page">
             <h2 class="page-title">👥 Hire Your Dream Team</h2>
             
-            <div class="staff-card">
-                <div class="staff-emoji">👨‍🍳</div>
-                <h3 style="text-align: center;">Head Chef</h3>
-                <input type="text" class="staff-input" placeholder="Enter chef's name" id="chefName" data-role="chef">
-                <div class="staff-country-selector">
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
+            <div class="staff-container">
+                <div class="staff-card">
+                    <div class="staff-emoji">👨‍🍳</div>
+                    <h3 style="text-align: center;">Head Chef</h3>
+                    <input type="text" class="staff-input" placeholder="Enter chef's name" id="chefName" data-role="chef">
+                    <div class="staff-country-selector">
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'chef', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="staff-card">
-                <div class="staff-emoji">👩‍🍳</div>
-                <h3 style="text-align: center;">Cook</h3>
-                <input type="text" class="staff-input" placeholder="Enter cook's name" id="cookName" data-role="cook">
-                 <div class="staff-country-selector">
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
+                <div class="staff-card">
+                    <div class="staff-emoji">👩‍🍳</div>
+                    <h3 style="text-align: center;">Cook</h3>
+                    <input type="text" class="staff-input" placeholder="Enter cook's name" id="cookName" data-role="cook">
+                     <div class="staff-country-selector">
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'cook', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="staff-card">
-                <div class="staff-emoji">👨‍💼</div>
-                <h3 style="text-align: center;">Manager</h3>
-                <input type="text" class="staff-input" placeholder="Enter manager's name" id="managerName" data-role="manager">
-                 <div class="staff-country-selector">
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
+                <div class="staff-card">
+                    <div class="staff-emoji">👨‍💼</div>
+                    <h3 style="text-align: center;">Manager</h3>
+                    <input type="text" class="staff-input" placeholder="Enter manager's name" id="managerName" data-role="manager">
+                     <div class="staff-country-selector">
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'manager', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
+                    </div>
                 </div>
-            </div>
-             <div class="staff-card">
-                <div class="staff-emoji">🤵</div>
-                <h3 style="text-align: center;">Waiter</h3>
-                <input type="text" class="staff-input" placeholder="Enter waiter's name" id="waiterName" data-role="waiter">
-                 <div class="staff-country-selector">
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
+                 <div class="staff-card">
+                    <div class="staff-emoji">🤵</div>
+                    <h3 style="text-align: center;">Waiter</h3>
+                    <input type="text" class="staff-input" placeholder="Enter waiter's name" id="waiterName" data-role="waiter">
+                     <div class="staff-country-selector">
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'waiter', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
+                    </div>
                 </div>
-            </div>
-             <div class="staff-card">
-                <div class="staff-emoji">🤵‍♀️</div>
-                <h3 style="text-align: center;">Waitress</h3>
-                <input type="text" class="staff-input" placeholder="Enter waitress's name" id="waitressName" data-role="waitress">
-                 <div class="staff-country-selector">
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
-                     <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
+                 <div class="staff-card">
+                    <div class="staff-emoji">🤵‍♀️</div>
+                    <h3 style="text-align: center;">Waitress</h3>
+                    <input type="text" class="staff-input" placeholder="Enter waitress's name" id="waitressName" data-role="waitress">
+                     <div class="staff-country-selector">
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'de-DE')"><div class="flag-emoji">🇩🇪</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'es-ES')"><div class="flag-emoji">🇪🇸</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'fr-FR')"><div class="flag-emoji">🇫🇷</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'zh-CN')"><div class="flag-emoji">🇨🇳</div></div>
+                         <div class="flag-item" onclick="selectStaffCountry(this, 'waitress', 'en-AU')"><div class="flag-emoji">🇦🇺</div></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1045,7 +1095,7 @@
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.voice = voice;
             utterance.lang = voice.lang; // Set lang to match the selected voice
-            utterance.rate = 0.85; // Slow down speech as per user preference
+            utterance.rate = 0.85; 
             utterance.pitch = 1.2;
             utterance.volume = 1;
 
