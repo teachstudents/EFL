@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍽️ Restaurant Dialogue Practice 🗣️</title>
+    <title>🍽️ Joel's Restaurant Dialogue Practice 🗣️</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
@@ -13,15 +13,81 @@
             font-weight: 500;
         }
         
-        .menu-card {
-            transition: all 0.3s ease;
-            cursor: pointer;
+        body {
+            background: linear-gradient(270deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+            background-size: 800% 800%;
+            animation: gradientShift 45s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+
+        #emoji-rain-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .emoji-rain {
+            position: absolute;
+            top: -10vh;
+            color: white;
+            opacity: 0.6;
+            animation: rainFall linear 1;
+        }
+
+        @keyframes rainFall {
+            to {
+                transform: translateY(120vh) rotate(360deg);
+            }
         }
         
-        .menu-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        .floating-emoji {
+            animation: float 4s ease-in-out infinite;
         }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .sparkle {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #fde047;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            animation: sparkle-animation 0.6s forwards;
+            box-shadow: 0 0 10px #fff, 0 0 15px #fde047;
+        }
+
+        @keyframes sparkle-animation {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+        
+        .menu-card { transition: all 0.3s ease; cursor: pointer; }
+        .menu-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
         
         .dialogue-bubble {
             position: relative;
@@ -33,46 +99,33 @@
             transition: all 0.4s ease-in-out;
             transform: scale(0.98);
         }
-
-        .dialogue-bubble.active {
-            opacity: 1;
-            transform: scale(1.02);
-            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2);
-        }
+        .dialogue-bubble.active { opacity: 1; transform: scale(1.02); box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2); }
+        .customer-bubble { background: linear-gradient(135deg, #e3f2fd, #bbdefb); margin-left: 20px; }
+        .staff-bubble { background: linear-gradient(135deg, #f3e5f5, #e1bee7); margin-right: 20px; }
         
-        .customer-bubble {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            margin-left: 20px;
-        }
+        mark { background-color: #fde047; border-radius: 3px; }
         
-        .staff-bubble {
-            background: linear-gradient(135deg, #f3e5f5, #e1bee7);
-            margin-right: 20px;
-        }
-        
-        mark {
-            background-color: #fde047; /* yellow-300 */
-            border-radius: 3px;
-        }
+        .notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #dc2626; color: white; padding: 10px 20px; border-radius: 9999px; z-index: 50; display: none; opacity: 0; transition: opacity 0.5s ease; font-size: 0.875rem; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-orange-400 via-red-500 to-pink-500 min-h-screen">
+<body class="min-h-screen">
+    <div id="notification" class="notification"></div>
+    <div id="emoji-rain-container"></div>
     <div class="container mx-auto px-4 py-6 max-w-7xl">
         <!-- Header -->
         <div class="text-center mb-6">
-            <h1 class="text-5xl md:text-6xl font-bold text-white mb-3">🍽️ Restaurant Dialogue Practice</h1>
-            <p class="text-xl md:text-2xl text-white/95 font-semibold">Practice conversations between customers and restaurant staff</p>
+            <h1 class="text-5xl md:text-6xl font-bold text-white mb-3">🍽️ Joel's Restaurant</h1>
         </div>
 
         <!-- Main Menu Selection -->
         <div id="menuSelection" class="bg-white/95 backdrop-filter backdrop-blur-lg rounded-3xl p-6 shadow-2xl mb-6">
-            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">🏪 Welcome to Sunny Side Café</h2>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">🏪 Welcome!</h2>
             <p class="text-lg text-gray-600 text-center mb-6">Choose a meal time to start your dialogue practice</p>
             
             <div class="grid md:grid-cols-3 gap-6">
                 <div class="menu-card bg-gradient-to-br from-yellow-100 to-orange-100 rounded-2xl p-6" onclick="generateScenario('breakfast')">
                     <div class="text-center">
-                        <div class="text-7xl mb-3">🌅</div>
+                        <div class="text-7xl mb-3 floating-emoji">🌅</div>
                         <h3 class="text-2xl font-bold text-gray-800 mb-2">Breakfast</h3>
                         <p class="text-gray-600">Morning conversations</p>
                     </div>
@@ -80,7 +133,7 @@
                 
                 <div class="menu-card bg-gradient-to-br from-green-100 to-teal-100 rounded-2xl p-6" onclick="generateScenario('lunch')">
                     <div class="text-center">
-                        <div class="text-7xl mb-3">☀️</div>
+                        <div class="text-7xl mb-3 floating-emoji">☀️</div>
                         <h3 class="text-2xl font-bold text-gray-800 mb-2">Lunch</h3>
                         <p class="text-gray-600">Midday conversations</p>
                     </div>
@@ -88,7 +141,7 @@
                 
                 <div class="menu-card bg-gradient-to-br from-purple-100 to-indigo-100 rounded-2xl p-6" onclick="generateScenario('dinner')">
                     <div class="text-center">
-                        <div class="text-7xl mb-3">🌙</div>
+                        <div class="text-7xl mb-3 floating-emoji">🌙</div>
                         <h3 class="text-2xl font-bold text-gray-800 mb-2">Dinner</h3>
                         <p class="text-gray-600">Evening conversations</p>
                     </div>
@@ -98,22 +151,27 @@
 
         <!-- Restaurant Details -->
         <div id="restaurantDetails" class="hidden">
-            <!-- Restaurant Info Header -->
             <div class="bg-white/95 backdrop-filter backdrop-blur-lg rounded-3xl p-5 shadow-2xl mb-6">
-                <div class="grid md:grid-cols-3 gap-4 items-center">
+                <div class="grid md:grid-cols-4 gap-4 items-center">
                     <div class="text-center">
-                        <div class="text-3xl mb-1" id="mealIcon">🌅</div>
+                        <div class="text-3xl mb-1 floating-emoji" id="mealIcon">🌅</div>
                         <h3 class="text-lg font-bold text-gray-800" id="mealType">Breakfast</h3>
                     </div>
                     
-                    <div class="text-center cursor-pointer" id="staffContainer">
-                        <div class="text-3xl mb-1">👨‍🍳</div>
+                    <div class="text-center cursor-pointer" id="staffContainer" data-tts="true" onclick="playBilingualGreeting()">
+                        <div class="text-3xl mb-1 floating-emoji" id="staffFlag">👨‍🍳</div>
                         <h3 class="text-lg font-bold text-gray-800">Today's Staff</h3>
                         <p class="text-md text-gray-600" id="staffInfo">Sarah (Waitress)</p>
                     </div>
+
+                    <div class="text-center cursor-pointer" id="timeContainer" data-tts="true">
+                        <div class="text-3xl mb-1 floating-emoji">⏰</div>
+                        <h3 class="text-lg font-bold text-gray-800">Opening Times</h3>
+                        <p class="text-md text-gray-600" id="timeInfo">8:00 AM - 11:30 AM</p>
+                    </div>
                     
-                    <div class="text-center cursor-pointer" id="specialContainer">
-                        <div class="text-3xl mb-1">⭐</div>
+                    <div class="text-center cursor-pointer" id="specialContainer" data-tts="true">
+                        <div class="text-3xl mb-1 floating-emoji">⭐</div>
                         <h3 class="text-lg font-bold text-gray-800">Special Today</h3>
                         <p class="text-sm text-gray-600" id="specialOffer">10% off pancakes!</p>
                     </div>
@@ -129,24 +187,15 @@
                 </div>
             </div>
 
-            <!-- Main Content Grid -->
             <div class="grid lg:grid-cols-2 gap-6">
-                <!-- Menu & Info -->
                 <div class="bg-white/95 backdrop-filter backdrop-blur-lg rounded-3xl p-6 shadow-2xl">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center" id="menuTitle">Today's Menu</h2>
-                    <div class="grid md:grid-cols-2 gap-4" id="menuItems">
-                        <!-- Menu items will be populated here -->
-                    </div>
+                    <div class="grid md:grid-cols-2 gap-4" id="menuItems"></div>
                 </div>
 
-                <!-- Dialogue Practice Section -->
                 <div class="bg-white/95 backdrop-filter backdrop-blur-lg rounded-3xl p-6 shadow-2xl">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">💬 Interactive Dialogue</h2>
-                    
-                    <div id="dialogueBox" class="h-96 overflow-y-auto bg-gray-50 rounded-2xl p-3">
-                        <!-- Dialogue will be generated here -->
-                    </div>
-                    
+                    <div id="dialogueBox" class="h-96 overflow-y-auto bg-gray-50 rounded-2xl p-3"></div>
                     <div class="text-center mt-5">
                         <button id="startDialogueBtn" onclick="startDialogue()" class="bg-purple-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-purple-600 transition-colors text-lg">
                             ▶️ Start Conversation
@@ -158,134 +207,155 @@
     </div>
 
     <script>
+        // ... (Script remains the same until getVoice function)
+
         // =================================================================================
         // --- 1. GLOBAL STATE & DATA ---
         // =================================================================================
         let currentMeal = '';
         let currentMenu = [];
         let currentStaff = {};
+        let currentTimes = {};
         let dialogueScript = [];
         let currentDialogueLine = 0;
 
         const restaurantData = {
-            breakfast: {
+             breakfast: {
                 icon: '🌅',
+                baseHour: 7,
                 items: [
-                    { name: 'Classic Pancakes', emoji: '🥞', price: 8.99, description: 'Fluffy pancakes with maple syrup' },
-                    { name: 'Eggs Benedict', emoji: '🍳', price: 12.50, description: 'Poached eggs on English muffin with hollandaise' },
-                    { name: 'Avocado Toast', emoji: '🥑', price: 9.75, description: 'Smashed avocado on sourdough with tomatoes' },
-                    { name: 'French Toast', emoji: '🍞', price: 10.25, description: 'Thick-cut brioche with cinnamon and berries' },
+                    { name: 'Classic Pancakes', emoji: '🥞', price: 9.99, description: 'Fluffy pancakes with maple syrup and berries' },
+                    { name: 'Bagel with Lox', emoji: '🥯', price: 13.50, description: 'Toasted bagel with cream cheese and smoked salmon' },
+                    { name: 'Greek Yogurt Parfait', emoji: '🥗', price: 7.99, description: 'Layered with granola, honey, and fresh fruit' },
+                    { name: 'Full English Breakfast', emoji: '🥓', price: 15.00, description: 'Eggs, bacon, sausage, beans, and toast' },
+                    { name: 'Breakfast Tacos', emoji: '🌮', price: 11.50, description: 'Scrambled eggs, avocado, and salsa in a tortilla' },
+                    { name: 'Mango Smoothie Bowl', emoji: '🥭', price: 9.50, description: 'Thick mango smoothie with coconut flakes' },
                     { name: 'Coffee', emoji: '☕', price: 3.50, description: 'Freshly brewed coffee' },
                     { name: 'Orange Juice', emoji: '🧃', price: 4.00, description: 'Freshly squeezed orange juice' }
                 ]
             },
             lunch: {
                 icon: '☀️',
+                baseHour: 12,
                 items: [
-                    { name: 'Caesar Salad', emoji: '🥗', price: 11.99, description: 'Crisp romaine with parmesan and croutons' },
-                    { name: 'Chicken Sandwich', emoji: '🥪', price: 13.50, description: 'Marinated chicken breast with avocado and bacon' },
-                    { name: 'Fish Tacos', emoji: '🌮', price: 14.75, description: 'Grilled fish with cabbage slaw and lime crema' },
-                    { name: 'Margherita Pizza', emoji: '🍕', price: 15.25, description: 'Fresh mozzarella, basil, and tomato sauce' },
+                    { name: 'Grilled Cheese & Soup', emoji: '🧀', price: 12.00, description: 'Classic grilled cheese with a bowl of tomato soup' },
+                    { name: 'Hummus Bowl', emoji: '🥙', price: 11.75, description: 'Mediterranean hummus with pita, olives, and veggies' },
+                    { name: 'Chicken Caesar Wrap', emoji: '🌯', price: 12.50, description: 'Grilled chicken and caesar salad in a tortilla wrap' },
+                    { name: 'Ramen', emoji: '🍜', price: 15.50, description: 'Pork broth ramen with a soft-boiled egg' },
+                    { name: 'Sushi Rolls', emoji: '🍣', price: 16.00, description: 'A selection of fresh sushi rolls with miso soup' },
+                    { name: 'Ceviche', emoji: '🐠', price: 14.50, description: 'Fresh fish cured in citrus juices with onion' },
+                    { name: 'Calamari Fritti', emoji: '🦑', price: 13.00, description: 'Lightly fried squid rings with marinara sauce' },
                     { name: 'Iced Tea', emoji: '🍹', price: 3.75, description: 'Refreshing iced tea with lemon' },
-                    { name: 'Soda', emoji: '🥤', price: 2.99, description: 'Choice of popular sodas' }
                 ]
             },
             dinner: {
                 icon: '🌙',
+                baseHour: 18,
                 items: [
-                    { name: 'Grilled Salmon', emoji: '🐟', price: 22.99, description: 'Atlantic salmon with lemon herb butter' },
-                    { name: 'Ribeye Steak', emoji: '🥩', price: 28.50, description: '12oz ribeye with garlic mashed potatoes' },
-                    { name: 'Chicken Parmesan', emoji: '🍗', price: 19.75, description: 'Breaded chicken with marinara and mozzarella' },
-                    { name: 'Lobster Ravioli', emoji: '🦞', price: 24.25, description: 'Homemade ravioli in creamy lobster sauce' },
-                    { name: 'Red Wine', emoji: '🍷', price: 9.00, description: 'A glass of our house red' },
-                    { name: 'Sparkling Water', emoji: '💧', price: 4.50, description: 'Imported sparkling mineral water' }
+                    { name: 'Dijon Baked Salmon', emoji: '🐟', price: 22.99, description: 'Baked salmon with roasted vegetables' },
+                    { name: 'Spaghetti Carbonara', emoji: '🍝', price: 19.00, description: 'Classic pasta with eggs, cheese, and pancetta' },
+                    { name: 'Chicken Fajitas', emoji: '🌮', price: 20.50, description: 'Sizzling chicken with peppers and onions' },
+                    { name: 'Steak with Potatoes', emoji: '🥩', price: 28.50, description: '12oz steak with garlic mashed potatoes' },
+                    { name: 'Chicken Tikka Masala', emoji: '🍛', price: 21.00, description: 'Creamy tomato curry with chicken and naan' },
+                    { name: 'Shrimp Scampi', emoji: '🦐', price: 23.50, description: 'Shrimp in garlic and white wine sauce over pasta' },
+                    { name: 'Oysters Rockefeller', emoji: '🦪', price: 18.00, description: 'Oysters baked with butter, herbs, and breadcrumbs' },
+                    { name: 'Lobster Thermidor', emoji: '🦞', price: 35.00, description: 'Creamy mixture of cooked lobster meat and brandy' },
+                    { name: 'Red Wine', emoji: '🍷', price: 9.00, description: 'A glass of our house red' }
                 ]
             }
         };
 
         const staffMembers = [
-            { name: 'Ava', role: 'Waitress', lang: 'en-US', voiceName: 'Ava' },
-            { name: 'Emma', role: 'Waitress', lang: 'en-US', voiceName: 'Emma' },
-            { name: 'Brian', role: 'Waiter', lang: 'en-US', voiceName: 'Brian' },
-            { name: 'Andrew', role: 'Waiter', lang: 'en-US', voiceName: 'Andrew' },
-            { name: 'Jean-Pierre', role: 'Waiter', lang: 'fr-FR' },
-            { name: 'Sofia', role: 'Waitress', lang: 'es-ES' },
-            { name: 'Klaus', role: 'Waiter', lang: 'de-DE' },
-            { name: 'Mei', role: 'Waitress', lang: 'zh-CN' }
+            { name: 'Ava', role: 'Waitress', voiceKey: 'en-US-Ava', flag: '🇺🇸' },
+            { name: 'Andrew', role: 'Waiter', voiceKey: 'en-US-Andrew', flag: '🇺🇸' },
+            { name: 'Emma', role: 'Waitress', voiceKey: 'en-US-Emma', flag: '🇺🇸' },
+            { name: 'Brian', role: 'Waiter', voiceKey: 'en-US-Brian', flag: '🇺🇸' }
         ];
-
+        
         const specialOffers = [ '10% off all main courses!', 'Free dessert with any entree', 'Happy hour: 2-for-1 drinks', '15% student discount' ];
 
         // =================================================================================
-        // --- 2. AUDIO & SPEECH SYNTHESIS (OPTIMIZED) ---
+        // --- 2. AUDIO & SPEECH SYNTHESIS (ROBUST) ---
         // =================================================================================
         let allVoices = [];
-        function loadVoices() {
-            allVoices = speechSynthesis.getVoices();
-            if (allVoices.length === 0) {
-                speechSynthesis.onvoiceschanged = () => {
-                    allVoices = speechSynthesis.getVoices();
-                };
-            }
+        
+        function showNotification(message) {
+            const el = document.getElementById('notification');
+            el.textContent = message;
+            el.style.display = 'block';
+            setTimeout(() => el.style.opacity = 1, 10);
+            setTimeout(() => {
+                el.style.opacity = 0;
+                setTimeout(() => el.style.display = 'none', 500);
+            }, 4000);
         }
-        document.addEventListener('DOMContentLoaded', loadVoices);
 
-        function speakText(text, lang = 'en-US', voiceName = null, onEndCallback = null, highlightElementId = null) {
-            if (!('speechSynthesis' in window)) return;
+        async function getVoice(voiceKey) {
             if (allVoices.length === 0) {
-                setTimeout(() => speakText(text, lang, voiceName, onEndCallback, highlightElementId), 100);
-                return;
+                 allVoices = await new Promise(resolve => {
+                    let voices = speechSynthesis.getVoices();
+                    if (voices.length) return resolve(voices);
+                    speechSynthesis.onvoiceschanged = () => resolve(speechSynthesis.getVoices());
+                });
             }
-            speechSynthesis.cancel();
 
+            const parts = voiceKey.split('-');
+            const lang = `${parts[0]}-${parts[1]}`;
+            const name = parts[2];
+            
             let voice;
-            if (voiceName) {
-                 voice = allVoices.find(v => v.lang.startsWith('en') && v.name.includes('Microsoft') && v.name.includes(voiceName) && (v.name.includes('Online') || v.name.includes('Multilingual')));
+
+            // Priority 1: Find a high-quality Microsoft voice with the specific name
+            if (name) {
+                voice = allVoices.find(v => v.lang === lang && v.name.includes('Microsoft') && v.name.includes(name));
             }
+            
+            // Priority 2: Fallback to any voice for that language
             if (!voice) {
-                voice = allVoices.find(v => v.lang === lang && v.name.includes('Microsoft') && (v.name.includes('Online') || v.name.includes('Natural')));
+                 voice = allVoices.find(v => v.lang === lang);
             }
-            if (!voice) {
-                voice = allVoices.find(v => v.lang === lang);
-            }
+            
+            // Priority 3: Ultimate fallback to a default English voice
             if (!voice) {
                 voice = allVoices.find(v => v.lang === 'en-US');
             }
-            if (!voice) {
+
+            if (!voice) throw new Error(`Could not find a suitable voice for key: ${voiceKey}`);
+            return voice;
+        }
+
+        async function speakText(text, voiceKey, onEndCallback = null, highlightElementId = null) {
+            try {
+                const voice = await getVoice(voiceKey);
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = voice;
+                utterance.lang = voice.lang;
+                utterance.rate = 0.85;
+
+                const highlightElement = document.getElementById(highlightElementId);
+                if (highlightElement) {
+                    utterance.onboundary = (event) => {
+                        if (event.name === 'word') {
+                            const start = event.charIndex;
+                            let end = text.indexOf(' ', start);
+                            if (end === -1) end = text.length;
+                            highlightElement.innerHTML = `"${text.substring(0, start)}<mark>${text.substring(start, end)}</mark>${text.substring(end)}"`;
+                        }
+                    };
+                    utterance.onend = () => {
+                        highlightElement.innerHTML = `"${text}"`;
+                        if (onEndCallback) onEndCallback();
+                    };
+                } else {
+                    if (onEndCallback) utterance.onend = onEndCallback;
+                }
+                
+                speechSynthesis.cancel();
+                speechSynthesis.speak(utterance);
+            } catch (err) {
+                showNotification(err.message);
                 if (onEndCallback) onEndCallback();
-                return;
             }
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.voice = voice;
-            utterance.lang = voice.lang;
-            utterance.rate = 0.85;
-
-            const highlightElement = document.getElementById(highlightElementId);
-            if (highlightElement) {
-                utterance.onboundary = (event) => {
-                    if (event.name === 'word') {
-                        const start = event.charIndex;
-                        let end = text.indexOf(' ', start);
-                        if (end === -1) end = text.length;
-                        const highlightedText = 
-                            text.substring(0, start) + 
-                            '<mark>' + 
-                            text.substring(start, end) + 
-                            '</mark>' + 
-                            text.substring(end);
-                        highlightElement.innerHTML = `"${highlightedText}"`;
-                    }
-                };
-                utterance.onend = () => {
-                    highlightElement.innerHTML = `"${text}"`; // Reset on end
-                    if (onEndCallback) onEndCallback();
-                };
-            } else {
-                 if (onEndCallback) utterance.onend = onEndCallback;
-            }
-            
-            speechSynthesis.speak(utterance);
         }
         
         // =================================================================================
@@ -294,10 +364,27 @@
         function getRandomItems(arr, count) {
             return [...arr].sort(() => 0.5 - Math.random()).slice(0, count);
         }
+        
+        function formatTime(hour, minute) {
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const h = hour % 12 || 12;
+            const m = minute < 10 ? '0' + minute : minute;
+            return `${h}:${m} ${ampm}`;
+        }
 
         function generateScenario(mealType) {
             currentMeal = mealType;
             const mealData = restaurantData[mealType];
+            
+            const minuteIncrements = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+            const startHour = mealData.baseHour + Math.floor(Math.random() * 2); 
+            const startMinute = getRandomItems(minuteIncrements, 1)[0];
+            const endHour = startHour + 4 + Math.floor(Math.random() * 2);
+            const endMinute = getRandomItems(minuteIncrements, 1)[0];
+            currentTimes = {
+                start: formatTime(startHour, startMinute),
+                end: formatTime(endHour, endMinute)
+            };
 
             currentMenu = getRandomItems(mealData.items, Math.floor(Math.random() * 2) + 4);
             currentStaff = getRandomItems(staffMembers, 1)[0];
@@ -306,21 +393,25 @@
             document.getElementById('mealIcon').textContent = mealData.icon;
             document.getElementById('mealType').textContent = mealType.charAt(0).toUpperCase() + mealType.slice(1);
             
+            document.getElementById('staffFlag').textContent = currentStaff.flag;
             const staffInfoEl = document.getElementById('staffInfo');
             staffInfoEl.textContent = `${currentStaff.name} (${currentStaff.role})`;
-            document.getElementById('staffContainer').onclick = () => speakText(staffInfoEl.textContent, currentStaff.lang, currentStaff.voiceName);
+            document.getElementById('staffContainer').onclick = () => speakText(`Your server is ${currentStaff.name}`, currentStaff.voiceKey);
+           
+            const timeInfoEl = document.getElementById('timeInfo');
+            timeInfoEl.textContent = `${currentTimes.start} - ${currentTimes.end}`;
+            document.getElementById('timeContainer').onclick = () => speakText(`We are open from ${currentTimes.start} to ${currentTimes.end}`, 'en-US-Ava');
 
             const specialOfferEl = document.getElementById('specialOffer');
             specialOfferEl.textContent = currentSpecial;
-            document.getElementById('specialContainer').onclick = () => speakText(specialOfferEl.textContent);
+            document.getElementById('specialContainer').onclick = () => speakText(specialOfferEl.textContent, 'en-US-Ava');
 
             document.getElementById('menuTitle').textContent = `Today's ${mealType.charAt(0).toUpperCase() + mealType.slice(1)} Menu`;
 
-            const menuContainer = document.getElementById('menuItems');
-            menuContainer.innerHTML = currentMenu.map(item => `
-                <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-3 border-2 border-gray-200 cursor-pointer" onclick="speakText('${item.name}. ${item.description.replace(/'/g, "\\'")}')">
+            document.getElementById('menuItems').innerHTML = currentMenu.map(item => `
+                <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-3 border-2 border-gray-200 cursor-pointer" data-tts="true" onclick="speakText('${item.name}. ${item.description.replace(/'/g, "\\'")}', 'en-US-Ava')">
                     <div class="flex items-start space-x-3">
-                        <div class="text-3xl pt-1">${item.emoji}</div>
+                        <div class="text-3xl pt-1 floating-emoji">${item.emoji}</div>
                         <div class="flex-1">
                             <h4 class="font-bold text-gray-800">${item.name}</h4>
                             <p class="text-xl font-bold text-green-600">$${item.price.toFixed(2)}</p>
@@ -345,31 +436,43 @@
         // =================================================================================
         // --- 4. DIALOGUE LOGIC ---
         // =================================================================================
-
+        
         function prepareInteractiveDialogue() {
-            const customerVoice = getRandomItems(['Ava', 'Andrew'], 1)[0];
-            const randomFood = getRandomItems(currentMenu.filter(i => i.price > 5), 1)[0] || getRandomItems(currentMenu, 1)[0];
-            const randomDrink = getRandomItems(currentMenu.filter(i => i.price <= 5), 1)[0] || getRandomItems(currentMenu, 1)[0];
+            const customerVoiceKey = getRandomItems(['en-US-Ava', 'en-US-Andrew', 'en-US-Emma'], 1)[0];
+            let randomFood = getRandomItems(currentMenu.filter(i => i.price > 10), 1)[0];
+            let randomDrink = getRandomItems(currentMenu.filter(i => i.price <= 5), 1)[0];
+
+            if (!randomFood || !randomDrink || randomFood.name === randomDrink.name) {
+                const distinctItems = [...new Set(currentMenu)];
+                if (distinctItems.length >= 2) {
+                    const twoItems = getRandomItems(distinctItems, 2);
+                    randomFood = twoItems[0].price > twoItems[1].price ? twoItems[0] : twoItems[1];
+                    randomDrink = twoItems[0].price > twoItems[1].price ? twoItems[1] : twoItems[0];
+                } else {
+                    randomFood = currentMenu[0];
+                    randomDrink = currentMenu[0] || currentMenu[0];
+                }
+            }
             const totalPrice = randomFood.price + randomDrink.price;
 
             dialogueScript = [
-                { speaker: currentStaff.role, name: currentStaff.name, text: `Hello! Welcome. My name is ${currentStaff.name}. Can I start you off with a drink?`, lang: currentStaff.lang, voice: currentStaff.voiceName },
-                { speaker: 'Customer', name: 'You', text: `Yes, I'll have the ${randomDrink.name}, please.`, lang: 'en-US', voice: customerVoice },
-                { speaker: currentStaff.role, name: currentStaff.name, text: `Excellent choice. Are you ready to order your meal, or would you like another moment?`, lang: currentStaff.lang, voice: currentStaff.voiceName },
-                { speaker: 'Customer', name: 'You', text: `I think I'm ready. I would like the ${randomFood.name}. Can you tell me if it contains nuts?`, lang: 'en-US', voice: customerVoice },
-                { speaker: currentStaff.role, name: currentStaff.name, text: `Let me check with the kitchen for you. One moment... Yes, our chef confirms the ${randomFood.name} is nut-free.`, lang: currentStaff.lang, voice: currentStaff.voiceName },
-                { speaker: 'Customer', name: 'You', text: `Wonderful, I'll have that then.`, lang: 'en-US', voice: customerVoice },
-                { speaker: currentStaff.role, name: currentStaff.name, text: `I'll be right back with your order.`, lang: currentStaff.lang, voice: currentStaff.voiceName },
-                { speaker: 'Customer', name: 'You', text: `Excuse me, could I have the bill please?`, lang: 'en-US', voice: customerVoice },
-                { speaker: currentStaff.role, name: currentStaff.name, text: `Of course. Here you are. Your total is $${totalPrice.toFixed(2)}.`, lang: currentStaff.lang, voice: currentStaff.voiceName },
-                { speaker: 'Customer', name: 'You', text: `Thank you for the wonderful service! Have a great day.`, lang: 'en-US', voice: customerVoice }
+                { speaker: currentStaff.role, name: currentStaff.name, text: `Hello! Welcome. I'm ${currentStaff.name}. Can I start you with a drink?`, voiceKey: currentStaff.voiceKey },
+                { speaker: 'Customer', name: 'You', text: `Yes, I'll have the ${randomDrink.name}, please.`, voiceKey: customerVoiceKey },
+                { speaker: currentStaff.role, name: currentStaff.name, text: `An excellent choice. And are you ready to order your meal?`, voiceKey: currentStaff.voiceKey },
+                { speaker: 'Customer', name: 'You', text: `I am. I'll have the ${randomFood.name}.`, voiceKey: customerVoiceKey },
+                { speaker: currentStaff.role, name: currentStaff.name, text: `Perfect. Just so you know, our special today is ${document.getElementById('specialOffer').textContent}`, voiceKey: currentStaff.voiceKey },
+                { speaker: 'Customer', name: 'You', text: `Oh, that sounds good! Maybe next time.`, voiceKey: customerVoiceKey },
+                { speaker: currentStaff.role, name: currentStaff.name, text: `I'll have that right out for you.`, voiceKey: currentStaff.voiceKey },
+                { speaker: 'Customer', name: 'You', text: `Excuse me, could we get the check, please?`, voiceKey: customerVoiceKey },
+                { speaker: currentStaff.role, name: currentStaff.name, text: `Certainly. Your total is $${totalPrice.toFixed(2)}.`, voiceKey: currentStaff.voiceKey },
+                { speaker: 'Customer', name: 'You', text: `Thank you for the great service!`, voiceKey: customerVoiceKey }
             ];
 
             const dialogueBox = document.getElementById('dialogueBox');
             dialogueBox.innerHTML = dialogueScript.map((line, index) => `
-                <div class="dialogue-bubble ${line.speaker.toLowerCase().includes('wait') ? 'staff-bubble' : 'customer-bubble'} cursor-pointer" id="line-${index}" onclick="speakTextWithHighlight(${index})">
+                <div class="dialogue-bubble ${line.speaker.toLowerCase().includes('wait') || line.speaker.toLowerCase().includes('owner') ? 'staff-bubble' : 'customer-bubble'} cursor-pointer" id="line-${index}" data-tts="true" onclick="speakTextWithHighlight(${index})">
                     <div class="flex items-start space-x-3">
-                        <div class="text-2xl">${line.speaker.toLowerCase().includes('wait') ? '👨‍🍳' : '👤'}</div>
+                        <div class="text-2xl floating-emoji">${line.speaker.toLowerCase().includes('wait') || line.speaker.toLowerCase().includes('owner') ? '👨‍🍳' : '👤'}</div>
                         <div>
                             <p class="font-semibold text-gray-800 mb-1">${line.name}</p>
                             <p class="text-black" id="line-text-${index}">"${line.text}"</p>
@@ -383,7 +486,7 @@
 
         function speakTextWithHighlight(index) {
             const line = dialogueScript[index];
-            speakText(line.text, line.lang, line.voice, null, `line-text-${index}`);
+            speakText(line.text, line.voiceKey, null, `line-text-${index}`);
         }
 
         function startDialogue() {
@@ -395,7 +498,7 @@
         function playNextLine() {
             if (currentDialogueLine >= dialogueScript.length) {
                 document.getElementById('startDialogueBtn').disabled = false;
-                speakText("Practice complete! Feel free to shuffle the details or start a new scenario.", 'en-US');
+                speakText("Practice complete! Feel free to shuffle the details or start a new scenario.", 'en-US-Ava');
                 document.querySelectorAll('.dialogue-bubble').forEach(el => el.classList.remove('active'));
                 return;
             }
@@ -410,8 +513,63 @@
                 currentDialogueLine++;
                 setTimeout(playNextLine, 800);
             };
-            speakText(line.text, line.lang, line.voice, onEnd, `line-text-${currentDialogueLine}`);
+            speakText(line.text, line.voiceKey, onEnd, `line-text-${currentDialogueLine}`);
         }
+        
+        // =================================================================================
+        // --- 5. VISUAL EFFECTS ---
+        // =================================================================================
+
+        function startEmojiRain() {
+            const container = document.getElementById('emoji-rain-container');
+            const emojis = ['🥞', '🍳', '🥑', '🍞', '🥗', '🥪', '🌮', '🍕', '🐟', '🥩', '🍗', '🦞', '☕', '🍹', '🍷', '🍓', '🍎', '🍒', '🍇'];
+            
+            setInterval(() => {
+                const emojiEl = document.createElement('div');
+                emojiEl.classList.add('emoji-rain');
+                emojiEl.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                emojiEl.style.left = Math.random() * 100 + 'vw';
+                emojiEl.style.fontSize = Math.random() * 1.5 + 1 + 'rem';
+                const duration = Math.random() * 8 + 10;
+                emojiEl.style.animationDuration = duration + 's';
+                
+                container.appendChild(emojiEl);
+
+                setTimeout(() => {
+                    emojiEl.remove();
+                }, duration * 1000);
+            }, 500);
+        }
+
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+            
+            const offsetX = (Math.random() - 0.5) * 40;
+            const offsetY = (Math.random() - 0.5) * 40;
+            
+            sparkle.style.left = `${x + offsetX}px`;
+            sparkle.style.top = `${y + offsetY}px`;
+            
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => {
+                sparkle.remove();
+            }, 600);
+        }
+        
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('[data-tts="true"]')) {
+                for (let i = 0; i < 8; i++) {
+                    createSparkle(e.clientX, e.clientY);
+                }
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadVoices();
+            startEmojiRain();
+        });
         
     </script>
 </body>
