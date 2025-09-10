@@ -8,12 +8,19 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
         
-      body, button, input, h1, h2, h3, h4, p, div {
+/* Global font stack for all text */
+body, button, input, h1, h2, h3, h4, p, div {
   font-family: 'Fredoka', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
   font-weight: 500;
 }
 
-        
+/* Force emoji-capable font for the staff flag only */
+#staffFlag {
+  font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+  transform: none !important; /* disable float animation for flags */
+  display: inline-block;
+}
+
         body {
             background: linear-gradient(270deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
             background-size: 800% 800%;
