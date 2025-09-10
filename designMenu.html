@@ -963,13 +963,14 @@
         const staffScripts = {
             'de-DE': { english: "Hello from Germany!", native: "Ich liebe es, leckere Brezeln und Bratwurst zu machen." },
             'es-ES': { english: "Hello from Spain!", native: "¡Tengo muchas ganas de cocinarte una paella!" },
-            'fr-FR': { english: "Bonjour from France!", native: "Je recommande les croissants et le coq au vin." },
+            'fr-FR': { english: "Bonjour from France!", native: "J'adore cuisiner des plats français classiques pour vous!" },
             'zh-CN': { english: "Nǐ hǎo from China!", native: "我们吃点饺子和北京烤鸭吧。" },
             'en-AU': { english: "G'day from Australia!", native: "How about some fish and chips, mate?" }
         };
 
         const foodDescriptions = {
             "baguette": { text: "Baguette fraîche et croustillante", lang: "fr-FR" },
+            "croissant": { text: "Un croissant au beurre, délicieux!", lang: "fr-FR" },
             "paella": { text: "Paella sabrosa y colorida", lang: "es-ES" },
             "pretzel": { text: "Frische, salzige Brezel", lang: "de-DE" },
             "dumpling": { text: "新鲜美味的饺子", lang: "zh-CN" }
@@ -1514,10 +1515,12 @@
 
         function generateSummary() {
             const summaryContainer = document.getElementById('restaurantSummary');
-            summaryContainer.innerHTML = ''; 
+            let summaryHTML = '<div class="staff-container">'; 
+            
             const createCard = (title, content) => `<div class="summary-card"><div class="summary-title">${title}</div><div class="menu-preview">${content}</div></div>`;
+            
             let overviewContent = `<strong>Restaurant Name:</strong> ${restaurant.restaurantName || 'N/A'}<br><strong>Owner:</strong> ${restaurant.owner || 'N/A'}<br><strong>Currency:</strong> ${restaurant.currency.code} (${restaurant.currency.symbol})<br><strong>Opening Hours:</strong> ${restaurant.openingHours.join(', ') || 'N/A'}`;
-            summaryContainer.innerHTML += createCard('🏪 Restaurant Overview', overviewContent);
+            summaryHTML += createCard('🏪 Restaurant Overview', overviewContent);
             
             const createMenuContent = (menu) => {
                 const allItems = [...menu.foods, ...menu.drinks];
@@ -1525,11 +1528,11 @@
             };
             
             const breakfastContent = createMenuContent(restaurant.breakfast);
-            if (breakfastContent) summaryContainer.innerHTML += createCard('🌅 Breakfast Menu', breakfastContent);
+            if (breakfastContent) summaryHTML += createCard('🌅 Breakfast Menu', breakfastContent);
             const lunchContent = createMenuContent(restaurant.lunch);
-            if (lunchContent) summaryContainer.innerHTML += createCard('☀️ Lunch Menu', lunchContent);
+            if (lunchContent) summaryHTML += createCard('☀️ Lunch Menu', lunchContent);
             const dinnerContent = createMenuContent(restaurant.dinner);
-            if (dinnerContent) summaryContainer.innerHTML += createCard('🌙 Dinner Menu', dinnerContent);
+            if (dinnerContent) summaryHTML += createCard('🌙 Dinner Menu', dinnerContent);
 
             const staffList = Object.entries(restaurant.staff).filter(([, s]) => s.name.trim() !== "");
             if (staffList.length > 0) {
@@ -1537,8 +1540,10 @@
                     const emojiMap = { chef: '👨‍🍳', cook: '👩‍🍳', manager: '👨‍💼', waiter: '🤵', waitress: '🤵‍♀️'};
                     return `<div>${emojiMap[role]} ${role.charAt(0).toUpperCase() + role.slice(1)}: ${staff.name}</div>`;
                 }).join('');
-                summaryContainer.innerHTML += createCard('👥 Our Amazing Team', staffContent);
+                summaryHTML += createCard('👥 Our Amazing Team', staffContent);
             }
+            summaryHTML += '</div>';
+            summaryContainer.innerHTML = summaryHTML;
         }
         
         // =================================================================================
