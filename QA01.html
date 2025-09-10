@@ -120,7 +120,14 @@
             <header class="flex-shrink-0">
                 <div class="flex justify-between items-center mb-1">
                     <button id="back-to-topics-btn" class="text-indigo-500 hover:text-indigo-700"><i class="fas fa-arrow-left mr-2"></i>Topics</button>
+                    <button id="next-btn" class="hidden bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-4 rounded-lg text-sm shadow-md flex items-center">Next <i class="fas fa-arrow-right ml-2"></i></button>
                 </div>
+                
+                <!-- Permanent Progress Indicator -->
+                <div id="progress-indicator" class="text-center font-semibold text-gray-500 dark:text-gray-400 text-sm mb-2">
+                  Topic: <span id="topic-name-display"></span> | Progress: <span id="question-progress-display"></span>
+                </div>
+
                 <!-- Timer Display -->
                 <div class="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-2 flex-shrink-0">
                     <svg class="w-full h-full" viewBox="0 0 100 100">
@@ -152,20 +159,20 @@
                     <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-2">
                         <audio id="audio-player" controls class="w-full max-w-xs"></audio>
                         <div class="flex flex-col gap-3 w-full max-w-xs">
-                           <!-- Smart Download button -->
-                           <button id="download-btn"
-                                   class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
-                               <i class="fas fa-download mr-1"></i>Download Recording / Open Folder
-                           </button>
-                           
-                           <!-- Upload button -->
-                           <a id="sharepoint-upload-link"
-                                 href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ"
-                                 target="_blank"
-                                 rel="noopener noreferrer"
-                                 class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-green-500/50 focus:ring-2 focus:ring-green-400 focus:outline-none active:scale-95 flex items-center justify-center">
-                               <i class="fas fa-upload mr-1"></i>Upload to Folder
-                           </a>
+                            <!-- Smart Download button -->
+                            <button id="download-btn"
+                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                                <i class="fas fa-download mr-1"></i>Download Recording / Open Folder
+                            </button>
+                            
+                            <!-- Upload button -->
+                            <a id="sharepoint-upload-link"
+                                   href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-green-500/50 focus:ring-2 focus:ring-green-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                                <i class="fas fa-upload mr-1"></i>Upload to Folder
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -176,7 +183,7 @@
             </header>
             
             <main class="flex-grow flex flex-col overflow-y-auto min-h-0 space-y-2 pt-2">
-                 <!-- Sentence Starters -->
+                  <!-- Sentence Starters -->
                 <div id="starters-container" class="hidden text-left">
                     <h3 class="text-sm font-bold mb-1 text-center">Sentence Starters</h3>
                     <div id="starters-list" class="flex flex-wrap gap-2 justify-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">
@@ -200,12 +207,6 @@
                 </div>
             </main>
 
-            <footer class="flex-shrink-0 mt-2">
-                <!-- Next Button -->
-                <div id="controls-container">
-                     <button id="next-btn" class="hidden w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg text-lg shadow-md">Next</button>
-                </div>
-            </footer>
         </div>
 
         <!-- Certificate Screen -->
@@ -352,6 +353,9 @@
         const nextBtn = document.getElementById('next-btn');
         const backToTopicsBtn = document.getElementById('back-to-topics-btn');
         
+        const topicNameDisplay = document.getElementById('topic-name-display');
+        const questionProgressDisplay = document.getElementById('question-progress-display');
+        
         const timerDisplay = document.getElementById('timer-display');
         const timerProgress = document.getElementById('timer-progress');
         const phaseIndicator = document.getElementById('phase-indicator');
@@ -388,9 +392,7 @@
         let audioChunks = [];
         let recordedBlob = null;
         let completedTopics = {};
-        let speechRecognition;
-        let finalTranscript = '';
-
+        
         const FULL_DASH_ARRAY = 283;
         const DEFAULT_RESPONSE_TIME = 60;
         const READ_TIME = 60;
@@ -440,7 +442,7 @@
             });
         }
 
-        function speak(text, isFeedback = false) {
+        function speak(text) {
             if (!ttsInitialized) return;
             try {
                 if (synth.speaking) synth.cancel();
@@ -448,7 +450,7 @@
                 utterThis.onerror = (event) => console.error('SpeechSynthesisUtterance.onerror', event);
                 if (preferredVoice) utterThis.voice = preferredVoice;
                 utterThis.pitch = 1;  
-                utterThis.rate = 0.85; // Slow down speech as requested
+                utterThis.rate = 0.85; 
                 synth.speak(utterThis);
             } catch (e) {
                 console.error("Speech synthesis failed:", e);
@@ -461,7 +463,6 @@
             if (savedCompletedTopics) {
                 try {
                     const parsed = JSON.parse(savedCompletedTopics);
-                    // Basic validation to ensure it's an object
                     if (typeof parsed === 'object' && parsed !== null) {
                         completedTopics = parsed;
                     } else {
@@ -469,7 +470,7 @@
                     }
                 } catch (e) {
                     console.error("Failed to parse saved progress:", e);
-                    completedTopics = {}; // Reset progress if data is corrupt
+                    completedTopics = {};
                 }
             }
             const savedName = localStorage.getItem('languagePracticeUserName');
@@ -504,6 +505,14 @@
                 topicSelection.appendChild(button);
             }
         }
+        
+        function returnToTopics() {
+            practiceScreen.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
+            clearInterval(timerInterval);
+            initializeTopics();
+            checkAllTopicsCompleted();
+        }
 
         // --- Core App Logic ---
         function startPractice(topic) {
@@ -517,20 +526,19 @@
         }
 
         function showQuestion() {
-            if (currentQuestionIndex >= currentQuestions.length) {
-                phaseIndicator.textContent = "Topic Complete!";
-                questionText.textContent = "You've finished this topic. Well done!";
-                completedTopics[currentQuestions.topicName] = true;
-                saveProgress();
-                checkAllTopicsCompleted();
-                resetRecordingUI();
-                nextBtn.classList.add('hidden');
-                speak("You've completed this topic! Well done.");
-                return;
-            }
-
             const item = currentQuestions[currentQuestionIndex];
             resetUIForNewQuestion();
+
+            // UPDATE HEADER AND NEXT BUTTON
+            topicNameDisplay.textContent = currentQuestions.topicName;
+            questionProgressDisplay.textContent = `Question ${currentQuestionIndex + 1} / ${currentQuestions.length}`;
+            nextBtn.classList.remove('hidden');
+
+            if (currentQuestionIndex >= currentQuestions.length - 1) {
+                nextBtn.innerHTML = `Finish Topic <i class="fas fa-check ml-2"></i>`;
+            } else {
+                nextBtn.innerHTML = `Next <i class="fas fa-arrow-right ml-2"></i>`;
+            }
             
             let fullQuestion = (item.intro ? item.intro + " " : "") + item.question;
             questionText.textContent = fullQuestion;
@@ -539,7 +547,6 @@
 
             speak(fullQuestion);
             
-            // Populate Sentence Starters
             if (item.starters && item.starters.length > 0) {
                 startersList.innerHTML = '';
                 item.starters.forEach(starter => {
@@ -551,7 +558,6 @@
                 startersContainer.classList.remove('hidden');
             }
 
-            // Populate Word Bank
             if (item.wordBank && item.wordBank.length > 0) {
                 wordBankList.innerHTML = '';
                 item.wordBank.forEach(word => {
@@ -564,7 +570,7 @@
             }
 
             const responseTime = item.timer || DEFAULT_RESPONSE_TIME;
-            phaseIndicator.textContent = `Prepare & Record (Question ${currentQuestionIndex + 1} of ${currentQuestions.length})`;
+            phaseIndicator.textContent = `Prepare & Record`;
             startTimer(responseTime, showSampleAnswersAndStartReadTimer);
         }
 
@@ -572,6 +578,9 @@
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 stopRecording();
             }
+            
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             
             phaseIndicator.textContent = "Review";
             recordBtn.disabled = true;
@@ -583,24 +592,20 @@
                 item.samples.forEach(sample => {
                     const li = document.createElement('li');
                     li.textContent = sample;
-                    // Changed to white text as requested
                     li.className = 'text-white text-sm sm:text-base';
                     samplesList.appendChild(li);
                 });
                 samplesContainer.classList.remove('hidden');
             }
 
-
             startTimer(READ_TIME, () => {
                 phaseIndicator.textContent = "Time's up!";
-                nextBtn.classList.remove('hidden');
             });
         }
         
-        // --- Certificate Logic ---
         function checkAllTopicsCompleted() {
             const totalTopics = Object.keys(practiceData).length;
-            const completedCount = Object.keys(completedTopics).length;
+            const completedCount = Object.keys(completedTopics).filter(topic => completedTopics[topic]).length;
             if (completedCount === totalTopics) {
                 showCertificate();
             }
@@ -619,16 +624,18 @@
             errorMessagebox.classList.remove('hidden');
             setTimeout(() => {
                 errorMessagebox.classList.add('hidden');
-            }, 5000); // Hide after 5 seconds
+            }, 5000);
         }
 
-        // --- Recording & Transcription Logic ---
         async function startRecording() {
             if (!window.MediaRecorder) {
                 showErrorMessage("Audio recording is not supported on this browser.");
                 return;
             }
             try {
+                nextBtn.disabled = true;
+                nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 
                 const isMobileEdge = /Edg\/\d+.*Android/.test(navigator.userAgent);
@@ -641,8 +648,7 @@
                 
                 mediaRecorder = new MediaRecorder(stream, options);
                 mediaRecorder.start();
-                startTranscription();
-
+                
                 recordBtn.classList.add('hidden');
                 stopRecordBtn.classList.remove('hidden');
                 recordingStatus.classList.remove('hidden');
@@ -664,6 +670,8 @@
             } catch (err) {
                 console.error("Error starting recording:", err);
                 showErrorMessage("Could not start audio recording. Please grant microphone permission.");
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
 
@@ -671,43 +679,8 @@
             if (mediaRecorder) {
                 mediaRecorder.stop();
             }
-            if (speechRecognition) {
-                speechRecognition.stop();
-            }
         }
 
-        function startTranscription() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                console.warn("Speech recognition not supported — skipping setup.");
-                return;
-            }
-
-            speechRecognition = new SpeechRecognition();
-            speechRecognition.continuous = true;
-            speechRecognition.interimResults = true;
-            speechRecognition.lang = 'en-US';
-            finalTranscript = '';
-
-            speechRecognition.onresult = (event) => {
-                let interimTranscript = '';
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript;
-                    } else {
-                        interimTranscript += event.results[i][0].transcript;
-                    }
-                }
-            };
-            
-            speechRecognition.onerror = (event) => {
-                 console.error('Speech recognition error detected: ' + event.error);
-            }
-
-            speechRecognition.start();
-        }
-
-        // --- Timer Functions ---
         function startTimer(duration, onEndCallback) {
             let timeLeft = duration;
             clearInterval(timerInterval);
@@ -734,15 +707,15 @@
             timerProgress.style.strokeDashoffset = FULL_DASH_ARRAY - offset;
         }
 
-        // --- UI Helper Functions ---
         function resetUIForNewQuestion() {
             samplesContainer.classList.add('hidden');
             startersContainer.classList.add('hidden');
             wordBankContainer.classList.add('hidden');
-            nextBtn.classList.add('hidden');
             errorMessagebox.classList.add('hidden');
             recordBtn.disabled = false;
             recordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             resetRecordingUI();
         }
 
@@ -754,11 +727,8 @@
             audioPlayer.src = '';
             audioChunks = [];
             recordedBlob = null;
-            finalTranscript = '';
         }
 
-        
-        // --- Snowfall Logic ---
         function createSnow() {
             const snowContainer = document.getElementById('snow-container');
             const snowflakeCount = window.innerWidth < 768 ? 15 : 50;
@@ -767,7 +737,7 @@
                 snowflake.innerHTML = '❄';
                 snowflake.classList.add('snowflake');
                 snowflake.style.left = Math.random() * 100 + 'vw';
-                snowflake.style.animationDuration = Math.random() * 5 + 5 + 's'; // 5-10 seconds
+                snowflake.style.animationDuration = Math.random() * 5 + 5 + 's';
                 snowflake.style.animationDelay = Math.random() * 5 + 's';
                 snowflake.style.fontSize = Math.random() * 1.5 + 0.5 + 'em';
                 snowflake.style.opacity = Math.random();
@@ -775,8 +745,6 @@
             }
         }
 
-
-        // --- Event Listeners ---
         startWithNameBtn.addEventListener('click', () => {
             userName = nameInput.value.trim();
             if (userName) {
@@ -785,7 +753,6 @@
                 userNameDisplay.textContent = userName;
                 topicSelectionContainer.classList.remove('hidden');
             } else {
-                // Using a custom message box instead of alert()
                 const nameError = document.createElement('div');
                 nameError.textContent = "Please enter your name.";
                 nameError.className = "text-red-500 text-sm mt-2";
@@ -797,7 +764,6 @@
         recordBtn.addEventListener('click', startRecording);
         stopRecordBtn.addEventListener('click', stopRecording);
         
-        // --- Certificate Download ---
         downloadCertificateBtn.addEventListener('click', () => {
           const certificateNode = document.getElementById('certificate-to-download');
           const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -827,7 +793,6 @@
             initializeTopics();
         });
 
-        // --- Recording Download ---
         downloadBtn.addEventListener('click', () => {
           if (recordedBlob) {
             const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
@@ -837,7 +802,6 @@
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
             if (isIOS) {
-              // Open tab immediately to avoid Safari popup block
               const newTab = window.open();
               if (newTab) newTab.location = blobUrl;
             } else {
@@ -850,7 +814,6 @@
               document.body.removeChild(a);
             }
 
-            // Visual feedback
             const originalText = downloadBtn.innerHTML;
             downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
             downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
@@ -862,7 +825,6 @@
             }, 2000);
 
           } else {
-            // No recording — open SharePoint folder
             window.open(
               'https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ',
               '_blank'
@@ -871,18 +833,21 @@
         });
 
         nextBtn.addEventListener('click', () => {
-            currentQuestionIndex++;
-            showQuestion();
+            if (nextBtn.disabled) return;
+            
+            // Check if it's the last question
+            if (currentQuestionIndex >= currentQuestions.length - 1) {
+                completedTopics[currentQuestions.topicName] = true;
+                saveProgress();
+                returnToTopics();
+            } else {
+                currentQuestionIndex++;
+                showQuestion();
+            }
         });
 
-        backToTopicsBtn.addEventListener('click', () => {
-            practiceScreen.classList.add('hidden');
-            welcomeScreen.classList.remove('hidden');
-            clearInterval(timerInterval);
-            initializeTopics();
-        });
+        backToTopicsBtn.addEventListener('click', returnToTopics);
         
-        // --- Initial Load ---
         async function main() {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             if (isIOS) {
@@ -892,11 +857,10 @@
                 }
             }
             
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !SpeechRecognition) {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 recordBtn.disabled = true;
                 recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                recordBtn.title = "Audio recording or recognition is not supported on this browser.";
+                recordBtn.title = "Audio recording is not supported on this browser.";
             }
             if (!window.speechSynthesis) {
                  console.warn("Text-to-speech is not supported on this browser.");
@@ -910,14 +874,6 @@
         }
         
         main();
-
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        if (isIOS) {
-            const sharepointLink = document.getElementById('sharepoint-upload-link');
-            if (sharepointLink) {
-                sharepointLink.removeAttribute('target');
-            }
-        }
     });
     </script>
 </body>
