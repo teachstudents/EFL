@@ -111,7 +111,7 @@
 <body class="min-h-screen">
     <div id="notification" class="notification"></div>
     <div id="emoji-rain-container"></div>
-    <div class="container mx-auto px-4 py-6 max-w-4xl">
+    <div class="container mx-auto px-4 py-6 max-w-5xl">
         <!-- Header -->
         <div class="text-center mb-6">
             <h1 class="text-4xl md:text-5xl font-bold text-white mb-3">🍽️ Joel's Restaurant</h1>
@@ -266,10 +266,21 @@
         const staffMembers = [
             { name: 'Ava', role: 'Waitress', voiceKey: 'en-US-Ava', flag: '🇺🇸' },
             { name: 'Andrew', role: 'Waiter', voiceKey: 'en-US-Andrew', flag: '🇺🇸' },
-            { name: 'Emma', role: 'Waitress', voiceKey: 'en-US-Emma', flag: '🇺🇸' },
-            { name: 'Brian', role: 'Waiter', voiceKey: 'en-US-Brian', flag: '🇺🇸' }
+            { name: 'Jean-Pierre', role: 'Waiter', voiceKey: 'fr-FR', flag: '🇫🇷'},
+            { name: 'Sofia', role: 'Waitress', voiceKey: 'es-ES', flag: '🇪🇸'},
+            { name: 'Wei', role: 'Waiter', voiceKey: 'zh-CN', flag: '🇨🇳'},
+            { name: 'Liam', role: 'Waiter', voiceKey: 'en-AU', flag: '🇦🇺' }
         ];
         
+        const staffScripts = {
+            'fr-FR': { english: "Welcome! You should try our special!", native: "Bonjour! C'est délicieux, je vous le recommande!"},
+            'es-ES': { english: "Hello! Our special today is a great choice!", native: "¡Hola! ¡Nuestra especialidad de hoy es una opción fantástica!"},
+            'zh-CN': { english: "Welcome! I think you will really like the special.", native: "欢迎! 我觉得你一定会喜欢这个特别推荐。"},
+            'en-AU': { english: "G'day, mate! The special is a real beauty today.", native: "You'll love it, I reckon!"},
+            'en-US-Ava': { english: "Welcome! I highly recommend our special today!", native: ""},
+            'en-US-Andrew': { english: "Hello there! Our special is a fantastic choice today!", native: ""}
+        };
+
         const specialOffers = [ '10% off all main courses!', 'Free dessert with any entree', 'Happy hour: 2-for-1 drinks', '15% student discount' ];
 
         // =================================================================================
@@ -303,22 +314,15 @@
             
             let voice;
 
-            // Priority 1: Find a high-quality Microsoft voice with the specific name
             if (name) {
                 voice = allVoices.find(v => v.lang === lang && v.name.includes('Microsoft') && v.name.includes(name));
             }
-            
-            // Priority 2: Fallback to any voice with that name
             if (!voice && name) {
                 voice = allVoices.find(v => v.name.includes(name));
             }
-
-            // Priority 3: Fallback to any voice for that language
             if (!voice) {
                  voice = allVoices.find(v => v.lang === lang);
             }
-            
-            // Priority 4: Ultimate fallback to a default English voice
             if (!voice) {
                 voice = allVoices.find(v => v.lang === 'en-US');
             }
@@ -397,9 +401,7 @@
             document.getElementById('mealType').textContent = mealType.charAt(0).toUpperCase() + mealType.slice(1);
             
             document.getElementById('staffFlag').textContent = currentStaff.flag;
-            const staffInfoEl = document.getElementById('staffInfo');
-            staffInfoEl.textContent = `${currentStaff.name} (${currentStaff.role})`;
-            document.getElementById('staffContainer').onclick = () => speakText(`Your server is ${currentStaff.name}`, currentStaff.voiceKey);
+            document.getElementById('staffInfo').textContent = `${currentStaff.name} (${currentStaff.role})`;
            
             const timeInfoEl = document.getElementById('timeInfo');
             timeInfoEl.textContent = `${currentTimes.start} - ${currentTimes.end}`;
@@ -440,6 +442,19 @@
         // --- 4. DIALOGUE LOGIC ---
         // =================================================================================
         
+        function playBilingualGreeting() {
+            const script = staffScripts[currentStaff.voiceKey];
+            if (!script) {
+                speakText(`Hello, I'm ${currentStaff.name}.`, currentStaff.voiceKey || 'en-US-Ava');
+                return;
+            }
+            speakText(script.english, 'en-US-Ava', () => {
+                if(script.native) {
+                    setTimeout(() => speakText(script.native, currentStaff.voiceKey), 300);
+                }
+            });
+        }
+        
         function prepareInteractiveDialogue() {
             const customerVoiceKey = getRandomItems(['en-US-Ava', 'en-US-Andrew', 'en-US-Emma'], 1)[0];
             let randomFood = getRandomItems(currentMenu.filter(i => i.price > 10), 1)[0];
@@ -459,15 +474,15 @@
             const totalPrice = randomFood.price + randomDrink.price;
 
             dialogueScript = [
-                { speaker: currentStaff.role, name: currentStaff.name, text: `Hello! Welcome. I'm ${currentStaff.name}. Can I start you with a drink?`, voiceKey: currentStaff.voiceKey },
+                { speaker: currentStaff.role, name: currentStaff.name, text: `Hello! I'm ${currentStaff.name}. Can I start you with a drink?`, voiceKey: 'en-US-Brian' },
                 { speaker: 'Customer', name: 'You', text: `Yes, I'll have the ${randomDrink.name}, please.`, voiceKey: customerVoiceKey },
-                { speaker: currentStaff.role, name: currentStaff.name, text: `An excellent choice. And are you ready to order your meal?`, voiceKey: currentStaff.voiceKey },
+                { speaker: currentStaff.role, name: currentStaff.name, text: `Excellent choice. And are you ready to order your meal?`, voiceKey: 'en-US-Brian' },
                 { speaker: 'Customer', name: 'You', text: `I am. I'll have the ${randomFood.name}.`, voiceKey: customerVoiceKey },
-                { speaker: currentStaff.role, name: currentStaff.name, text: `Perfect. Just so you know, our special today is ${document.getElementById('specialOffer').textContent}`, voiceKey: currentStaff.voiceKey },
+                { speaker: currentStaff.role, name: currentStaff.name, text: `Perfect. Just so you know, our special today is ${document.getElementById('specialOffer').textContent}`, voiceKey: 'en-US-Brian' },
                 { speaker: 'Customer', name: 'You', text: `Oh, that sounds good! Maybe next time.`, voiceKey: customerVoiceKey },
-                { speaker: currentStaff.role, name: currentStaff.name, text: `I'll have that right out for you.`, voiceKey: currentStaff.voiceKey },
+                { speaker: currentStaff.role, name: currentStaff.name, text: `I'll have that right out for you.`, voiceKey: 'en-US-Brian' },
                 { speaker: 'Customer', name: 'You', text: `Excuse me, could we get the check, please?`, voiceKey: customerVoiceKey },
-                { speaker: currentStaff.role, name: currentStaff.name, text: `Certainly. Your total is $${totalPrice.toFixed(2)}.`, voiceKey: currentStaff.voiceKey },
+                { speaker: currentStaff.role, name: currentStaff.name, text: `Certainly. Your total is $${totalPrice.toFixed(2)}.`, voiceKey: 'en-US-Brian' },
                 { speaker: 'Customer', name: 'You', text: `Thank you for the great service!`, voiceKey: customerVoiceKey }
             ];
 
