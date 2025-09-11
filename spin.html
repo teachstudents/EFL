@@ -223,19 +223,8 @@
     <div id="celebration-container"></div>
 
     <script>
-        const studentData = {
-            g10: ['冯奕尘', '黄若涵', '李丰屹', '李鹏潞', '梁锦天', '刘景扬', '龙俊志', '马赫', '聂溪康', '庞云蔚', '曲家瑞', '孙诗童', '王子言', '杨晴珺', '张宸恺', '赵浩文'],
-            g11: ['陈峻弘', '韩睿雄', '何怡敏', '康艺芸', '李雨霏', '李沾衣', '刘圃言', '庞泽霖', '王梓晗', '尹九思', '游项雯', '于浚哲', '臧姝婷', '张澜馨'],
-            g12: ['安政聿', '蔡子墨', '刘镇榕', '马知行', '邱天', '盛思语', '唐可盈', '田子凡', '谢斯飞', '杨加麒', '张程皓', '赵晨达鑫', '周逸凡']
-        };
-
-        const mainMenu = document.getElementById('main-menu');
-        const pickerContainers = document.querySelectorAll('.picker-container');
-        let currentActivity = { type: null, grade: null, cleanup: null };
-        let pickedStudentsHistory = {};
-
-        // --- UTILITIES ---
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        // Utility function to shuffle an array (Fisher-Yates shuffle)
+        // This is placed at the top because it's needed immediately to randomize the initial student lists.
         function shuffleArray(array) {
             const shuffled = [...array];
             for (let i = shuffled.length - 1; i > 0; i--) {
@@ -244,6 +233,31 @@
             }
             return shuffled;
         }
+
+        const studentData = {
+            g10: ['冯奕尘', '黄若涵', '李丰屹', '李鹏潞', '梁锦天', '刘景扬', '龙俊志', '马赫', '聂溪康', '庞云蔚', '曲家瑞', '孙诗童', '王子言', '杨晴珺', '张宸恺', '赵浩文'],
+            g11: ['陈峻弘', '韩睿雄', '何怡敏', '康艺芸', '李雨霏', '李沾衣', '刘圃言', '庞泽霖', '王梓晗', '尹九思', '游项雯', '于浚哲', '臧姝婷', '张澜馨'],
+            g12: ['安政聿', '蔡子墨', '刘镇榕', '马知行', '邱天', '盛思语', '唐可盈', '田子凡', '谢斯飞', '杨加麒', '张程皓', '赵晨达鑫', '周逸凡']
+        };
+        
+        // Immediately shuffle all student lists on script load.
+        // This ensures that the first pick is always random when the page starts.
+        (function randomizeInitialStudentLists() {
+            for (const grade in studentData) {
+                if (studentData.hasOwnProperty(grade)) {
+                    studentData[grade] = shuffleArray(studentData[grade]);
+                }
+            }
+        })();
+
+        const mainMenu = document.getElementById('main-menu');
+        const pickerContainers = document.querySelectorAll('.picker-container');
+        let currentActivity = { type: null, grade: null, cleanup: null };
+        let pickedStudentsHistory = {};
+
+        // --- UTILITIES ---
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
         function createTickSound() {
             if (audioContext.state === 'suspended') audioContext.resume();
             const osc = audioContext.createOscillator();
@@ -323,9 +337,9 @@
                     break;
                 case 'timer':
                     container.innerHTML = getSpeakingTimerTemplate(grade);
-                    currentActivity.cleanup = initSpeakingTimer(container, students);
+                    currentActivity.cleanup = initSpeakingTimer(container, students, grade);
                     break;
-                 case 'teams':
+               case 'teams':
                     container.innerHTML = getTeamPickerTemplate(grade);
                     currentActivity.cleanup = initTeamPicker(container, students, grade);
                     break;
@@ -418,6 +432,7 @@
                         <div class="flex justify-center gap-4">
                             <button id="timer-start-btn" class="bg-teal-500 text-white font-bold py-3 px-6 rounded-full text-lg">▶️ Start</button>
                             <button id="timer-skip-btn" class="bg-purple-500 text-white font-bold py-3 px-6 rounded-full text-lg">⏭️ Next</button>
+                            <button id="timer-reset-btn" class="bg-red-500 text-white font-bold py-3 px-6 rounded-full text-lg">🔄 Reset</button>
                         </div>
                     </div>
                 </div>
@@ -661,56 +676,113 @@
             };
         }
 
-        function initSpeakingTimer(container, students) {
-            let shuffledStudents = shuffleArray(students);
-            let currentStudentIndex = 0, timeLeft = 45, timerInterval = null;
+        function initSpeakingTimer(container, students, grade) {
+            let timeLeft = 45;
+            let timerInterval = null;
+            let currentSpeaker = null;
+
             const speakerName = container.querySelector("#timer-speaker-name");
             const timerDisplay = container.querySelector("#timer-display");
             const startBtn = container.querySelector("#timer-start-btn");
             const skipBtn = container.querySelector("#timer-skip-btn");
+            const resetBtn = container.querySelector("#timer-reset-btn");
             const body = container.querySelector('.picker-body');
 
-            function updateStudentsDisplay() {
-                const existingList = container.querySelector('#speaking-timer-list');
-                if(existingList) existingList.remove();
-                
-                const items = shuffledStudents.map((student, index) => `<div class="student-list-item ${index === currentStudentIndex ? 'bg-teal-500 font-bold' : ''}">${student}</div>`).join('');
-                const listHTML = getStudentListHTML(shuffledStudents).replace('<div class="student-list-grid">', `<div class="student-list-grid">${items}`);
-                body.insertAdjacentHTML('beforeend', `<div id="speaking-timer-list">${listHTML}</div>`);
+            const listHTML = getStudentListHTML(students, 'timer-student');
+            body.insertAdjacentHTML('beforeend', listHTML);
+            const studentElements = container.querySelectorAll('.student-list-item');
+
+            function updateView() {
+                studentElements.forEach(el => {
+                    el.classList.remove('highlight');
+                    if (pickedStudentsHistory[grade] && pickedStudentsHistory[grade].includes(el.textContent)) {
+                        el.classList.add('picked');
+                    } else {
+                        el.classList.remove('picked');
+                    }
+                });
+
+                if (currentSpeaker) {
+                    speakerName.textContent = currentSpeaker;
+                    const speakerElement = Array.from(studentElements).find(el => el.textContent === currentSpeaker);
+                    if (speakerElement) {
+                        speakerElement.classList.add('highlight');
+                    }
+                } else {
+                     const availableStudents = students.filter(s => !pickedStudentsHistory[grade] || !pickedStudentsHistory[grade].includes(s));
+                     if (availableStudents.length === 0) {
+                         speakerName.textContent = "All Done!";
+                     } else {
+                         speakerName.textContent = "Ready...";
+                     }
+                }
+                timerDisplay.textContent = timeLeft;
             }
 
-            function startTimer() {
-                if (timerInterval || shuffledStudents.length === 0) return;
-                speakerName.textContent = shuffledStudents[currentStudentIndex];
-                updateStudentsDisplay();
-                timerInterval = setInterval(() => {
-                    timeLeft--;
-                    timerDisplay.textContent = timeLeft;
-                    if (timeLeft <= 0) nextStudent(true);
-                }, 1000);
-            }
-            
-            function nextStudent(finished) {
+            function pickAndSetNewSpeaker() {
                 clearInterval(timerInterval);
                 timerInterval = null;
-                if (finished) {
-                    triggerHugeCelebration(shuffledStudents[currentStudentIndex], true);
-                }
                 timeLeft = 45;
-                timerDisplay.textContent = timeLeft;
-                currentStudentIndex++;
-                if (currentStudentIndex >= shuffledStudents.length) {
-                    currentStudentIndex = 0; // Loop back to the start
+
+                const availableStudents = students.filter(s => !pickedStudentsHistory[grade].includes(s));
+
+                if (availableStudents.length === 0) {
+                    currentSpeaker = null;
+                    updateView();
+                    return false;
                 }
-                startTimer();
+
+                currentSpeaker = availableStudents[Math.floor(Math.random() * availableStudents.length)];
+                updateView();
+                return true;
             }
 
-            startBtn.onclick = startTimer;
-            skipBtn.onclick = () => nextStudent(false);
-            
-            updateStudentsDisplay();
+            function handleStart() {
+                if (timerInterval) return;
+                if (!currentSpeaker) {
+                    if (!pickAndSetNewSpeaker()) return;
+                }
+                if (!pickedStudentsHistory[grade].includes(currentSpeaker)) {
+                    pickedStudentsHistory[grade].push(currentSpeaker);
+                }
+                updateView();
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        triggerHugeCelebration(currentSpeaker, true);
+                        currentSpeaker = null;
+                        timeLeft = 45;
+                        updateView();
+                    } else {
+                        timerDisplay.textContent = timeLeft;
+                    }
+                }, 1000);
+            }
 
-            return () => { clearInterval(timerInterval); };
+            function handleSkip() {
+                pickAndSetNewSpeaker();
+            }
+
+            function handleReset() {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                timeLeft = 45;
+                currentSpeaker = null;
+                pickedStudentsHistory[grade] = [];
+                updateView();
+            }
+
+            startBtn.onclick = handleStart;
+            skipBtn.onclick = handleSkip;
+            resetBtn.onclick = handleReset;
+
+            updateView();
+
+            return () => {
+                clearInterval(timerInterval);
+            };
         }
 
         function initTeamPicker(container, students, grade) {
