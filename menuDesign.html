@@ -8,19 +8,11 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
         
-/* Global font stack for all text */
-body, button, input, h1, h2, h3, h4, p, div {
-  font-family: 'Fredoka', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
-  font-weight: 500;
-}
-
-/* Force emoji-capable font for the staff flag only */
-#staffFlag {
-  font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
-  transform: none !important; /* disable float animation for flags */
-  display: inline-block;
-}
-
+        body, button, input, h1, h2, h3, h4, p, div {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 500;
+        }
+        
         body {
             background: linear-gradient(270deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
             background-size: 800% 800%;
@@ -227,46 +219,18 @@ body, button, input, h1, h2, h3, h4, p, div {
 
         const restaurantData = {
              breakfast: {
-                icon: '🌅',
-                baseHour: 7,
-                items: [
-                    { name: 'Classic Pancakes', emoji: '🥞', price: 9.99, description: 'Fluffy pancakes with maple syrup and berries' },
-                    { name: 'Bagel with Lox', emoji: '🥯', price: 13.50, description: 'Toasted bagel with cream cheese and smoked salmon' },
-                    { name: 'Greek Yogurt Parfait', emoji: '🥗', price: 7.99, description: 'Layered with granola, honey, and fresh fruit' },
-                    { name: 'Full English Breakfast', emoji: '🥓', price: 15.00, description: 'Eggs, bacon, sausage, beans, and toast' },
-                    { name: 'Breakfast Tacos', emoji: '🌮', price: 11.50, description: 'Scrambled eggs, avocado, and salsa in a tortilla' },
-                    { name: 'Mango Smoothie Bowl', emoji: '🥭', price: 9.50, description: 'Thick mango smoothie with coconut flakes' },
-                    { name: 'Coffee', emoji: '☕', price: 3.50, description: 'Freshly brewed coffee' },
-                    { name: 'Orange Juice', emoji: '🧃', price: 4.00, description: 'Freshly squeezed orange juice' }
+                icon: '🌅', baseHour: 7, items: [
+                    { name: 'Buttermilk Pancakes', emoji: '🥞', price: 9.99, description: 'With maple syrup and berries' }, { name: 'Belgian Waffles', emoji: '🧇', price: 10.50, description: 'Served with whipped cream' }, { name: 'Classic Fried Eggs', emoji: '🍳', price: 8.00, description: 'Two eggs cooked your way' }, { name: 'Crispy Bacon Strips', emoji: '🥓', price: 4.50, description: 'A side of delicious crispy bacon' }, { name: 'Buttered French Croissant', emoji: '🥐', price: 5.00, description: 'A flaky, buttery classic' }, { name: 'Smashed Avocado Toast', emoji: '🍞', price: 11.25, description: 'On sourdough with chili flakes' }, { name: 'Greek Yogurt Parfait', emoji: '🥗', price: 7.99, description: 'Layered with granola and honey' }, { name: 'Breakfast Tacos', emoji: '🌮', price: 11.50, description: 'Scrambled eggs, avocado, and salsa' }, { name: 'Mango Smoothie Bowl', emoji: '🥭', price: 9.50, description: 'Thick mango smoothie with coconut flakes' }, { name: 'Fresh Strawberry Bowl', emoji: '🍓', price: 6.00, description: 'A bowl of fresh, sweet strawberries' }, { name: 'Brewed Black Coffee', emoji: '☕', price: 3.50, description: 'Hot and freshly brewed' }, { name: 'Mixed Fruit Juice', emoji: '🧃', price: 4.00, description: 'A blend of seasonal fruits' }
                 ]
             },
             lunch: {
-                icon: '☀️',
-                baseHour: 12,
-                items: [
-                    { name: 'Grilled Cheese & Soup', emoji: '🧀', price: 12.00, description: 'Classic grilled cheese with a bowl of tomato soup' },
-                    { name: 'Hummus Bowl', emoji: '🥙', price: 11.75, description: 'Mediterranean hummus with pita, olives, and veggies' },
-                    { name: 'Chicken Caesar Wrap', emoji: '🌯', price: 12.50, description: 'Grilled chicken and caesar salad in a tortilla wrap' },
-                    { name: 'Ramen', emoji: '🍜', price: 15.50, description: 'Pork broth ramen with a soft-boiled egg' },
-                    { name: 'Sushi Rolls', emoji: '🍣', price: 16.00, description: 'A selection of fresh sushi rolls with miso soup' },
-                    { name: 'Ceviche', emoji: '🐠', price: 14.50, description: 'Fresh fish cured in citrus juices with onion' },
-                    { name: 'Calamari Fritti', emoji: '🦑', price: 13.00, description: 'Lightly fried squid rings with marinara sauce' },
-                    { name: 'Iced Tea', emoji: '🍹', price: 3.75, description: 'Refreshing iced tea with lemon' },
+                icon: '☀️', baseHour: 12, items: [
+                    { name: 'Cheeseburger', emoji: '🍔', price: 14.50, description: 'With lettuce, tomato, and our special sauce' }, { name: 'Pepperoni Pizza Slice', emoji: '🍕', price: 5.00, description: 'A classic slice of pepperoni pizza' }, { name: 'Chicken Caesar Wrap', emoji: '🌯', price: 12.50, description: 'Grilled chicken and caesar salad in a tortilla' }, { name: 'Ramen', emoji: '🍜', price: 15.50, description: 'Pork broth ramen with a soft-boiled egg' }, { name: 'Sushi Rolls', emoji: '🍣', price: 16.00, description: 'A selection of fresh sushi rolls with miso soup' }, { name: 'Ceviche', emoji: '🐠', price: 14.50, description: 'Fresh fish cured in citrus juices with onion' }, { name: 'Calamari Fritti', emoji: '🦑', price: 13.00, description: 'Lightly fried squid rings with marinara sauce' }, { name: 'Watermelon Granita', emoji: '🍉', price: 7.00, description: 'Icy and sweet watermelon dessert' }, { name: 'Grape Sorbet', emoji: '🍇', price: 6.75, description: 'A light and refreshing grape sorbet' }, { name: 'Iced Tea', emoji: '🍹', price: 3.75, description: 'Refreshing iced tea with lemon' }, { name: 'Soft Drink', emoji: '🥤', price: 2.99, description: 'Choice of popular sodas' }
                 ]
             },
             dinner: {
-                icon: '🌙',
-                baseHour: 18,
-                items: [
-                    { name: 'Dijon Baked Salmon', emoji: '🐟', price: 22.99, description: 'Baked salmon with roasted vegetables' },
-                    { name: 'Spaghetti Carbonara', emoji: '🍝', price: 19.00, description: 'Classic pasta with eggs, cheese, and pancetta' },
-                    { name: 'Chicken Fajitas', emoji: '🌮', price: 20.50, description: 'Sizzling chicken with peppers and onions' },
-                    { name: 'Steak with Potatoes', emoji: '🥩', price: 28.50, description: '12oz steak with garlic mashed potatoes' },
-                    { name: 'Chicken Tikka Masala', emoji: '🍛', price: 21.00, description: 'Creamy tomato curry with chicken and naan' },
-                    { name: 'Shrimp Scampi', emoji: '🦐', price: 23.50, description: 'Shrimp in garlic and white wine sauce over pasta' },
-                    { name: 'Oysters Rockefeller', emoji: '🦪', price: 18.00, description: 'Oysters baked with butter, herbs, and breadcrumbs' },
-                    { name: 'Lobster Thermidor', emoji: '🦞', price: 35.00, description: 'Creamy mixture of cooked lobster meat and brandy' },
-                    { name: 'Red Wine', emoji: '🍷', price: 9.00, description: 'A glass of our house red' }
+                icon: '🌙', baseHour: 18, items: [
+                    { name: 'Dijon Baked Salmon', emoji: '🐟', price: 22.99, description: 'Baked salmon with roasted vegetables' }, { name: 'Spaghetti Bolognese', emoji: '🍝', price: 19.00, description: 'Rich meat sauce over spaghetti' }, { name: 'Chicken Fajitas', emoji: '🌮', price: 20.50, description: 'Sizzling chicken with peppers and onions' }, { name: 'Grilled Ribeye Steak', emoji: '🥩', price: 28.50, description: '12oz steak with garlic mashed potatoes' }, { name: 'Chicken Tikka Masala', emoji: '🍛', price: 21.00, description: 'Creamy tomato curry with chicken and naan' }, { name: 'Shrimp Scampi', emoji: '🦐', price: 23.50, description: 'Shrimp in garlic and white wine sauce over pasta' }, { name: 'Oysters Rockefeller', emoji: '🦪', price: 18.00, description: 'Oysters baked with butter and herbs' }, { name: 'Lobster Thermidor', emoji: '🦞', price: 35.00, description: 'A creamy mixture of cooked lobster meat' }, { name: 'Apple Pie', emoji: '🍎', price: 8.50, description: 'Classic apple pie with a flaky crust' }, { name: 'Cherry Cheesecake', emoji: '🍒', price: 9.25, description: 'Creamy cheesecake topped with cherry compote' }, { name: 'Red Wine', emoji: '🍷', price: 9.00, description: 'A glass of our house red' }
                 ]
             }
         };
@@ -277,13 +241,17 @@ body, button, input, h1, h2, h3, h4, p, div {
             { name: 'Jean-Pierre', role: 'Waiter', voiceKey: 'fr-FR', flag: '🇫🇷'},
             { name: 'Sofia', role: 'Waitress', voiceKey: 'es-ES', flag: '🇪🇸'},
             { name: 'Wei', role: 'Waiter', voiceKey: 'zh-CN', flag: '🇨🇳'},
-            { name: 'Liam', role: 'Waiter', voiceKey: 'en-AU', flag: '🇦🇺' }
+            { name: 'Liam', role: 'Waiter', voiceKey: 'en-AU', flag: '🇦🇺' },
+            { name: 'Giuseppe', role: 'Owner', voiceKey: 'it-IT', flag: '🇮🇹'},
+            { name: 'Seraphina', role: 'Waitress', voiceKey: 'de-DE', flag: '🇩🇪' }
         ];
         
         const staffScripts = {
             'fr-FR': { english: "Welcome! You should try our special!", native: "Bonjour! C'est délicieux, je vous le recommande!"},
             'es-ES': { english: "Hello! Our special today is a great choice!", native: "¡Hola! ¡Nuestra especialidad de hoy es una opción fantástica!"},
             'zh-CN': { english: "Welcome! I think you will really like the special.", native: "欢迎! 我觉得你一定会喜欢这个特别推荐。"},
+            'de-DE': { english: "Welcome! Our special today is very good.", native: "Willkommen! Unser Tagesgericht ist sehr gut."},
+            'it-IT': { english: "A warm welcome! Our special is a true taste of Italy.", native: "Benvenuti! La nostra specialità è un vero assaggio d'Italia."},
             'en-AU': { english: "G'day, mate! The special is a real beauty today.", native: "You'll love it, I reckon!"},
             'en-US-Ava': { english: "Welcome! I highly recommend our special today!", native: ""},
             'en-US-Andrew': { english: "Hello there! Our special is a fantastic choice today!", native: ""}
@@ -401,7 +369,7 @@ body, button, input, h1, h2, h3, h4, p, div {
                 end: formatTime(endHour, endMinute)
             };
 
-            currentMenu = getRandomItems(mealData.items, Math.floor(Math.random() * 2) + 4);
+            currentMenu = getRandomItems(mealData.items, Math.floor(Math.random() * 3) + 5);
             currentStaff = getRandomItems(staffMembers, 1)[0];
             const currentSpecial = getRandomItems(specialOffers, 1)[0];
 
@@ -464,9 +432,9 @@ body, button, input, h1, h2, h3, h4, p, div {
         }
         
         function prepareInteractiveDialogue() {
-            const customerVoiceKey = getRandomItems(['en-US-Ava', 'en-US-Andrew', 'en-US-Emma'], 1)[0];
-            let randomFood = getRandomItems(currentMenu.filter(i => i.price > 10), 1)[0];
-            let randomDrink = getRandomItems(currentMenu.filter(i => i.price <= 5), 1)[0];
+            const customerVoiceKey = getRandomItems(['en-US-Ava', 'en-US-Andrew'], 1)[0];
+            let randomFood = getRandomItems(currentMenu.filter(i => i.price > 10), 1)[0] || getRandomItems(currentMenu, 1)[0];
+            let randomDrink = getRandomItems(currentMenu.filter(i => i.price <= 5), 1)[0] || getRandomItems(currentMenu, 1)[0];
 
             if (!randomFood || !randomDrink || randomFood.name === randomDrink.name) {
                 const distinctItems = [...new Set(currentMenu)];
@@ -482,9 +450,9 @@ body, button, input, h1, h2, h3, h4, p, div {
             const totalPrice = randomFood.price + randomDrink.price;
 
             dialogueScript = [
-                { speaker: currentStaff.role, name: currentStaff.name, text: `Hello! I'm ${currentStaff.name}. Can I start you with a drink?`, voiceKey: 'en-US-Brian' },
+                { speaker: currentStaff.role, name: currentStaff.name, text: `Hello there! Welcome. My name is ${currentStaff.name}. Can I start you with a drink?`, voiceKey: 'en-US-Brian' },
                 { speaker: 'Customer', name: 'You', text: `Yes, I'll have the ${randomDrink.name}, please.`, voiceKey: customerVoiceKey },
-                { speaker: currentStaff.role, name: currentStaff.name, text: `Excellent choice. And are you ready to order your meal?`, voiceKey: 'en-US-Brian' },
+                { speaker: currentStaff.role, name: currentStaff.name, text: `An excellent choice. And are you ready to order your meal?`, voiceKey: 'en-US-Brian' },
                 { speaker: 'Customer', name: 'You', text: `I am. I'll have the ${randomFood.name}.`, voiceKey: customerVoiceKey },
                 { speaker: currentStaff.role, name: currentStaff.name, text: `Perfect. Just so you know, our special today is ${document.getElementById('specialOffer').textContent}`, voiceKey: 'en-US-Brian' },
                 { speaker: 'Customer', name: 'You', text: `Oh, that sounds good! Maybe next time.`, voiceKey: customerVoiceKey },
