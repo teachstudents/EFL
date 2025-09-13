@@ -343,6 +343,18 @@
         @keyframes correctPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         @keyframes incorrectShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
 
+        .correct-answer-reveal {
+            font-size: 1rem;
+            color: #f9ed69;
+            margin-top: 1rem;
+            font-weight: bold;
+            text-shadow: 0 0 8px #f9ed69;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .praise-word, .point-badge {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%); font-size: 2.5rem; font-weight: bold;
@@ -526,6 +538,7 @@
                         <div class="player-area">
                             <div class="player-name" id="player1Name"></div>
                             <div class="answer-buttons" id="player1Buttons"></div>
+                            <div class="correct-answer-reveal" id="player1AnswerReveal"></div>
                         </div>
                     </div>
                     <div class="versus-indicator">VS</div>
@@ -534,6 +547,7 @@
                          <div class="player-area">
                             <div class="player-name" id="player2Name"></div>
                             <div class="answer-buttons" id="player2Buttons"></div>
+                            <div class="correct-answer-reveal" id="player2AnswerReveal"></div>
                         </div>
                     </div>
                 </div>
@@ -856,12 +870,15 @@
             setupAnswerButtons(1);
             setupAnswerButtons(2);
             
-            // This sequence is critical: Play audio, then on completion, start the timer.
+            document.getElementById('player1AnswerReveal').textContent = '';
+            document.getElementById('player2AnswerReveal').textContent = '';
+
+            // Start timer immediately
+            startRoundTimer();
+            // Play the audio after a short delay so UI is ready
             setTimeout(() => {
-                playAudio(questionTextForAudio, 0, 'en-US', () => {
-                    startRoundTimer();
-                });
-            }, 500);
+              playAudio(questionTextForAudio, 0, 'en-US');
+            }, 300);
         }
         
         function setupAnswerButtons(playerNum) {
@@ -950,7 +967,7 @@
                 timerProg.style.width = `${(timeLeft / 10) * 100}%`;
 
                 if (timeLeft === 5) {
-                    sentenceEl.innerHTML = gameState.currentFullSentence;
+                    sentenceEl.innerHTML = gameState.currentQuestion.questionObject.sentence_template;
                     sentenceEl.style.display = 'block';
                 }
 
@@ -959,6 +976,10 @@
                     sentenceEl.style.display = 'none';
                     if (!gameState.answersGiven.player1 && !gameState.answersGiven.player2) playSound('incorrect');
                     
+                    const correctAnswer = gameState.currentQuestion.correctAnswer;
+                    document.getElementById('player1AnswerReveal').textContent = correctAnswer;
+                    document.getElementById('player2AnswerReveal').textContent = correctAnswer;
+
                     revealCorrectAnswers();
                     setTimeout(nextCard, 2500); 
                 }
