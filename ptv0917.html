@@ -864,8 +864,9 @@
             gameState.answersGiven = { player1: false, player2: false };
             const question = gameState.rounds[gameState.currentRound - 1][gameState.currentCard - 1];
             gameState.currentQuestion = { questionObject: question, correctAnswer: question.answer };
+            
             gameState.currentFullSentence = question.sentence_template.replace('___', `<strong>${question.answer}</strong>`);
-            const questionTextForAudio = question.sentence_template.replace('___', '...');
+            const fullSentenceForAudio = question.sentence_template.replace('___', question.answer);
             
             setupAnswerButtons(1);
             setupAnswerButtons(2);
@@ -877,7 +878,7 @@
             startRoundTimer();
             // Play the audio after a short delay so UI is ready
             setTimeout(() => {
-              playAudio(questionTextForAudio, 0, 'en-US');
+              playAudio(fullSentenceForAudio, 0, 'en-US');
             }, 300);
         }
         
@@ -967,7 +968,7 @@
                 timerProg.style.width = `${(timeLeft / 10) * 100}%`;
 
                 if (timeLeft === 5) {
-                    sentenceEl.innerHTML = gameState.currentQuestion.questionObject.sentence_template;
+                    sentenceEl.innerHTML = gameState.currentFullSentence;
                     sentenceEl.style.display = 'block';
                 }
 
@@ -1155,4 +1156,3 @@
     </script>
 </body>
 </html>
-
