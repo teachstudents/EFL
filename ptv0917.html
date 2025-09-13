@@ -129,11 +129,6 @@
             color: #ecf0f1;
             margin-bottom: 4px;
         }
-
-        .phase-indicator {
-            font-size: 1.3rem;
-            color: #f9ed69;
-        }
         
         /* Game Modes */
         .game-modes {
@@ -399,22 +394,29 @@
         .timer-bar { width: 100%; height: 15px; background: rgba(0,0,0,0.5); border-radius: 10px; overflow: hidden; border: 2px solid #e94560; }
         .timer-progress { height: 100%; background: linear-gradient(45deg, #f9ed69, #f1c40f); transition: width 0.1s linear; border-radius: 10px; }
 
-        .sentence-reveal {
+        .bottom-sentence-reveal {
             display: none;
-            position: absolute;
-            top: 50%;
+            position: fixed;
+            bottom: 20px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 800px;
             background: rgba(15, 52, 96, 0.9);
             border: 2px solid #f9ed69;
             border-radius: 15px;
-            padding: 2rem;
-            font-size: 1.8rem;
+            padding: 1rem;
+            font-size: 1.4rem;
             text-align: center;
             color: #ecf0f1;
             z-index: 500;
             text-shadow: 0 0 10px #f9ed69;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
         }
 
         /* Fireworks */
@@ -442,7 +444,7 @@
             .mode-btn { padding: 1rem 2rem; font-size: 1.2rem; }
             .answer-buttons { grid-template-columns: 1fr; }
             .player-area { min-height: 250px; }
-            .sentence-reveal { font-size: 1.2rem; padding: 1rem; }
+            .bottom-sentence-reveal { font-size: 1rem; padding: 0.8rem; }
             .progress-info { justify-content: center; gap: 0.5rem; }
             .header-score { font-size: 1.2rem; }
         }
@@ -470,6 +472,7 @@
     <div class="audio-bg" id="audioBg"></div>
     <div class="fireworks-container" id="fireworksContainer"></div>
     <div class="phase-transition" id="phaseTransition"><div id="transitionText"></div></div>
+    <div class="bottom-sentence-reveal" id="bottomSentenceReveal"></div>
 
     <div class="game-container">
         <!-- Game Progress (shown after start) -->
@@ -480,7 +483,7 @@
                     <div id="headerTeam1Score">0</div>
                 </div>
                 <div class="progress-item-center">
-                    <div class="progress-item"><span class="phase-indicator" id="currentPhase">Round 1</span></div>
+                    <div class="progress-item">Round: <span id="currentRoundDisplay">1</span>/<span id="totalRoundsHeader"></span></div>
                     <div class="progress-item">Card: <span id="currentCard">1</span>/10</div>
                 </div>
                 <div class="header-score">
@@ -530,7 +533,6 @@
 
             <!-- Game Play -->
             <div class="game-play" id="gamePlay">
-                <div class="sentence-reveal" id="sentenceReveal"></div>
                 <div class="timer-container"><div class="timer-display" id="timerDisplay">10</div><div class="timer-bar"><div class="timer-progress" id="timerProgress"></div></div></div>
                 <div class="game-area">
                     <div class="team-game-area" id="team1GameArea">
@@ -606,14 +608,15 @@
                 team2: { name: '', players: [] }, 
                 team1Score: 0, team2Score: 0, // Grand total scores
                 roundScore1: 0, roundScore2: 0, // Scores for the current 10 cards
-                answersGiven: { player1: false, player2: false },
+                isRoundActive: false,
                 currentPlayer1: '', currentPlayer2: '',
                 team1Queue: [], team2Queue: [],
                 roundTimer: null,
                 currentQuestion: null,
                 currentFullSentence: '',
                 rounds: [], 
-                isAutoMode: false, totalRoundsNeeded: 0
+                isAutoMode: false, totalRoundsNeeded: 0,
+                voiceIndex: 0
             };
         }
         resetGameState();
@@ -626,7 +629,7 @@
             const voices = speechSynthesis.getVoices();
             if (voices.length === 0) return; 
 
-            const requestedVoiceDetails = ['Ava', 'Brian', 'Emma', 'Andrew'];
+            const requestedVoiceDetails = ['Ava', 'Brian', 'Emma', 'Andrew', 'William'];
             let specificVoices = [];
 
             requestedVoiceDetails.forEach(name => {
@@ -640,44 +643,25 @@
                 }
             });
             
-            if (specificVoices.length < 4) {
-                requestedVoiceDetails.forEach(name => {
-                    if (!specificVoices.some(v => v.name.includes(name))) {
-                        const fallbackVoice = voices.find(v => v.name.includes(name) && v.lang.startsWith('en-'));
-                        if (fallbackVoice && !specificVoices.some(v => v.name === fallbackVoice.name)) {
-                            specificVoices.push(fallbackVoice);
-                        }
-                    }
-                });
-            }
-
-            preferredVoices = [...new Map(specificVoices.map(item => [item['name'], item])).values()];
-
-            if (preferredVoices.length === 0) {
-                preferredVoices.push(
-                    voices.find(v => v.lang.startsWith('en-US') && v.name.includes('Google')) || 
-                    voices.find(v => v.lang.startsWith('en-US')) ||
-                    voices.find(v => v.lang.startsWith('en-'))
-                );
-            }
+            preferredVoices = specificVoices;
         }
         
         speechSynthesis.onvoiceschanged = loadVoices;
 
-        function playAudio(text, voiceIndex = 0, lang = 'en-US', onEnd = null) {
-            if ('speechSynthesis' in window) {
+        function playAudio(text, onEnd = null) {
+            if ('speechSynthesis' in window && preferredVoices.length > 0) {
                 speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
-                if (preferredVoices.length > 0 && preferredVoices[voiceIndex % preferredVoices.length]) {
-                    utterance.voice = preferredVoices[voiceIndex % preferredVoices.length];
-                }
-                utterance.lang = lang;
+                utterance.voice = preferredVoices[gameState.voiceIndex];
+                utterance.lang = 'en-US';
                 utterance.rate = 0.85;
                 if (typeof onEnd === 'function') {
                     utterance.onend = onEnd;
                 }
                 speechSynthesis.speak(utterance);
+                gameState.voiceIndex = (gameState.voiceIndex + 1) % preferredVoices.length;
             } else if (typeof onEnd === 'function') {
+                // If no voices, just fire the callback to not stall the game
                 onEnd();
             }
         }
@@ -724,6 +708,7 @@
             document.getElementById('gameModes').style.display = 'none';
             document.getElementById('game-content').style.display = 'block';
             document.getElementById('gameProgress').style.display = 'block';
+            document.getElementById('totalRoundsHeader').textContent = gameState.totalRoundsNeeded;
             
             shuffleTeams();
             buildAllRounds();
@@ -771,8 +756,12 @@
         }
         
         function selectPlayersForRound() {
-            if (gameState.team1Queue.length === 0) gameState.team1Queue = [...gameState.team1.players].sort(() => 0.5 - Math.random());
-            if (gameState.team2Queue.length === 0) gameState.team2Queue = [...gameState.team2.players].sort(() => 0.5 - Math.random());
+            if (gameState.team1Queue.length === 0) {
+                gameState.team1Queue = [...gameState.team1.players].sort(() => 0.5 - Math.random());
+            }
+            if (gameState.team2Queue.length === 0) {
+                gameState.team2Queue = [...gameState.team2.players].sort(() => 0.5 - Math.random());
+            }
             
             gameState.currentPlayer1 = gameState.team1Queue.pop();
             gameState.currentPlayer2 = gameState.team2Queue.pop();
@@ -851,7 +840,7 @@
         }
 
         function updateGameProgress() {
-            document.getElementById('currentPhase').textContent = `Round ${gameState.currentRound}`;
+            document.getElementById('currentRoundDisplay').textContent = gameState.currentRound;
             document.getElementById('currentCard').textContent = `${gameState.currentCard}`;
         }
         
@@ -861,11 +850,10 @@
         }
 
         function setupQuestions() {
-            gameState.answersGiven = { player1: false, player2: false };
+            gameState.isRoundActive = true;
             const question = gameState.rounds[gameState.currentRound - 1][gameState.currentCard - 1];
             gameState.currentQuestion = { questionObject: question, correctAnswer: question.answer };
             
-            gameState.currentFullSentence = question.sentence_template.replace('___', `<strong>${question.answer}</strong>`);
             const fullSentenceForAudio = question.sentence_template.replace('___', question.answer);
             
             setupAnswerButtons(1);
@@ -878,7 +866,7 @@
             startRoundTimer();
             // Play the audio after a short delay so UI is ready
             setTimeout(() => {
-              playAudio(fullSentenceForAudio, 0, 'en-US');
+              playAudio(fullSentenceForAudio);
             }, 300);
         }
         
@@ -899,9 +887,9 @@
         }
         
         function selectAnswer(playerNum, selectedAns) {
-            const playerKey = `player${playerNum}`;
-            if (gameState.answersGiven[playerKey]) return; // Player already answered
-            gameState.answersGiven[playerKey] = true;
+            if (!gameState.isRoundActive) return; // Round is over, no more answers
+            gameState.isRoundActive = false;
+            clearTimeout(gameState.roundTimer);
 
             const question = gameState.currentQuestion;
             const isCorrect = selectedAns === question.correctAnswer;
@@ -909,16 +897,13 @@
             const btns = document.getElementById(`player${playerNum}Buttons`).children;
             for(let btn of btns){
                 if(btn.textContent === selectedAns) btn.classList.add(isCorrect ? 'correct' : 'incorrect');
-                // Disable this player's buttons after they answer
-                btn.onclick = null;
-                btn.style.cursor = 'default';
             }
 
             playSound(isCorrect ? 'correct' : 'incorrect');
             if (isCorrect) {
                 if (playerNum === 1) { gameState.team1Score++; gameState.roundScore1++; } 
                 else { gameState.team2Score++; gameState.roundScore2++; }
-                playAudio(praiseAudioPhrases[Math.floor(Math.random() * praiseAudioPhrases.length)], 1);
+                playAudio(praiseAudioPhrases[Math.floor(Math.random() * praiseAudioPhrases.length)]);
                 showPraise(playerNum); 
                 createGlitterEffect(playerNum);
             } else {
@@ -930,6 +915,14 @@
             document.getElementById('team1RoundScore').textContent = gameState.roundScore1;
             document.getElementById('team2RoundScore').textContent = gameState.roundScore2;
             updateHeaderScores();
+
+            // End of round logic
+            document.getElementById('bottomSentenceReveal').style.display = 'none';
+            const correctAnswer = gameState.currentQuestion.correctAnswer;
+            document.getElementById('player1AnswerReveal').textContent = correctAnswer;
+            document.getElementById('player2AnswerReveal').textContent = correctAnswer;
+            revealCorrectAnswers();
+            setTimeout(nextCard, 2500);
         }
 
         function revealCorrectAnswers() {
@@ -956,7 +949,7 @@
             let timeLeft = 10;
             const timerDisp = document.getElementById('timerDisplay');
             const timerProg = document.getElementById('timerProgress');
-            const sentenceEl = document.getElementById('sentenceReveal');
+            const sentenceEl = document.getElementById('bottomSentenceReveal');
             
             timerDisp.textContent = timeLeft;
             timerProg.style.width = '100%';
@@ -968,14 +961,15 @@
                 timerProg.style.width = `${(timeLeft / 10) * 100}%`;
 
                 if (timeLeft === 5) {
-                    sentenceEl.innerHTML = gameState.currentFullSentence;
+                    sentenceEl.innerHTML = gameState.currentQuestion.questionObject.sentence_template;
                     sentenceEl.style.display = 'block';
                 }
 
                 if (timeLeft <= 0) {
                     clearInterval(gameState.roundTimer);
+                    gameState.isRoundActive = false;
                     sentenceEl.style.display = 'none';
-                    if (!gameState.answersGiven.player1 && !gameState.answersGiven.player2) playSound('incorrect');
+                    playSound('incorrect');
                     
                     const correctAnswer = gameState.currentQuestion.correctAnswer;
                     document.getElementById('player1AnswerReveal').textContent = correctAnswer;
