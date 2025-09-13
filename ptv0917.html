@@ -302,32 +302,32 @@
             text-align: center;
         }
 
-        .team-score-display .team-name { font-size: 1.1rem; font-weight: bold; }
-        .team-score-display .score-number { font-size: 2rem; color: #f9ed69; text-shadow: 0 0 15px #f9ed69; }
+        .team-score-display .team-name { font-size: 1.2rem; font-weight: bold; }
+        .team-score-display .score-number { font-size: 2.2rem; color: #f9ed69; text-shadow: 0 0 15px #f9ed69; }
 
         .player-area {
-            flex-grow: 1; /* Allow player area to fill space */
+            flex-grow: 1;
             background: rgba(15, 52, 96, 0.8);
             border-radius: 20px;
-            padding: 1.5rem;
+            padding: 1rem;
             border: 2px solid #e94560;
             text-align: center;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
         }
 
         .player-name { 
-            font-size: 1.4rem; 
+            font-size: 1.5rem; 
             font-weight: bold; 
-            margin-bottom: 1rem; 
+            margin-bottom: 1.5rem; 
             text-shadow: 0 0 10px #e94560;
-            min-height: 40px; 
+            min-height: 45px; 
         }
 
-        .answer-buttons { display: grid; grid-template-columns: 1fr; gap: 0.5rem; margin-top: 1rem; }
+        .answer-buttons { display: grid; grid-template-columns: 1fr; gap: 0.8rem; margin-top: 0; }
         .answer-btn {
-            padding: 0.8rem; font-size: 1.1rem; font-weight: bold;
+            padding: 1rem; font-size: 1.2rem; font-weight: bold;
             background: linear-gradient(45deg, rgba(233, 69, 96, 0.4), rgba(255, 113, 138, 0.6));
             color: #ffffff; /* Changed to white for clarity */
             border: 2px solid #e94560; border-radius: 10px;
@@ -341,12 +341,12 @@
         @keyframes incorrectShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
 
         .correct-answer-reveal {
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: #f9ed69;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
             font-weight: bold;
             text-shadow: 0 0 8px #f9ed69;
-            height: 25px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -750,8 +750,13 @@
         }
 
         function startAutoChampionship() {
+            resetGameState(); // Reset for "Play Again" functionality
             gameState.isAutoMode = true;
             gameState.phase = 'team-setup';
+            if (playerNames.length > 0) {
+                 gameState.totalRoundsNeeded = Math.ceil(playerNames.length / 2);
+            }
+
             document.getElementById('gameModes').style.display = 'none';
             document.getElementById('game-content').style.display = 'block';
             document.getElementById('gameProgress').style.display = 'block';
@@ -838,18 +843,19 @@
             setTimeout(() => {
                 document.getElementById('slot1Window').textContent = gameState.currentPlayer1;
                 document.getElementById('slot2Window').textContent = gameState.currentPlayer2;
-                announcePlayersAndStartCountdown();
+                startGameCountdown(); 
+                announcePlayers();
             }, 3000);
         }
         
-        function announcePlayersAndStartCountdown() {
+        function announcePlayers() {
             const p1Name = gameState.currentPlayer1.split('/')[0].trim();
             const p2Name = gameState.currentPlayer2.split('/')[0].trim();
 
             playChineseAudio(p1Name, () => {
                 playChineseAudio(p1Name, () => {
                     playChineseAudio(p2Name, () => {
-                        playChineseAudio(p2Name, startGameCountdown);
+                        playChineseAudio(p2Name); // No callback
                     });
                 });
             });
@@ -1189,10 +1195,11 @@
         function resetGame() {
             clearInterval(gameState.roundTimer);
             stopGameEffects();
-            resetGameState();
+            document.getElementById('certificate').style.display = 'none';
+            // Don't reset everything, just go back to the menu to select a new grade
+            // which will trigger a full reset via startAutoChampionship()
             document.getElementById('game-content').style.display = 'none';
             document.getElementById('gameProgress').style.display = 'none';
-            document.getElementById('certificate').style.display = 'none';
             document.getElementById('phaseTransition').style.display = 'none';
             document.getElementById('gameModes').style.display = 'flex';
             speechSynthesis.cancel();
