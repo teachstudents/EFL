@@ -1,1 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEFR Past Tense Verb Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #191825; /* New Dark Purple */
+            color: #ecf0f1; /* Light Grey Text */
+            overflow: hidden; 
+            min-height: 100vh;
+            position: relative;
+            transition: background-color 2s ease-in-out;
+        }
+
+        /* Laser Beam Effect */
+        .laser-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        .laser {
+            position: absolute;
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(0, 245, 212, 0.8)); /* New Teal */
+            border-radius: 5px;
+            animation: shoot-ltr 2s linear forwards;
+        }
+
+        @keyframes shoot-ltr {
+            0% { transform: translateX(-200px); opacity: 1; }
+            100% { transform: translateX(100vw); opacity: 0; }
+        }
+        
+        @keyframes shoot-rtl {
+            0% { transform: translateX(200px); opacity: 1; }
+            100% { transform: translateX(-100vw); opacity: 0; }
+        }
+
+
+        /* Audio Wave Background */
+        .audio-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .wave {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 1px;
+            height: 1px;
+            border: 2px solid rgba(0, 245, 212, 0.2); /* New Teal */
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 4s ease-out infinite;
+        }
+
+        @keyframes pulse {
+            0% { width: 0; height: 0; opacity: 0.5; }
+            100% { width: 150vmax; height: 150vmax; opacity: 0; }
+        }
+
+        /* Game Container */
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Game Progress Header */
+        .game-progress {
+            background: rgba(46, 41, 78, 0.7);
+            border-radius: 15px;
+            padding: 0.5rem 1.5rem;
+            margin-bottom: 1rem;
+            border: 2px solid #00f5d4; /* New Teal */
+            text-align: center;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .progress-item {
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-shadow: 0 0 5px #00f5d4;
+        }
+        
+        .progress-item-center {
+            text-align: center;
+        }
+
+        .header-score {
+            font-size: 1.4rem;
+            color: #9b5de5; /* New Lavender */
+            text-shadow: 0 0 10px #9b5de5;
+        }
+        
+        .header-score span {
+            display: block;
+            font-size: 1rem;
+            color: #ecf0f1;
+            margin-bottom: 4px;
+        }
+        
+        /* Game Modes */
+        .game-modes {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            margin: 5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 1.2rem 2.5rem;
+            font-size: 1.3rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00f5d4, #00bfa5); /* New Teal Gradient */
+            color: #191825;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 245, 212, 0.5);
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 245, 212, 0.8);
+        }
+        
+        /* Team Setup */
+        .team-setup {
+            display: none;
+            text-align: center;
+            background: rgba(46, 41, 78, 0.5);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 2px solid #00f5d4;
+        }
+
+        .teams-display {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .team {
+            flex: 1;
+            background: rgba(46, 41, 78, 0.8);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 2px solid #00f5d4;
+        }
+
+        .team h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #9b5de5;
+            text-shadow: 0 0 10px #9b5de5;
+        }
+
+        .team-member {
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            background: rgba(0, 245, 212, 0.1);
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        /* Player Selection */
+        .player-selection {
+            display: none;
+            text-align: center;
+            background: rgba(46, 41, 78, 0.5);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 2px solid #00f5d4;
+        }
+
+        .slot-machine {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2.5rem auto 1.5rem;
+        }
+
+        .slot-reel {
+            width: 250px;
+            height: 250px;
+            border: 5px solid #00f5d4;
+            border-radius: 15px;
+            background: rgba(0,0,0,0.8);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slot-team-name {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #9b5de5;
+            text-shadow: 0 0 8px #9b5de5;
+            width: 100%;
+            text-align: center;
+        }
+
+        .slot-window {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 220px;
+            height: 100px;
+            background: rgba(46, 41, 78, 0.9);
+            border: 2px solid #9b5de5;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            z-index: 10;
+            padding: 10px;
+            word-wrap: break-word;
+        }
+
+        .slot-strip {
+            position: absolute;
+            width: 100%;
+            transition: transform 3s ease-out;
+        }
+
+        .slot-item {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 0 10px;
+            border-bottom: 1px solid rgba(0, 245, 212, 0.3);
+        }
+
+        /* Game Play */
+        .game-play { display: none; position: relative; }
+        .game-area { display: flex; justify-content: space-between; align-items: stretch; gap: 1rem; }
+
+        .versus-indicator {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #9b5de5;
+            text-shadow: 0 0 15px #9b5de5;
+            animation: bonusPulse 1.5s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+        }
+
+        .team-game-area { flex: 1; display: flex; flex-direction: column; gap: 1rem; position: relative; }
+        
+        .team-score-display {
+            background: rgba(46, 41, 78, 0.8);
+            border-radius: 15px;
+            padding: 0.5rem;
+            border: 2px solid #00f5d4;
+            text-align: center;
+        }
+
+        .team-score-display .team-name { font-size: 1.2rem; font-weight: bold; }
+        .team-score-display .score-number { font-size: 2.2rem; color: #9b5de5; text-shadow: 0 0 15px #9b5de5; }
+
+        .player-area {
+            flex-grow: 1;
+            background: rgba(46, 41, 78, 0.8);
+            border-radius: 20px;
+            padding: 1rem;
+            border: 2px solid #00f5d4;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .player-name { 
+            font-size: 1.5rem; 
+            font-weight: bold; 
+            margin-bottom: 1.5rem; 
+            text-shadow: 0 0 10px #00f5d4;
+            min-height: 45px; 
+        }
+
+        .answer-buttons { display: grid; grid-template-columns: 1fr; gap: 0.8rem; margin-top: 0; }
+        .answer-btn {
+            padding: 1rem; font-size: 1.2rem; font-weight: bold;
+            background: linear-gradient(45deg, rgba(0, 245, 212, 0.25), rgba(0, 191, 165, 0.4));
+            color: #ffffff; 
+            border: 2px solid #00f5d4; border-radius: 10px;
+            cursor: pointer; transition: all 0.3s ease;
+            text-shadow: 0 0 3px rgba(0,0,0,0.5); 
+        }
+        .answer-btn:hover { background: linear-gradient(45deg, rgba(0, 245, 212, 0.5), rgba(0, 191, 165, 0.7)); transform: scale(1.05); }
+        .answer-btn.correct { background: linear-gradient(45deg, #2ecc71, #27ae60); color: #fff; animation: correctPulse 0.5s ease; }
+        .answer-btn.incorrect { background: linear-gradient(45deg, #e74c3c, #c0392b); color: #fff; animation: incorrectShake 0.5s ease; }
+        @keyframes correctPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        @keyframes incorrectShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+
+        .correct-answer-reveal {
+            font-size: 1.1rem;
+            color: #9b5de5;
+            margin-top: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 8px #9b5de5;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .praise-word, .point-badge {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); font-size: 2.5rem; font-weight: bold;
+            z-index: 100; pointer-events: none; animation: praise-animation 1.5s ease-out forwards;
+        }
+        .point-badge { font-size: 2rem; color: #9b5de5; text-shadow: 0 0 10px #9b5de5; top: 15%; }
+        @keyframes praise-animation { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; } 100% { transform: translate(-50%, -200%) scale(1.2); opacity: 0; } }
+
+        .encouragement-phrase {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); font-size: 1.5rem; font-weight: bold;
+            z-index: 100; pointer-events: none; animation: encouragement-animation 2s ease-out forwards;
+            color: #9b5de5; text-shadow: 0 0 10px #9b5de5; text-align: center; width: 80%;
+        }
+        @keyframes encouragement-animation {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+            80% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -120%) scale(1); opacity: 0; }
+        }
+
+        .glitter-token {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #9b5de5;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 200;
+            opacity: 0;
+            animation: fly-to-score 1s ease-out forwards;
+            box-shadow: 0 0 5px #fff, 0 0 10px #9b5de5;
+        }
+
+        @keyframes fly-to-score {
+            0% { transform: translate(0, 0) scale(0.8); opacity: 1; }
+            100% { transform: translate(var(--x-end), var(--y-end)) scale(0); opacity: 0; }
+        }
+
+        /* Timer */
+        .timer-container { margin: 1rem 0; text-align: center; }
+        .timer-display { font-size: 2.5rem; font-weight: bold; color: #9b5de5; text-shadow: 0 0 20px #9b5de5; margin-bottom: 0.5rem; }
+        .timer-bar { width: 100%; height: 15px; background: rgba(0,0,0,0.5); border-radius: 10px; overflow: hidden; border: 2px solid #00f5d4; }
+        .timer-progress { height: 100%; background: linear-gradient(45deg, #9b5de5, #f72585); transition: width 0.1s linear; border-radius: 10px; }
+
+        .bottom-sentence-reveal {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 800px;
+            background: rgba(46, 41, 78, 0.9);
+            border: 2px solid #9b5de5;
+            border-radius: 15px;
+            padding: 1rem;
+            font-size: 1.4rem;
+            text-align: center;
+            color: #ecf0f1;
+            z-index: 500;
+            text-shadow: 0 0 10px #9b5de5;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        /* Fireworks */
+        .fireworks-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; }
+        .firework { position: absolute; width: 6px; height: 6px; border-radius: 50%; animation: fireworkExplode 2s ease-out forwards; }
+        @keyframes fireworkExplode { 0% { transform: scale(0); opacity: 1; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+
+        /* Certificate */
+        .certificate {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); background: linear-gradient(135deg, #ecf0f1, #bdc3c7);
+            color: #191825; padding: 3rem; border-radius: 20px; text-align: center;
+            border: 5px solid #00f5d4; box-shadow: 0 0 50px rgba(255,255,255,0.8);
+            z-index: 2000; max-width: 600px;
+        }
+        .certificate h2 { font-size: 2.5rem; margin-bottom: 1rem; color: #00f5d4; }
+        .certificate-content { font-size: 1.3rem; line-height: 1.6; margin: 2rem 0; }
+        .winning-team { font-size: 2rem; font-weight: bold; color: #9b5de5; margin: 1rem 0; }
+        .final-score { font-size: 1.8rem; font-weight: bold; color: #191825; margin: 1rem 0; }
+        .certificate-date { font-size: 1.1rem; margin-top: 2rem; font-style: italic; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .game-area, .teams-display, .progress-info, .game-modes { flex-direction: column; }
+            .mode-btn { padding: 1rem 2rem; font-size: 1.2rem; }
+            .answer-buttons { grid-template-columns: 1fr; }
+            .player-area { min-height: 250px; }
+            .bottom-sentence-reveal { font-size: 1rem; padding: 0.8rem; }
+            .progress-info { justify-content: center; gap: 0.5rem; }
+            .header-score { font-size: 1.2rem; }
+        }
+        
+        @media (max-height: 700px) {
+            .player-area { padding: 0.5rem; min-height: 220px;}
+            .mode-btn { margin: 2rem 0; }
+            .game-container { padding: 5px;}
+        }
+
+        /* Phase Transition */
+        .phase-transition {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); background: rgba(0,0,0,0.9);
+            color: #ecf0f1; padding: 3rem; border-radius: 20px; text-align: center;
+            border: 3px solid #00f5d4; box-shadow: 0 0 50px rgba(0, 245, 212, 0.8);
+            z-index: 1500; font-size: 2rem; font-weight: bold; text-shadow: 0 0 20px #00f5d4;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="laser-container" id="laserContainer"></div>
+    <!-- Backgrounds and Effects -->
+    <div class="audio-bg" id="audioBg"></div>
+    <div class="fireworks-container" id="fireworksContainer"></div>
+    <div class="phase-transition" id="phaseTransition"><div id="transitionText"></div></div>
+    <div class="bottom-sentence-reveal" id="bottomSentenceReveal"></div>
+
+    <div class="game-container">
+        <!-- Game Progress (shown after start) -->
+        <div class="game-progress" id="gameProgress" style="display: none;">
+            <div class="progress-info">
+                <div class="header-score">
+                    <span id="headerTeam1Name">Team 1</span>
+                    <div id="headerTeam1Score">0</div>
+                </div>
+                <div class="progress-item-center">
+                    <div class="progress-item">Round: <span id="currentRoundDisplay">1</span>/<span id="totalRoundsHeader"></span></div>
+                    <div class="progress-item">Card: <span id="currentCard">1</span>/10</div>
+                </div>
+                <div class="header-score">
+                    <span id="headerTeam2Name">Team 2</span>
+                    <div id="headerTeam2Score">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grade Selection (Start Screen) -->
+        <div class="game-modes" id="gameModes">
+            <button class="mode-btn" onclick="selectGradeAndStart(10)">Grade 10</button>
+            <button class="mode-btn" onclick="selectGradeAndStart(11)">Grade 11</button>
+            <button class="mode-btn" onclick="selectGradeAndStart(12)">Grade 12</button>
+        </div>
+
+        <!-- All other game sections are hidden by default -->
+        <div id="game-content" style="display: none;">
+            <!-- Team Setup -->
+            <div class="team-setup" id="teamSetup">
+                <h2 style="font-size: 2rem; margin-bottom: 1rem; text-shadow: 0 0 15px #00f5d4;">👥 Team Formation</h2>
+                <div class="teams-display">
+                    <div class="team"><h3 id="team1Name"></h3><div id="team1Members"></div></div>
+                    <div class="team"><h3 id="team2Name"></h3><div id="team2Members"></div></div>
+                </div>
+            </div>
+
+            <!-- Player Selection -->
+            <div class="player-selection" id="playerSelection">
+                <h2 style="font-size: 2rem; margin-bottom: 1rem; text-shadow: 0 0 15px #00f5d4;">🎰 Player Selection</h2>
+                <div class="slot-machine">
+                    <div class="slot-reel">
+                        <div class="slot-team-name" id="slot1TeamName"></div>
+                        <div class="slot-window" id="slot1Window">---</div>
+                        <div class="slot-strip" id="slot1Strip"></div>
+                    </div>
+                    <div class="slot-reel">
+                        <div class="slot-team-name" id="slot2TeamName"></div>
+                        <div class="slot-window" id="slot2Window">---</div>
+                        <div class="slot-strip" id="slot2Strip"></div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 1rem; font-size: 1.2rem; color: #9b5de5;">
+                    <div id="selectionCountdown">Game starts in <span id="countdownTimer">10</span>s...</div>
+                </div>
+            </div>
+
+            <!-- Game Play -->
+            <div class="game-play" id="gamePlay">
+                <div class="timer-container"><div class="timer-display" id="timerDisplay">10</div><div class="timer-bar"><div class="timer-progress" id="timerProgress"></div></div></div>
+                <div class="game-area">
+                    <div class="team-game-area" id="team1GameArea">
+                        <div class="team-score-display"><div class="team-name" id="gameTeam1Name">Team 1 Round</div><div class="score-number" id="team1RoundScore">0</div></div>
+                        <div class="player-area">
+                            <div class="player-name" id="player1Name"></div>
+                            <div class="answer-buttons" id="player1Buttons"></div>
+                            <div class="correct-answer-reveal" id="player1AnswerReveal"></div>
+                        </div>
+                    </div>
+                    <div class="versus-indicator">VS</div>
+                    <div class="team-game-area" id="team2GameArea">
+                        <div class="team-score-display"><div class="team-name" id="gameTeam2Name">Team 2 Round</div><div class="score-number" id="team2RoundScore">0</div></div>
+                         <div class="player-area">
+                            <div class="player-name" id="player2Name"></div>
+                            <div class="answer-buttons" id="player2Buttons"></div>
+                            <div class="correct-answer-reveal" id="player2AnswerReveal"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certificate -->
+    <div class="certificate" id="certificate">
+        <h2>🏆 CHAMPIONSHIP CERTIFICATE 🏆</h2>
+        <div class="certificate-content">
+            <p>This certifies that</p>
+            <div class="winning-team" id="certificateTeam"></div>
+            <p>has won the <strong>Past Tense Verb Challenge</strong></p>
+            <div class="final-score" id="certificateScore"></div>
+            <div id="certificateMembers" style="margin: 1rem 0; font-weight: bold;"></div>
+        </div>
+        <div class="certificate-date" id="certificateDate"></div>
+        <button class="mode-btn" onclick="resetGame()" style="margin-top: 2rem;">🔄 Play Again</button>
+    </div>
+
+    <script>
+        // Player Data
+        const grade10Players = ["冯奕尘 / Feng, Yichen", "黄若涵 / Huang, Ruohan", "李丰屹 / Li, Fengyi", "李鹏潞 / Li, Penglu", "梁锦天 / Ling, Jintian", "刘景扬 / Liu, Jingyang", "龙俊志 / Long, Junzhi", "马赫 / Ma, He", "聂溪康 / Nie, Xikang", "庞云蔚 / Pang, Yunwei", "曲家瑞 / Qu, Jiarui", "孙诗童 / Sun, Shitong", "王子言 / Wang, Ziyan", "杨晴珺 / Yang, Qingjun", "张宸恺 / Zhang, Chenkai", "赵浩文 / Zhao, Haowen"];
+        const grade11Players = ["陈峻弘 / Chen, Junhong", "韩睿雄 / Han, Ruixiong", "何怡敏 / He, Yimin", "康艺芸 / Kang, Yiyun", "李雨霏 / Li, Yufei", "李沾衣 / Li, Zhanyi", "刘圃言 / Liu, Puyan", "庞泽霖 / Pang, Zelin", "王梓晗 / Wang, Zihan", "尹九思 / Yin, Jiusi", "游项雯 / You, Xiangwen", "于浚哲 / Yu, Junzhe", "臧姝婷 / Zang, Shuting", "张澜馨 / Zhang, Lanxin"];
+        const grade12Players = ["安政聿 / An, Zhengyu", "蔡子墨 / Cai, Zimo", "刘镇榕 / Liu, Zhenrong", "马知行 / Ma, Zhixing", "邱天 / Qiu, Tian", "盛思语 / Sheng, Siyu", "唐可盈 / Tang, Keying", "田子凡 / Tian, Zifan", "谢斯飞 / Xie, Sifei", "杨加麒 / Yang, Jiaqi", "张程皓 / Zhang, Chenghao", "赵晨达鑫 / Zhao, Chendaxin", "周逸凡 / Zhou, Yifan"];
+        let playerNames = [];
+
+        const cefrSentences = {
+            A1: [ { verb: "was", sentence: "The weather was nice yesterday." }, { verb: "had", sentence: "I had a big breakfast." }, { verb: "went", sentence: "She went to the shop." }, { verb: "saw", sentence: "He saw a bird in the garden." }, { verb: "did", sentence: "We did our homework." }, { verb: "said", sentence: "The teacher said hello." }, { verb: "got", sentence: "They got a new car." }, { verb: "made", sentence: "My mother made a cake." }, { verb: "knew", sentence: "I knew the answer." }, { verb: "took", sentence: "He took a photo." }, { verb: "came", sentence: "She came to my house." }, { verb: "thought", sentence: "I thought about you." }, { verb: "looked", sentence: "We looked at the map." }, { verb: "used", sentence: "He used a blue pen." }, { verb: "found", sentence: "I found my keys." }, { verb: "gave", sentence: "She gave me a book." }, { verb: "told", sentence: "He told me a secret." }, { verb: "worked", sentence: "My father worked late." }, { verb: "called", sentence: "She called her friend." }, { verb: "tried", sentence: "I tried the new food." }, { verb: "asked", sentence: "He asked a question." }, { verb: "needed", sentence: "We needed more time." }, { verb: "felt", sentence: "She felt happy." }, { verb: "left", sentence: "He left the party early." }, { verb: "put", sentence: "I put the book on the table." }, { verb: "meant", sentence: "I understood what she meant." }, { verb: "kept", sentence: "He kept his promise." }, { verb: "let", sentence: "My parents let me go out." }, { verb: "began", sentence: "The movie began at 8 PM." }, { verb: "seemed", sentence: "It seemed like a good idea." }, { verb: "helped", sentence: "She helped me with my bag." }, { verb: "talked", sentence: "We talked for an hour." }, { verb: "turned", sentence: "He turned the page." }, { verb: "started", sentence: "The rain started suddenly." }, { verb: "played", sentence: "The children played outside." }, { verb: "ran", sentence: "I ran a long distance." }, { verb: "moved", sentence: "They moved to a new city." }, { verb: "liked", sentence: "She liked the concert." }, { verb: "lived", sentence: "He lived in London for a year." }, { verb: "believed", sentence: "I believed his story." }, { verb: "brought", sentence: "She brought some snacks." }, { verb: "happened", sentence: "An accident happened on the road." }, { verb: "wrote", sentence: "He wrote a letter." }, { verb: "sat", sentence: "We sat on the beach." }, { verb: "stood", sentence: "The man stood by the door." }, { verb: "lost", sentence: "I lost my wallet." }, { verb: "paid", sentence: "She paid for the coffee." }, { verb: "met", sentence: "We met at the station." }, { verb: "heard", sentence: "I heard a strange noise." }, { verb: "ate", sentence: "The dog ate its food quickly." } ],
+            A2: [ { verb: "bought", sentence: "I bought a new phone last week." }, { verb: "drank", sentence: "She drank all the juice." }, { verb: "drove", sentence: "He drove his car to the mountains." }, { verb: "ate", sentence: "We ate at a nice restaurant." }, { verb: "forgot", sentence: "I forgot to lock the door." }, { verb: "flew", sentence: "They flew to Spain for their holiday." }, { verb: "grew", sentence: "My uncle grew tomatoes in his garden." }, { verb: "hid", sentence: "The cat hid under the bed." }, { verb: "hit", sentence: "He hit the ball very hard." }, { verb: "held", sentence: "She held the baby carefully." }, { verb: "hurt", sentence: "I hurt my leg when I fell." }, { verb: "learnt", sentence: "We learnt a lot at the museum." }, { verb: "paid", sentence: "He paid the electricity bill." }, { verb: "read", sentence: "I read an interesting book." }, { verb: "rode", sentence: "She rode her bike to school." }, { verb: "rang", sentence: "The phone rang three times." }, { verb: "ran", sentence: "The children ran in the park." }, { verb: "slept", sentence: "The dog slept on the sofa." }, { verb: "spoke", sentence: "I spoke to my boss this morning." }, { verb: "spent", sentence: "We spent all our money." }, { verb: "stole", sentence: "Someone stole my bicycle." }, { verb: "swam", sentence: "He swam in the sea." }, { verb: "taught", sentence: "My father taught me how to drive." }, { verb: "threw", sentence: "She threw the ball to the dog." }, { verb: "understood", sentence: "I understood the instructions." }, { verb: "woke", sentence: "He woke up very early." }, { verb: "wore", sentence: "She wore a beautiful dress." }, { verb: "won", sentence: "Our team won the match." }, { verb: "built", sentence: "They built a new house." }, { verb: "caught", sentence: "The cat caught a mouse." }, { verb: "chose", sentence: "I chose the red shirt." }, { verb: "cost", sentence: "The ticket cost fifty dollars." }, { verb: "cut", sentence: "He cut the paper with scissors." }, { verb: "drew", sentence: "She drew a picture of a house." }, { verb: "dreamt", sentence: "I dreamt about flying last night." }, { verb: "felt", sentence: "We felt tired after the long walk." }, { verb: "fought", sentence: "The two men fought over money." }, { verb: "found", sentence: "She found a wallet on the street." }, { verb: "heard", sentence: "He heard someone call his name." }, { verb: "sent", sentence: "I sent an email to my colleague." }, { verb: "shone", sentence: "The sun shone brightly all day." }, { verb: "shot", sentence: "The hunter shot a deer." }, { verb: "showed", sentence: "She showed me her new shoes." }, { verb: "shut", sentence: "He shut the window because it was cold." }, { verb: "sang", sentence: "She sang a beautiful song." }, { verb: "sank", sentence: "The ship sank in the storm." }, { verb: "sold", sentence: "They sold their old car." }, { verb: "spelt", sentence: "I spelt the word correctly." }, { verb: "stood", sentence: "We stood in line for an hour." }, { verb: "took", sentence: "She took the bus to work." } ],
+            B1: [ { verb: "admitted", sentence: "He admitted that he had made a mistake." }, { verb: "advised", sentence: "The doctor advised him to rest." }, { verb: "agreed", sentence: "She agreed to help me with my project." }, { verb: "allowed", sentence: "My parents allowed me to go to the party." }, { verb: "announced", sentence: "The company announced its new product." }, { verb: "apologized", sentence: "He apologized for being late." }, { verb: "appeared", sentence: "A new problem appeared suddenly." }, { verb: "arranged", sentence: "They arranged a meeting for next week." }, { verb: "arrived", sentence: "We arrived at the airport on time." }, { verb: "avoided", sentence: "She avoided talking to her ex-boyfriend." }, { verb: "beat", sentence: "Our team beat the champions." }, { verb: "became", sentence: "He became a famous actor." }, { verb: "bent", sentence: "The strong wind bent the trees." }, { verb: "bit", sentence: "The dog bit the postman." }, { verb: "blew", sentence: "The wind blew the leaves away." }, { verb: "broke", sentence: "She broke a plate while washing dishes." }, { verb: "burnt", sentence: "I burnt the toast this morning." }, { verb: "complained", sentence: "He complained about the noisy neighbours." }, { verb: "confirmed", sentence: "She confirmed her flight reservation." }, { verb: "consisted", sentence: "The meal consisted of three courses." }, { verb: "convinced", sentence: "I convinced him to join our team." }, { verb: "dealt", sentence: "The manager dealt with the customer's complaint." }, { verb: "denied", sentence: "The politician denied the accusations." }, { verb: "depended", sentence: "Our success depended on teamwork." }, { verb: "described", sentence: "She described the man to the police." }, { verb: "deserved", sentence: "He deserved to win the prize." }, { verb: "destroyed", sentence: "The fire destroyed the entire building." }, { verb: "developed", sentence: "The company developed a new software." }, { verb: "disagreed", sentence: "I disagreed with his opinion." }, { verb: "discovered", sentence: "Columbus discovered America in 1492." }, { verb: "discussed", sentence: "We discussed the plan in detail." }, { verb: "earned", sentence: "She earned a lot of money last year." }, { verb: "encouraged", sentence: "My teacher encouraged me to study harder." }, { verb: "existed", sentence: "Dinosaurs existed millions of years ago." }, { verb: "expected", sentence: "I expected you to be here earlier." }, { verb: "explained", sentence: "He explained the rules of the game." }, { verb: "fed", sentence: "She fed her cat this morning." }, { verb: "forgave", sentence: "I forgave him for what he did." }, { verb: "froze", sentence: "The lake froze during the winter." }, { verb: "insisted", sentence: "He insisted on paying for dinner." }, { verb: "introduced", sentence: "She introduced me to her friends." }, { verb: "invented", sentence: "Alexander Bell invented the telephone." }, { verb: "lent", sentence: "I lent my car to a friend." }, { verb: "lay", sentence: "The dog lay on the floor." }, { verb: "led", sentence: "The guide led us through the forest." }, { verb: "lit", sentence: "She lit a candle." }, { verb: "managed", sentence: "He managed to finish the project on time." }, { verb: "measured", sentence: "We measured the room's dimensions." }, { verb: "offered", sentence: "She offered me a cup of tea." }, { verb: "prepared", sentence: "They prepared a delicious meal for us." } ],
+            B2: [ { verb: "accomplished", sentence: "She accomplished her goal of running a marathon." }, { verb: "acknowledged", sentence: "He acknowledged the team's hard work." }, { verb: "anticipated", sentence: "We anticipated a rise in sales." }, { verb: "appreciated", sentence: "I appreciated her thoughtful gesture." }, { verb: "underwent", sentence: "The city underwent significant changes." }, { verb: "broadcast", sentence: "The news was broadcast all over the world." }, { verb: "clarified", sentence: "The teacher clarified the complex topic." }, { verb: "collaborated", sentence: "The two artists collaborated on a masterpiece." }, { verb: "committed", sentence: "He committed himself to the cause." }, { verb: "compensated", sentence: "The company compensated the employees for their overtime." }, { verb: "compiled", sentence: "She compiled a list of all the resources." }, { verb: "conceived", sentence: "He conceived the idea for the new app." }, { verb: "conducted", sentence: "The orchestra conducted a brilliant performance." }, { verb: "confronted", sentence: "She confronted her fear of public speaking." }, { verb: "consulted", sentence: "They consulted an expert before making a decision." }, { verb: "contradicted", sentence: "The evidence contradicted his statement." }, { verb: "conveyed", sentence: "The painting conveyed a sense of peace." }, { verb: "demonstrated", sentence: "The scientist demonstrated the new technology." }, { verb: "derived", sentence: "The word 'algebra' derived from an Arabic term." }, { verb: "differentiated", sentence: "The study differentiated between the two groups." }, { verb: "diminished", sentence: "His influence diminished over the years." }, { verb: "disposed", sentence: "They disposed of the old furniture." }, { verb: "disrupted", sentence: "The protest disrupted traffic in the city center." }, { verb: "distinguished", sentence: "He distinguished himself as a great leader." }, { verb: "eliminated", sentence: "The team was eliminated from the competition." }, { verb: "emphasized", sentence: "The speaker emphasized the importance of education." }, { verb: "encountered", sentence: "We encountered some difficulties along the way." }, { verb: "enhanced", sentence: "The new features enhanced the user experience." }, { verb: "ensured", sentence: "The manager ensured that everyone was satisfied." }, { verb: "evaluated", sentence: "The committee evaluated all the proposals." }, { verb: "exceeded", sentence: "The results exceeded our expectations." }, { verb: "exhibited", sentence: "The museum exhibited a collection of modern art." }, { verb: "facilitated", sentence: "The new software facilitated communication." }, { verb: "forecast", sentence: "The weather channel forecast rain for the weekend." }, { verb: "foresaw", sentence: "He foresaw the company's potential for growth." }, { verb: "founded", sentence: "The university was founded in the 19th century." }, { verb: "illustrated", sentence: "The book was beautifully illustrated." }, { verb: "implemented", sentence: "The government implemented a new policy." }, { verb: "incurred", sentence: "The company incurred significant losses." }, { verb: "inferred", sentence: "From his tone, she inferred that he was angry." }, { verb: "initiated", sentence: "They initiated a new research project." }, { verb: "inspired", sentence: "Her story inspired millions of people." }, { verb: "integrated", sentence: "The new system was integrated with the old one." }, { verb: "interpreted", sentence: "The guide interpreted the ancient script for us." }, { verb: "justified", sentence: "He justified his actions by explaining the situation." }, { verb: "negotiated", sentence: "The two countries negotiated a peace treaty." }, { verb: "perceived", sentence: "She perceived a change in his attitude." }, { verb: "persuaded", sentence: "They persuaded him to reconsider his decision." }, { verb: "preceded", sentence: "A period of calm preceded the storm." }, { verb: "published", sentence: "The author published her new novel." } ],
+        };
+        
+        const correctPhrases = ["Stellar work!", "You've got it!", "Absolutely brilliant!", "That's the one!", "Incredible!", "You're a genius!", "Keep it up!", "Outstanding!", "Perfectly done!", "You're on fire!"];
+        const incorrectPhrases = ["Great attempt!", "Not this time.", "Keep trying!", "Mistakes are proof that you are trying.", "That's not it, but I believe in you!", "So close!", "Don't worry, try again.", "That's a learning opportunity!", "Your persistence is inspiring.", "Even experts get it wrong sometimes."];
+        const praiseAudioPhrases = ["Great answer!", "Excellent!", "Correct!", "Well done!", "Perfect!", "That's right!", "Amazing!", "Fantastic!"];
+
+        const TEAM_REVEAL_TIME = 5000;
+
+        // Game State
+        let gameState;
+        let gameEffectsIntervals = [];
+
+        function resetGameState() {
+            gameState = {
+                phase: 'menu', currentRound: 1, currentCard: 1,
+                totalRoundsPlayed: 0, 
+                team1: { name: '', players: [] }, 
+                team2: { name: '', players: [] }, 
+                team1Score: 0, team2Score: 0, // Grand total scores
+                roundScore1: 0, roundScore2: 0, // Scores for the current 10 cards
+                isRoundActive: false,
+                currentPlayer1: '', currentPlayer2: '',
+                team1Queue: [], team2Queue: [],
+                roundTimer: null,
+                currentQuestion: null,
+                rounds: [], 
+                isAutoMode: false, totalRoundsNeeded: 0,
+                englishVoiceIndex: 0,
+                chineseVoiceIndex: 0
+            };
+        }
+        resetGameState();
+
+        // --- Sound Engine ---
+        let preferredEnglishVoices = [];
+        let preferredChineseVoices = [];
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function loadVoices() {
+            const voices = speechSynthesis.getVoices();
+            if (voices.length === 0) return; 
+
+            // English Voices
+            const requestedEnglishVoiceDetails = ['Ava', 'Brian', 'Emma', 'Andrew', 'William'];
+            let specificEnglishVoices = [];
+            requestedEnglishVoiceDetails.forEach(name => {
+                const idealVoice = voices.find(v => 
+                    v.name.toLowerCase().includes('microsoft') && 
+                    v.name.includes(name) && 
+                    v.name.toLowerCase().includes('multilingual')
+                );
+                if (idealVoice && !specificEnglishVoices.some(v => v.name === idealVoice.name)) {
+                    specificEnglishVoices.push(idealVoice);
+                }
+            });
+            preferredEnglishVoices = specificEnglishVoices;
+
+            // Chinese Voices
+            const requestedChineseVoiceDetails = ['Xiaoxiao', 'Yunxi', 'Yunjian'];
+             let specificChineseVoices = [];
+            requestedChineseVoiceDetails.forEach(name => {
+                const idealVoice = voices.find(v => 
+                    v.name.toLowerCase().includes('microsoft') && 
+                    v.name.includes(name)
+                );
+                if (idealVoice && !specificChineseVoices.some(v => v.name === idealVoice.name)) {
+                    specificChineseVoices.push(idealVoice);
+                }
+            });
+            preferredChineseVoices = specificChineseVoices;
+        }
+        
+        speechSynthesis.onvoiceschanged = loadVoices;
+
+        function playEnglishAudio(text, onEnd = null) {
+            if ('speechSynthesis' in window && preferredEnglishVoices.length > 0) {
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = preferredEnglishVoices[gameState.englishVoiceIndex];
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                if (typeof onEnd === 'function') {
+                    utterance.onend = onEnd;
+                }
+                speechSynthesis.speak(utterance);
+                gameState.englishVoiceIndex = (gameState.englishVoiceIndex + 1) % preferredEnglishVoices.length;
+            } else if (typeof onEnd === 'function') {
+                onEnd();
+            }
+        }
+
+        function playChineseAudio(text, onEnd = null) {
+            if ('speechSynthesis' in window && preferredChineseVoices.length > 0) {
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = preferredChineseVoices[gameState.chineseVoiceIndex];
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.85;
+                 if (typeof onEnd === 'function') {
+                    utterance.onend = onEnd;
+                }
+                speechSynthesis.speak(utterance);
+                gameState.chineseVoiceIndex = (gameState.chineseVoiceIndex + 1) % preferredChineseVoices.length;
+            } else if (typeof onEnd === 'function') {
+                // If no voices, just fire the callback to not stall the game
+                onEnd();
+            }
+        }
+
+        const correctSounds=[{seq:[{freq:1046,dur:.3}]},{seq:[{freq:784,dur:.15},{freq:1046,dur:.2}]},{seq:[{freq:523,dur:.1},{freq:659,dur:.1},{freq:784,dur:.15}]},{seq:[{freq:1200,type:"square",dur:.08}]},{seq:[{freq:440,dur:.1},{freq:554,dur:.1},{freq:659,dur:.15}]},{seq:[{freq:880,dur:.2}]},{seq:[{freq:659,dur:.2},{freq:987,dur:.25}]},{seq:[{freq:1568,dur:.05},{freq:2093,dur:.08}]},{seq:[{freq:500,type:"sawtooth",dur:.1},{freq:1e3,type:"sawtooth",dur:.15}]},{seq:[{freq:622,type:"triangle",dur:.15},{freq:830,type:"triangle",dur:.2}]},{seq:[{freq:1e3,dur:.05},{freq:1500,dur:.05},{freq:2e3,dur:.05}]},{seq:[{freq:1046,dur:.05,gap:.05},{freq:1046,dur:.2}]},{seq:[{freq:784,type:"sine",vol:.4,dur:.3}]},{seq:[{freq:523,dur:.4},{freq:659,dur:.4,gap:-.4},{freq:784,dur:.4,gap:-.4}]},{seq:[{freq:1318,dur:.3,vol:.3},{freq:1328,dur:.3,vol:.3,gap:-.3}]},{seq:[{freq:523,dur:.08},{freq:587,dur:.08},{freq:659,dur:.08},{freq:698,dur:.08},{freq:784,dur:.15}]},{seq:[{freq:784,dur:.1},{freq:659,dur:.1},{freq:523,dur:.2}]},{seq:[{freq:987,dur:.25}]},{seq:[{freq:1046,dur:.05,gap:.02},{freq:1318,dur:.05,gap:.02},{freq:1568,dur:.1}]},{seq:[{freq:493,dur:.2},{freq:523,dur:.3}]}];
+        const incorrectSounds=[{seq:[{freq:150,type:"square",dur:.4}]},{seq:[{freq:220,dur:.15,gap:.05},{freq:220,dur:.15}]},{seq:[{freq:440,dur:.1},{freq:330,dur:.1},{freq:220,dur:.3}]},{seq:[{freq:110,dur:.5}]},{seq:[{freq:440,type:"sawtooth",dur:.3},{freq:450,type:"sawtooth",dur:.3,gap:-.3}]},{seq:[{freq:100,type:"square",dur:.3}]},{seq:[{freq:523,dur:.2},{freq:261,dur:.3}]},{seq:[{freq:300,dur:.1}]},{seq:[{freq:130,dur:.6}]},{seq:[{freq:600,dur:.1},{freq:200,dur:.2}]},{seq:[{freq:180,dur:.08,gap:.04},{freq:180,dur:.08}]},{seq:[{freq:200,type:"triangle",dur:.4}]},{seq:[{freq:247,dur:.3},{freq:261,dur:.3,gap:-.3}]},{seq:[{freq:400,type:"square",dur:.1,gap:.05},{freq:200,type:"square",dur:.2}]},{seq:[{freq:300,dur:.05,gap:.05},{freq:300,dur:.05,gap:.05},{freq:300,dur:.05}]},{seq:[{freq:330,dur:.3},{freq:230,dur:.3,gap:-.3}]},{seq:[{freq:120,type:"sawtooth",dur:.4},{freq:122,type:"sawtooth",dur:.4,gap:-.4}]},{seq:[{freq:250,dur:.2}]},{seq:[{freq:196,dur:.25}]},{seq:[{freq:90,type:"sawtooth",dur:.5}]}];
+        function playSound(type){let e="correct"===type?correctSounds:incorrectSounds,t=e[Math.floor(Math.random()*e.length)],o=audioContext.currentTime;t.seq.forEach(e=>{e.gap&&e.gap>0&&(o+=e.gap);let t=audioContext.createOscillator(),n=audioContext.createGain();t.connect(n),n.connect(audioContext.destination),t.frequency.setValueAtTime(e.freq,o),t.type=e.type||"sine",n.gain.setValueAtTime(e.vol||.5,o),n.gain.exponentialRampToValueAtTime(.001,o+e.dur),t.start(o),t.stop(o+e.dur),e.gap&&e.gap>=0||(o+=e.dur)})}
+        
+        function switchScreen(activeScreen) {
+            ['teamSetup', 'playerSelection', 'gamePlay'].forEach(screenId => {
+                const el = document.getElementById(screenId);
+                if(el) el.style.display = (screenId === activeScreen) ? 'block' : 'none';
+            });
+        }
+        
+        function selectGradeAndStart(grade) {
+            if (grade === 10) playerNames = [...grade10Players];
+            if (grade === 11) playerNames = [...grade11Players];
+            if (grade === 12) playerNames = [...grade12Players];
+            if (playerNames.length === 0) return;
+            startAutoChampionship();
+        }
+
+        let allProcessedQuestions = [];
+
+        function buildAllRounds() {
+             const stopWords = new Set(['the', 'a', 'an', 'it', 'is', 'was', 'were', 'in', 'on', 'at', 'for', 'with', 'by', 'to', 'from', 'of', 'and', 'or', 'but', 'i', 'you', 'he', 'she', 'we', 'they', 'her', 'his', 'us', 'a', 'about', 'after', 'all', 'also', 'an', 'as', 'at', 'be', 'because', 'but', 'by', 'can', 'come', 'could', 'day', 'do', 'does', 'did', 'even', 'find', 'first', 'for', 'from', 'get', 'give', 'go', 'have', 'has', 'had', 'he', 'her', 'here', 'him', 'his', 'how', 'if', 'into', 'its', 'just', 'know', 'like', 'look', 'make', 'man', 'many', 'me', 'more', 'my', 'new', 'no', 'not', 'now', 'one', 'only', 'or', 'other', 'our', 'out', 'people', 'say', 'see', 'she', 'so', 'some', 'take', 'tell', 'than', 'that', 'their', 'them', 'then', 'there', 'these', 'they', 'thing', 'think', 'this', 'those', 'time', 'up', 'use', 'very', 'want', 'way', 'we', 'well', 'what', 'when', 'which', 'who', 'will', 'with', 'would', 'year', 'your']);
+            
+            const processSentences = (sentenceList) => {
+                return sentenceList.map(item => {
+                    const answer = item.verb;
+                    const sentence = item.sentence;
+                    const words = sentence.replace(/[.,]/g, '').toLowerCase().split(' ');
+                    let potentialDistractors = words.filter(word => word !== answer && !stopWords.has(word));
+                    
+                    potentialDistractors = [...new Set(potentialDistractors)];
+
+                    potentialDistractors.sort(() => 0.5 - Math.random());
+                    const distractors = potentialDistractors.slice(0, 2);
+
+                    const fallbackVerbs = ["jumped", "talked", "looked", "used", "worked"];
+                    while(distractors.length < 2) {
+                        const fallback = fallbackVerbs[Math.floor(Math.random() * fallbackVerbs.length)];
+                        if(!distractors.includes(fallback) && fallback !== answer) {
+                            distractors.push(fallback);
+                        }
+                    }
+
+                    return { sentence, answer, distractors };
+                });
+            };
+
+            const allA1 = processSentences(cefrSentences.A1);
+            const allA2 = processSentences(cefrSentences.A2);
+            const allB1 = processSentences(cefrSentences.B1);
+            const allB2 = processSentences(cefrSentences.B2);
+            
+            let availableA1 = [...allA1].sort(() => 0.5 - Math.random());
+            let availableA2 = [...allA2].sort(() => 0.5 - Math.random());
+            let availableB1 = [...allB1].sort(() => 0.5 - Math.random());
+            let availableB2 = [...allB2].sort(() => 0.5 - Math.random());
+            
+            gameState.rounds = [];
+
+            for (let i = 0; i < gameState.totalRoundsNeeded; i++) {
+                const roundQuestions = [];
+
+                // Replenish pools if they run low
+                if (availableA1.length < 3) availableA1.push(...[...allA1].sort(() => 0.5 - Math.random()));
+                if (availableA2.length < 3) availableA2.push(...[...allA2].sort(() => 0.5 - Math.random()));
+                if (availableB1.length < 2) availableB1.push(...[...allB1].sort(() => 0.5 - Math.random()));
+                if (availableB2.length < 2) availableB2.push(...[...allB2].sort(() => 0.5 - Math.random()));
+
+                roundQuestions.push(...availableA1.splice(0, 3));
+                roundQuestions.push(...availableA2.splice(0, 3));
+                roundQuestions.push(...availableB1.splice(0, 2));
+                roundQuestions.push(...availableB2.splice(0, 2));
+                
+                gameState.rounds.push(roundQuestions.sort(() => 0.5 - Math.random())); // Shuffle within the round
+            }
+        }
+
+        function startAutoChampionship() {
+            resetGameState(); 
+            gameState.isAutoMode = true;
+            gameState.phase = 'team-setup';
+            if (playerNames.length > 0) {
+                 gameState.totalRoundsNeeded = Math.ceil(playerNames.length / 2);
+            }
+
+            document.getElementById('gameModes').style.display = 'none';
+            document.getElementById('game-content').style.display = 'block';
+            document.getElementById('gameProgress').style.display = 'block';
+            document.getElementById('totalRoundsHeader').textContent = gameState.totalRoundsNeeded;
+            
+            shuffleTeams();
+            buildAllRounds();
+
+            document.getElementById('headerTeam1Name').textContent = gameState.team1.name;
+            document.getElementById('headerTeam2Name').textContent = gameState.team2.name;
+            updateHeaderScores();
+
+            switchScreen('teamSetup');
+            
+            setTimeout(() => {
+                  showPhaseTransition('🎮 Starting Challenge!', 2000);
+                  setTimeout(() => startPlayingPhase(), 2000);
+            }, TEAM_REVEAL_TIME); 
+        }
+
+        function shuffleTeams() {
+            const academicTeams = ["The Sound Waves 🌊", "The Listeners 👂", "The Verb Voyagers 🚀", "The Audio Aces 🎙️"];
+            const shuffledTeams = academicTeams.sort(() => .5 - Math.random());
+            gameState.team1.name = shuffledTeams[0];
+            gameState.team2.name = shuffledTeams[1];
+            
+            const shuffledPlayers = [...playerNames].sort(() => .5 - Math.random());
+            const mid = Math.ceil(shuffledPlayers.length / 2);
+            gameState.team1.players = shuffledPlayers.slice(0, mid);
+            gameState.team2.players = shuffledPlayers.slice(mid);
+            
+            displayTeams();
+        }
+        
+        function displayTeams() {
+            document.getElementById('team1Name').innerHTML = gameState.team1.name;
+            document.getElementById('team2Name').innerHTML = gameState.team2.name;
+            const t1Members = document.getElementById('team1Members');
+            const t2Members = document.getElementById('team2Members');
+            t1Members.innerHTML = gameState.team1.players.map(p => `<div class="team-member">${p}</div>`).join('');
+            t2Members.innerHTML = gameState.team2.players.map(p => `<div class="team-member">${p}</div>`).join('');
+        }
+
+        function startPlayingPhase() {
+            gameState.phase = 'player-selection';
+            gameState.currentCard = 1;
+            showPhaseTransition(`⚔️ Competition Round ${gameState.currentRound}`, 2000);
+            setTimeout(selectPlayersForRound, 2000);
+        }
+        
+        function selectPlayersForRound() {
+            if (gameState.team1Queue.length === 0) {
+                gameState.team1Queue = [...gameState.team1.players].sort(() => 0.5 - Math.random());
+            }
+            if (gameState.team2Queue.length === 0) {
+                gameState.team2Queue = [...gameState.team2.players].sort(() => 0.5 - Math.random());
+            }
+            
+            gameState.currentPlayer1 = gameState.team1Queue.pop();
+            gameState.currentPlayer2 = gameState.team2Queue.pop();
+            
+            updateGameProgress();
+            switchScreen('playerSelection');
+            createSlotMachine();
+        }
+
+        function createSlotMachine() {
+            document.getElementById('slot1TeamName').innerHTML = gameState.team1.name;
+            document.getElementById('slot2TeamName').innerHTML = gameState.team2.name;
+
+            const s1 = document.getElementById('slot1Strip');
+            const s2 = document.getElementById('slot2Strip');
+            s1.innerHTML = ''; s2.innerHTML = '';
+            for (let i = 0; i < 40; i++) {
+                s1.innerHTML += `<div class="slot-item">${gameState.team1.players[i % gameState.team1.players.length]}</div>`;
+                s2.innerHTML += `<div class="slot-item">${gameState.team2.players[i % gameState.team2.players.length]}</div>`;
+            }
+            const i1 = gameState.team1.players.indexOf(gameState.currentPlayer1);
+            const i2 = gameState.team2.players.indexOf(gameState.currentPlayer2);
+            [s1, s2].forEach(s => { s.style.transition = 'none'; s.style.transform = 'translateY(0)'; s.offsetHeight; s.style.transition = 'transform 3s ease-out'; });
+            s1.style.transform = `translateY(-${(40 - (gameState.team1.players.length - i1)) * 60}px)`;
+            s2.style.transform = `translateY(-${(40 - (gameState.team2.players.length - i2)) * 60}px)`;
+            
+            setTimeout(() => {
+                document.getElementById('slot1Window').textContent = gameState.currentPlayer1;
+                document.getElementById('slot2Window').textContent = gameState.currentPlayer2;
+                startGameCountdown(); 
+                announcePlayers();
+            }, 3000);
+        }
+        
+        function announcePlayers() {
+            const p1Name = gameState.currentPlayer1.split('/')[0].trim();
+            const p2Name = gameState.currentPlayer2.split('/')[0].trim();
+
+            playChineseAudio(p1Name, () => {
+                playChineseAudio(p1Name, () => {
+                    playChineseAudio(p2Name, () => {
+                        playChineseAudio(p2Name); // No callback
+                    });
+                });
+            });
+        }
+
+        function startGameCountdown() {
+            let count = 10;
+            const timerEl = document.getElementById('countdownTimer');
+            timerEl.textContent = count;
+            document.getElementById('selectionCountdown').style.display = 'block';
+
+            const interval = setInterval(() => {
+                count--;
+                timerEl.textContent = count;
+                if (count <= 0) { 
+                    clearInterval(interval);
+                    document.getElementById('selectionCountdown').style.display = 'none';
+                    start10CardRound();
+                }
+            }, 1000);
+        }
+        
+        function start10CardRound() {
+            gameState.phase = 'playing';
+            gameState.currentCard = 1;
+            gameState.roundScore1 = 0;
+            gameState.roundScore2 = 0;
+            document.getElementById('team1RoundScore').textContent = 0;
+            document.getElementById('team2RoundScore').textContent = 0;
+            startGameEffects();
+            switchScreen('gamePlay');
+            updateGameProgress();
+            playNextCard();
+        }
+
+        function playNextCard() {
+            if (gameState.currentCard > 10) {
+                gameState.totalRoundsPlayed++;
+                playSound('correct');
+                stopGameEffects();
+                showPhaseTransition(`🎉 Round Complete!`, 3000);
+
+                setTimeout(() => {
+                    if (gameState.totalRoundsPlayed >= gameState.totalRoundsNeeded) {
+                        endGame();
+                        return;
+                    }
+                    gameState.currentRound++;
+                    startPlayingPhase();
+                }, 3000);
+                return;
+            }
+            updateGameProgress();
+            setupQuestions();
+        }
+
+        function updateGameProgress() {
+            document.getElementById('currentRoundDisplay').textContent = gameState.currentRound;
+            document.getElementById('currentCard').textContent = `${gameState.currentCard}`;
+        }
+        
+        function updateHeaderScores() {
+            document.getElementById('headerTeam1Score').textContent = gameState.team1Score;
+            document.getElementById('headerTeam2Score').textContent = gameState.team2Score;
+        }
+
+        function setupQuestions() {
+            gameState.isRoundActive = true;
+            const question = gameState.rounds[gameState.currentRound - 1][gameState.currentCard - 1];
+            gameState.currentQuestion = question;
+            
+            setupAnswerButtons(1);
+            setupAnswerButtons(2);
+            
+            document.getElementById('player1AnswerReveal').textContent = '';
+            document.getElementById('player2AnswerReveal').textContent = '';
+
+            startRoundTimer();
+            setTimeout(() => {
+              playEnglishAudio(question.sentence);
+            }, 300);
+        }
+        
+        function setupAnswerButtons(playerNum) {
+            const container = document.getElementById(`player${playerNum}Buttons`);
+            container.innerHTML = '';
+            const question = gameState.currentQuestion;
+            let answers = [question.answer, ...question.distractors];
+            answers.sort(() => .5 - Math.random());
+
+            answers.forEach((ans) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = ans;
+                btn.onclick = () => selectAnswer(playerNum, ans);
+                container.appendChild(btn);
+            });
+        }
+        
+        function selectAnswer(playerNum, selectedAns) {
+            if (!gameState.isRoundActive) return; 
+            gameState.isRoundActive = false;
+            clearTimeout(gameState.roundTimer);
+
+            const question = gameState.currentQuestion;
+            const isCorrect = selectedAns === question.answer;
+            
+            const btns = document.getElementById(`player${playerNum}Buttons`).children;
+            for(let btn of btns){
+                if(btn.textContent === selectedAns) btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+            }
+
+            playSound(isCorrect ? 'correct' : 'incorrect');
+            if (isCorrect) {
+                if (playerNum === 1) { gameState.team1Score++; gameState.roundScore1++; } 
+                else { gameState.team2Score++; gameState.roundScore2++; }
+                playEnglishAudio(praiseAudioPhrases[Math.floor(Math.random() * praiseAudioPhrases.length)]);
+                showPraise(playerNum); 
+                createGlitterEffect(playerNum);
+            } else {
+                if (playerNum === 1) { gameState.team2Score++; gameState.roundScore2++; } 
+                else { gameState.team1Score++; gameState.roundScore1++; }
+                showEncouragement(playerNum);
+            }
+
+            document.getElementById('team1RoundScore').textContent = gameState.roundScore1;
+            document.getElementById('team2RoundScore').textContent = gameState.roundScore2;
+            updateHeaderScores();
+
+            document.getElementById('bottomSentenceReveal').style.display = 'none';
+            const correctAnswer = gameState.currentQuestion.answer;
+            document.getElementById('player1AnswerReveal').textContent = correctAnswer;
+            document.getElementById('player2AnswerReveal').textContent = correctAnswer;
+            revealCorrectAnswers();
+            setTimeout(nextCard, 2500);
+        }
+
+        function revealCorrectAnswers() {
+            const correctAnswer = gameState.currentQuestion.answer;
+            for (let i = 1; i <= 2; i++) {
+                const buttons = document.getElementById(`player${i}Buttons`).children;
+                for (let btn of buttons) {
+                    btn.onclick = null; 
+                    btn.style.cursor = 'default';
+                    if (btn.textContent === correctAnswer && !btn.classList.contains('incorrect')) {
+                        btn.classList.add('correct');
+                    }
+                }
+            }
+        }
+
+        function nextCard() {
+            gameState.currentCard++;
+            playNextCard();
+        }
+
+        function startRoundTimer() {
+            clearTimeout(gameState.roundTimer);
+            let timeLeft = 10;
+            const timerDisp = document.getElementById('timerDisplay');
+            const timerProg = document.getElementById('timerProgress');
+            const sentenceEl = document.getElementById('bottomSentenceReveal');
+            
+            timerDisp.textContent = timeLeft;
+            timerProg.style.width = '100%';
+            sentenceEl.style.display = 'none';
+
+            gameState.roundTimer = setInterval(() => {
+                timeLeft--;
+                timerDisp.textContent = timeLeft;
+                timerProg.style.width = `${(timeLeft / 10) * 100}%`;
+
+                if (timeLeft === 5) {
+                    sentenceEl.innerHTML = gameState.currentQuestion.sentence;
+                    sentenceEl.style.display = 'block';
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(gameState.roundTimer);
+                    gameState.isRoundActive = false;
+                    sentenceEl.style.display = 'none';
+                    playSound('incorrect');
+                    
+                    const correctAnswer = gameState.currentQuestion.answer;
+                    document.getElementById('player1AnswerReveal').textContent = correctAnswer;
+                    document.getElementById('player2AnswerReveal').textContent = correctAnswer;
+
+                    revealCorrectAnswers();
+                    setTimeout(nextCard, 2500); 
+                }
+            }, 1000);
+        }
+        
+        function showPraise(playerNum) {
+            const text = correctPhrases[Math.floor(Math.random() * correctPhrases.length)];
+            const el = document.createElement('div');
+            el.className = 'praise-word'; el.textContent = text;
+            el.style.color = playerNum === 1 ? '#00f5d4' : '#f72585';
+            const badge = document.createElement('div');
+            badge.className = 'point-badge'; badge.textContent = "+1";
+            const container = document.getElementById(`team${playerNum}GameArea`);
+            container.appendChild(el); container.appendChild(badge);
+            setTimeout(() => { el.remove(); badge.remove(); }, 1500);
+        }
+
+        function createGlitterEffect(playerNum) {
+            const container = document.getElementById(`team${playerNum}GameArea`);
+            const playerArea = container.querySelector('.player-area');
+            const scoreDisplay = container.querySelector('.team-score-display');
+            if (!playerArea || !scoreDisplay) return;
+
+            const startRect = playerArea.getBoundingClientRect();
+            const endRect = scoreDisplay.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            const startX = startRect.left + startRect.width / 2 - containerRect.left;
+            const startY = startRect.top + startRect.height / 2 - containerRect.top;
+            const endX = endRect.left + endRect.width / 2 - containerRect.left;
+            const endY = endRect.top + endRect.height / 2 - containerRect.top;
+
+            for (let i = 0; i < 15; i++) {
+                const glitter = document.createElement('div');
+                glitter.className = 'glitter-token';
+                glitter.style.left = `${startX}px`;
+                glitter.style.top = `${startY}px`;
+                
+                const moveX = endX - startX + (Math.random() - 0.5) * 60;
+                const moveY = endY - startY + (Math.random() - 0.5) * 30;
+
+                glitter.style.setProperty('--x-end', `${moveX}px`);
+                glitter.style.setProperty('--y-end', `${moveY}px`);
+                glitter.style.animationDelay = `${Math.random() * 0.3}s`;
+
+                container.appendChild(glitter);
+                setTimeout(() => glitter.remove(), 1300);
+            }
+        }
+
+        function showEncouragement(playerNum) {
+            const phrase = incorrectPhrases[Math.floor(Math.random() * incorrectPhrases.length)];
+            const el = document.createElement('div');
+            el.className = 'encouragement-phrase'; el.textContent = phrase;
+            document.getElementById(`team${playerNum}GameArea`).appendChild(el);
+            setTimeout(() => el.remove(), 2000);
+        }
+        
+        function showPhaseTransition(text, duration = 3000) {
+            const transition = document.getElementById('phaseTransition');
+            document.getElementById('transitionText').textContent = text;
+            transition.style.display = 'block';
+            
+            setTimeout(() => {
+                transition.style.display = 'none';
+            }, duration);
+        }
+
+        function endGame() {
+            clearInterval(gameState.roundTimer);
+            stopGameEffects();
+            const winner = gameState.team1Score > gameState.team2Score ? gameState.team1.name : (gameState.team2Score > gameState.team1Score ? gameState.team2.name : 'Tie Game');
+            const members = gameState.team1Score > gameState.team2Score ? gameState.team1.players : (gameState.team2Score > gameState.team1Score ? gameState.team2.players : [...gameState.team1.players, ...gameState.team2.players]);
+            document.getElementById('game-content').style.display = 'none';
+            document.getElementById('gameProgress').style.display = 'none';
+            showCertificate(winner, members);
+            for (let i = 0; i < 100; i++) setTimeout(createFireworks, i * 50);
+        }
+
+        function showCertificate(winner, members) {
+            const cert = document.getElementById('certificate');
+            document.getElementById('certificateTeam').textContent = winner;
+            document.getElementById('certificateScore').textContent = `Final Score: ${gameState.team1Score} - ${gameState.team2Score}`;
+            document.getElementById('certificateDate').textContent = `Date: ${new Date('2025-09-13T12:00:00').toLocaleDateString()}`;
+            document.getElementById('certificateMembers').textContent = members.join(', ');
+            cert.style.display = 'block';
+        }
+
+        function createFireworks() {
+            const container = document.getElementById('fireworksContainer');
+            const colors = ['#9b5de5', '#00f5d4', '#f72585', '#ecf0f1'];
+            for (let i = 0; i < 15; i++) {
+                const fw = document.createElement('div');
+                fw.className = 'firework';
+                fw.style.left = `${Math.random() * 100}%`;
+                fw.style.top = `${Math.random() * 100}%`;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                fw.style.background = color;
+                fw.style.boxShadow = `0 0 20px ${color}`;
+                container.appendChild(fw);
+                setTimeout(() => fw.remove(), 2000);
+            }
+        }
+        
+        // --- Visual Effects Control ---
+        function startGameEffects() {
+            const bgColors = ['#191825', '#23203B', '#1E1B32'];
+            let currentBgIndex = 0;
+            const bgInterval = setInterval(() => {
+                currentBgIndex = (currentBgIndex + 1) % bgColors.length;
+                document.body.style.backgroundColor = bgColors[currentBgIndex];
+            }, 5000);
+
+            const laserInterval = setInterval(createLaserBeam, 700);
+            gameEffectsIntervals.push(bgInterval, laserInterval);
+        }
+
+        function stopGameEffects() {
+            gameEffectsIntervals.forEach(clearInterval);
+            gameEffectsIntervals = [];
+            document.body.style.backgroundColor = '#191825'; // Reset to default
+        }
+
+        function createLaserBeam() {
+            const laserContainer = document.getElementById('laserContainer');
+            const laser = document.createElement('div');
+            laser.className = 'laser';
+            laser.style.top = `${Math.random() * 100}%`;
+            laser.style.animationDuration = `${1 + Math.random() * 1.5}s`;
+            
+            if(Math.random() > 0.5) {
+                laser.style.right = '-200px';
+                laser.style.animationName = 'shoot-rtl';
+                laser.style.background = 'linear-gradient(270deg, transparent, rgba(155, 93, 229, 0.8))';
+            } else { 
+                laser.style.left = '-200px';
+                laser.style.animationName = 'shoot-ltr';
+            }
+
+            laserContainer.appendChild(laser);
+            setTimeout(() => laser.remove(), 2500);
+        }
+
+        function resetGame() {
+            clearInterval(gameState.roundTimer);
+            stopGameEffects();
+            document.getElementById('certificate').style.display = 'none';
+            document.getElementById('game-content').style.display = 'none';
+            document.getElementById('gameProgress').style.display = 'none';
+            document.getElementById('phaseTransition').style.display = 'none';
+            document.getElementById('gameModes').style.display = 'flex';
+            speechSynthesis.cancel();
+        }
+
+        window.addEventListener('load', () => {
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = loadVoices;
+            }
+            loadVoices();
+
+            setTimeout(() => playEnglishAudio("Hello there!"), 500);
+
+            const audioBg = document.getElementById('audioBg');
+            for(let i=0; i<3; i++){
+                let wave = document.createElement("div");
+                wave.className = "wave";
+                wave.style.animationDelay = `${i * 1.3}s`;
+                audioBg.appendChild(wave);
+            }
+        });
+    </script>
+</body>
+</html>
