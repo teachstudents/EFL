@@ -168,14 +168,93 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-        // --- UPGRADED SPEECH SERVICE (v6.2) ---
-        class SpeechService {
-            constructor() {
-                this.synth = window.speechSynthesis;
-                this.enabled = true;
-                this.utteranceQueue = [];
-                this.isSpeaking = false;
-            }
+       // --- UPGRADED SPEECH SERVICE (v6.3) with Auto Voice Switching ---
+class SpeechService {
+  constructor() {
+    this.synth = window.speechSynthesis;
+    this.enabled = true;
+    this.utteranceQueue = [];
+    this.isSpeaking = false;
+    this.voices = [];
+    this.selectedVoice = null;
+
+    // Load voices when available
+    this.synth.onvoiceschanged = () => {
+      this.voices = this.synth.getVoices();
+      // Default to Brian if available
+      this.setVoiceByName('Microsoft Brian Online (Natural) - English (United States)');
+    };
+  }
+
+  setVoiceByName(name) {
+    const match = this.voices.find(v => v.name === name);
+    if (match) {
+      this.selectedVoice = match;
+      console.log(`Voice set to: ${match.name}`);
+    } else {
+      console.warn(`Voice "${name}" not found. Using default.`);
+    }
+  }
+
+  // Automatically choose voice based on game
+  setVoiceForGame(gameName) {
+    switch (gameName) {
+      case 'memory':
+        this.setVoiceByName('Microsoft Brian Online (Natural) - English (United States)');
+        break;
+      case 'drop':
+        this.setVoiceByName('Microsoft Ava Online (Natural) - English (United States)');
+        break;
+      case 'scramble':
+        this.setVoiceByName('Microsoft Andrew Online (Natural) - English (United States)');
+        break;
+      case 'listen':
+        this.setVoiceByName('Microsoft Emma Online (Natural) - English (United States)');
+        break;
+      default:
+        this.setVoiceByName('Microsoft Brian Online (Natural) - English (United States)');
+    }
+  }
+
+  speak(text, options = {}) {
+    if (!this.enabled || !text) return;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = options.rate || 0.85;
+    utterance.pitch = options.pitch || 1;
+    if (options.lang) utterance.lang = options.lang;
+    if (this.selectedVoice) utterance.voice = this.selectedVoice;
+
+    utterance.onend = () => {
+      this.isSpeaking = false;
+      this.processQueue();
+    };
+    this.utteranceQueue.push(utterance);
+    if (!this.isSpeaking) {
+      this.processQueue();
+    }
+  }
+
+  processQueue() {
+    if (this.utteranceQueue.length > 0 && !this.isSpeaking) {
+      this.isSpeaking = true;
+      const utterance = this.utteranceQueue.shift();
+      this.synth.speak(utterance);
+    }
+  }
+
+  toggle() {
+    this.enabled = !this.enabled;
+    if (!this.enabled) {
+      this.utteranceQueue = [];
+      this.synth.cancel();
+    }
+    return this.enabled;
+  }
+
+  isEnabled() {
+    return this.enabled;
+  }
+}
 
             speak(text, options = {}) {
                 if (!this.enabled || !text) return;
