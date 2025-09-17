@@ -323,10 +323,18 @@
             filter: brightness(1.1);
         }
         
+        .story-content.clickable-tts:hover, .message-content.clickable-tts:hover {
+            transform: none;
+        }
+
         .speaking {
             outline: 4px solid #4ECDC4;
             box-shadow: 0 0 20px rgba(78, 205, 196, 0.7);
             animation: pulse 1s infinite;
+        }
+
+        .story-content.speaking, .message-content.speaking {
+             animation: none;
         }
 
         .dialogue-section {
@@ -1112,8 +1120,6 @@
             
             <div class="learning-progress">
                 <div class="progress-text">Learning Progress: <span id="learningProgress0">0/6</span></div>
-                <button class="nav-button" onclick="skipToPage(0)" style="margin-top: 10px;">Skip</button>
-                <button class="nav-button" onclick="repeatLearning(0)" style="margin-top: 10px;">Repeat</button>
             </div>
         </div>
 
@@ -1182,8 +1188,6 @@
             </div>
             <div class="learning-progress">
                 <div class="progress-text">Learning Progress: <span id="learningProgress1">0/10</span></div>
-                <button class="nav-button" onclick="skipToPage(1)" style="margin-top: 10px;">Skip</button>
-                <button class="nav-button" onclick="repeatLearning(1)" style="margin-top: 10px;">Repeat</button>
             </div>
         </div>
 
@@ -1402,8 +1406,6 @@
             </div>
             <div class="learning-progress">
                 <div class="progress-text">Learning Progress: <span id="learningProgress2">0/12</span></div>
-                <button class="nav-button" onclick="skipToPage(2)" style="margin-top: 10px;">Skip</button>
-                <button class="nav-button" onclick="repeatLearning(2)" style="margin-top: 10px;">Repeat</button>
             </div>
         </div>
 
@@ -1570,7 +1572,7 @@
 
             <div class="story-section">
                 <div class="story-title">📖 The Best Breakfast Ever</div>
-                <div class="story-content">
+                <div class="story-content clickable-tts" onclick="handleTTSClick(this, this.textContent.trim(), 'Ava')">
                     Leo and Elsa love breakfast time! Leo's favorite breakfast is fluffy pancakes with fresh strawberries and a tall glass of cold milk. Elsa prefers scrambled eggs with toast and a cup of orange juice. They both agree that breakfast is the most important meal of the day because it gives them energy to learn and play. Sometimes they share their food and try new combinations. Their mom always says, "A good breakfast makes a great day!"
                 </div>
             </div>
@@ -1596,8 +1598,6 @@
             </div>
             <div class="learning-progress">
                 <div class="progress-text">Learning Progress: <span id="learningProgress3">0/10</span></div>
-                <button class="nav-button" onclick="skipToPage(3)" style="margin-top: 10px;">Skip</button>
-                <button class="nav-button" onclick="repeatLearning(3)" style="margin-top: 10px;">Repeat</button>
             </div>
         </div>
 
@@ -1719,7 +1719,7 @@
 
             <div class="story-section">
                 <div class="story-title">📖 Lunchtime Adventures</div>
-                <div class="story-content">
+                <div class="story-content clickable-tts" onclick="handleTTSClick(this, this.textContent.trim(), 'Ava')">
                     At school, Leo and Elsa enjoy lunchtime with their classmates. Leo brings a lunch box with fried rice, broccoli, and a bottle of water. Elsa loves her noodle soup with carrots and cucumber. They always share their food and try each other's lunch. "Sharing makes food taste better!" says Elsa. Leo agrees and adds, "And eating vegetables makes us strong and smart!" Their teacher is proud of their healthy eating habits.
                 </div>
             </div>
@@ -1739,14 +1739,11 @@
                 <div class="learning-card" data-word="salad" data-voice="William"><div class="card-emoji">🥗</div><div class="card-word">salad</div></div>
                 <div class="learning-card" data-word="ice cream" data-voice="Ava"><div class="card-emoji">🍨</div><div class="card-word">ice cream</div></div>
                 <div class="learning-card" data-word="cake" data-voice="Emma"><div class="card-emoji">🍰</div><div class="card-word">cake</div></div>
-                <div class="learning-card" data-word="lasagna" data-voice="Andrew"><div class="card-emoji"> lasagna</div><div class="card-word">lasagna</div></div>
                 <div class="learning-card" data-word="curry" data-voice="Brian"><div class="card-emoji">🍛</div><div class="card-word">curry</div></div>
                 <div class="learning-card" data-word="roast chicken" data-voice="William"><div class="card-emoji">🍗</div><div class="card-word">roast chicken</div></div>
             </div>
             <div class="learning-progress">
-                <div class="progress-text">Learning Progress: <span id="learningProgress4">0/10</span></div>
-                <button class="nav-button" onclick="skipToPage(4)" style="margin-top: 10px;">Skip</button>
-                <button class="nav-button" onclick="repeatLearning(4)" style="margin-top: 10px;">Repeat</button>
+                <div class="progress-text">Learning Progress: <span id="learningProgress4">0/9</span></div>
             </div>
         </div>
 
@@ -1785,7 +1782,6 @@
                         <div class="menu-item" onclick="handleSelection(this, 'beef')">🥩 Beef</div>
                         <div class="menu-item" onclick="handleSelection(this, 'pork')">🥓 Pork</div>
                         <div class="menu-item" onclick="handleSelection(this, 'pasta')">🍝 Pasta</div>
-                        <div class="menu-item" onclick="handleSelection(this, 'lasagna')"> Lasagna</div>
                         <div class="menu-item" onclick="handleSelection(this, 'curry')">🍛 Curry</div>
                         <div class="menu-item" onclick="handleSelection(this, 'roast chicken')">🍗 Roast Chicken</div>
                     </div>
@@ -1869,7 +1865,7 @@
 
             <div class="story-section">
                 <div class="story-title">📖 Family Dinner Time</div>
-                <div class="story-content">
+                <div class="story-content clickable-tts" onclick="handleTTSClick(this, this.textContent.trim(), 'Ava')">
                     Every evening, Leo and Elsa's family gathers around the dinner table. Tonight, Mom cooked delicious grilled chicken with roasted potatoes and fresh salad. Dad tells funny stories about his day at work while they eat. Leo and Elsa share what they learned at school. After the main course, they enjoy chocolate ice cream for dessert. "Family dinner is the best time of the day," says Leo. Elsa nods and adds, "Because we're all together!"
                 </div>
             </div>
@@ -1891,8 +1887,6 @@
             </div>
             <div class="learning-progress">
                 <div class="progress-text">Learning Progress: <span id="learningProgress5">0/6</span></div>
-                <button class="nav-button" onclick="skipToPage(5)" style="margin-top: 10px;">Skip</button>
-                <button class="nav-button" onclick="repeatLearning(5)" style="margin-top: 10px;">Repeat</button>
             </div>
         </div>
 
@@ -2023,7 +2017,7 @@
 
             <div class="story-section">
                 <div class="story-title">📖 Hobby Adventures</div>
-                <div class="story-content">
+                <div class="story-content clickable-tts" onclick="handleTTSClick(this, this.textContent.trim(), 'Ava')">
                     Leo and Elsa have many exciting hobbies! Leo loves to read adventure books about brave heroes and magical worlds. He also enjoys drawing pictures of dragons and castles. Elsa is passionate about music and plays the piano beautifully. She also loves gardening and grows colorful flowers in her small garden. On weekends, they sometimes do crafts together, making friendship bracelets and paper airplanes. Their hobbies make them creative and happy!
                 </div>
             </div>
@@ -2046,8 +2040,6 @@
             </div>
             <div class="learning-progress">
                 <div class="progress-text">Learning Progress: <span id="learningProgress6">0/7</span></div>
-                <button class="nav-button" onclick="skipToPage(6)" style="margin-top: 10px;">Skip</button>
-                <button class="nav-button" onclick="repeatLearning(6)" style="margin-top: 10px;">Repeat</button>
             </div>
         </div>
 
@@ -2178,7 +2170,7 @@
 
             <div class="story-section">
                 <div class="story-title">📖 Saturday Sports Day</div>
-                <div class="story-content">
+                <div class="story-content clickable-tts" onclick="handleTTSClick(this, this.textContent.trim(), 'Ava')">
                     Saturday is Leo and Elsa's favorite day for sports and outdoor activities! In the morning, they go to the park to play soccer with their friends. Leo is good at kicking the ball, and Elsa is an excellent goalkeeper. After lunch, they ride their bicycles around the neighborhood, racing each other to the playground. In the afternoon, they go swimming at the community pool. "Exercise makes us strong and healthy!" says Leo. Elsa agrees, "And it's so much fun too!"
                 </div>
             </div>
@@ -2200,8 +2192,6 @@
             </div>
             <div class="learning-progress">
                 <div class="progress-text">Learning Progress: <span id="learningProgress7">0/6</span></div>
-                <button class="nav-button" onclick="skipToPage(7)" style="margin-top: 10px;">Skip</button>
-                <button class="nav-button" onclick="repeatLearning(7)" style="margin-top: 10px;">Repeat</button>
             </div>
         </div>
 
@@ -2332,7 +2322,7 @@
 
             <div class="story-section">
                 <div class="story-title">📖 Perfect Sunday Together</div>
-                <div class="story-content">
+                <div class="story-content clickable-tts" onclick="handleTTSClick(this, this.textContent.trim(), 'Ava')">
                     Sunday is Leo and Elsa's family day! They start the morning by helping mom bake delicious chocolate chip cookies. The sweet smell fills the whole house! After breakfast, they work on a big 1000-piece puzzle together on the dining table. In the afternoon, the family goes to the park for a picnic under the big oak tree. They play board games on a blanket and watch the clouds in the sky. In the evening, they snuggle on the couch to watch their favorite family movie. "Sundays are perfect for being together," says Elsa. Leo smiles and hugs his sister, "Every day is better with family!"
                 </div>
             </div>
@@ -2558,6 +2548,7 @@
         // --- Upgraded TTS Function ---
         function handleTTSClick(element, text, voiceShortName) {
             const synth = window.speechSynthesis;
+            synth.cancel(); // Stop any previous speech
 
             // Ensure voices are loaded
             if (synth.getVoices().length === 0) {
@@ -2587,7 +2578,6 @@
                  if(element) element.classList.remove('speaking');
             }
 
-            synth.cancel(); 
             synth.speak(utterance);
         }
 
@@ -2747,6 +2737,7 @@
         }
 
         function restartAdventure() {
+            window.speechSynthesis.cancel();
             currentFlowIndex = 0;
             earnedTrophies = 0;
             selectedItems = { breakfast: [], lunch: [], dinner: [], hobbies: [], saturday: [], sunday: [] };
@@ -2770,6 +2761,7 @@
         }
 
         function reviewJourney() {
+            window.speechSynthesis.cancel();
             currentFlowIndex = pageFlow.indexOf('page-0');
             showCurrentView();
             createSoundEffect('📖', document.body);
@@ -2840,6 +2832,7 @@
         }
 
         function changePage(direction) {
+            window.speechSynthesis.cancel();
             const newIndex = currentFlowIndex + direction;
             if (newIndex >= 0 && newIndex < pageFlow.length) {
                 currentFlowIndex = newIndex;
@@ -2885,8 +2878,7 @@
             
             const playNextCard = () => {
                 if (currentCardIndex >= cards.length) {
-                    setTimeout(() => changePage(1), 1000);
-                    return;
+                    return; // Stop after last card
                 }
                 const card = cards[currentCardIndex];
                 cards.forEach(c => c.classList.remove('active-learning'));
@@ -2902,19 +2894,6 @@
                 }, 6000)
             };
             setTimeout(playNextCard, 1000);
-        }
-
-        function skipToPage(pageNum) {
-            const targetViewId = `page-${pageNum}`;
-            const targetIndex = pageFlow.indexOf(targetViewId);
-            if (targetIndex !== -1) {
-                currentFlowIndex = targetIndex;
-                showCurrentView();
-            }
-        }
-
-        function repeatLearning(pageNum) {
-            startAutoLearning(`learning-${pageNum}`);
         }
         
         // --- Verb Test Drag and Drop ---
