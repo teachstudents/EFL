@@ -254,6 +254,11 @@
             cursor: grabbing;
             transform: scale(0.95);
         }
+        
+        .word-item.selected-word {
+             border-color: #FF6B6B;
+             transform: scale(1.1);
+        }
 
         .word-item.dragging {
             opacity: 0.7;
@@ -374,6 +379,15 @@
             padding: 15px;
             margin: 10px 0;
             text-align: left;
+        }
+        
+        .think-pair-share ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .think-pair-share li {
+            margin-bottom: 5px;
         }
 
         .tps-title {
@@ -893,6 +907,7 @@
         .message-content {
             cursor: pointer;
             transition: all 0.3s ease;
+            text-align: left;
         }
 
         .message-content:hover {
@@ -952,18 +967,40 @@
         .verb-section h3 { color: #FF6B6B; margin-bottom: 15px; }
         .verb-questions { list-style: none; padding: 0; }
         .verb-questions li { margin-bottom: 15px; font-size: 1.1em; }
-        .verb-questions input {
-            border: 2px solid #ddd;
-            border-radius: 10px;
+        
+        .dropzone {
+            display: inline-block;
+            min-width: 120px;
+            min-height: 30px;
             padding: 5px 10px;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            font-size: 1em;
-            width: 120px;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            vertical-align: middle;
+            background-color: #f9f9f9;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
-        .verb-questions input:focus { outline: none; border-color: #4ECDC4; }
-        .verb-questions input.correct { border-color: #4CAF50; background-color: #E8F5E9; }
-        .verb-questions input.incorrect { border-color: #F44336; background-color: #FFEBEE; }
+        .dropzone.drag-over {
+            border-color: #4ECDC4;
+            background-color: #e0f7fa;
+        }
+        .dropzone.filled {
+             border-style: solid;
+             border-color: #ccc;
+             padding: 2px;
+        }
+        .dropzone.filled .word-item {
+            cursor: default;
+        }
+        .dropzone.correct {
+            border-color: #4CAF50;
+            background-color: #E8F5E9;
+        }
+        .dropzone.incorrect {
+            border-color: #F44336;
+            background-color: #FFEBEE;
+        }
+
         .verb-test-controls { text-align: center; margin-top: 20px; }
         .verb-test-results { font-size: 1.5em; font-weight: bold; margin-top: 20px; color: #333; }
 
@@ -1047,27 +1084,27 @@
             </div>
             
             <div class="learning-cards" id="learningCards0">
-                <div class="learning-card" data-word="Schedule" data-voice="Kore">
+                <div class="learning-card" data-word="Schedule" data-voice="Ava">
                     <div class="card-emoji">📅</div>
                     <div class="card-word">Schedule</div>
                 </div>
-                <div class="learning-card" data-word="Time" data-voice="Leda">
+                <div class="learning-card" data-word="Time" data-voice="Emma">
                     <div class="card-emoji">⏰</div>
                     <div class="card-word">Time</div>
                 </div>
-                <div class="learning-card" data-word="Activities" data-voice="Orus">
+                <div class="learning-card" data-word="Activities" data-voice="Andrew">
                     <div class="card-emoji">🎯</div>
                     <div class="card-word">Activities</div>
                 </div>
-                <div class="learning-card" data-word="Fun" data-voice="Fenrir">
+                <div class="learning-card" data-word="Fun" data-voice="Brian">
                     <div class="card-emoji">🎉</div>
                     <div class="card-word">Fun</div>
                 </div>
-                <div class="learning-card" data-word="Adventure" data-voice="Charon">
+                <div class="learning-card" data-word="Adventure" data-voice="William">
                     <div class="card-emoji">🗺️</div>
                     <div class="card-word">Adventure</div>
                 </div>
-                <div class="learning-card" data-word="Learning" data-voice="Kore">
+                <div class="learning-card" data-word="Learning" data-voice="Ava">
                     <div class="card-emoji">📖</div>
                     <div class="card-word">Learning</div>
                 </div>
@@ -1088,30 +1125,30 @@
             </div>
 
             <div class="characters">
-                <div class="character clickable-tts" onclick="handleTTSClick(this, 'Hello! I am Leo!', 'Fenrir')">
+                <div class="character clickable-tts" onclick="handleTTSClick(this, 'Hello! I am Leo!', 'Brian')">
                     <div class="character-avatar">👦</div>
                     <div class="character-name">Leo</div>
                 </div>
-                <div class="character clickable-tts" onclick="handleTTSClick(this, 'Hi there! I am Elsa!', 'Leda')">
+                <div class="character clickable-tts" onclick="handleTTSClick(this, 'Hi there! I am Elsa!', 'Emma')">
                     <div class="character-avatar">👧</div>
                     <div class="character-name">Elsa</div>
                 </div>
             </div>
 
             <div class="learning-cards" id="welcomeCards">
-                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Schedule', 'Kore')">
+                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Schedule', 'Ava')">
                     <div class="card-emoji">📅</div>
                     <div class="card-word">Schedule</div>
                 </div>
-                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Time', 'Kore')">
+                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Time', 'Ava')">
                     <div class="card-emoji">⏰</div>
                     <div class="card-word">Time</div>
                 </div>
-                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Activities', 'Kore')">
+                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Activities', 'Ava')">
                     <div class="card-emoji">🎯</div>
                     <div class="card-word">Activities</div>
                 </div>
-                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Fun', 'Kore')">
+                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Fun', 'Ava')">
                     <div class="card-emoji">🎉</div>
                     <div class="card-word">Fun</div>
                 </div>
@@ -1119,7 +1156,7 @@
 
             <div class="story-section">
                 <div class="story-title">📖 Our Learning Journey</div>
-                <div class="story-content clickable-tts" onclick="handleTTSClick(this, this.textContent, 'Kore')">
+                <div class="story-content clickable-tts" onclick="handleTTSClick(this, this.textContent.trim(), 'Ava')">
                     Leo and Elsa are excited to learn about daily schedules! They will create their own schedule, choose meals, and share their favorite activities. Join them on this fun learning adventure where every choice matters and every moment is special!
                 </div>
             </div>
@@ -1132,16 +1169,16 @@
                 <p>Let's learn these words! Each card will show for 6 seconds.</p>
             </div>
             <div class="learning-cards" id="learningCards1">
-                 <div class="learning-card" data-word="wake up" data-voice="Kore"><div class="card-emoji">🛏️</div><div class="card-word">wake up</div></div>
-                 <div class="learning-card" data-word="brush teeth" data-voice="Leda"><div class="card-emoji">🦷</div><div class="card-word">brush teeth</div></div>
-                 <div class="learning-card" data-word="eat breakfast" data-voice="Orus"><div class="card-emoji">🍳</div><div class="card-word">eat breakfast</div></div>
-                 <div class="learning-card" data-word="go to school" data-voice="Fenrir"><div class="card-emoji">🏫</div><div class="card-word">go to school</div></div>
-                 <div class="learning-card" data-word="have lunch" data-voice="Charon"><div class="card-emoji">🍱</div><div class="card-word">have lunch</div></div>
-                 <div class="learning-card" data-word="do homework" data-voice="Kore"><div class="card-emoji">📚</div><div class="card-word">do homework</div></div>
-                 <div class="learning-card" data-word="play games" data-voice="Leda"><div class="card-emoji">🎮</div><div class="card-word">play games</div></div>
-                 <div class="learning-card" data-word="eat dinner" data-voice="Orus"><div class="card-emoji">🍽️</div><div class="card-word">eat dinner</div></div>
-                 <div class="learning-card" data-word="watch TV" data-voice="Fenrir"><div class="card-emoji">📺</div><div class="card-word">watch TV</div></div>
-                 <div class="learning-card" data-word="go to bed" data-voice="Charon"><div class="card-emoji">😴</div><div class="card-word">go to bed</div></div>
+                 <div class="learning-card" data-word="wake up" data-voice="Ava"><div class="card-emoji">🛏️</div><div class="card-word">wake up</div></div>
+                 <div class="learning-card" data-word="brush teeth" data-voice="Emma"><div class="card-emoji">🦷</div><div class="card-word">brush teeth</div></div>
+                 <div class="learning-card" data-word="eat breakfast" data-voice="Andrew"><div class="card-emoji">🍳</div><div class="card-word">eat breakfast</div></div>
+                 <div class="learning-card" data-word="go to school" data-voice="Brian"><div class="card-emoji">🏫</div><div class="card-word">go to school</div></div>
+                 <div class="learning-card" data-word="have lunch" data-voice="William"><div class="card-emoji">🍱</div><div class="card-word">have lunch</div></div>
+                 <div class="learning-card" data-word="do homework" data-voice="Ava"><div class="card-emoji">📚</div><div class="card-word">do homework</div></div>
+                 <div class="learning-card" data-word="play games" data-voice="Emma"><div class="card-emoji">🎮</div><div class="card-word">play games</div></div>
+                 <div class="learning-card" data-word="eat dinner" data-voice="Andrew"><div class="card-emoji">🍽️</div><div class="card-word">eat dinner</div></div>
+                 <div class="learning-card" data-word="watch TV" data-voice="Brian"><div class="card-emoji">📺</div><div class="card-word">watch TV</div></div>
+                 <div class="learning-card" data-word="go to bed" data-voice="William"><div class="card-emoji">😴</div><div class="card-word">go to bed</div></div>
             </div>
             <div class="learning-progress">
                 <div class="progress-text">Learning Progress: <span id="learningProgress1">0/10</span></div>
@@ -1160,6 +1197,11 @@
             <div class="content-row">
                 <div class="think-pair-share">
                     <div class="tps-title">🤔 Think-Pair-Share: My Daily Schedule</div>
+                     <ul>
+                        <li>What is the first thing you do in the morning?</li>
+                        <li>What is your favorite part of the school day?</li>
+                        <li>What do you do to relax before bed?</li>
+                    </ul>
                     <div class="tps-phases">
                         <div class="tps-phase">
                             <div class="phase-icon animated-emoji">🤔</div>
@@ -1184,26 +1226,26 @@
 
                 <div class="story-section">
                     <div class="story-title">📖 Leo and Elsa's Perfect Day</div>
-                    <div class="story-content clickable-tts" onclick="handleTTSClick(this, 'Leo and Elsa created their perfect daily schedule! Leo wakes up early at seven AM and brushes his teeth right away. Elsa loves to eat a healthy breakfast at eight AM before going to school. At twelve PM, they both enjoy lunch with their friends. After school at three PM, they do their homework together. In the evening at six PM, the family has dinner together. Finally, at nine PM, they watch their favorite TV show before going to bed. What a wonderful day!', 'Kore')">
+                    <div class="story-content clickable-tts" onclick="handleTTSClick(this, this.textContent.trim(), 'Ava')">
                         Leo and Elsa created their perfect daily schedule! Leo wakes up early at 7:00 AM and brushes his teeth right away. Elsa loves to eat a healthy breakfast at 8:00 AM before going to school. At 12:00 PM, they both enjoy lunch with their friends. After school at 3:00 PM, they do their homework together. In the evening at 6:00 PM, the family has dinner together. Finally, at 9:00 PM, they watch their favorite TV show before going to bed. What a wonderful day!
                     </div>
                 </div>
             </div>
 
             <div class="learning-cards compact" id="scheduleCards">
-                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Morning', 'Kore')">
+                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Morning', 'Ava')">
                     <div class="card-emoji">🌅</div>
                     <div class="card-word">Morning</div>
                 </div>
-                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Afternoon', 'Kore')">
+                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Afternoon', 'Ava')">
                     <div class="card-emoji">☀️</div>
                     <div class="card-word">Afternoon</div>
                 </div>
-                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Evening', 'Kore')">
+                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Evening', 'Ava')">
                     <div class="card-emoji">🌆</div>
                     <div class="card-word">Evening</div>
                 </div>
-                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Night', 'Kore')">
+                <div class="learning-card clickable-tts" onclick="handleCardClick(this, 'Night', 'Ava')">
                     <div class="card-emoji">🌙</div>
                     <div class="card-word">Night</div>
                 </div>
@@ -1212,61 +1254,61 @@
             <div class="word-bank">
                 <div class="word-bank-title">🎯 Activity Bank - Drag to Schedule!</div>
                 <div class="word-items" id="activityBank">
-                    <div class="word-item clickable-tts" draggable="true" data-activity="wake up" onclick="handleTTSClick(this, 'wake up', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-activity="wake up" onclick="handleTTSClick(this, 'wake up', 'Ava')">
                         <span>🛏️</span> Wake up
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-activity="brush teeth" onclick="handleTTSClick(this, 'brush teeth', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-activity="brush teeth" onclick="handleTTSClick(this, 'brush teeth', 'Ava')">
                         <span>🦷</span> Brush teeth
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-activity="eat breakfast" onclick="handleTTSClick(this, 'eat breakfast', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-activity="eat breakfast" onclick="handleTTSClick(this, 'eat breakfast', 'Ava')">
                         <span>🍳</span> Eat breakfast
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-activity="go to school" onclick="handleTTSClick(this, 'go to school', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-activity="go to school" onclick="handleTTSClick(this, 'go to school', 'Ava')">
                         <span>🏫</span> Go to school
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-activity="have lunch" onclick="handleTTSClick(this, 'have lunch', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-activity="have lunch" onclick="handleTTSClick(this, 'have lunch', 'Ava')">
                         <span>🍱</span> Have lunch
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-activity="do homework" onclick="handleTTSClick(this, 'do homework', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-activity="do homework" onclick="handleTTSClick(this, 'do homework', 'Ava')">
                         <span>📚</span> Do homework
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-activity="play games" onclick="handleTTSClick(this, 'play games', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-activity="play games" onclick="handleTTSClick(this, 'play games', 'Ava')">
                         <span>🎮</span> Play games
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-activity="eat dinner" onclick="handleTTSClick(this, 'eat dinner', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-activity="eat dinner" onclick="handleTTSClick(this, 'eat dinner', 'Ava')">
                         <span>🍽️</span> Eat dinner
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-activity="watch TV" onclick="handleTTSClick(this, 'watch TV', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-activity="watch TV" onclick="handleTTSClick(this, 'watch TV', 'Ava')">
                         <span>📺</span> Watch TV
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-activity="go to bed" onclick="handleTTSClick(this, 'go to bed', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-activity="go to bed" onclick="handleTTSClick(this, 'go to bed', 'Ava')">
                         <span>😴</span> Go to bed
                     </div>
                 </div>
             </div>
 
             <div class="schedule-container" id="scheduleContainer">
-                <div class="time-slot clickable-tts" data-time="7:00 AM" onclick="handleTTSClick(this, 'Seven o clock in the morning', 'Kore')">
+                <div class="time-slot clickable-tts" data-time="7:00 AM" onclick="handleTTSClick(this, 'Seven o clock in the morning', 'Ava')">
                     <div class="time-label">🌅 7:00 AM</div>
                     <div class="activity-display" id="slot-7am"></div>
                 </div>
-                <div class="time-slot clickable-tts" data-time="8:00 AM" onclick="handleTTSClick(this, 'Eight o clock in the morning', 'Kore')">
+                <div class="time-slot clickable-tts" data-time="8:00 AM" onclick="handleTTSClick(this, 'Eight o clock in the morning', 'Ava')">
                     <div class="time-label">🌅 8:00 AM</div>
                     <div class="activity-display" id="slot-8am"></div>
                 </div>
-                <div class="time-slot clickable-tts" data-time="12:00 PM" onclick="handleTTSClick(this, 'Twelve o clock in the afternoon', 'Kore')">
+                <div class="time-slot clickable-tts" data-time="12:00 PM" onclick="handleTTSClick(this, 'Twelve o clock in the afternoon', 'Ava')">
                     <div class="time-label">☀️ 12:00 PM</div>
                     <div class="activity-display" id="slot-12pm"></div>
                 </div>
-                <div class="time-slot clickable-tts" data-time="3:00 PM" onclick="handleTTSClick(this, 'Three o clock in the afternoon', 'Kore')">
+                <div class="time-slot clickable-tts" data-time="3:00 PM" onclick="handleTTSClick(this, 'Three o clock in the afternoon', 'Ava')">
                     <div class="time-label">☀️ 3:00 PM</div>
                     <div class="activity-display" id="slot-3pm"></div>
                 </div>
-                <div class="time-slot clickable-tts" data-time="6:00 PM" onclick="handleTTSClick(this, 'Six o clock in the evening', 'Kore')">
+                <div class="time-slot clickable-tts" data-time="6:00 PM" onclick="handleTTSClick(this, 'Six o clock in the evening', 'Ava')">
                     <div class="time-label">🌆 6:00 PM</div>
                     <div class="activity-display" id="slot-6pm"></div>
                 </div>
-                <div class="time-slot clickable-tts" data-time="9:00 PM" onclick="handleTTSClick(this, 'Nine o clock at night', 'Kore')">
+                <div class="time-slot clickable-tts" data-time="9:00 PM" onclick="handleTTSClick(this, 'Nine o clock at night', 'Ava')">
                     <div class="time-label">🌙 9:00 PM</div>
                     <div class="activity-display" id="slot-9pm"></div>
                 </div>
@@ -1281,10 +1323,10 @@
                                 <span class="character-avatar">👦</span>
                                 <span class="character-name">Leo</span>
                             </div>
-                            <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'What time do you wake up, Elsa? I usually wake up at seven in the morning because I like to have enough time to get ready for school.', 'Fenrir')">
+                            <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'What time do you wake up, Elsa? I usually wake up at seven in the morning because I like to have enough time to get ready for school.', 'Brian')">
                                 <strong>Leo asks:</strong> "What time do you wake up, Elsa? I usually wake up at 7:00 AM because I like to have enough time to get ready for school."
                             </div>
-                            <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I wake up at seven o clock every day too! My mom wakes me up gently and I brush my teeth first thing. Then I get dressed and comb my hair before going downstairs for breakfast.', 'Leda')">
+                            <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I wake up at seven o clock every day too! My mom wakes me up gently and I brush my teeth first thing. Then I get dressed and comb my hair before going downstairs for breakfast.', 'Emma')">
                                 <strong>Elsa answers:</strong> "I wake up at 7:00 AM every day too! My mom wakes me up gently and I brush my teeth first thing. Then I get dressed and comb my hair before going downstairs for breakfast."
                             </div>
                         </div>
@@ -1296,10 +1338,10 @@
                                 <span class="character-avatar">👧</span>
                                 <span class="character-name">Elsa</span>
                             </div>
-                            <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you do homework after school, Leo? I always do my homework right after I get home because then I have more time to play later.', 'Leda')">
+                            <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you do homework after school, Leo? I always do my homework right after I get home because then I have more time to play later.', 'Emma')">
                                 <strong>Elsa asks:</strong> "Do you do homework after school, Leo? I always do my homework right after I get home because then I have more time to play later."
                             </div>
-                            <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes, I do my homework at three o clock too! I sit at my desk in my room and do math first because it is the hardest for me. Then I do reading and writing. My dad helps me if I have questions.', 'Fenrir')">
+                            <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes, I do my homework at three o clock too! I sit at my desk in my room and do math first because it is the hardest for me. Then I do reading and writing. My dad helps me if I have questions.', 'Brian')">
                                 <strong>Leo answers:</strong> "Yes, I do my homework at 3:00 PM too! I sit at my desk in my room and do math first because it's the hardest for me. Then I do reading and writing. My dad helps me if I have questions."
                             </div>
                         </div>
@@ -1311,10 +1353,10 @@
                                 <span class="character-avatar">👦</span>
                                 <span class="character-name">Leo</span>
                             </div>
-                            <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'What is your favorite time of day, Elsa? Mine is dinner time because our whole family sits together and talks about our day.', 'Fenrir')">
+                            <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'What is your favorite time of day, Elsa? Mine is dinner time because our whole family sits together and talks about our day.', 'Brian')">
                                 <strong>Leo asks:</strong> "What's your favorite time of day, Elsa? Mine is dinner time because our whole family sits together and talks about our day."
                             </div>
-                            <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I love dinner time too! But I also really like bedtime because mom reads me stories and we cuddle. She reads about princesses and adventures, and sometimes dad joins us too.', 'Leda')">
+                            <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I love dinner time too! But I also really like bedtime because mom reads me stories and we cuddle. She reads about princesses and adventures, and sometimes dad joins us too.', 'Emma')">
                                 <strong>Elsa answers:</strong> "I love dinner time too! But I also really like bedtime because mom reads me stories and we cuddle. She reads about princesses and adventures, and sometimes dad joins us too."
                             </div>
                         </div>
@@ -1326,10 +1368,10 @@
                                 <span class="character-avatar">👧</span>
                                 <span class="character-name">Elsa</span>
                             </div>
-                            <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you like going to school, Leo? I love school because I get to see my friends and learn new things every day. My teacher is very nice and funny.', 'Leda')">
+                            <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you like going to school, Leo? I love school because I get to see my friends and learn new things every day. My teacher is very nice and funny.', 'Emma')">
                                 <strong>Elsa asks:</strong> "Do you like going to school, Leo? I love school because I get to see my friends and learn new things every day. My teacher is very nice and funny."
                             </div>
-                            <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes, I love school too! My favorite subject is science because we do cool experiments. Yesterday we made a volcano with baking soda and vinegar. It was so exciting when it erupted!', 'Fenrir')">
+                            <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes, I love school too! My favorite subject is science because we do cool experiments. Yesterday we made a volcano with baking soda and vinegar. It was so exciting when it erupted!', 'Brian')">
                                 <strong>Leo answers:</strong> "Yes, I love school too! My favorite subject is science because we do cool experiments. Yesterday we made a volcano with baking soda and vinegar. It was so exciting when it erupted!"
                             </div>
                         </div>
@@ -1345,18 +1387,21 @@
                 <p>Let's learn these words! Each card will show for 6 seconds.</p>
             </div>
             <div class="learning-cards" id="learningCards2">
-                <div class="learning-card" data-word="pancakes" data-voice="Kore"><div class="card-emoji">🥞</div><div class="card-word">pancakes</div></div>
-                <div class="learning-card" data-word="eggs" data-voice="Leda"><div class="card-emoji">🍳</div><div class="card-word">eggs</div></div>
-                <div class="learning-card" data-word="toast" data-voice="Orus"><div class="card-emoji">🍞</div><div class="card-word">toast</div></div>
-                <div class="learning-card" data-word="cereal" data-voice="Fenrir"><div class="card-emoji">🥣</div><div class="card-word">cereal</div></div>
-                <div class="learning-card" data-word="waffles" data-voice="Charon"><div class="card-emoji">🧇</div><div class="card-word">waffles</div></div>
-                <div class="learning-card" data-word="banana" data-voice="Kore"><div class="card-emoji">🍌</div><div class="card-word">banana</div></div>
-                <div class="learning-card" data-word="apple" data-voice="Leda"><div class="card-emoji">🍎</div><div class="card-word">apple</div></div>
-                <div class="learning-card" data-word="milk" data-voice="Orus"><div class="card-emoji">🥛</div><div class="card-word">milk</div></div>
-                <div class="learning-card" data-word="juice" data-voice="Fenrir"><div class="card-emoji">🧃</div><div class="card-word">juice</div></div>
+                <div class="learning-card" data-word="pancakes" data-voice="Ava"><div class="card-emoji">🥞</div><div class="card-word">pancakes</div></div>
+                <div class="learning-card" data-word="eggs" data-voice="Emma"><div class="card-emoji">🍳</div><div class="card-word">eggs</div></div>
+                <div class="learning-card" data-word="toast" data-voice="Andrew"><div class="card-emoji">🍞</div><div class="card-word">toast</div></div>
+                <div class="learning-card" data-word="cereal" data-voice="Brian"><div class="card-emoji">🥣</div><div class="card-word">cereal</div></div>
+                <div class="learning-card" data-word="waffles" data-voice="William"><div class="card-emoji">🧇</div><div class="card-word">waffles</div></div>
+                <div class="learning-card" data-word="banana" data-voice="Ava"><div class="card-emoji">🍌</div><div class="card-word">banana</div></div>
+                <div class="learning-card" data-word="apple" data-voice="Emma"><div class="card-emoji">🍎</div><div class="card-word">apple</div></div>
+                <div class="learning-card" data-word="milk" data-voice="Andrew"><div class="card-emoji">🥛</div><div class="card-word">milk</div></div>
+                <div class="learning-card" data-word="juice" data-voice="Brian"><div class="card-emoji">🧃</div><div class="card-word">juice</div></div>
+                 <div class="learning-card" data-word="yogurt" data-voice="William"><div class="card-emoji">🍦</div><div class="card-word">yogurt</div></div>
+                <div class="learning-card" data-word="sausage" data-voice="Ava"><div class="card-emoji">🌭</div><div class="card-word">sausage</div></div>
+                <div class="learning-card" data-word="bagel" data-voice="Emma"><div class="card-emoji">🥯</div><div class="card-word">bagel</div></div>
             </div>
             <div class="learning-progress">
-                <div class="progress-text">Learning Progress: <span id="learningProgress2">0/9</span></div>
+                <div class="progress-text">Learning Progress: <span id="learningProgress2">0/12</span></div>
                 <button class="nav-button" onclick="skipToPage(2)" style="margin-top: 10px;">Skip</button>
                 <button class="nav-button" onclick="repeatLearning(2)" style="margin-top: 10px;">Repeat</button>
             </div>
@@ -1370,19 +1415,19 @@
             </div>
 
             <div class="learning-cards" id="breakfastCards">
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Breakfast', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Breakfast', 'Ava')">
                     <div class="card-emoji">🍳</div>
                     <div class="card-word">Breakfast</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Delicious', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Delicious', 'Ava')">
                     <div class="card-emoji">😋</div>
                     <div class="card-word">Delicious</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Healthy', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Healthy', 'Ava')">
                     <div class="card-emoji">💪</div>
                     <div class="card-word">Healthy</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Yummy', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Yummy', 'Ava')">
                     <div class="card-emoji">🤤</div>
                     <div class="card-word">Yummy</div>
                 </div>
@@ -1391,35 +1436,44 @@
             <div class="word-bank">
                 <div class="word-bank-title">🍳 Breakfast Foods - Drag to Your Plate!</div>
                 <div class="word-items" id="breakfastBank">
-                    <div class="word-item clickable-tts" draggable="true" data-food="pancakes" onclick="handleTTSClick(this, 'pancakes', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-food="pancakes" onclick="handleTTSClick(this, 'pancakes', 'Ava')">
                         <span>🥞</span> Pancakes
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-food="eggs" onclick="handleTTSClick(this, 'eggs', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-food="eggs" onclick="handleTTSClick(this, 'eggs', 'Ava')">
                         <span>🍳</span> Eggs
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-food="toast" onclick="handleTTSClick(this, 'toast', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-food="toast" onclick="handleTTSClick(this, 'toast', 'Ava')">
                         <span>🍞</span> Toast
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-food="cereal" onclick="handleTTSClick(this, 'cereal', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-food="cereal" onclick="handleTTSClick(this, 'cereal', 'Ava')">
                         <span>🥣</span> Cereal
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-food="oatmeal" onclick="handleTTSClick(this, 'oatmeal', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-food="oatmeal" onclick="handleTTSClick(this, 'oatmeal', 'Ava')">
                         <span>🥣</span> Oatmeal
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-food="waffles" onclick="handleTTSClick(this, 'waffles', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-food="waffles" onclick="handleTTSClick(this, 'waffles', 'Ava')">
                         <span>🧇</span> Waffles
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-food="banana" onclick="handleTTSClick(this, 'banana', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-food="banana" onclick="handleTTSClick(this, 'banana', 'Ava')">
                         <span>🍌</span> Banana
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-food="apple" onclick="handleTTSClick(this, 'apple', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-food="apple" onclick="handleTTSClick(this, 'apple', 'Ava')">
                         <span>🍎</span> Apple
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-food="milk" onclick="handleTTSClick(this, 'milk', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-food="milk" onclick="handleTTSClick(this, 'milk', 'Ava')">
                         <span>🥛</span> Milk
                     </div>
-                    <div class="word-item clickable-tts" draggable="true" data-food="juice" onclick="handleTTSClick(this, 'juice', 'Kore')">
+                    <div class="word-item clickable-tts" draggable="true" data-food="juice" onclick="handleTTSClick(this, 'juice', 'Ava')">
                         <span>🧃</span> Juice
+                    </div>
+                     <div class="word-item clickable-tts" draggable="true" data-food="yogurt" onclick="handleTTSClick(this, 'yogurt', 'Ava')">
+                        <span>🍦</span> Yogurt
+                    </div>
+                     <div class="word-item clickable-tts" draggable="true" data-food="sausage" onclick="handleTTSClick(this, 'sausage', 'Ava')">
+                        <span>🌭</span> Sausage
+                    </div>
+                     <div class="word-item clickable-tts" draggable="true" data-food="bagel" onclick="handleTTSClick(this, 'bagel', 'Ava')">
+                        <span>🥯</span> Bagel
                     </div>
                 </div>
             </div>
@@ -1467,18 +1521,18 @@
                 <div class="dialogue-header">💬 Breakfast Conversation</div>
                 <div class="question-container">
                     <div class="character-dialogue">
-                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you like pancakes for breakfast?', 'Fenrir')">
+                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you like pancakes for breakfast?', 'Brian')">
                             <strong>Leo asks:</strong> "Do you like pancakes for breakfast?"
                         </div>
-                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes, I love pancakes with strawberries!', 'Leda')">
+                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes, I love pancakes with strawberries!', 'Emma')">
                             "Yes, I love pancakes with strawberries!"
                         </div>
                     </div>
                     <div class="character-dialogue">
-                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'What do you drink in the morning?', 'Leda')">
+                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'What do you drink in the morning?', 'Emma')">
                             <strong>Elsa asks:</strong> "What do you drink in the morning?"
                         </div>
-                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I drink milk and orange juice!', 'Fenrir')">
+                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I drink milk and orange juice!', 'Brian')">
                             "I drink milk and orange juice!"
                         </div>
                     </div>
@@ -1487,6 +1541,11 @@
 
             <div class="think-pair-share">
                 <div class="tps-title">🤔 Think-Pair-Share: Favorite Breakfast</div>
+                 <ul>
+                    <li>What is your favorite healthy breakfast?</li>
+                    <li>Why is breakfast an important meal?</li>
+                    <li>What is something new you would like to try for breakfast?</li>
+                </ul>
                 <div class="tps-phases">
                     <div class="tps-phase">
                         <div class="phase-icon">🤔</div>
@@ -1524,16 +1583,19 @@
                 <p>Let's learn these words! Each card will show for 6 seconds.</p>
             </div>
             <div class="learning-cards" id="learningCards3">
-                <div class="learning-card" data-word="rice" data-voice="Kore"><div class="card-emoji">🍚</div><div class="card-word">rice</div></div>
-                <div class="learning-card" data-word="noodles" data-voice="Leda"><div class="card-emoji">🍜</div><div class="card-word">noodles</div></div>
-                <div class="learning-card" data-word="sandwich" data-voice="Orus"><div class="card-emoji">🥪</div><div class="card-word">sandwich</div></div>
-                <div class="learning-card" data-word="pizza" data-voice="Fenrir"><div class="card-emoji">🍕</div><div class="card-word">pizza</div></div>
-                <div class="learning-card" data-word="broccoli" data-voice="Charon"><div class="card-emoji">🥦</div><div class="card-word">broccoli</div></div>
-                <div class="learning-card" data-word="carrots" data-voice="Kore"><div class="card-emoji">🥕</div><div class="card-word">carrots</div></div>
-                <div class="learning-card" data-word="soup" data-voice="Leda"><div class="card-emoji">🍲</div><div class="card-word">soup</div></div>
+                <div class="learning-card" data-word="rice" data-voice="Ava"><div class="card-emoji">🍚</div><div class="card-word">rice</div></div>
+                <div class="learning-card" data-word="noodles" data-voice="Emma"><div class="card-emoji">🍜</div><div class="card-word">noodles</div></div>
+                <div class="learning-card" data-word="sandwich" data-voice="Andrew"><div class="card-emoji">🥪</div><div class="card-word">sandwich</div></div>
+                <div class="learning-card" data-word="pizza" data-voice="Brian"><div class="card-emoji">🍕</div><div class="card-word">pizza</div></div>
+                <div class="learning-card" data-word="broccoli" data-voice="William"><div class="card-emoji">🥦</div><div class="card-word">broccoli</div></div>
+                <div class="learning-card" data-word="carrots" data-voice="Ava"><div class="card-emoji">🥕</div><div class="card-word">carrots</div></div>
+                <div class="learning-card" data-word="soup" data-voice="Emma"><div class="card-emoji">🍲</div><div class="card-word">soup</div></div>
+                <div class="learning-card" data-word="tacos" data-voice="Andrew"><div class="card-emoji">🌮</div><div class="card-word">tacos</div></div>
+                <div class="learning-card" data-word="burger" data-voice="Brian"><div class="card-emoji">🍔</div><div class="card-word">burger</div></div>
+                <div class="learning-card" data-word="sushi" data-voice="William"><div class="card-emoji">🍣</div><div class="card-word">sushi</div></div>
             </div>
             <div class="learning-progress">
-                <div class="progress-text">Learning Progress: <span id="learningProgress3">0/7</span></div>
+                <div class="progress-text">Learning Progress: <span id="learningProgress3">0/10</span></div>
                 <button class="nav-button" onclick="skipToPage(3)" style="margin-top: 10px;">Skip</button>
                 <button class="nav-button" onclick="repeatLearning(3)" style="margin-top: 10px;">Repeat</button>
             </div>
@@ -1547,19 +1609,19 @@
             </div>
 
             <div class="learning-cards" id="lunchCards">
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Lunch', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Lunch', 'Ava')">
                     <div class="card-emoji">🍱</div>
                     <div class="card-word">Lunch</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Tasty', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Tasty', 'Ava')">
                     <div class="card-emoji">😋</div>
                     <div class="card-word">Tasty</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Fresh', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Fresh', 'Ava')">
                     <div class="card-emoji">🌿</div>
                     <div class="card-word">Fresh</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Nutritious', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Nutritious', 'Ava')">
                     <div class="card-emoji">🥗</div>
                     <div class="card-word">Nutritious</div>
                 </div>
@@ -1572,9 +1634,10 @@
                         <div class="menu-item" onclick="handleSelection(this, 'rice')">🍚 Rice</div>
                         <div class="menu-item" onclick="handleSelection(this, 'noodles')">🍜 Noodles</div>
                         <div class="menu-item" onclick="handleSelection(this, 'sandwich')">🥪 Sandwich</div>
-                        <div class="menu-item" onclick="handleSelection(this, 'dumplings')">🥟 Dumplings</div>
-                        <div class="menu-item" onclick="handleSelection(this, 'fried rice')">🍛 Fried Rice</div>
                         <div class="menu-item" onclick="handleSelection(this, 'pizza')">🍕 Pizza</div>
+                        <div class="menu-item" onclick="handleSelection(this, 'tacos')">🌮 Tacos</div>
+                        <div class="menu-item" onclick="handleSelection(this, 'burger')">🍔 Burger</div>
+                        <div class="menu-item" onclick="handleSelection(this, 'sushi')">🍣 Sushi</div>
                     </div>
                 </div>
                 <div class="menu-category">
@@ -1607,18 +1670,18 @@
                 <div class="dialogue-header">💬 Lunch Time Chat</div>
                 <div class="question-container">
                     <div class="character-dialogue">
-                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you want to eat rice or noodles?', 'Fenrir')">
+                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you want to eat rice or noodles?', 'Brian')">
                             <strong>Leo asks:</strong> "Do you want to eat rice or noodles?"
                         </div>
-                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I want noodles with vegetables, please!', 'Leda')">
+                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I want noodles with vegetables, please!', 'Emma')">
                             "I want noodles with vegetables, please!"
                         </div>
                     </div>
                     <div class="character-dialogue">
-                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you like soup for lunch?', 'Leda')">
+                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you like soup for lunch?', 'Emma')">
                             <strong>Elsa asks:</strong> "Do you like soup for lunch?"
                         </div>
-                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes, I love hot soup on cold days!', 'Fenrir')">
+                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes, I love hot soup on cold days!', 'Brian')">
                             "Yes, I love hot soup on cold days!"
                         </div>
                     </div>
@@ -1627,6 +1690,11 @@
 
             <div class="think-pair-share">
                 <div class="tps-title">🤔 Think-Pair-Share: Healthy Lunch</div>
+                <ul>
+                    <li>What do you usually eat for lunch at school?</li>
+                    <li>What makes a lunch healthy?</li>
+                    <li>If you could pack your own lunch, what would you include?</li>
+                </ul>
                 <div class="tps-phases">
                     <div class="tps-phase">
                         <div class="phase-icon">🤔</div>
@@ -1664,16 +1732,19 @@
                 <p>Let's learn these words! Each card will show for 6 seconds.</p>
             </div>
             <div class="learning-cards" id="learningCards4">
-                <div class="learning-card" data-word="chicken" data-voice="Kore"><div class="card-emoji">🍗</div><div class="card-word">chicken</div></div>
-                <div class="learning-card" data-word="fish" data-voice="Leda"><div class="card-emoji">🐟</div><div class="card-word">fish</div></div>
-                <div class="learning-card" data-word="pasta" data-voice="Orus"><div class="card-emoji">🍝</div><div class="card-word">pasta</div></div>
-                <div class="learning-card" data-word="potatoes" data-voice="Fenrir"><div class="card-emoji">🥔</div><div class="card-word">potatoes</div></div>
-                <div class="learning-card" data-word="salad" data-voice="Charon"><div class="card-emoji">🥗</div><div class="card-word">salad</div></div>
-                <div class="learning-card" data-word="ice cream" data-voice="Kore"><div class="card-emoji">🍨</div><div class="card-word">ice cream</div></div>
-                <div class="learning-card" data-word="cake" data-voice="Leda"><div class="card-emoji">🍰</div><div class="card-word">cake</div></div>
+                <div class="learning-card" data-word="chicken" data-voice="Ava"><div class="card-emoji">🍗</div><div class="card-word">chicken</div></div>
+                <div class="learning-card" data-word="fish" data-voice="Emma"><div class="card-emoji">🐟</div><div class="card-word">fish</div></div>
+                <div class="learning-card" data-word="pasta" data-voice="Andrew"><div class="card-emoji">🍝</div><div class="card-word">pasta</div></div>
+                <div class="learning-card" data-word="potatoes" data-voice="Brian"><div class="card-emoji">🥔</div><div class="card-word">potatoes</div></div>
+                <div class="learning-card" data-word="salad" data-voice="William"><div class="card-emoji">🥗</div><div class="card-word">salad</div></div>
+                <div class="learning-card" data-word="ice cream" data-voice="Ava"><div class="card-emoji">🍨</div><div class="card-word">ice cream</div></div>
+                <div class="learning-card" data-word="cake" data-voice="Emma"><div class="card-emoji">🍰</div><div class="card-word">cake</div></div>
+                <div class="learning-card" data-word="lasagna" data-voice="Andrew"><div class="card-emoji"> lasagna</div><div class="card-word">lasagna</div></div>
+                <div class="learning-card" data-word="curry" data-voice="Brian"><div class="card-emoji">🍛</div><div class="card-word">curry</div></div>
+                <div class="learning-card" data-word="roast chicken" data-voice="William"><div class="card-emoji">🍗</div><div class="card-word">roast chicken</div></div>
             </div>
             <div class="learning-progress">
-                <div class="progress-text">Learning Progress: <span id="learningProgress4">0/7</span></div>
+                <div class="progress-text">Learning Progress: <span id="learningProgress4">0/10</span></div>
                 <button class="nav-button" onclick="skipToPage(4)" style="margin-top: 10px;">Skip</button>
                 <button class="nav-button" onclick="repeatLearning(4)" style="margin-top: 10px;">Repeat</button>
             </div>
@@ -1687,19 +1758,19 @@
             </div>
 
             <div class="learning-cards" id="dinnerCards">
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Dinner', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Dinner', 'Ava')">
                     <div class="card-emoji">🍽️</div>
                     <div class="card-word">Dinner</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Family', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Family', 'Ava')">
                     <div class="card-emoji">👨‍👩‍👧‍👦</div>
                     <div class="card-word">Family</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Together', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Together', 'Ava')">
                     <div class="card-emoji">🤝</div>
                     <div class="card-word">Together</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Delicious', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Delicious', 'Ava')">
                     <div class="card-emoji">😋</div>
                     <div class="card-word">Delicious</div>
                 </div>
@@ -1713,8 +1784,10 @@
                         <div class="menu-item" onclick="handleSelection(this, 'fish')">🐟 Fish</div>
                         <div class="menu-item" onclick="handleSelection(this, 'beef')">🥩 Beef</div>
                         <div class="menu-item" onclick="handleSelection(this, 'pork')">🥓 Pork</div>
-                        <div class="menu-item" onclick="handleSelection(this, 'tofu')">🧈 Tofu</div>
                         <div class="menu-item" onclick="handleSelection(this, 'pasta')">🍝 Pasta</div>
+                        <div class="menu-item" onclick="handleSelection(this, 'lasagna')"> Lasagna</div>
+                        <div class="menu-item" onclick="handleSelection(this, 'curry')">🍛 Curry</div>
+                        <div class="menu-item" onclick="handleSelection(this, 'roast chicken')">🍗 Roast Chicken</div>
                     </div>
                 </div>
                 <div class="menu-category">
@@ -1747,18 +1820,18 @@
                 <div class="dialogue-header">💬 Dinner Conversation</div>
                 <div class="question-container">
                     <div class="character-dialogue">
-                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'What is your favorite dinner food?', 'Fenrir')">
+                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'What is your favorite dinner food?', 'Brian')">
                             <strong>Leo asks:</strong> "What's your favorite dinner food?"
                         </div>
-                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I love chicken with potatoes and salad!', 'Leda')">
+                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I love chicken with potatoes and salad!', 'Emma')">
                             "I love chicken with potatoes and salad!"
                         </div>
                     </div>
                     <div class="character-dialogue">
-                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you want ice cream for dessert?', 'Leda')">
+                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you want ice cream for dessert?', 'Emma')">
                             <strong>Elsa asks:</strong> "Do you want ice cream for dessert?"
                         </div>
-                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes, please! I love chocolate ice cream!', 'Fenrir')">
+                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes, please! I love chocolate ice cream!', 'Brian')">
                             "Yes, please! I love chocolate ice cream!"
                         </div>
                     </div>
@@ -1767,6 +1840,11 @@
 
             <div class="think-pair-share">
                 <div class="tps-title">🤔 Think-Pair-Share: Family Dinner</div>
+                <ul>
+                    <li>What is special about eating dinner with your family?</li>
+                    <li>What is your favorite family meal?</li>
+                    <li>How can you help prepare for dinner?</li>
+                </ul>
                 <div class="tps-phases">
                     <div class="tps-phase">
                         <div class="phase-icon">🤔</div>
@@ -1804,12 +1882,12 @@
                 <p>Let's learn these words! Each card will show for 6 seconds.</p>
             </div>
             <div class="learning-cards" id="learningCards5">
-                <div class="learning-card" data-word="drawing" data-voice="Kore"><div class="card-emoji">✏️</div><div class="card-word">drawing</div></div>
-                <div class="learning-card" data-word="reading" data-voice="Leda"><div class="card-emoji">📚</div><div class="card-word">reading</div></div>
-                <div class="learning-card" data-word="music" data-voice="Orus"><div class="card-emoji">🎵</div><div class="card-word">music</div></div>
-                <div class="learning-card" data-word="dancing" data-voice="Fenrir"><div class="card-emoji">💃</div><div class="card-word">dancing</div></div>
-                <div class="learning-card" data-word="cooking" data-voice="Charon"><div class="card-emoji">👨‍🍳</div><div class="card-word">cooking</div></div>
-                <div class="learning-card" data-word="gardening" data-voice="Kore"><div class="card-emoji">🌱</div><div class="card-word">gardening</div></div>
+                <div class="learning-card" data-word="drawing" data-voice="Ava"><div class="card-emoji">✏️</div><div class="card-word">drawing</div></div>
+                <div class="learning-card" data-word="reading" data-voice="Emma"><div class="card-emoji">📚</div><div class="card-word">reading</div></div>
+                <div class="learning-card" data-word="music" data-voice="Andrew"><div class="card-emoji">🎵</div><div class="card-word">music</div></div>
+                <div class="learning-card" data-word="dancing" data-voice="Brian"><div class="card-emoji">💃</div><div class="card-word">dancing</div></div>
+                <div class="learning-card" data-word="cooking" data-voice="William"><div class="card-emoji">👨‍🍳</div><div class="card-word">cooking</div></div>
+                <div class="learning-card" data-word="gardening" data-voice="Ava"><div class="card-emoji">🌱</div><div class="card-word">gardening</div></div>
             </div>
             <div class="learning-progress">
                 <div class="progress-text">Learning Progress: <span id="learningProgress5">0/6</span></div>
@@ -1826,19 +1904,19 @@
             </div>
 
             <div class="learning-cards" id="hobbyCards">
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Hobbies', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Hobbies', 'Ava')">
                     <div class="card-emoji">🎨</div>
                     <div class="card-word">Hobbies</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Creative', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Creative', 'Ava')">
                     <div class="card-emoji">💡</div>
                     <div class="card-word">Creative</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Fun', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Fun', 'Ava')">
                     <div class="card-emoji">🎉</div>
                     <div class="card-word">Fun</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Enjoy', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Enjoy', 'Ava')">
                     <div class="card-emoji">😊</div>
                     <div class="card-word">Enjoy</div>
                 </div>
@@ -1896,18 +1974,18 @@
                 <div class="dialogue-header">💬 Hobby Talk</div>
                 <div class="question-container">
                     <div class="character-dialogue">
-                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you like to draw pictures?', 'Fenrir')">
+                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you like to draw pictures?', 'Brian')">
                             <strong>Leo asks:</strong> "Do you like to draw pictures?"
                         </div>
-                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes! I love drawing animals and flowers!', 'Leda')">
+                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes! I love drawing animals and flowers!', 'Emma')">
                             "Yes! I love drawing animals and flowers!"
                         </div>
                     </div>
                     <div class="character-dialogue">
-                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'What is your favorite hobby?', 'Leda')">
+                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'What is your favorite hobby?', 'Emma')">
                             <strong>Elsa asks:</strong> "What's your favorite hobby?"
                         </div>
-                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I love reading adventure books!', 'Fenrir')">
+                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I love reading adventure books!', 'Brian')">
                             "I love reading adventure books!"
                         </div>
                     </div>
@@ -1916,6 +1994,11 @@
 
             <div class="think-pair-share">
                 <div class="tps-title">🤔 Think-Pair-Share: Creative Hobbies</div>
+                 <ul>
+                    <li>What is a hobby you would like to try?</li>
+                    <li>Why is it good to have hobbies?</li>
+                    <li>How do you share your hobbies with friends or family?</li>
+                </ul>
                 <div class="tps-phases">
                     <div class="tps-phase">
                         <div class="phase-icon">🤔</div>
@@ -1953,13 +2036,13 @@
                 <p>Let's learn these words! Each card will show for 6 seconds.</p>
             </div>
             <div class="learning-cards" id="learningCards6">
-                <div class="learning-card" data-word="soccer" data-voice="Kore"><div class="card-emoji">⚽</div><div class="card-word">soccer</div></div>
-                <div class="learning-card" data-word="basketball" data-voice="Leda"><div class="card-emoji">🏀</div><div class="card-word">basketball</div></div>
-                <div class="learning-card" data-word="swimming" data-voice="Orus"><div class="card-emoji">🏊‍♂️</div><div class="card-word">swimming</div></div>
-                <div class="learning-card" data-word="cycling" data-voice="Fenrir"><div class="card-emoji">🚴‍♀️</div><div class="card-word">cycling</div></div>
-                <div class="learning-card" data-word="running" data-voice="Charon"><div class="card-emoji">🏃‍♂️</div><div class="card-word">running</div></div>
-                <div class="learning-card" data-word="tennis" data-voice="Kore"><div class="card-emoji">🎾</div><div class="card-word">tennis</div></div>
-                <div class="learning-card" data-word="hiking" data-voice="Leda"><div class="card-emoji">🥾</div><div class="card-word">hiking</div></div>
+                <div class="learning-card" data-word="soccer" data-voice="Ava"><div class="card-emoji">⚽</div><div class="card-word">soccer</div></div>
+                <div class="learning-card" data-word="basketball" data-voice="Emma"><div class="card-emoji">🏀</div><div class="card-word">basketball</div></div>
+                <div class="learning-card" data-word="swimming" data-voice="Andrew"><div class="card-emoji">🏊‍♂️</div><div class="card-word">swimming</div></div>
+                <div class="learning-card" data-word="cycling" data-voice="Brian"><div class="card-emoji">🚴‍♀️</div><div class="card-word">cycling</div></div>
+                <div class="learning-card" data-word="running" data-voice="William"><div class="card-emoji">🏃‍♂️</div><div class="card-word">running</div></div>
+                <div class="learning-card" data-word="tennis" data-voice="Ava"><div class="card-emoji">🎾</div><div class="card-word">tennis</div></div>
+                <div class="learning-card" data-word="hiking" data-voice="Emma"><div class="card-emoji">🥾</div><div class="card-word">hiking</div></div>
             </div>
             <div class="learning-progress">
                 <div class="progress-text">Learning Progress: <span id="learningProgress6">0/7</span></div>
@@ -1976,19 +2059,19 @@
             </div>
 
             <div class="learning-cards" id="saturdayCards">
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Saturday', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Saturday', 'Ava')">
                     <div class="card-emoji">📅</div>
                     <div class="card-word">Saturday</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Sports', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Sports', 'Ava')">
                     <div class="card-emoji">⚽</div>
                     <div class="card-word">Sports</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Active', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Active', 'Ava')">
                     <div class="card-emoji">💪</div>
                     <div class="card-word">Active</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Exercise', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Exercise', 'Ava')">
                     <div class="card-emoji">🏃‍♂️</div>
                     <div class="card-word">Exercise</div>
                 </div>
@@ -2046,18 +2129,18 @@
                 <div class="dialogue-header">💬 Sports Talk</div>
                 <div class="question-container">
                     <div class="character-dialogue">
-                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you want to play soccer on Saturday?', 'Fenrir')">
+                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you want to play soccer on Saturday?', 'Brian')">
                             <strong>Leo asks:</strong> "Do you want to play soccer on Saturday?"
                         </div>
-                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes! I love playing soccer with friends!', 'Leda')">
+                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes! I love playing soccer with friends!', 'Emma')">
                             "Yes! I love playing soccer with friends!"
                         </div>
                     </div>
                     <div class="character-dialogue">
-                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you like swimming or cycling more?', 'Leda')">
+                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you like swimming or cycling more?', 'Emma')">
                             <strong>Elsa asks:</strong> "Do you like swimming or cycling more?"
                         </div>
-                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I like both! Swimming is cool and cycling is fun!', 'Fenrir')">
+                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I like both! Swimming is cool and cycling is fun!', 'Brian')">
                             "I like both! Swimming is cool and cycling is fun!"
                         </div>
                     </div>
@@ -2066,6 +2149,11 @@
 
             <div class="think-pair-share">
                 <div class="tps-title">🤔 Think-Pair-Share: Weekend Sports</div>
+                <ul>
+                    <li>What is your favorite sport to play?</li>
+                    <li>Why is it important to be active?</li>
+                    <li>What is a fun activity to do outside with friends?</li>
+                </ul>
                 <div class="tps-phases">
                     <div class="tps-phase">
                         <div class="phase-icon">🤔</div>
@@ -2103,12 +2191,12 @@
                 <p>Let's learn these words! Each card will show for 6 seconds.</p>
             </div>
             <div class="learning-cards" id="learningCards7">
-                <div class="learning-card" data-word="movies" data-voice="Kore"><div class="card-emoji">🎬</div><div class="card-word">movies</div></div>
-                <div class="learning-card" data-word="board games" data-voice="Leda"><div class="card-emoji">🎲</div><div class="card-word">board games</div></div>
-                <div class="learning-card" data-word="picnic" data-voice="Orus"><div class="card-emoji">🧺</div><div class="card-word">picnic</div></div>
-                <div class="learning-card" data-word="zoo visit" data-voice="Fenrir"><div class="card-emoji">🦁</div><div class="card-word">zoo visit</div></div>
-                <div class="learning-card" data-word="baking" data-voice="Charon"><div class="card-emoji">🧁</div><div class="card-word">baking</div></div>
-                <div class="learning-card" data-word="puzzles" data-voice="Kore"><div class="card-emoji">🧩</div><div class="card-word">puzzles</div></div>
+                <div class="learning-card" data-word="movies" data-voice="Ava"><div class="card-emoji">🎬</div><div class="card-word">movies</div></div>
+                <div class="learning-card" data-word="board games" data-voice="Emma"><div class="card-emoji">🎲</div><div class="card-word">board games</div></div>
+                <div class="learning-card" data-word="picnic" data-voice="Andrew"><div class="card-emoji">🧺</div><div class="card-word">picnic</div></div>
+                <div class="learning-card" data-word="zoo visit" data-voice="Brian"><div class="card-emoji">🦁</div><div class="card-word">zoo visit</div></div>
+                <div class="learning-card" data-word="baking" data-voice="William"><div class="card-emoji">🧁</div><div class="card-word">baking</div></div>
+                <div class="learning-card" data-word="puzzles" data-voice="Ava"><div class="card-emoji">🧩</div><div class="card-word">puzzles</div></div>
             </div>
             <div class="learning-progress">
                 <div class="progress-text">Learning Progress: <span id="learningProgress7">0/6</span></div>
@@ -2125,19 +2213,19 @@
             </div>
 
             <div class="learning-cards" id="sundayCards">
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Sunday', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Sunday', 'Ava')">
                     <div class="card-emoji">🌞</div>
                     <div class="card-word">Sunday</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Relax', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Relax', 'Ava')">
                     <div class="card-emoji">😌</div>
                     <div class="card-word">Relax</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Family', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Family', 'Ava')">
                     <div class="card-emoji">👨‍👩‍👧‍👦</div>
                     <div class="card-word">Family</div>
                 </div>
-                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Peaceful', 'Kore')">
+                <div class="learning-card" onclick="flashCard(this); handleTTSClick(this, 'Peaceful', 'Ava')">
                     <div class="card-emoji">🕊️</div>
                     <div class="card-word">Peaceful</div>
                 </div>
@@ -2195,18 +2283,18 @@
                 <div class="dialogue-header">💬 Sunday Plans</div>
                 <div class="question-container">
                     <div class="character-dialogue">
-                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you want to watch a movie on Sunday?', 'Fenrir')">
+                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you want to watch a movie on Sunday?', 'Brian')">
                             <strong>Leo asks:</strong> "Do you want to watch a movie on Sunday?"
                         </div>
-                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes! Let us watch a funny cartoon together!', 'Leda')">
+                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'Yes! Let us watch a funny cartoon together!', 'Emma')">
                             "Yes! Let's watch a funny cartoon together!"
                         </div>
                     </div>
                     <div class="character-dialogue">
-                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you like to bake cookies with mom?', 'Leda')">
+                        <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Do you like to bake cookies with mom?', 'Emma')">
                             <strong>Elsa asks:</strong> "Do you like to bake cookies with mom?"
                         </div>
-                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I love baking! Chocolate chip cookies are my favorite!', 'Fenrir')">
+                        <div class="dialogue-answer clickable-tts" onclick="handleTTSClick(this, 'I love baking! Chocolate chip cookies are my favorite!', 'Brian')">
                             "I love baking! Chocolate chip cookies are my favorite!"
                         </div>
                     </div>
@@ -2215,6 +2303,11 @@
 
             <div class="think-pair-share">
                 <div class="tps-title">🤔 Think-Pair-Share: Perfect Sunday</div>
+                 <ul>
+                    <li>What makes Sunday a relaxing day for you?</li>
+                    <li>What is your favorite family activity?</li>
+                    <li>How is your Sunday different from your Saturday?</li>
+                </ul>
                 <div class="tps-phases">
                     <div class="tps-phase">
                         <div class="phase-icon">🤔</div>
@@ -2249,19 +2342,33 @@
         <div class="page" id="page-verb-test">
             <div class="page-header">
                 <h1 class="page-title">📝 Verb Tense Challenge</h1>
-                <p>Fill in the blanks with the correct form of the verb!</p>
+                <p>Drag and drop the words to fill in the blanks!</p>
             </div>
-    
+             <div class="word-bank">
+                <div class="word-bank-title">Verb Bank</div>
+                <div id="verb-bank-items" class="word-items">
+                    <div class="word-item" draggable="true" data-verb="wake up">wake up</div>
+                    <div class="word-item" draggable="true" data-verb="plays">plays</div>
+                    <div class="word-item" draggable="true" data-verb="reads">reads</div>
+                    <div class="word-item" draggable="true" data-verb="eat">eat</div>
+                    <div class="word-item" draggable="true" data-verb="do">do</div>
+                    <div class="word-item" draggable="true" data-verb="learning">learning</div>
+                    <div class="word-item" draggable="true" data-verb="drawing">drawing</div>
+                    <div class="word-item" draggable="true" data-verb="baking">baking</div>
+                    <div class="word-item" draggable="true" data-verb="watching">watching</div>
+                    <div class="word-item" draggable="true" data-verb="swimming">swimming</div>
+                </div>
+            </div>
             <div class="verb-test-container">
                 <div class="verb-section">
                     <h3>Present Tense Practice</h3>
                     <p>Use the simple present tense (e.g., I play, Leo plays).</p>
                     <ul class="verb-questions">
-                        <li>I <input type="text" data-answer="wake up" placeholder="..."> (wake up) at 7 AM.</li>
-                        <li>Elsa <input type="text" data-answer="plays" placeholder="..."> (play) the piano.</li>
-                        <li>Leo <input type="text" data-answer="reads" placeholder="..."> (read) adventure books.</li>
-                        <li>I <input type="text" data-answer="eat" placeholder="..."> (eat) breakfast in the morning.</li>
-                        <li>Leo and Elsa <input type="text" data-answer="do" placeholder="..."> (do) their homework together.</li>
+                        <li>I <span class="dropzone" data-answer="wake up"></span> (wake up) at 7 AM.</li>
+                        <li>Elsa <span class="dropzone" data-answer="plays"></span> (play) the piano.</li>
+                        <li>Leo <span class="dropzone" data-answer="reads"></span> (read) adventure books.</li>
+                        <li>I <span class="dropzone" data-answer="eat"></span> (eat) breakfast in the morning.</li>
+                        <li>Leo and Elsa <span class="dropzone" data-answer="do"></span> (do) their homework together.</li>
                     </ul>
                 </div>
     
@@ -2269,11 +2376,11 @@
                     <h3>Continuous Tense Practice</h3>
                     <p>Use the present continuous tense (e.g., I am playing, Elsa is playing).</p>
                      <ul class="verb-questions">
-                        <li>I am <input type="text" data-answer="learning" placeholder="..."> (learn) about schedules.</li>
-                        <li>Leo is <input type="text" data-answer="drawing" placeholder="..."> (draw) a picture of a dragon.</li>
-                        <li>Elsa is <input type="text" data-answer="baking" placeholder="..."> (bake) cookies with her mom.</li>
-                        <li>We are <input type="text" data-answer="watching" placeholder="..."> (watch) a movie tonight.</li>
-                        <li>They are <input type="text" data-answer="swimming" placeholder="..."> (swim) in the pool.</li>
+                        <li>I am <span class="dropzone" data-answer="learning"></span> (learn) about schedules.</li>
+                        <li>Leo is <span class="dropzone" data-answer="drawing"></span> (draw) a picture of a dragon.</li>
+                        <li>Elsa is <span class="dropzone" data-answer="baking"></span> (bake) cookies with her mom.</li>
+                        <li>We are <span class="dropzone" data-answer="watching"></span> (watch) a movie tonight.</li>
+                        <li>They are <span class="dropzone" data-answer="swimming"></span> (swim) in the pool.</li>
                     </ul>
                 </div>
             </div>
@@ -2292,11 +2399,11 @@
             </div>
 
             <div class="characters">
-                <div class="character clickable-tts" onclick="handleTTSClick(this, 'Congratulations! You did an amazing job learning with us!', 'Fenrir')">
+                <div class="character clickable-tts" onclick="handleTTSClick(this, 'Congratulations! You did an amazing job learning with us!', 'Brian')">
                     <div class="character-avatar">👦</div>
                     <div class="character-name">Leo says: "Great job!"</div>
                 </div>
-                <div class="character clickable-tts" onclick="handleTTSClick(this, 'Thank you for joining our adventure! You learned so much!', 'Leda')">
+                <div class="character clickable-tts" onclick="handleTTSClick(this, 'Thank you for joining our adventure! You learned so much!', 'Emma')">
                     <div class="character-avatar">👧</div>
                     <div class="character-name">Elsa says: "Well done!"</div>
                 </div>
@@ -2373,7 +2480,7 @@
                 </div>
 
                 <div class="final-message">
-                    <div class="message-content clickable-tts" onclick="handleTTSClick(this, 'Congratulations on completing Leo and Elsa daily schedule adventure! You have learned so much about daily routines, healthy eating, fun activities, and English conversation. You practiced vocabulary, created schedules, planned meals, and discovered new hobbies. Leo and Elsa are so proud of your hard work and dedication. Remember, learning English is a wonderful journey, and every day brings new opportunities to practice and grow. Keep exploring, keep learning, and keep having fun with English! You are amazing!', 'Kore')">
+                    <div class="message-content clickable-tts" onclick="handleTTSClick(this, this.textContent.trim(), 'Ava')">
                         <h3>🌟 A Special Message for You! 🌟</h3>
                         <p>Congratulations on completing Leo & Elsa's Daily Schedule Adventure! You have learned so much about daily routines, healthy eating, fun activities, and English conversation.</p>
                         <p>You practiced vocabulary, created schedules, planned meals, and discovered new hobbies. Leo and Elsa are so proud of your hard work and dedication!</p>
@@ -2401,7 +2508,7 @@
                                     <span class="character-avatar">👦</span>
                                     <span class="character-name">Leo</span>
                                 </div>
-                                <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Thank you for joining our adventure! You helped us create the perfect daily schedule. I learned that having a good routine makes every day special and organized. What was your favorite part of our journey together?', 'Fenrir')">
+                                <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'Thank you for joining our adventure! You helped us create the perfect daily schedule. I learned that having a good routine makes every day special and organized. What was your favorite part of our journey together?', 'Brian')">
                                     <strong>Leo says:</strong> "Thank you for joining our adventure! You helped us create the perfect daily schedule. I learned that having a good routine makes every day special and organized. What was your favorite part of our journey together?"
                                 </div>
                             </div>
@@ -2413,7 +2520,7 @@
                                     <span class="character-avatar">👧</span>
                                     <span class="character-name">Elsa</span>
                                 </div>
-                                <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'I had so much fun planning meals and activities with you! You showed us that learning can be exciting and interactive. I hope you will continue practicing English every day. Remember, the best way to learn is to have fun while doing it. Will you come back and visit us again soon?', 'Leda')">
+                                <div class="dialogue-question clickable-tts" onclick="handleTTSClick(this, 'I had so much fun planning meals and activities with you! You showed us that learning can be exciting and interactive. I hope you will continue practicing English every day. Remember, the best way to learn is to have fun while doing it. Will you come back and visit us again soon?', 'Emma')">
                                     <strong>Elsa says:</strong> "I had so much fun planning meals and activities with you! You showed us that learning can be exciting and interactive. I hope you'll continue practicing English every day. Remember, the best way to learn is to have fun while doing it. Will you come back and visit us again soon?"
                                 </div>
                             </div>
@@ -2445,96 +2552,44 @@
         let selectedItems = {
             breakfast: [], lunch: [], dinner: [], hobbies: [], saturday: [], sunday: []
         };
-        const audioCache = {};
-        let isSpeaking = false;
         let audioCtx; 
+        let selectedVerbElement = null;
 
-        // --- Gemini TTS Integration ---
-        function base64ToArrayBuffer(base64) {
-            const binaryString = window.atob(base64);
-            const len = binaryString.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            return bytes.buffer;
-        }
+        // --- Upgraded TTS Function ---
+        function handleTTSClick(element, text, voiceShortName) {
+            const synth = window.speechSynthesis;
 
-        function pcmToWav(pcmData, numChannels, sampleRate) {
-            const buffer = new ArrayBuffer(44 + pcmData.length * 2);
-            const view = new DataView(buffer);
-            view.setUint32(0, 0x52494646, false); // "RIFF"
-            view.setUint32(4, 36 + pcmData.length * 2, true);
-            view.setUint32(8, 0x57415645, false); // "WAVE"
-            view.setUint32(12, 0x666d7420, false); // "fmt "
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true);
-            view.setUint16(22, numChannels, true);
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * numChannels * 2, true);
-            view.setUint16(32, numChannels * 2, true);
-            view.setUint16(34, 16, true);
-            view.setUint32(36, 0x64617461, false); // "data"
-            view.setUint32(40, pcmData.length * 2, true);
-            for (let i = 0; i < pcmData.length; i++) {
-                view.setInt16(44 + i * 2, pcmData[i], true);
-            }
-            return new Blob([view], { type: 'audio/wav' });
-        }
-
-        async function speakText(text, voiceName = 'Kore', element = null) {
-            if (isSpeaking) return;
-            const cacheKey = `${text}|${voiceName}`;
-            if (audioCache[cacheKey]) {
-                new Audio(audioCache[cacheKey]).play();
+            // Ensure voices are loaded
+            if (synth.getVoices().length === 0) {
+                synth.onvoiceschanged = () => handleTTSClick(element, text, voiceShortName);
                 return;
             }
-            isSpeaking = true;
-            if (element) element.classList.add('speaking');
-            try {
-                const apiKey = "";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
-                const payload = {
-                    contents: [{ parts: [{ text: text }] }],
-                    generationConfig: {
-                        responseModalities: ["AUDIO"],
-                        speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } }
-                    },
-                    model: "gemini-2.5-flash-preview-tts"
-                };
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
-                const result = await response.json();
-                const part = result?.candidates?.[0]?.content?.parts?.[0];
-                const audioData = part?.inlineData?.data;
-                const mimeType = part?.inlineData?.mimeType;
-                if (audioData && mimeType?.startsWith("audio/")) {
-                    const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)[1], 10);
-                    const pcmData = base64ToArrayBuffer(audioData);
-                    const pcm16 = new Int16Array(pcmData);
-                    const wavBlob = pcmToWav(pcm16, 1, sampleRate);
-                    const audioUrl = URL.createObjectURL(wavBlob);
-                    audioCache[cacheKey] = audioUrl;
-                    const audio = new Audio(audioUrl);
-                    audio.play();
-                    audio.onended = () => {
-                        isSpeaking = false;
-                        if (element) element.classList.remove('speaking');
-                    };
-                } else {
-                    throw new Error("No audio data in API response.");
-                }
-            } catch (error) {
-                console.error("Error with Text-to-Speech:", error);
-                isSpeaking = false;
-                if (element) element.classList.remove('speaking');
+
+            const voices = synth.getVoices();
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            utterance.rate = 0.85;
+
+            const selectedVoice = voices.find(v => v.name.toLowerCase().includes(voiceShortName.toLowerCase()) && v.lang.startsWith('en'));
+
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            } else {
+                console.warn(`Voice "${voiceShortName}" not found. Using default.`);
             }
+
+            if(element) element.classList.add('speaking');
+            utterance.onend = () => {
+                if(element) element.classList.remove('speaking');
+            };
+            
+            utterance.onerror = () => {
+                 if(element) element.classList.remove('speaking');
+            }
+
+            synth.cancel(); 
+            synth.speak(utterance);
         }
-        // --- End of TTS Integration ---
 
         function playClickSound() {
             if (!audioCtx) {
@@ -2559,14 +2614,9 @@
             oscillator.stop(audioCtx.currentTime + 0.1);
         }
 
-        function handleTTSClick(element, text, voice = 'Kore') {
-            speakText(text, voice, element);
-            createSoundEffect('🔊', element);
-        }
-
-        function handleCardClick(element, text, voice = 'Kore') {
+        function handleCardClick(element, text, voice = 'Ava') {
             flashCard(element);
-            speakText(text, voice, element);
+            handleTTSClick(element, text, voice);
         }
 
         function flashCard(card) {
@@ -2587,7 +2637,7 @@
         }
 
         function initializeDragAndDrop() {
-            document.querySelectorAll('.word-item[draggable="true"]').forEach(item => {
+            document.querySelectorAll('#activityBank .word-item[draggable="true"], #breakfastBank .word-item[draggable="true"]').forEach(item => {
                 item.addEventListener('dragstart', handleDragStart);
                 item.addEventListener('dragend', handleDragEnd);
             });
@@ -2598,7 +2648,7 @@
                 dropzone.addEventListener('dragleave', handleDragLeave);
             });
         }
-
+        
         function handleDragStart(e) {
             e.target.classList.add('dragging');
             if (e.target.dataset.activity) {
@@ -2608,6 +2658,10 @@
             if (e.target.dataset.food) {
                 e.dataTransfer.setData('text/plain', e.target.dataset.food);
                 e.dataTransfer.setData('type', 'food');
+            }
+            if(e.target.dataset.verb) {
+                e.dataTransfer.setData('text/plain', e.target.dataset.verb);
+                e.dataTransfer.setData('elementId', e.target.id);
             }
         }
 
@@ -2621,11 +2675,13 @@
 
         function handleDragEnter(e) {
             e.preventDefault();
-            e.target.closest('.time-slot, .breakfast-plate')?.classList.add('drag-over');
+            const target = e.target.closest('.time-slot, .breakfast-plate, .dropzone');
+            if(target) target.classList.add('drag-over');
         }
 
         function handleDragLeave(e) {
-            e.target.closest('.time-slot, .breakfast-plate')?.classList.remove('drag-over');
+             const target = e.target.closest('.time-slot, .breakfast-plate, .dropzone');
+            if(target) target.classList.remove('drag-over');
         }
 
         function handleDrop(e) {
@@ -2668,10 +2724,11 @@
         function handleSelection(item, itemName) {
             item.classList.toggle('selected');
             const pageType = getCurrentPageType();
+            if(!pageType) return;
             if (item.classList.contains('selected')) {
                 selectedItems[pageType].push(itemName);
                 createSoundEffect('✨', item);
-                handleTTSClick(item, itemName, 'Kore');
+                handleTTSClick(item, itemName, 'Ava');
             } else {
                 selectedItems[pageType] = selectedItems[pageType].filter(i => i !== itemName);
             }
@@ -2709,14 +2766,14 @@
             document.querySelectorAll('.selected-items .word-items').forEach(c => c.innerHTML = '');
             showCurrentView();
             createSoundEffect('🎯', document.body);
-            speakText('Starting a new adventure! Let us learn together again!', 'Kore');
+            handleTTSClick(null, 'Starting a new adventure! Let us learn together again!', 'Ava');
         }
 
         function reviewJourney() {
             currentFlowIndex = pageFlow.indexOf('page-0');
             showCurrentView();
             createSoundEffect('📖', document.body);
-            speakText('Let us review your amazing learning journey!', 'Kore');
+            handleTTSClick(null, 'Let us review your amazing learning journey!', 'Ava');
         }
 
         function updateSelectionDisplay(pageType) {
@@ -2744,7 +2801,7 @@
                     button.textContent = 'Start';
                     timerElement.textContent = `${minutes}:00`;
                     createSoundEffect('⏰', button);
-                    speakText(`${phase} time is finished!`, 'Kore');
+                    handleTTSClick(null, `${phase} time is finished!`, 'Ava');
                     earnTrophy();
                 }
             }, 1000);
@@ -2769,15 +2826,16 @@
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.getElementById(viewId)?.classList.add('active');
 
-            const isLearning = viewId.startsWith('learning-');
             document.getElementById('prevBtn').disabled = currentFlowIndex === 0;
             document.getElementById('nextBtn').disabled = currentFlowIndex === pageFlow.length - 1;
 
             updateProgress();
-            if (isLearning) {
+            if (viewId.startsWith('learning-')) {
                 startAutoLearning(viewId);
             } else if (viewId === 'page-1' || viewId === 'page-2') {
                 setTimeout(initializeDragAndDrop, 100);
+            } else if (viewId === 'page-verb-test') {
+                setTimeout(initializeVerbDragDrop, 100);
             }
         }
 
@@ -2813,7 +2871,7 @@
             showCurrentView();
             createFallingEmojis();
              document.body.addEventListener('click', (e) => {
-                if (e.target.matches('button')) {
+                if (e.target.closest('button')) {
                     playClickSound();
                 }
             });
@@ -2824,6 +2882,7 @@
             const cards = learningPage.querySelectorAll('.learning-card');
             const pageNum = viewId.split('-')[1];
             let currentCardIndex = 0;
+            
             const playNextCard = () => {
                 if (currentCardIndex >= cards.length) {
                     setTimeout(() => changePage(1), 1000);
@@ -2832,11 +2891,15 @@
                 const card = cards[currentCardIndex];
                 cards.forEach(c => c.classList.remove('active-learning'));
                 card.classList.add('active-learning');
-                speakText(card.dataset.word, card.dataset.voice, card);
+                handleTTSClick(card, card.dataset.word, card.dataset.voice);
                 const progressElement = document.getElementById(`learningProgress${pageNum}`);
                 if (progressElement) progressElement.textContent = `${currentCardIndex + 1}/${cards.length}`;
-                currentCardIndex++;
-                setTimeout(playNextCard, 6000);
+                
+                setTimeout(() => {
+                     card.classList.remove('active-learning');
+                     currentCardIndex++;
+                     playNextCard();
+                }, 6000)
             };
             setTimeout(playNextCard, 1000);
         }
@@ -2853,29 +2916,99 @@
         function repeatLearning(pageNum) {
             startAutoLearning(`learning-${pageNum}`);
         }
+        
+        // --- Verb Test Drag and Drop ---
+        function initializeVerbDragDrop() {
+            const verbItems = document.querySelectorAll('#verb-bank-items .word-item');
+            const dropzones = document.querySelectorAll('.dropzone');
+
+            verbItems.forEach((item, index) => {
+                item.id = `verb-${index}`; // Ensure each has a unique ID
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+                item.addEventListener('click', selectVerbForTap);
+            });
+            
+            dropzones.forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('drop', handleVerbDrop);
+                zone.addEventListener('dragenter', handleDragEnter);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('click', placeVerbOnTap);
+            });
+        }
+        
+        function selectVerbForTap(e) {
+            const currentSelected = document.querySelector('.word-item.selected-word');
+            if(currentSelected) currentSelected.classList.remove('selected-word');
+            
+            if(selectedVerbElement !== e.currentTarget) {
+                 e.currentTarget.classList.add('selected-word');
+                 selectedVerbElement = e.currentTarget;
+            } else {
+                selectedVerbElement = null; // Deselect if tapped again
+            }
+        }
+
+        function placeVerbOnTap(e) {
+            const dropzone = e.currentTarget;
+            if(selectedVerbElement && !dropzone.hasChildNodes()){
+                 // If dropzone has an old word, move it back to bank
+                if (dropzone.firstElementChild) {
+                    document.getElementById('verb-bank-items').appendChild(dropzone.firstElementChild);
+                }
+                dropzone.appendChild(selectedVerbElement);
+                dropzone.classList.add('filled');
+                selectedVerbElement.classList.remove('selected-word');
+                selectedVerbElement = null;
+            }
+        }
+
+        function handleVerbDrop(e) {
+            e.preventDefault();
+            const dropzone = e.target.closest('.dropzone');
+            dropzone.classList.remove('drag-over');
+            
+            const elementId = e.dataTransfer.getData('elementId');
+            const draggedElement = document.getElementById(elementId);
+            
+             // If dropzone has an old word, move it back to bank
+            if (dropzone.firstElementChild) {
+                document.getElementById('verb-bank-items').appendChild(dropzone.firstElementChild);
+            }
+
+            dropzone.innerHTML = ''; // Clear it before appending
+            dropzone.appendChild(draggedElement);
+            dropzone.classList.add('filled');
+        }
 
         function checkVerbAnswers() {
             let correctAnswers = 0;
-            const questions = document.querySelectorAll('#page-verb-test input[data-answer]');
-            questions.forEach(input => {
-                const userAnswer = input.value.trim().toLowerCase();
-                const correctAnswer = input.dataset.answer.toLowerCase();
-                input.classList.remove('correct', 'incorrect');
-                if (userAnswer === correctAnswer) {
-                    input.classList.add('correct');
-                    correctAnswers++;
+            const dropzones = document.querySelectorAll('#page-verb-test .dropzone');
+            dropzones.forEach(zone => {
+                zone.classList.remove('correct', 'incorrect');
+                const droppedWord = zone.querySelector('.word-item');
+                if (droppedWord) {
+                    const userAnswer = droppedWord.dataset.verb.trim().toLowerCase();
+                    const correctAnswer = zone.dataset.answer.toLowerCase();
+                    if (userAnswer === correctAnswer) {
+                        zone.classList.add('correct');
+                        correctAnswers++;
+                    } else {
+                        zone.classList.add('incorrect');
+                    }
                 } else {
-                    input.classList.add('incorrect');
+                     zone.classList.add('incorrect'); // Mark empty as incorrect
                 }
             });
             const resultsContainer = document.getElementById('verbTestResults');
-            resultsContainer.textContent = `You got ${correctAnswers} out of ${questions.length} correct!`;
-            if (correctAnswers === questions.length) {
+            resultsContainer.textContent = `You got ${correctAnswers} out of ${dropzones.length} correct!`;
+            if (correctAnswers === dropzones.length) {
                 resultsContainer.textContent += ' 🎉 Great job!';
-                speakText('Wow, you got them all right! Great job!', 'Fenrir');
+                handleTTSClick(null, 'Wow, you got them all right! Great job!', 'Brian');
                 earnTrophy();
             } else {
-                 speakText(`You got ${correctAnswers} out of ${questions.length} correct. Keep practicing!`, 'Kore');
+                 handleTTSClick(null, `You got ${correctAnswers} out of ${dropzones.length} correct. Keep practicing!`, 'Ava');
             }
         }
     </script>
