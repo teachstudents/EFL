@@ -120,7 +120,7 @@
             <header class="flex-shrink-0">
                 <div class="flex justify-between items-center mb-2">
                     <div class="w-1/3 text-left">
-                        <button id="back-to-topics-btn" class="text-gray-700 dark:text-gray-200 hover:underline"><i class="fas fa-arrow-left mr-2"></i>Back to Topics</button>
+                        <button id="back-to-topics-btn" class="hover:underline" style="color: #FFFFFF;"><i class="fas fa-arrow-left mr-2"></i>Back to Topics</button>
                     </div>
                     <div class="w-1/3 text-center">
                         <button id="feedback-btn" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg text-sm shadow-md">
@@ -128,7 +128,7 @@
                         </button>
                     </div>
                     <div class="w-1/3 text-right">
-                        <button id="next-btn" class="hidden text-green-500 hover:text-green-700 font-bold">Next Question<i class="fas fa-arrow-right ml-2"></i></button>
+                        <button id="next-btn" class="hidden font-bold" style="color: #FFFFFF;">Next Question<i class="fas fa-arrow-right ml-2"></i></button>
                     </div>
                 </div>
                 <!-- Timer Display -->
@@ -480,7 +480,8 @@
         // --- State Variables ---
         let userName = '';
         let currentQuestionIndex = 0;
-        let currentQuestions = [];
+        let masterQuestionList = [];
+        let currentQuestions = []; // This will now be the master list during practice
         let timerInterval;
         let mediaRecorder;
         let audioChunks = [];
@@ -537,18 +538,31 @@
             });
         }
 
-        function speak(text, isFeedback = false) {
-            if (!ttsInitialized) return;
+        function speak(text) {
+            if (!ttsInitialized || !synth || !text) {
+                console.warn("TTS not ready or text is empty.");
+                return;
+            }
+
             try {
-                if (synth.speaking) synth.cancel();
-                const utterThis = new SpeechSynthesisUtterance(text);
-                utterThis.onerror = (event) => console.error('SpeechSynthesisUtterance.onerror', event);
-                if (preferredVoice) utterThis.voice = preferredVoice;
-                utterThis.pitch = 1;  
-                utterThis.rate = 0.85; // Slow down speech as requested
-                synth.speak(utterThis);
+                if (synth.speaking) {
+                    synth.cancel();
+                }
+                setTimeout(() => {
+                    const utterThis = new SpeechSynthesisUtterance(text);
+                    utterThis.onerror = (event) => {
+                        console.error(`SpeechSynthesisUtterance.onerror: ${event.error}`, { text: text });
+                    };
+                    if (preferredVoice) {
+                        utterThis.voice = preferredVoice;
+                    }
+                    utterThis.pitch = 1;
+                    utterThis.rate = 0.85;
+                    synth.speak(utterThis);
+                }, 100); 
+
             } catch (e) {
-                console.error("Speech synthesis failed:", e);
+                console.error("Speech synthesis 'speak' function threw an exception:", e);
             }
         }
 
@@ -558,7 +572,6 @@
             if (savedCompletedTopics) {
                 try {
                     const parsed = JSON.parse(savedCompletedTopics);
-                    // Basic validation to ensure it's an object
                     if (typeof parsed === 'object' && parsed !== null) {
                         completedTopics = parsed;
                     } else {
@@ -566,7 +579,7 @@
                     }
                 } catch (e) {
                     console.error("Failed to parse saved progress:", e);
-                    completedTopics = {}; // Reset progress if data is corrupt
+                    completedTopics = {};
                 }
             }
             const savedName = localStorage.getItem('languagePracticeUserName');
@@ -581,7 +594,7 @@
             if(userName) localStorage.setItem('languagePracticeUserName', userName);
         }
 
-        // --- UI Initialization ---
+        // --- UI Initialization & Data Setup ---
         function initializeTopics() {
             topicSelection.innerHTML = '';
             for (const topic in practiceData) {
@@ -589,7 +602,7 @@
                 
                 let checkmark = '';
                 if (completedTopics && completedTopics[topic]) {
-                    checkmark = `<i class="fas fa-check-circle text-green-500 ml-2"></i>`;
+                    checkmark = `<i class="fas fa-check-circle ml-2" style="color: #0000FF;"></i>`;
                     button.className = "w-full bg-green-100 dark:bg-green-900/50 p-2 rounded-lg shadow-md hover:bg-green-200 dark:hover:bg-green-800/60 transition-colors flex items-center justify-center";
                 } else {
                     button.className = "w-full bg-white dark:bg-gray-700 p-2 rounded-lg shadow-md hover:bg-indigo-100 dark:hover:bg-indigo-800 transition-all transform hover:scale-105 flex items-center justify-center";
@@ -601,12 +614,22 @@
                 topicSelection.appendChild(button);
             }
         }
+        
+        function createMasterList() {
+            masterQuestionList = [];
+            for (const topic in practiceData) {
+                practiceData[topic].forEach(question => {
+                    masterQuestionList.push({ ...question, topicName: topic });
+                });
+            }
+        }
 
         // --- Core App Logic ---
         function startPractice(topic) {
-            currentQuestions = practiceData[topic];
-            currentQuestions.topicName = topic;
-            currentQuestionIndex = 0;
+            const startIndex = masterQuestionList.findIndex(q => q.topicName === topic);
+            currentQuestionIndex = (startIndex !== -1) ? startIndex : 0;
+            currentQuestions = masterQuestionList;
+            
             welcomeScreen.classList.add('hidden');
             practiceScreen.classList.remove('hidden');
             certificateScreen.classList.add('hidden');
@@ -616,20 +639,35 @@
         }
 
         function showQuestion() {
+            if (currentQuestionIndex > 0) {
+                const prevQuestion = currentQuestions[currentQuestionIndex - 1];
+                const currentQuestion = currentQuestions[currentQuestionIndex];
+                if (currentQuestion && prevQuestion.topicName !== currentQuestion.topicName) {
+                    if (!completedTopics[prevQuestion.topicName]) {
+                        completedTopics[prevQuestion.topicName] = true;
+                        saveProgress();
+                    }
+                }
+            }
+
             if (currentQuestionIndex >= currentQuestions.length) {
-                phaseIndicator.textContent = "Topic Complete!";
-                questionText.textContent = "You've finished this topic. Well done!";
-                completedTopics[currentQuestions.topicName] = true;
-                saveProgress();
-                checkAllTopicsCompleted();
-                resetRecordingUI();
+                if (currentQuestions.length > 0) {
+                    const lastTopicName = currentQuestions[currentQuestions.length - 1].topicName;
+                     if (!completedTopics[lastTopicName]) {
+                        completedTopics[lastTopicName] = true;
+                        saveProgress();
+                    }
+                }
+                phaseIndicator.textContent = "All topics complete!";
+                questionText.textContent = "You've finished everything. Fantastic work!";
+                speak("You've finished everything. Fantastic work!");
                 nextBtn.classList.add('hidden');
                 feedbackBtn.classList.add('hidden');
-                speak("You've completed this topic! Well done.");
+                showCertificate();
                 return;
             }
 
-            nextBtn.disabled = false; // Re-enable button for the new question
+            nextBtn.disabled = false;
 
             const item = currentQuestions[currentQuestionIndex];
             resetUIForNewQuestion();
@@ -641,7 +679,6 @@
 
             speak(fullQuestion);
             
-            // Populate Sentence Starters
             if (item.starters && item.starters.length > 0) {
                 startersList.innerHTML = '';
                 item.starters.forEach(starter => {
@@ -653,7 +690,6 @@
                 startersContainer.classList.remove('hidden');
             }
 
-            // Populate Word Bank
             if (item.wordBank && item.wordBank.length > 0) {
                 wordBankList.innerHTML = '';
                 item.wordBank.forEach(word => {
@@ -665,9 +701,9 @@
                 wordBankContainer.classList.remove('hidden');
             }
 
-            const responseTime = item.timer || DEFAULT_RESPONSE_TIME;
-            phaseIndicator.textContent = `Prepare & Record (Question ${currentQuestionIndex + 1} of ${currentQuestions.length})`;
+            phaseIndicator.textContent = `${item.topicName} (Question ${currentQuestionIndex + 1} of ${currentQuestions.length})`;
             
+            const responseTime = item.timer || DEFAULT_RESPONSE_TIME;
             startTimer(responseTime, () => {
                 if (mediaRecorder && mediaRecorder.state === 'recording') {
                     stopRecording();
@@ -676,15 +712,6 @@
                 recordBtn.disabled = true;
                 recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
             });
-        }
-        
-        // --- Certificate Logic ---
-        function checkAllTopicsCompleted() {
-            const totalTopics = Object.keys(practiceData).length;
-            const completedCount = Object.keys(completedTopics).length;
-            if (completedCount === totalTopics) {
-                showCertificate();
-            }
         }
         
         function showCertificate() {
@@ -700,7 +727,7 @@
             errorMessagebox.classList.remove('hidden');
             setTimeout(() => {
                 errorMessagebox.classList.add('hidden');
-            }, 5000); // Hide after 5 seconds
+            }, 5000);
         }
 
         // --- Recording & Transcription Logic ---
@@ -711,7 +738,6 @@
             }
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                
                 const isMobileEdge = /Edg\/\d+.*Android/.test(navigator.userAgent);
                 let options = {};
                 if (!isMobileEdge) {
@@ -836,7 +862,6 @@
             recordedBlob = null;
             finalTranscript = '';
         }
-
         
         // --- Snowfall Logic ---
         function createSnow() {
@@ -847,14 +872,13 @@
                 snowflake.innerHTML = '❄';
                 snowflake.classList.add('snowflake');
                 snowflake.style.left = Math.random() * 100 + 'vw';
-                snowflake.style.animationDuration = Math.random() * 5 + 5 + 's'; // 5-10 seconds
+                snowflake.style.animationDuration = Math.random() * 5 + 5 + 's';
                 snowflake.style.animationDelay = Math.random() * 5 + 's';
                 snowflake.style.fontSize = Math.random() * 1.5 + 0.5 + 'em';
                 snowflake.style.opacity = Math.random();
                 snowContainer.appendChild(snowflake);
             }
         }
-
 
         // --- Event Listeners ---
         startWithNameBtn.addEventListener('click', () => {
@@ -865,7 +889,6 @@
                 userNameDisplay.textContent = userName;
                 topicSelectionContainer.classList.remove('hidden');
             } else {
-                // Using a custom message box instead of alert()
                 const nameError = document.createElement('div');
                 nameError.textContent = "Please enter your name.";
                 nameError.className = "text-red-500 text-sm mt-2";
@@ -877,7 +900,6 @@
         recordBtn.addEventListener('click', startRecording);
         stopRecordBtn.addEventListener('click', stopRecording);
         
-        // --- Certificate Download ---
         downloadCertificateBtn.addEventListener('click', () => {
           const certificateNode = document.getElementById('certificate-to-download');
           const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -907,17 +929,15 @@
             initializeTopics();
         });
 
-        // --- Recording Download ---
         downloadBtn.addEventListener('click', () => {
             if (recordedBlob) {
-                const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
+                const topicName = currentQuestions[currentQuestionIndex].topicName.replace(/\s+/g, '_');
                 const sanitizedUserName = userName.replace(/\s+/g, '_');
                 const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
                 const blobUrl = URL.createObjectURL(recordedBlob);
                 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
                 if (isIOS) {
-                    // Open tab immediately to avoid Safari popup block
                     const newTab = window.open();
                     if (newTab) newTab.location = blobUrl;
                 } else {
@@ -930,7 +950,6 @@
                     document.body.removeChild(a);
                 }
 
-                // Visual feedback
                 const originalText = downloadBtn.innerHTML;
                 downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
                 downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
@@ -942,7 +961,6 @@
                 }, 2000);
 
             } else {
-                // No recording — open SharePoint folder
                 window.open(
                     'https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ',
                     '_blank'
@@ -951,7 +969,7 @@
         });
 
         nextBtn.addEventListener('click', () => {
-            nextBtn.disabled = true; // Prevent double-clicks
+            nextBtn.disabled = true;
             currentQuestionIndex++;
             showQuestion();
         });
@@ -960,6 +978,7 @@
             practiceScreen.classList.add('hidden');
             welcomeScreen.classList.remove('hidden');
             clearInterval(timerInterval);
+            speak(''); // Cancel any ongoing speech
             initializeTopics();
         });
 
@@ -969,8 +988,11 @@
                 return;
             }
 
+            const currentTopicName = masterQuestionList[currentQuestionIndex].topicName;
+            const questionsForCurrentTopic = practiceData[currentTopicName];
+
             samplesList.innerHTML = ''; 
-            currentQuestions.forEach((questionItem, index) => {
+            questionsForCurrentTopic.forEach((questionItem, index) => {
                 const questionHeader = document.createElement('h4');
                 questionHeader.textContent = `Q${index + 1}: ${questionItem.question}`;
                 questionHeader.className = 'font-bold text-white text-sm mt-2 first:mt-0';
@@ -1010,6 +1032,7 @@
             
             await initializeTTS().catch(err => console.error(err));
             
+            createMasterList();
             createSnow();
             loadProgress();
             initializeTopics();
