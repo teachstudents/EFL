@@ -190,6 +190,92 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
 
+        .audio-btn:disabled {
+            background: linear-gradient(145deg, #ccc, #999);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .replay-section {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: none;
+        }
+
+        .replay-btn {
+            background: linear-gradient(145deg, #FF6B35, #F7931E);
+            border: none;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .replay-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .replay-btn:disabled {
+            background: linear-gradient(145deg, #ccc, #999);
+            cursor: not-allowed;
+            animation: none;
+            transform: none;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3); }
+            50% { box-shadow: 0 8px 25px rgba(255, 107, 53, 0.6), 0 0 30px rgba(255, 107, 53, 0.4); }
+            100% { box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3); }
+        }
+
+        .difficulty-indicator {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+        }
+
+        .difficulty-easy { color: #4CAF50; }
+        .difficulty-medium { color: #FF9800; }
+        .difficulty-hard { color: #F44336; }
+
+        .streak-indicator {
+            position: absolute;
+            top: 130px;
+            right: 20px;
+            background: linear-gradient(145deg, #FFD700, #FFA000);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            display: none;
+            animation: streakGlow 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes streakGlow {
+            0% { box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3); }
+            100% { box-shadow: 0 5px 15px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5); }
+        }
+
         .game-area {
             display: flex;
             flex: 1;
@@ -767,6 +853,23 @@
             <div style="margin-top: 5px; font-size: 16px;">Grade <span id="currentGradeDisplay">10</span></div>
         </div>
 
+        <!-- Difficulty Indicator -->
+        <div class="difficulty-indicator" id="difficultyIndicator">
+            <span id="difficultyText">🟢 Easy</span>
+        </div>
+
+        <!-- Streak Indicator -->
+        <div class="streak-indicator" id="streakIndicator">
+            🔥 Streak: <span id="streakCount">0</span>
+        </div>
+
+        <!-- Audio Replay Button -->
+        <div class="replay-section" id="replaySection">
+            <button class="replay-btn" id="replayBtn" onclick="replayAudio()" title="Replay Audio (1 time only)">
+                🔊
+            </button>
+        </div>
+
         <div class="top-section">
             <div class="control-buttons">
                 <button class="control-btn" onclick="backToMenu()">🏠 Menu</button>
@@ -844,7 +947,9 @@
     </div>
 
     <script>
-        // Student names by grade
+        // ========================================
+        // 📚 STUDENT NAMES SECTION - DRAG & DROP TO REPLACE
+        // ========================================
         const studentsByGrade = {
             10: [
                 "冯奕尘 / FENG, YICHEN", "黄若涵 / HUANG, RUOHAN", "李丰屹 / LI, FENGYI", 
@@ -853,6 +958,7 @@
                 "庞云蔚 / PANG, YUNWEI", "曲家瑞 / QU, JIARUI", "孙诗童 / SUN, SHITONG",
                 "王子言 / WANG, ZIYAN", "杨晴珺 / YANG, QINGJUN", "张宸恺 / ZHANG, CHENKAI",
                 "赵浩文 / ZHAO, HAOWEN", "徐浚洹 / JUN, HUANXU"
+                // ADD NEW GRADE 10 STUDENTS HERE - FORMAT: "中文名 / ENGLISH NAME"
             ],
             11: [
                 "陈峻弘 / CHEN, JUNHONG", "韩睿雄 / HAN, RUIXIONG", "何怡敏 / HE, YIMIN",
@@ -860,6 +966,7 @@
                 "刘圃言 / LIU, PUYAN", "庞泽霖 / PANG, ZELIN", "王梓晗 / WANG, ZIHAN",
                 "尹九思 / YIN, JIUSI", "游项雯 / YOU, XIANGWEN", "于浚哲 / YU, JUNZHE",
                 "臧姝婷 / ZANG, SHUTING", "张澜馨 / ZHANG, LANXIN"
+                // ADD NEW GRADE 11 STUDENTS HERE - FORMAT: "中文名 / ENGLISH NAME"
             ],
             12: [
                 "安政聿 / AN, ZHENGYU", "蔡子墨 / CAI, ZIMO", "刘镇榕 / LIU, ZHENRONG",
@@ -867,6 +974,7 @@
                 "唐可盈 / TANG, KEYING", "田子凡 / TIAN, ZIFAN", "谢斯飞 / XIE, SIFEI",
                 "杨加麒 / YANG, JIAQI", "张程皓 / ZHANG, CHENGHAO", "赵晨达鑫 / ZHAO, CHENDAXIN",
                 "周逸凡 / ZHOU, YIFAN"
+                // ADD NEW GRADE 12 STUDENTS HERE - FORMAT: "中文名 / ENGLISH NAME"
             ]
         };
 
@@ -880,32 +988,243 @@
         let usedPlayers = [];
         let playerScores = {};
         let globalLeaderboard = {}; // Track all-time scores
+        let playerStreaks = {}; // Track consecutive correct answers
         let timeLeft = 10;
         let timerInterval;
         let gameActive = false;
         let currentQuestionData = null;
+        let audioReplaysUsed = {}; // Track audio replays per player per question
 
-        // Time expressions for questions
-        const timeExpressions = [
-            { time: "2:15 PM", spoken: "quarter past two", alternatives: ["two fifteen", "fifteen past two"] },
-            { time: "2:45 PM", spoken: "quarter to three", alternatives: ["two forty-five", "fifteen to three"] },
-            { time: "3:10 PM", spoken: "ten past three", alternatives: ["three ten", "ten after three"] },
-            { time: "3:50 PM", spoken: "ten to four", alternatives: ["three fifty", "ten before four"] },
-            { time: "4:15 PM", spoken: "quarter past four", alternatives: ["four fifteen", "fifteen past four"] },
-            { time: "4:45 PM", spoken: "quarter to five", alternatives: ["four forty-five", "fifteen to five"] },
-            { time: "5:10 PM", spoken: "ten past five", alternatives: ["five ten", "ten after five"] },
-            { time: "5:50 PM", spoken: "ten to six", alternatives: ["five fifty", "ten before six"] },
-            { time: "6:15 PM", spoken: "quarter past six", alternatives: ["six fifteen", "fifteen past six"] },
-            { time: "6:45 PM", spoken: "quarter to seven", alternatives: ["six forty-five", "fifteen to seven"] },
-            { time: "7:10 PM", spoken: "ten past seven", alternatives: ["seven ten", "ten after seven"] },
-            { time: "7:50 PM", spoken: "ten to eight", alternatives: ["seven fifty", "ten before eight"] },
-            { time: "8:30 AM", spoken: "half past eight", alternatives: ["eight thirty", "thirty past eight"] },
-            { time: "9:00 AM", spoken: "nine o'clock", alternatives: ["nine", "nine sharp"] },
-            { time: "10:20 AM", spoken: "twenty past ten", alternatives: ["ten twenty", "twenty after ten"] },
-            { time: "11:40 AM", spoken: "twenty to twelve", alternatives: ["eleven forty", "twenty before twelve"] },
-            { time: "12:00 PM", spoken: "twelve noon", alternatives: ["midday", "twelve o'clock"] },
-            { time: "1:30 PM", spoken: "half past one", alternatives: ["one thirty", "thirty past one"] }
+        // ========================================
+        // 🎯 QUESTION DATABASE - DRAG & DROP TO REPLACE
+        // ========================================
+        
+        // EASY QUESTIONS (Questions 1-3) - Simple times, clear contexts
+        const easyTimeExpressions = [
+            { 
+                time: "9:00 AM", 
+                display: "9:00 AM",
+                color: "#4CAF50",
+                spoken: "nine o'clock", 
+                alternatives: ["nine", "nine sharp"],
+                category: "daily_routine"
+            },
+            { 
+                time: "12:00 PM", 
+                display: "12:00 PM",
+                color: "#FF9800",
+                spoken: "twelve noon", 
+                alternatives: ["midday", "twelve o'clock"],
+                category: "daily_routine"
+            },
+            { 
+                time: "6:00 PM", 
+                display: "6:00 PM",
+                color: "#9C27B0",
+                spoken: "six o'clock", 
+                alternatives: ["six", "six sharp"],
+                category: "daily_routine"
+            },
+            { 
+                time: "8:30 AM", 
+                display: "8:30 AM",
+                color: "#2196F3",
+                spoken: "half past eight", 
+                alternatives: ["eight thirty", "thirty past eight"],
+                category: "schedule"
+            },
+            { 
+                time: "1:30 PM", 
+                display: "1:30 PM",
+                color: "#FF5722",
+                spoken: "half past one", 
+                alternatives: ["one thirty", "thirty past one"],
+                category: "appointment"
+            },
+            { 
+                time: "7:30 PM", 
+                display: "7:30 PM",
+                color: "#795548",
+                spoken: "half past seven", 
+                alternatives: ["seven thirty", "thirty past seven"],
+                category: "daily_routine"
+            }
         ];
+
+        // MEDIUM QUESTIONS (Questions 4-7) - Quarter hours and specific minutes
+        const mediumTimeExpressions = [
+            { 
+                time: "2:15 PM", 
+                display: "2:15 PM",
+                color: "#E91E63",
+                spoken: "quarter past two", 
+                alternatives: ["two fifteen", "fifteen past two"],
+                category: "appointment"
+            },
+            { 
+                time: "4:45 PM", 
+                display: "4:45 PM",
+                color: "#673AB7",
+                spoken: "quarter to five", 
+                alternatives: ["four forty-five", "fifteen to five"],
+                category: "schedule"
+            },
+            { 
+                time: "10:15 AM", 
+                display: "10:15 AM",
+                color: "#009688",
+                spoken: "quarter past ten", 
+                alternatives: ["ten fifteen", "fifteen past ten"],
+                category: "daily_routine"
+            },
+            { 
+                time: "3:45 PM", 
+                display: "3:45 PM",
+                color: "#FF6B35",
+                spoken: "quarter to four", 
+                alternatives: ["three forty-five", "fifteen to four"],
+                category: "appointment"
+            },
+            { 
+                time: "11:20 AM", 
+                display: "11:20 AM",
+                color: "#8BC34A",
+                spoken: "twenty past eleven", 
+                alternatives: ["eleven twenty", "twenty after eleven"],
+                category: "schedule"
+            },
+            { 
+                time: "5:40 PM", 
+                display: "5:40 PM",
+                color: "#FFC107",
+                spoken: "twenty to six", 
+                alternatives: ["five forty", "twenty before six"],
+                category: "daily_routine"
+            }
+        ];
+
+        // HARD QUESTIONS (Questions 8-10) - Complex times and tricky contexts
+        const hardTimeExpressions = [
+            { 
+                time: "3:07 AM", 
+                display: "3:07 AM",
+                color: "#607D8B",
+                spoken: "seven minutes past three", 
+                alternatives: ["three oh seven", "seven after three"],
+                category: "appointment"
+            },
+            { 
+                time: "11:53 PM", 
+                display: "11:53 PM",
+                color: "#9E9E9E",
+                spoken: "seven minutes to twelve", 
+                alternatives: ["eleven fifty-three", "seven before midnight"],
+                category: "schedule"
+            },
+            { 
+                time: "6:22 AM", 
+                display: "6:22 AM",
+                color: "#FF4081",
+                spoken: "twenty-two minutes past six", 
+                alternatives: ["six twenty-two", "twenty-two after six"],
+                category: "daily_routine"
+            },
+            { 
+                time: "9:38 PM", 
+                display: "9:38 PM",
+                color: "#536DFE",
+                spoken: "twenty-two minutes to ten", 
+                alternatives: ["nine thirty-eight", "twenty-two before ten"],
+                category: "appointment"
+            },
+            { 
+                time: "4:13 PM", 
+                display: "4:13 PM",
+                color: "#1DE9B6",
+                spoken: "thirteen minutes past four", 
+                alternatives: ["four thirteen", "thirteen after four"],
+                category: "schedule"
+            },
+            { 
+                time: "8:47 AM", 
+                display: "8:47 AM",
+                color: "#FF6D00",
+                spoken: "thirteen minutes to nine", 
+                alternatives: ["eight forty-seven", "thirteen before nine"],
+                category: "daily_routine"
+            }
+        ];
+
+        // ========================================
+        // 📝 CONVERSATION TEMPLATES - DRAG & DROP TO REPLACE
+        // ========================================
+        
+        const conversationTemplates = {
+            // EASY CONVERSATIONS - Simple, direct
+            easy: {
+                daily_routine: [
+                    "I wake up at {time} every morning. My alarm goes off at {time} sharp.",
+                    "Breakfast is served at {time}. The dining hall opens at {time}.",
+                    "School starts at {time}. Don't be late! Classes begin at {time}.",
+                    "I go to bed at {time}. Lights out at {time} every night."
+                ],
+                schedule: [
+                    "The meeting is at {time}. Please arrive by {time}.",
+                    "The bus leaves at {time}. Departure time is {time}.",
+                    "The movie starts at {time}. Show time is {time}.",
+                    "The store opens at {time}. Opening time is {time}."
+                ],
+                appointment: [
+                    "Your appointment is at {time}. See you at {time}.",
+                    "The doctor will see you at {time}. Your slot is {time}.",
+                    "Let's meet at {time}. I'll be there at {time}.",
+                    "The interview is scheduled for {time}. Please come at {time}."
+                ]
+            },
+            
+            // MEDIUM CONVERSATIONS - More context, some distractors
+            medium: {
+                appointment: [
+                    "Can we meet at {distractor1}? Actually, I have a conflict. How about {time}? Yes, {time} works perfectly!",
+                    "I thought our appointment was at {distractor1}, but I checked my calendar and it's actually {time}. So {time} it is!",
+                    "The original time was {distractor1}, but we moved it to {time}. The new time is {time}."
+                ],
+                schedule: [
+                    "The train usually leaves at {distractor1}, but today it departs at {time}. Make sure you're there by {time}.",
+                    "Class was supposed to start at {distractor1}, but it's been changed to {time}. New start time is {time}.",
+                    "The event begins at {time}. Not {distractor1} like last week, but {time} today."
+                ],
+                daily_routine: [
+                    "I used to have lunch at {distractor1}, but now I eat at {time}. My new lunch time is {time}.",
+                    "The gym closes at {distractor1} on weekdays, but today it closes at {time}. So we need to finish by {time}.",
+                    "My work schedule changed from {distractor1} to {time}. I now start at {time}."
+                ]
+            },
+            
+            // HARD CONVERSATIONS - Complex contexts, multiple distractors
+            hard: {
+                appointment: [
+                    "The appointment was moved from {distractor1} to {distractor2}, then finally to {time}. So the confirmed time is {time}.",
+                    "I suggested {distractor1}, but that doesn't work. Then we tried {distractor2}, but that's also busy. Let's do {time} instead. {time} is perfect.",
+                    "Originally it was {distractor1}, then we changed it to {distractor2}, but now it's definitely {time}. Final time: {time}."
+                ],
+                schedule: [
+                    "The conference call was at {distractor1} yesterday, {distractor2} last week, but today it's at {time}. Today's time is {time}.",
+                    "Flight departures: Gate A at {distractor1}, Gate B at {distractor2}, but our Gate C flight leaves at {time}. Our departure is {time}.",
+                    "Morning shift starts at {distractor1}, afternoon at {distractor2}, but night shift begins at {time}. Night shift time: {time}."
+                ],
+                daily_routine: [
+                    "Breakfast is from {distractor1} to {distractor2}, but today it starts early at {time}. Today's breakfast time: {time}.",
+                    "The library opens at {distractor1} on weekdays, {distractor2} on weekends, but today it opens at {time}. Today's opening: {time}.",
+                    "Regular hours are {distractor1} to {distractor2}, but today we're open from {time}. Today we start at {time}."
+                ]
+            }
+        };
+
+        // ADD NEW QUESTIONS HERE:
+        // 1. Add to appropriate difficulty array (easy/medium/hard)
+        // 2. Include: time, display, color, spoken, alternatives, category
+        // 3. Add matching conversation templates above
 
         // TTS Voices - Microsoft Edge high quality voices
         const voices = ['Microsoft Ava Online (Natural) - English (United States)', 'Microsoft Brian Online (Natural) - English (United States)', 'Microsoft William Online (Natural) - English (United States)', 'Microsoft Andrew Online (Natural) - English (United States)', 'Microsoft Emma Online (Natural) - English (United States)'];
@@ -960,11 +1279,15 @@
             currentPlayers = [];
             usedPlayers = [];
             playerScores = {};
+            playerStreaks = {};
+            audioReplaysUsed = {};
             
-            // Hide all overlays
+            // Hide all overlays and UI elements
             document.getElementById('leaderboard').style.display = 'none';
             document.getElementById('learningPhase').style.display = 'none';
             document.getElementById('nameShuffle').style.display = 'none';
+            document.getElementById('replayBtn').style.display = 'none';
+            document.getElementById('streakIndicator').style.display = 'none';
             
             // Show menu, hide game
             document.getElementById('gameContainer').style.display = 'none';
@@ -987,106 +1310,119 @@
             }, 1000);
         }
 
-        // Generate listening comprehension question
+        // ========================================
+        // 🎯 QUESTION GENERATION ENGINE
+        // ========================================
+        
         function generateQuestion() {
-            const correctTime = timeExpressions[Math.floor(Math.random() * timeExpressions.length)];
-            const distractorTimes = timeExpressions.filter(t => t !== correctTime)
+            // Determine difficulty based on question number
+            let difficulty, timePool, templatePool;
+            
+            if (currentQuestion <= 3) {
+                difficulty = 'easy';
+                timePool = easyTimeExpressions;
+                templatePool = conversationTemplates.easy;
+            } else if (currentQuestion <= 7) {
+                difficulty = 'medium';
+                timePool = mediumTimeExpressions;
+                templatePool = conversationTemplates.medium;
+            } else {
+                difficulty = 'hard';
+                timePool = hardTimeExpressions;
+                templatePool = conversationTemplates.hard;
+            }
+            
+            // Update difficulty indicator
+            updateDifficultyIndicator(difficulty);
+            
+            // Select correct time from appropriate pool
+            const correctTime = timePool[Math.floor(Math.random() * timePool.length)];
+            
+            // Get all possible times for distractors (from all pools)
+            const allTimes = [...easyTimeExpressions, ...mediumTimeExpressions, ...hardTimeExpressions];
+            const distractorTimes = allTimes.filter(t => t.time !== correctTime.time)
                 .sort(() => Math.random() - 0.5)
                 .slice(0, 3);
 
             // Create the 4 choices (correct + 3 distractors)
             const choices = [correctTime, ...distractorTimes];
             
-            // Create shorter conversation with time mentions
-            const conversations = [
-                {
-                    script: `Can we meet at ${distractorTimes[0].spoken}? Actually, I have an appointment then. How about ${correctTime.spoken}? Yes, ${correctTime.spoken} works perfectly!`,
-                    correctAnswer: correctTime
-                },
-                {
-                    script: `The meeting was at ${distractorTimes[0].spoken}, but we changed it to ${correctTime.spoken}. So it's ${correctTime.spoken} now.`,
-                    correctAnswer: correctTime
-                },
-                {
-                    script: `I suggested ${distractorTimes[0].spoken}, but that doesn't work. Let's do ${correctTime.spoken} instead. ${correctTime.spoken} is perfect.`,
-                    correctAnswer: correctTime
-                },
-                {
-                    script: `The train leaves at ${distractorTimes[0].spoken}. Wait, no, that's the wrong schedule. It actually departs at ${correctTime.spoken}. Make sure you're there by ${correctTime.spoken}.`,
-                    correctAnswer: correctTime
-                },
-                {
-                    script: `My appointment is at ${correctTime.spoken}. I thought it was ${distractorTimes[0].spoken}, but I checked and it's definitely ${correctTime.spoken}.`,
-                    correctAnswer: correctTime
-                },
-                {
-                    script: `The movie starts at ${distractorTimes[0].spoken}. Oh wait, I'm looking at yesterday's schedule. Today it starts at ${correctTime.spoken}. So ${correctTime.spoken} it is!`,
-                    correctAnswer: correctTime
-                },
-                {
-                    script: `Class begins at ${correctTime.spoken}. Don't be late! Remember, ${correctTime.spoken} sharp. Not ${distractorTimes[0].spoken} like last week.`,
-                    correctAnswer: correctTime
-                },
-                {
-                    script: `The bus comes at ${distractorTimes[0].spoken} on weekdays, but today it's ${correctTime.spoken}. So we need to be ready by ${correctTime.spoken}.`,
-                    correctAnswer: correctTime
-                },
-                {
-                    script: `I'll pick you up at ${correctTime.spoken}. Not ${distractorTimes[0].spoken} like we originally planned. The new time is ${correctTime.spoken}.`,
-                    correctAnswer: correctTime
-                },
-                {
-                    script: `The store closes at ${distractorTimes[0].spoken} on weekdays, but today they close at ${correctTime.spoken}. We need to get there before ${correctTime.spoken}.`,
-                    correctAnswer: correctTime
-                },
-                {
-                    script: `Lunch is served from ${distractorTimes[0].spoken} to ${distractorTimes[1].spoken}, but today it starts at ${correctTime.spoken}. So lunch begins at ${correctTime.spoken}.`,
-                    correctAnswer: correctTime
-                },
-                {
-                    script: `The conference call was moved from ${distractorTimes[0].spoken} to ${correctTime.spoken}. Please join us at ${correctTime.spoken} instead.`,
-                    correctAnswer: correctTime
-                }
-            ];
-
-            const selectedConversation = conversations[Math.floor(Math.random() * conversations.length)];
+            // Generate conversation based on difficulty and category
+            const categoryTemplates = templatePool[correctTime.category];
+            const template = categoryTemplates[Math.floor(Math.random() * categoryTemplates.length)];
+            
+            let script = template;
+            
+            // Replace placeholders based on difficulty
+            if (difficulty === 'easy') {
+                script = script.replace(/{time}/g, correctTime.spoken);
+            } else if (difficulty === 'medium') {
+                script = script.replace(/{time}/g, correctTime.spoken)
+                             .replace(/{distractor1}/g, distractorTimes[0].spoken);
+            } else { // hard
+                script = script.replace(/{time}/g, correctTime.spoken)
+                             .replace(/{distractor1}/g, distractorTimes[0].spoken)
+                             .replace(/{distractor2}/g, distractorTimes[1].spoken);
+            }
             
             // Shuffle choices for each player column
             const player1Choices = [...choices].sort(() => Math.random() - 0.5);
             const player2Choices = [...choices].sort(() => Math.random() - 0.5);
             const player3Choices = [...choices].sort(() => Math.random() - 0.5);
             
-            // Update button labels with shuffled choices for each player
+            // Update button labels with shuffled choices and colors
             const buttons = document.querySelectorAll('.choice-button');
             
             // Player 1 buttons (0-3)
             player1Choices.forEach((choice, index) => {
-                buttons[index].textContent = choice.time;
-                buttons[index].classList.remove('correct');
+                buttons[index].innerHTML = `<span style="color: ${choice.color}; font-weight: bold;">${choice.display}</span>`;
+                buttons[index].classList.remove('correct', 'incorrect');
                 buttons[index].disabled = false;
+                buttons[index].style.opacity = '1';
             });
             
             // Player 2 buttons (4-7)
             player2Choices.forEach((choice, index) => {
-                buttons[index + 4].textContent = choice.time;
-                buttons[index + 4].classList.remove('correct');
+                buttons[index + 4].innerHTML = `<span style="color: ${choice.color}; font-weight: bold;">${choice.display}</span>`;
+                buttons[index + 4].classList.remove('correct', 'incorrect');
                 buttons[index + 4].disabled = false;
+                buttons[index + 4].style.opacity = '1';
             });
             
             // Player 3 buttons (8-11)
             player3Choices.forEach((choice, index) => {
-                buttons[index + 8].textContent = choice.time;
-                buttons[index + 8].classList.remove('correct');
+                buttons[index + 8].innerHTML = `<span style="color: ${choice.color}; font-weight: bold;">${choice.display}</span>`;
+                buttons[index + 8].classList.remove('correct', 'incorrect');
                 buttons[index + 8].disabled = false;
+                buttons[index + 8].style.opacity = '1';
             });
 
             return {
-                script: selectedConversation.script,
+                script: script,
                 correctTime: correctTime,
+                difficulty: difficulty,
                 player1Choices: player1Choices,
                 player2Choices: player2Choices,
                 player3Choices: player3Choices
             };
+        }
+
+        function updateDifficultyIndicator(difficulty) {
+            const indicator = document.getElementById('difficultyText');
+            switch(difficulty) {
+                case 'easy':
+                    indicator.innerHTML = '🟢 Easy';
+                    indicator.className = 'difficulty-easy';
+                    break;
+                case 'medium':
+                    indicator.innerHTML = '🟡 Medium';
+                    indicator.className = 'difficulty-medium';
+                    break;
+                case 'hard':
+                    indicator.innerHTML = '🔴 Hard';
+                    indicator.className = 'difficulty-hard';
+                    break;
+            }
         }
 
         // Select new players with dynamic animation
@@ -1286,6 +1622,12 @@
                 clearInterval(timerInterval);
             }
 
+            // Reset audio replay for new question
+            audioReplaysUsed[currentQuestion] = {};
+            currentPlayers.forEach(player => {
+                audioReplaysUsed[currentQuestion][player] = false;
+            });
+
             // Reset button states
             const buttons = document.querySelectorAll('.choice-button');
             buttons.forEach(button => {
@@ -1295,12 +1637,18 @@
             });
 
             gameActive = true; // Allow answers immediately - even before voice starts
-            timeLeft = 10;
+            timeLeft = 15;
             
             // Generate new question
             currentQuestionData = generateQuestion();
             
             document.getElementById('currentQuestion').textContent = currentQuestion;
+
+            // Show replay button and reset it
+            document.getElementById('replaySection').style.display = 'block';
+            const replayBtn = document.getElementById('replayBtn');
+            replayBtn.disabled = false;
+            replayBtn.style.opacity = '1';
 
             // Reset progress bar
             const progressFill = document.getElementById('progressFill');
@@ -1308,16 +1656,56 @@
             progressFill.style.width = '100%';
             progressEmoji.textContent = '⏰';
 
+            // Update streak display
+            updateStreakDisplay();
+
             // Start timer and play audio simultaneously - answers can be clicked immediately
             startTimer();
             
-            // Announce question number first
-            speak(`Question ${currentQuestion}. Listen carefully.`);
+            // Announce question number and difficulty
+            const difficultyText = currentQuestionData.difficulty.charAt(0).toUpperCase() + currentQuestionData.difficulty.slice(1);
+            speak(`Question ${currentQuestion}. ${difficultyText} level. Listen carefully.`);
             
             // Then play the listening audio after a short delay
             setTimeout(() => {
                 playAudio();
-            }, 2000);
+            }, 3000);
+        }
+
+        // Audio replay function
+        function replayAudio() {
+            if (!gameActive || !currentQuestionData) return;
+            
+            // Disable replay button after use
+            const replayBtn = document.getElementById('replayBtn');
+            replayBtn.disabled = true;
+            replayBtn.style.opacity = '0.5';
+            
+            // Cancel any current speech and replay
+            speechSynthesis.cancel();
+            setTimeout(() => {
+                playAudio();
+            }, 500);
+        }
+
+        // Update streak display
+        function updateStreakDisplay() {
+            const streakIndicator = document.getElementById('streakIndicator');
+            const streakCount = document.getElementById('streakCount');
+            
+            // Find highest streak among current players
+            let maxStreak = 0;
+            currentPlayers.forEach(player => {
+                const streak = playerStreaks[player] || 0;
+                if (streak > maxStreak) maxStreak = streak;
+            });
+            
+            if (maxStreak > 0) {
+                streakIndicator.style.display = 'block';
+                streakCount.textContent = maxStreak;
+            } else {
+                streakIndicator.style.display = 'none';
+            }
         }
 
         // Play audio for the question
@@ -1336,7 +1724,7 @@
                     voice.name.includes('Andrew') || 
                     voice.name.includes('Emma')
                 ) || availableVoices.find(voice => voice.lang.includes('en')) || availableVoices[0];
-                utterance.rate = 1.1;
+                utterance.rate = 0.85;
                 utterance.pitch = 1;
                 
                 speechSynthesis.speak(utterance);
@@ -1352,13 +1740,13 @@
             timerInterval = setInterval(() => {
                 timeLeft--;
                 
-                const percentage = (timeLeft / 10) * 100;
+                const percentage = (timeLeft / 15) * 100;
                 progressFill.style.width = percentage + '%';
                 
                 // Change emoji based on time left
-                if (timeLeft > 7) {
+                if (timeLeft > 10) {
                     progressEmoji.textContent = '⏰';
-                } else if (timeLeft > 3) {
+                } else if (timeLeft > 5) {
                     progressEmoji.textContent = '⚠️';
                 } else {
                     progressEmoji.textContent = '🚨';
@@ -1385,6 +1773,9 @@
             gameActive = false;
             clearInterval(timerInterval);
             speechSynthesis.cancel(); // Stop any ongoing speech
+            
+            // Hide replay button
+            document.getElementById('replayBtn').style.display = 'none';
             
             const buttons = document.querySelectorAll('.choice-button');
             
@@ -1415,7 +1806,8 @@
             
             // Highlight correct and incorrect answers
             buttons.forEach((button, index) => {
-                if (button.textContent === currentQuestionData.correctTime.time) {
+                const buttonText = button.querySelector('span') ? button.querySelector('span').textContent : button.textContent;
+                if (buttonText === currentQuestionData.correctTime.display) {
                     button.classList.add('correct');
                     createFireworks(button);
                     createSparkles(button);
@@ -1426,32 +1818,71 @@
                 }
             });
             
-            // Award or deduct points
+            // Initialize streak if not exists
+            if (!playerStreaks[answeringPlayer]) {
+                playerStreaks[answeringPlayer] = 0;
+            }
+            
+            // Award or deduct points with streak bonuses
             if (isCorrect) {
-                // Correct answer: +10 points to answering player
-                playerScores[answeringPlayer] += 10;
+                // Update streak
+                playerStreaks[answeringPlayer]++;
+                
+                // Base points + streak bonus
+                let points = 10;
+                let streakBonus = 0;
+                
+                if (playerStreaks[answeringPlayer] >= 3) {
+                    streakBonus = Math.min(playerStreaks[answeringPlayer] * 2, 20); // Max 20 bonus
+                    points += streakBonus;
+                }
+                
+                playerScores[answeringPlayer] += points;
                 playCorrectSound();
+                
+                // Reset other players' streaks
+                currentPlayers.forEach(player => {
+                    if (player !== answeringPlayer) {
+                        playerStreaks[player] = 0;
+                    }
+                });
                 
                 // Announce in both languages
                 const chineseName = answeringPlayer.split(' / ')[0];
                 const englishName = answeringPlayer.split(' / ')[1] || chineseName;
                 
                 // First announce correct in English
-                speak(`Excellent! Correct answer!`);
+                let announcement = `Excellent! Correct answer!`;
+                if (streakBonus > 0) {
+                    announcement += ` ${playerStreaks[answeringPlayer]} in a row! Streak bonus: ${streakBonus} points!`;
+                }
+                speak(announcement);
                 
                 // Then announce player name and points in Chinese
                 setTimeout(() => {
-                    speakChinese(`${chineseName}，答对了！加十分！`);
+                    let chineseAnnouncement = `${chineseName}，答对了！加${points}分！`;
+                    if (streakBonus > 0) {
+                        chineseAnnouncement += `连续${playerStreaks[answeringPlayer]}题正确！奖励${streakBonus}分！`;
+                    }
+                    speakChinese(chineseAnnouncement);
                 }, 2000);
                 
                 // Finally announce in English
                 setTimeout(() => {
-                    speak(`${englishName} gets 10 points!`);
+                    speak(`${englishName} gets ${points} points!`);
                 }, 4000);
                 
                 // Create flying tokens to the player's score
-                createFlyingTokens(buttons[choiceIndex], getPlayerScoreElement(answeringPlayer), '+10');
+                createFlyingTokens(buttons[choiceIndex], getPlayerScoreElement(answeringPlayer), `+${points}`);
+                
+                // Create extra streak effects
+                if (streakBonus > 0) {
+                    createStreakEffects(buttons[choiceIndex]);
+                }
             } else {
+                // Reset answering player's streak
+                playerStreaks[answeringPlayer] = 0;
+                
                 // Incorrect answer: -5 points to answering player, +5 points to other players
                 playerScores[answeringPlayer] -= 5;
                 currentPlayers.forEach(player => {
@@ -1486,12 +1917,38 @@
             
             // Update display
             updatePlayerDisplay();
+            updateStreakDisplay();
             
-            // Move to next question
+            // Move to next question - give more time for feedback
             setTimeout(() => {
                 currentQuestion++;
                 startNewQuestion();
-            }, 3000);
+            }, 6000);
+        }
+
+        // Create streak effects
+        function createStreakEffects(button) {
+            const rect = button.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // Create fire emojis for streak
+            const fireEmojis = ['🔥', '⚡', '💥', '✨', '🌟'];
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    const fire = document.createElement('div');
+                    fire.className = 'celebration-burst';
+                    fire.textContent = fireEmojis[Math.floor(Math.random() * fireEmojis.length)];
+                    fire.style.left = centerX + (Math.random() - 0.5) * 300 + 'px';
+                    fire.style.top = centerY + (Math.random() - 0.5) * 300 + 'px';
+                    fire.style.fontSize = '36px';
+                    document.body.appendChild(fire);
+
+                    setTimeout(() => {
+                        fire.remove();
+                    }, 2000);
+                }, i * 100);
+            }
         }
 
         // Create fireworks effect
@@ -1666,11 +2123,20 @@
             gameActive = false;
             if (!currentQuestionData) return;
             
+            // Hide replay button
+            document.getElementById('replayBtn').style.display = 'none';
+            
+            // Reset all players' streaks on timeout
+            currentPlayers.forEach(player => {
+                playerStreaks[player] = 0;
+            });
+            
             const buttons = document.querySelectorAll('.choice-button');
             
             // Show correct answer across all columns
             buttons.forEach((button, index) => {
-                if (button.textContent === currentQuestionData.correctTime.time) {
+                const buttonText = button.querySelector('span') ? button.querySelector('span').textContent : button.textContent;
+                if (buttonText === currentQuestionData.correctTime.display) {
                     button.classList.add('correct');
                     createSparkles(button);
                 }
@@ -1681,13 +2147,17 @@
             speak("Time's up! The correct answer was " + currentQuestionData.correctTime.spoken);
             
             setTimeout(() => {
-                speakChinese("时间到！正确答案是" + currentQuestionData.correctTime.time);
+                speakChinese("时间到！正确答案是" + currentQuestionData.correctTime.display);
             }, 3000);
+            
+            // Update displays
+            updatePlayerDisplay();
+            updateStreakDisplay();
             
             setTimeout(() => {
                 currentQuestion++;
                 startNewQuestion();
-            }, 3000);
+            }, 6000);
         }
 
         // End round and show leaderboard
@@ -1759,14 +2229,21 @@
         // Next round with automatic player shuffling
         function nextRound() {
             document.getElementById('leaderboard').style.display = 'none';
+            document.getElementById('replayBtn').style.display = 'none';
+            document.getElementById('streakIndicator').style.display = 'none';
+            
             currentRound++;
             currentQuestion = 1;
             document.getElementById('currentRound').textContent = currentRound;
             
-            // Reset scores for all players
+            // Reset scores and streaks for all players
             Object.keys(playerScores).forEach(player => {
                 playerScores[player] = 0;
             });
+            Object.keys(playerStreaks).forEach(player => {
+                playerStreaks[player] = 0;
+            });
+            audioReplaysUsed = {};
             
             // Automatically select new players for next round
             selectNewPlayers();
@@ -1878,7 +2355,7 @@
                     voice.name.includes('Andrew') || 
                     voice.name.includes('Emma')
                 ) || availableVoices.find(voice => voice.lang.includes('en')) || availableVoices[0];
-                utterance.rate = 0.9;
+                utterance.rate = 0.85;
                 utterance.pitch = 1;
                 speechSynthesis.speak(utterance);
                 
@@ -1902,5 +2379,5 @@
             // Menu is shown by default, game container is hidden
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'981862172414eb34',t:'MTc1ODI3NzU2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98188f76670fed37',t:'MTc1ODI3OTQyNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
