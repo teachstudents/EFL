@@ -59,6 +59,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            gap: 20px;
         }
 
         .progress-section {
@@ -197,19 +198,6 @@
             transform: none;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-
-        .difficulty-indicator {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 16px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .difficulty-easy { color: #4CAF50; }
-        .difficulty-medium { color: #FF9800; }
-        .difficulty-hard { color: #F44336; }
 
         .streak-indicator {
             position: absolute;
@@ -573,10 +561,7 @@
             100% { transform: scale(1); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); }
         }
 
-        .round-info {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+        .round-info-display {
             color: white;
             font-size: 20px;
             font-weight: 600;
@@ -584,6 +569,8 @@
             padding: 12px 20px;
             border-radius: 12px;
             border: 2px solid rgba(255, 255, 255, 0.3);
+            text-align: center;
+            white-space: nowrap;
         }
 
         .fireworks {
@@ -804,11 +791,6 @@
     </div>
 
     <div class="game-container" id="gameContainer" style="display: none;">
-        <div class="round-info">
-            Round: <span id="currentRound">1</span> | Question: <span id="currentQuestion">1</span>/10
-            <div style="margin-top: 5px; font-size: 16px;">Grade <span id="currentGradeDisplay">10</span></div>
-        </div>
-
         <!-- Streak Indicator -->
         <div class="streak-indicator" id="streakIndicator">
             🔥 Streak: <span id="streakCount">0</span>
@@ -817,9 +799,6 @@
         <div class="top-section">
             <div class="control-buttons">
                 <button class="control-btn" onclick="backToMenu()">🏠 Menu</button>
-                <div class="difficulty-indicator" id="difficultyIndicator">
-                    <span id="difficultyText">🟢 Easy</span>
-                </div>
             </div>
             
             <div class="progress-section">
@@ -828,6 +807,9 @@
                         <div class="progress-emoji" id="progressEmoji">⏰</div>
                     </div>
                 </div>
+            </div>
+            <div class="round-info-display">
+                R: <span id="currentRound">1</span>/8 | Q: <span id="currentQuestion">1</span>/10
             </div>
         </div>
 
@@ -922,22 +904,6 @@
                 // ADD NEW GRADE 12 STUDENTS HERE - FORMAT: "中文名 / ENGLISH NAME"
             ]
         };
-
-        let currentGrade = null;
-        let studentNames = [];
-
-        // Game state
-        let currentRound = 1;
-        let currentQuestion = 1;
-        let currentPlayers = [];
-        let usedPlayers = [];
-        let playerScores = {};
-        let globalLeaderboard = {}; // Track all-time scores
-        let playerStreaks = {}; // Track consecutive correct answers
-        let timeLeft = 10;
-        let timerInterval;
-        let gameActive = false;
-        let currentQuestionData = null;
 
         // ========================================
         // 🎯 QUESTION DATABASE - DRAG & DROP TO REPLACE
@@ -1165,23 +1131,414 @@
             }
         };
 
-        // ADD NEW QUESTIONS HERE:
-        // 1. Add to appropriate difficulty array (easy/medium/hard)
-        // 2. Include: time, display, color, spoken, alternatives, category
-        // 3. Add matching conversation templates above
-
-        // TTS Voices - Microsoft Edge high quality voices
-        const voices = ['Microsoft Ava Online (Natural) - English (United States)', 'Microsoft Brian Online (Natural) - English (United States)', 'Microsoft William Online (Natural) - English (United States)', 'Microsoft Andrew Online (Natural) - English (United States)', 'Microsoft Emma Online (Natural) - English (United States)'];
+        // ======= STATE =======
+        let currentGrade = null;
+        let studentNames = [];
+        let currentRound = 1;
+        let currentQuestion = 1;
+        let currentPlayers = [];
+        let usedPlayers = [];
+        let playerScores = {};
+        let globalLeaderboard = {};
+        let playerStreaks = {};
+        let timeLeft = 15;
+        let gameActive = false;
+        let currentQuestionData = null;
+        let questionInterval = null;
+        let timers = new Set();
+        let cachedVoices = [];
+        let voicesReady = false;
         let currentVoiceIndex = 0;
 
-        // Initialize game
+        const voiceNames = [
+          'Microsoft Ava Online (Natural) - English (United States)',
+          'Microsoft Brian Online (Natural) - English (United States)',
+          'Microsoft William Online (Natural) - English (United States)',
+          'Microsoft Andrew Online (Natural) - English (United States)',
+          'Microsoft Emma Online (Natural) - English (United States)'
+        ];
+
+        // ======= TIMER & SPEECH HELPERS (FIXED) =======
+        function clearTimer(ref) {
+          if (!ref) return;
+          if (ref._type === 'interval') clearInterval(ref.id);
+          else clearTimeout(ref.id);
+          timers.delete(ref);
+        }
+
+        function makeInterval(fn, ms) {
+          const id = setInterval(fn, ms);
+          const ref = { id, _type: 'interval' };
+          timers.add(ref);
+          return ref;
+        }
+
+        function makeTimeout(fn, ms) {
+          const id = setTimeout(fn, ms);
+          const ref = { id, _type: 'timeout' };
+          timers.add(ref);
+          return ref;
+        }
+
+        function stopAllSpeech() {
+          if ('speechSynthesis' in window) {
+            speechSynthesis.cancel();
+          }
+        }
+
+        function ensureVoicesReady() {
+          return new Promise(resolve => {
+            if (voicesReady) return resolve(cachedVoices);
+
+            const load = () => {
+              cachedVoices = speechSynthesis.getVoices();
+              if (cachedVoices && cachedVoices.length > 0) {
+                voicesReady = true;
+                resolve(cachedVoices);
+              }
+            };
+            
+            const existing = speechSynthesis.getVoices();
+            if (existing && existing.length > 0) {
+              cachedVoices = existing;
+              voicesReady = true;
+              resolve(cachedVoices);
+            } else {
+              window.speechSynthesis.onvoiceschanged = () => load();
+              // A trick to trigger voice loading on some browsers
+              try {
+                const u = new SpeechSynthesisUtterance('');
+                speechSynthesis.speak(u);
+                speechSynthesis.cancel();
+              } catch {}
+              makeTimeout(load, 1000); // Failsafe
+            }
+          });
+        }
+
+        function speakOnce(text, { lang = 'en-US', rate = 0.85, pitch = 1, voicePref = null } = {}) {
+            return new Promise(async (resolve) => {
+                if (!('speechSynthesis' in window) || !text) {
+                    console.warn("Speech synthesis not supported or text is empty.");
+                    return resolve();
+                }
+
+                await ensureVoicesReady();
+                stopAllSpeech(); 
+                
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = lang;
+                u.rate = rate;
+                u.pitch = pitch;
+
+                if (cachedVoices.length > 0) {
+                    let selectedVoice;
+                    if (lang === 'zh-CN') {
+                        selectedVoice = cachedVoices.find(v => v.lang === 'zh-CN');
+                    } else {
+                         selectedVoice = cachedVoices.find(v =>
+                            v.name === voiceNames[currentVoiceIndex] ||
+                            v.name.includes('Ava') ||
+                            v.name.includes('Brian') ||
+                            v.name.includes('William') ||
+                            v.name.includes('Andrew') ||
+                            v.name.includes('Emma')
+                        ) || cachedVoices.find(v => v.lang.startsWith('en')) || cachedVoices[0];
+                    }
+                    if (selectedVoice) u.voice = selectedVoice;
+                }
+                
+                u.onend = () => resolve();
+                u.onerror = (e) => {
+                    console.error("SpeechSynthesis Error:", e);
+                    resolve(); // Resolve anyway to not block the game
+                };
+                
+                speechSynthesis.speak(u);
+                if (lang.startsWith('en')) {
+                    currentVoiceIndex = (currentVoiceIndex + 1) % voiceNames.length;
+                }
+            });
+        }
+        
+        function speak(text) { return speakOnce(text, { lang: 'en-US', rate: 0.85, pitch: 1 }); }
+        function speakChinese(text) { return speakOnce(text, { lang: 'zh-CN', rate: 0.8, pitch: 1 }); }
+
+        function playAudio() {
+            if (!currentQuestionData) return Promise.resolve();
+            return speakOnce(currentQuestionData.script);
+        }
+
+        // ======= TIMER (FIXED) =======
+        function startTimer() {
+            const progressFill = document.getElementById('progressFill');
+            const progressEmoji = document.getElementById('progressEmoji');
+            if (questionInterval) clearTimer(questionInterval);
+
+            timeLeft = 15;
+            progressFill.style.width = '100%';
+            progressEmoji.textContent = '⏰';
+
+            questionInterval = makeInterval(() => {
+                timeLeft--;
+                const percentage = (timeLeft / 15) * 100;
+                progressFill.style.width = percentage + '%';
+
+                if (timeLeft > 10) progressEmoji.textContent = '⏰';
+                else if (timeLeft > 5) progressEmoji.textContent = '⚠️';
+                else progressEmoji.textContent = '🚨';
+
+                if (timeLeft <= 5 && timeLeft > 0) { playTickSound(); }
+
+                if (timeLeft <= 0) {
+                    clearTimer(questionInterval);
+                    questionInterval = null;
+                    stopAllSpeech();
+                    playBuzzerSound();
+                    timeUp();
+                }
+            }, 1000);
+        }
+
+        // ======= GAME FLOW (FIXED) =======
+        async function startNewQuestion() {
+            if (currentQuestion > 10) {
+                endRound();
+                return;
+            }
+
+            stopAllSpeech();
+            if (questionInterval) {
+                clearTimer(questionInterval);
+                questionInterval = null;
+            }
+
+            const buttons = document.querySelectorAll('.choice-button');
+            buttons.forEach(button => {
+                button.disabled = false;
+                button.classList.remove('correct', 'incorrect');
+                button.style.opacity = '1';
+            });
+
+            gameActive = true;
+            timeLeft = 15;
+            currentQuestionData = generateQuestion();
+            document.getElementById('currentQuestion').textContent = currentQuestion;
+            document.getElementById('progressFill').style.width = '100%';
+            document.getElementById('progressEmoji').textContent = '⏰';
+
+            updateStreakDisplay();
+            startTimer();
+
+            const difficultyText = currentQuestionData.difficulty.charAt(0).toUpperCase() + currentQuestionData.difficulty.slice(1);
+            await speak(`Question ${currentQuestion}. ${difficultyText} level. Listen carefully.`);
+            
+            // Only play audio if the timer is still running
+            if (gameActive) {
+                await playAudio();
+            }
+        }
+
+        async function selectAnswer(choiceIndex) {
+            if (!gameActive || !currentQuestionData) return;
+            
+            gameActive = false;
+            if (questionInterval) {
+                clearTimer(questionInterval);
+                questionInterval = null;
+            }
+            stopAllSpeech();
+
+            const buttons = document.querySelectorAll('.choice-button');
+            buttons.forEach(button => button.disabled = true);
+
+            // --- [Start of Original Logic] ---
+            let answeringPlayer;
+            let selectedChoice;
+            
+            if (choiceIndex >= 0 && choiceIndex <= 3) {
+                answeringPlayer = currentPlayers[0];
+                selectedChoice = currentQuestionData.player1Choices[choiceIndex];
+            } else if (choiceIndex >= 4 && choiceIndex <= 7) {
+                answeringPlayer = currentPlayers[1];
+                selectedChoice = currentQuestionData.player2Choices[choiceIndex - 4];
+            } else {
+                answeringPlayer = currentPlayers[2];
+                selectedChoice = currentQuestionData.player3Choices[choiceIndex - 8];
+            }
+            
+            const isCorrect = selectedChoice.time === currentQuestionData.correctTime.time;
+            
+            buttons.forEach((button, index) => {
+                const buttonText = button.querySelector('span') ? button.querySelector('span').textContent : button.textContent;
+                if (buttonText === currentQuestionData.correctTime.display) {
+                    button.classList.add('correct');
+                    createFireworks(button);
+                    createSparkles(button);
+                } else if (index === choiceIndex) {
+                    button.classList.add('incorrect');
+                    createShakeEffect(button);
+                }
+            });
+            
+            if (!playerStreaks[answeringPlayer]) {
+                playerStreaks[answeringPlayer] = 0;
+            }
+            
+            if (isCorrect) {
+                playerStreaks[answeringPlayer]++;
+                let points = 10;
+                let streakBonus = 0;
+                if (playerStreaks[answeringPlayer] >= 3) {
+                    streakBonus = Math.min(playerStreaks[answeringPlayer] * 2, 20);
+                    points += streakBonus;
+                }
+                playerScores[answeringPlayer] += points;
+                playCorrectSound();
+                currentPlayers.forEach(player => {
+                    if (player !== answeringPlayer) playerStreaks[player] = 0;
+                });
+                
+                let announcement = `Excellent! Correct answer!`;
+                if (streakBonus > 0) announcement += ` ${playerStreaks[answeringPlayer]} in a row! Streak bonus: ${streakBonus} points!`;
+                await speak(announcement);
+                
+                let chineseAnnouncement = `${answeringPlayer.split(' / ')[0]}，答对了！加${points}分！`;
+                if (streakBonus > 0) chineseAnnouncement += `连续${playerStreaks[answeringPlayer]}题正确！奖励${streakBonus}分！`;
+                await speakChinese(chineseAnnouncement);
+
+                await speak(`${answeringPlayer.split(' / ')[1]} gets ${points} points!`);
+
+                createFlyingTokens(buttons[choiceIndex], getPlayerScoreElement(answeringPlayer), `+${points}`);
+                if (streakBonus > 0) createStreakEffects(buttons[choiceIndex]);
+            } else {
+                playerStreaks[answeringPlayer] = 0;
+                playerScores[answeringPlayer] -= 5;
+                currentPlayers.forEach(player => {
+                    if (player !== answeringPlayer) {
+                        playerScores[player] += 5;
+                        createFlyingTokens(buttons[choiceIndex], getPlayerScoreElement(player), '+5');
+                    }
+                });
+                playWrongSound();
+                
+                await speak(`Sorry, that's incorrect.`);
+                await speakChinese(`${answeringPlayer.split(' / ')[0]}，答错了。减五分，其他人加五分。`);
+                await speak(`${answeringPlayer.split(' / ')[1]} loses 5 points, others gain 5 points.`);
+                 
+                createFlyingTokens(buttons[choiceIndex], getPlayerScoreElement(answeringPlayer), '-5');
+            }
+            
+            updatePlayerDisplay();
+            updateStreakDisplay();
+            // --- [End of Original Logic] ---
+            
+            makeTimeout(() => {
+                currentQuestion++;
+                startNewQuestion();
+            }, 2000);
+        }
+
+        async function timeUp() {
+            gameActive = false;
+            if (!currentQuestionData) return;
+            stopAllSpeech();
+
+            // Reset all players' streaks on timeout
+            currentPlayers.forEach(player => {
+                playerStreaks[player] = 0;
+            });
+            
+            const buttons = document.querySelectorAll('.choice-button');
+            buttons.forEach((button) => {
+                const buttonText = button.querySelector('span') ? button.querySelector('span').textContent : button.textContent;
+                if (buttonText === currentQuestionData.correctTime.display) {
+                    button.classList.add('correct');
+                    createSparkles(button);
+                }
+                button.disabled = true;
+            });
+
+            await speak(`Time's up! The correct answer was ${currentQuestionData.correctTime.spoken}`);
+            await speakChinese(`时间到！正确答案是${currentQuestionData.correctTime.display}`);
+            
+            updatePlayerDisplay();
+            updateStreakDisplay();
+
+            makeTimeout(() => {
+                currentQuestion++;
+                startNewQuestion();
+            }, 2000);
+        }
+
+        async function endRound() {
+            stopAllSpeech();
+            // --- [Original Logic for leaderboard] ---
+            const leaderboard = document.getElementById('leaderboard');
+            const content = document.getElementById('leaderboardContent');
+            const globalContent = document.getElementById('globalScores');
+            
+            currentPlayers.forEach(player => {
+                if (!globalLeaderboard[player]) globalLeaderboard[player] = 0;
+                globalLeaderboard[player] += playerScores[player];
+            });
+            
+            const sortedPlayers = [...currentPlayers].sort((a, b) => playerScores[b] - playerScores[a]);
+            
+            let leaderboardHTML = '<h3>Round Scores:</h3>';
+            sortedPlayers.forEach((player, index) => {
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
+                leaderboardHTML += `<div style="margin: 10px 0; font-size: 20px;">${medal} ${player.split(' / ')[0]}: ${playerScores[player]} points</div>`;
+            });
+            
+            const globalSorted = Object.entries(globalLeaderboard).sort(([,a], [,b]) => b - a).slice(0, 10);
+            
+            let globalHTML = '';
+            globalSorted.forEach(([player, score], index) => {
+                const medal = index === 0 ? '👑' : index === 1 ? '🥇' : index === 2 ? '🥈' : index === 3 ? '🥉' : '⭐';
+                globalHTML += `<div style="margin: 5px 0; font-size: 16px;">${medal} ${player.split(' / ')[0]}: ${score} total points</div>`;
+            });
+            
+            content.innerHTML = leaderboardHTML;
+            globalContent.innerHTML = globalHTML;
+            leaderboard.style.display = 'block';
+            
+            const winner = sortedPlayers[0];
+            const winnerChinese = winner.split(' / ')[0];
+            const winnerEnglish = winner.split(' / ')[1] || winnerChinese;
+            const winnerScore = playerScores[winner];
+            
+            createWinnerFireworks();
+
+            await speak(`Congratulations! Round winner!`);
+            await speakChinese(`恭喜${winnerChinese}！本轮获胜！得分${winnerScore}分！`);
+            await speak(`${winnerEnglish} is the round champion with ${winnerScore} points!`);
+            // --- [End of Original Logic] ---
+            
+            makeTimeout(() => { nextRound(); }, 2000);
+        }
+
+        function nextRound() {
+            stopAllSpeech();
+            document.getElementById('leaderboard').style.display = 'none';
+            document.getElementById('streakIndicator').style.display = 'none';
+
+            currentRound++;
+            currentQuestion = 1;
+            document.getElementById('currentRound').textContent = currentRound;
+
+            Object.keys(playerScores).forEach(player => { playerScores[player] = 0; });
+            Object.keys(playerStreaks).forEach(player => { playerStreaks[player] = 0; });
+
+            selectNewPlayers();
+        }
+
+        // ======= ALL YOUR EXISTING EFFECTS, ANIMATIONS, AND OTHER FUNCTIONS ARE PRESERVED BELOW =======
         function initGame() {
             createLaserBeams();
             createFloatingEmojis();
-            // Don't auto-start, wait for grade selection
         }
 
-        // Create floating emojis
         function createFloatingEmojis() {
             const emojis = ['🎵', '🎶', '🎧', '🎤', '⭐', '✨', '🌟', '💫', '🎯', '🏆', '🎊', '🎉', '🔥', '💎', '🌈', '🎭', '🎪', '🎨', '🎲', '🎸', '🎺', '🎻', '🥇', '🏅', '👑', '💝', '🎁', '🌸', '🌺', '🌻', '🦋', '🐝', '🌙', '☀️', '⚡', '🔮'];
             
@@ -1199,12 +1556,10 @@
                 }, 10000);
             }, 800);
         }
-
         // Grade selection
         function selectGrade(grade) {
             currentGrade = grade;
             studentNames = studentsByGrade[grade];
-            document.getElementById('currentGradeDisplay').textContent = grade;
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('gameContainer').style.display = 'flex';
             selectNewPlayers();
@@ -1212,11 +1567,9 @@
 
         // Back to menu
         function backToMenu() {
-            // Stop any ongoing speech
-            speechSynthesis.cancel();
-            clearInterval(timerInterval);
+            stopAllSpeech();
+            if(questionInterval) clearTimer(questionInterval);
             
-            // Reset game state
             gameActive = false;
             currentRound = 1;
             currentQuestion = 1;
@@ -1225,18 +1578,15 @@
             playerScores = {};
             playerStreaks = {};
             
-            // Hide all overlays and UI elements
             document.getElementById('leaderboard').style.display = 'none';
             document.getElementById('learningPhase').style.display = 'none';
             document.getElementById('nameShuffle').style.display = 'none';
             document.getElementById('streakIndicator').style.display = 'none';
             
-            // Show menu, hide game
             document.getElementById('gameContainer').style.display = 'none';
             document.getElementById('mainMenu').style.display = 'flex';
         }
 
-        // Create laser beam effects
         function createLaserBeams() {
             setInterval(() => {
                 const laser = document.createElement('div');
@@ -1252,12 +1602,7 @@
             }, 1000);
         }
 
-        // ========================================
-        // 🎯 QUESTION GENERATION ENGINE
-        // ========================================
-        
         function generateQuestion() {
-            // Determine difficulty based on question number
             let difficulty, timePool, templatePool;
             
             if (currentQuestion <= 3) {
@@ -1274,10 +1619,6 @@
                 templatePool = conversationTemplates.hard;
             }
             
-            // Update difficulty indicator
-            updateDifficultyIndicator(difficulty);
-            
-            // Select correct time from appropriate pool
             const correctTime = timePool[Math.floor(Math.random() * timePool.length)];
             
             // Get all possible times for distractors (from all pools)
@@ -1286,16 +1627,13 @@
                 .sort(() => Math.random() - 0.5)
                 .slice(0, 3);
 
-            // Create the 4 choices (correct + 3 distractors)
             const choices = [correctTime, ...distractorTimes];
             
-            // Generate conversation based on difficulty and category
             const categoryTemplates = templatePool[correctTime.category];
             const template = categoryTemplates[Math.floor(Math.random() * categoryTemplates.length)];
             
             let script = template;
             
-            // Replace placeholders based on difficulty
             if (difficulty === 'easy') {
                 script = script.replace(/{time}/g, correctTime.spoken);
             } else if (difficulty === 'medium') {
@@ -1307,15 +1645,12 @@
                              .replace(/{distractor2}/g, distractorTimes[1].spoken);
             }
             
-            // Shuffle choices for each player column
             const player1Choices = [...choices].sort(() => Math.random() - 0.5);
             const player2Choices = [...choices].sort(() => Math.random() - 0.5);
             const player3Choices = [...choices].sort(() => Math.random() - 0.5);
             
-            // Update button labels with shuffled choices - all white text with shadow
             const buttons = document.querySelectorAll('.choice-button');
             
-            // Player 1 buttons (0-3)
             player1Choices.forEach((choice, index) => {
                 buttons[index].innerHTML = `<span style="color: white; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">${choice.display}</span>`;
                 buttons[index].classList.remove('correct', 'incorrect');
@@ -1323,7 +1658,6 @@
                 buttons[index].style.opacity = '1';
             });
             
-            // Player 2 buttons (4-7)
             player2Choices.forEach((choice, index) => {
                 buttons[index + 4].innerHTML = `<span style="color: white; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">${choice.display}</span>`;
                 buttons[index + 4].classList.remove('correct', 'incorrect');
@@ -1331,7 +1665,6 @@
                 buttons[index + 4].style.opacity = '1';
             });
             
-            // Player 3 buttons (8-11)
             player3Choices.forEach((choice, index) => {
                 buttons[index + 8].innerHTML = `<span style="color: white; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">${choice.display}</span>`;
                 buttons[index + 8].classList.remove('correct', 'incorrect');
@@ -1349,29 +1682,10 @@
             };
         }
 
-        function updateDifficultyIndicator(difficulty) {
-            const indicator = document.getElementById('difficultyText');
-            switch(difficulty) {
-                case 'easy':
-                    indicator.innerHTML = '🟢 Easy';
-                    indicator.className = 'difficulty-easy';
-                    break;
-                case 'medium':
-                    indicator.innerHTML = '🟡 Medium';
-                    indicator.className = 'difficulty-medium';
-                    break;
-                case 'hard':
-                    indicator.innerHTML = '🔴 Hard';
-                    indicator.className = 'difficulty-hard';
-                    break;
-            }
-        }
-
         // Select new players with dynamic animation
         function selectNewPlayers() {
             showNameShuffle();
             
-            // Reset used players if we've used everyone
             if (usedPlayers.length >= studentNames.length) {
                 usedPlayers = [];
             }
@@ -1380,30 +1694,26 @@
             const shuffleContainer = document.getElementById('shuffleContainer');
             const selectedPlayersDiv = document.getElementById('selectedPlayers');
             
-            // Clear containers
             shuffleContainer.innerHTML = '';
             selectedPlayersDiv.innerHTML = '';
             
-            // Add all available names with floating animation
             availablePlayers.forEach((name, index) => {
                 setTimeout(() => {
                     const nameDiv = document.createElement('div');
                     nameDiv.className = 'shuffle-name';
-                    nameDiv.textContent = name.split(' / ')[0]; // Show Chinese name
+                    nameDiv.textContent = name.split(' / ')[0];
                     nameDiv.style.animationDelay = (index * 0.1) + 's';
                     shuffleContainer.appendChild(nameDiv);
                 }, index * 100);
             });
             
-            // Start selection process after all names are shown
             setTimeout(() => {
                 selectPlayersSequentially(availablePlayers, 0);
             }, availablePlayers.length * 100 + 1000);
         }
 
-        function selectPlayersSequentially(availablePlayers, playerIndex) {
+        async function selectPlayersSequentially(availablePlayers, playerIndex) {
             if (playerIndex >= 3) {
-                // All players selected, show countdown
                 setTimeout(() => {
                     showPlayerCountdown();
                 }, 2000);
@@ -1412,59 +1722,48 @@
 
             const shuffleContainer = document.getElementById('shuffleContainer');
             const selectedPlayersDiv = document.getElementById('selectedPlayers');
-            const nameElements = shuffleContainer.querySelectorAll('.shuffle-name');
+            const nameElements = Array.from(shuffleContainer.querySelectorAll('.shuffle-name'));
             
-            // Highlight random names for dramatic effect
             let highlightCount = 0;
-            const highlightInterval = setInterval(() => {
-                // Remove previous highlights
+            const highlightInterval = setInterval(async () => {
                 nameElements.forEach(el => el.classList.remove('selected'));
                 
-                // Add highlight to random name
-                const randomIndex = Math.floor(Math.random() * nameElements.length);
-                if (nameElements[randomIndex] && !nameElements[randomIndex].classList.contains('selected')) {
-                    nameElements[randomIndex].classList.add('selected');
+                const availableNameElements = Array.from(shuffleContainer.querySelectorAll('.shuffle-name'));
+                if (availableNameElements.length === 0) {
+                    clearInterval(highlightInterval);
+                    return;
+                }
+
+                const randomIndex = Math.floor(Math.random() * availableNameElements.length);
+                if (availableNameElements[randomIndex]) {
+                    availableNameElements[randomIndex].classList.add('selected');
                 }
                 
                 highlightCount++;
                 if (highlightCount > 8) {
                     clearInterval(highlightInterval);
                     
-                    // Select final player
                     const selectedIndex = Math.floor(Math.random() * availablePlayers.length);
                     const selectedPlayer = availablePlayers.splice(selectedIndex, 1)[0];
                     currentPlayers.push(selectedPlayer);
                     usedPlayers.push(selectedPlayer);
                     
-                    // Remove selected name from shuffle container
                     nameElements.forEach(el => {
                         if (el.textContent === selectedPlayer.split(' / ')[0]) {
                             el.remove();
                         }
                     });
                     
-                    // Add to selected players display
                     const selectedDiv = document.createElement('div');
                     selectedDiv.className = 'selected-player';
                     selectedDiv.textContent = `Player ${playerIndex + 1}: ${selectedPlayer.split(' / ')[0]}`;
                     selectedPlayersDiv.appendChild(selectedDiv);
                     
-                    // Play selection sound
                     playCorrectSound();
                     
-                    // Announce player name in both languages
-                    const chineseName = selectedPlayer.split(' / ')[0];
-                    const englishName = selectedPlayer.split(' / ')[1] || chineseName;
+                    await speakChinese(selectedPlayer.split(' / ')[0]);
+                    await speak(`Player ${playerIndex + 1}: ${selectedPlayer.split(' / ')[1] || selectedPlayer.split(' / ')[0]}`);
                     
-                    // First announce in Chinese
-                    speakChinese(chineseName);
-                    
-                    // Then announce in English after a short delay
-                    setTimeout(() => {
-                        speak(`Player ${playerIndex + 1}: ${englishName}`);
-                    }, 1500);
-                    
-                    // Continue with next player
                     setTimeout(() => {
                         selectPlayersSequentially(availablePlayers, playerIndex + 1);
                     }, 1000);
@@ -1472,13 +1771,10 @@
             }, 200);
         }
 
-        // Show name shuffling animation
         function showNameShuffle() {
             const shuffleDiv = document.getElementById('nameShuffle');
             shuffleDiv.style.display = 'block';
-            currentPlayers = []; // Reset current players
-            
-            // Play shuffle sound effect
+            currentPlayers = [];
             playShuffleSound();
         }
 
@@ -1486,13 +1782,11 @@
             document.getElementById('nameShuffle').style.display = 'none';
         }
 
-        // Show 10 second countdown for players to get ready
         function showPlayerCountdown() {
             const shuffleDiv = document.getElementById('nameShuffle');
             const titleDiv = shuffleDiv.querySelector('.shuffle-title');
             const containerDiv = shuffleDiv.querySelector('.shuffle-container');
             
-            // Clear shuffle container and show countdown
             containerDiv.innerHTML = '';
             
             let countdown = 10;
@@ -1505,9 +1799,8 @@
                 if (countdown <= 0) {
                     clearInterval(countdownInterval);
                     
-                    // Initialize scores for current round
                     currentPlayers.forEach(player => {
-                        playerScores[player] = 0; // Reset to 0 for new round
+                        playerScores[player] = 0;
                     });
 
                     updatePlayerDisplay();
@@ -1517,15 +1810,12 @@
             }, 1000);
         }
 
-        // Skip learning phase and go directly to questions
         function showLearningPhase() {
-            // Skip learning phase, go directly to first question
             setTimeout(() => {
                 startNewQuestion();
             }, 500);
         }
 
-        // Update player display
         function updatePlayerDisplay() {
             const player1Name = currentPlayers[0] ? currentPlayers[0].split(' / ')[0] : 'Player 1';
             const player2Name = currentPlayers[1] ? currentPlayers[1].split(' / ')[0] : 'Player 2';
@@ -1539,7 +1829,6 @@
             const score2 = playerScores[player2FullName] || 0;
             const score3 = playerScores[player3FullName] || 0;
             
-            // Determine who has highest score for trophy
             const maxScore = Math.max(score1, score2, score3);
             const trophy1 = score1 === maxScore && score1 > 0 ? ' 🏆' : '';
             const trophy2 = score2 === maxScore && score2 > 0 ? ' 🏆' : '';
@@ -1550,62 +1839,10 @@
             document.getElementById('player3').innerHTML = `${player3Name}${trophy3}<div class="player-score" id="score3">${score3} points</div>`;
         }
 
-        // Start new question
-        function startNewQuestion() {
-            if (currentQuestion > 10) {
-                endRound();
-                return;
-            }
-
-            // Clear any existing timer
-            if (timerInterval) {
-                clearInterval(timerInterval);
-            }
-
-            // Reset button states
-            const buttons = document.querySelectorAll('.choice-button');
-            buttons.forEach(button => {
-                button.disabled = false;
-                button.classList.remove('correct', 'incorrect');
-                button.style.opacity = '1';
-            });
-
-            gameActive = true; // Allow answers immediately - even before voice starts
-            timeLeft = 15;
-            
-            // Generate new question
-            currentQuestionData = generateQuestion();
-            
-            document.getElementById('currentQuestion').textContent = currentQuestion;
-
-            // Reset progress bar
-            const progressFill = document.getElementById('progressFill');
-            const progressEmoji = document.getElementById('progressEmoji');
-            progressFill.style.width = '100%';
-            progressEmoji.textContent = '⏰';
-
-            // Update streak display
-            updateStreakDisplay();
-
-            // Start timer and play audio simultaneously - answers can be clicked immediately
-            startTimer();
-            
-            // Announce question number and difficulty
-            const difficultyText = currentQuestionData.difficulty.charAt(0).toUpperCase() + currentQuestionData.difficulty.slice(1);
-            speak(`Question ${currentQuestion}. ${difficultyText} level. Listen carefully.`);
-            
-            // Then play the listening audio after a short delay
-            setTimeout(() => {
-                playAudio();
-            }, 3000);
-        }
-
-        // Update streak display
         function updateStreakDisplay() {
             const streakIndicator = document.getElementById('streakIndicator');
             const streakCount = document.getElementById('streakCount');
             
-            // Find highest streak among current players
             let maxStreak = 0;
             currentPlayers.forEach(player => {
                 const streak = playerStreaks[player] || 0;
@@ -1619,229 +1856,12 @@
                 streakIndicator.style.display = 'none';
             }
         }
-
-        // Play audio for the question
-        function playAudio() {
-            if (currentQuestionData) {
-                // Cancel any previous speech
-                speechSynthesis.cancel();
-                
-                const utterance = new SpeechSynthesisUtterance(currentQuestionData.script);
-                const availableVoices = speechSynthesis.getVoices();
-                utterance.voice = availableVoices.find(voice => 
-                    voice.name === voices[currentVoiceIndex] || 
-                    voice.name.includes('Ava') || 
-                    voice.name.includes('Brian') || 
-                    voice.name.includes('William') || 
-                    voice.name.includes('Andrew') || 
-                    voice.name.includes('Emma')
-                ) || availableVoices.find(voice => voice.lang.includes('en')) || availableVoices[0];
-                utterance.rate = 0.85;
-                utterance.pitch = 1;
-                
-                speechSynthesis.speak(utterance);
-                currentVoiceIndex = (currentVoiceIndex + 1) % voices.length;
-            }
-        }
-
-        // Start timer
-        function startTimer() {
-            const progressFill = document.getElementById('progressFill');
-            const progressEmoji = document.getElementById('progressEmoji');
-            
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                
-                const percentage = (timeLeft / 15) * 100;
-                progressFill.style.width = percentage + '%';
-                
-                // Change emoji based on time left
-                if (timeLeft > 10) {
-                    progressEmoji.textContent = '⏰';
-                } else if (timeLeft > 5) {
-                    progressEmoji.textContent = '⚠️';
-                } else {
-                    progressEmoji.textContent = '🚨';
-                }
-                
-                // Play ticking sound for last 5 seconds
-                if (timeLeft <= 5 && timeLeft > 0) {
-                    playTickSound();
-                }
-                
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    speechSynthesis.cancel(); // Stop any ongoing speech
-                    playBuzzerSound();
-                    timeUp();
-                }
-            }, 1000);
-        }
-
-        // Handle answer selection
-        function selectAnswer(choiceIndex) {
-            if (!gameActive || !currentQuestionData) return;
-            
-            gameActive = false;
-            clearInterval(timerInterval);
-            speechSynthesis.cancel(); // Stop any ongoing speech
-            
-            const buttons = document.querySelectorAll('.choice-button');
-            
-            // Disable all buttons
-            buttons.forEach(button => button.disabled = true);
-            
-            // Determine which player answered and get their selected choice
-            let answeringPlayer;
-            let selectedChoice;
-            let playerChoices;
-            
-            if (choiceIndex >= 0 && choiceIndex <= 3) {
-                answeringPlayer = currentPlayers[0];
-                selectedChoice = currentQuestionData.player1Choices[choiceIndex];
-                playerChoices = currentQuestionData.player1Choices;
-            } else if (choiceIndex >= 4 && choiceIndex <= 7) {
-                answeringPlayer = currentPlayers[1];
-                selectedChoice = currentQuestionData.player2Choices[choiceIndex - 4];
-                playerChoices = currentQuestionData.player2Choices;
-            } else {
-                answeringPlayer = currentPlayers[2];
-                selectedChoice = currentQuestionData.player3Choices[choiceIndex - 8];
-                playerChoices = currentQuestionData.player3Choices;
-            }
-            
-            // Check if answer is correct
-            const isCorrect = selectedChoice.time === currentQuestionData.correctTime.time;
-            
-            // Highlight correct and incorrect answers
-            buttons.forEach((button, index) => {
-                const buttonText = button.querySelector('span') ? button.querySelector('span').textContent : button.textContent;
-                if (buttonText === currentQuestionData.correctTime.display) {
-                    button.classList.add('correct');
-                    createFireworks(button);
-                    createSparkles(button);
-                } else if (index === choiceIndex) {
-                    // Mark the selected incorrect answer
-                    button.classList.add('incorrect');
-                    createShakeEffect(button);
-                }
-            });
-            
-            // Initialize streak if not exists
-            if (!playerStreaks[answeringPlayer]) {
-                playerStreaks[answeringPlayer] = 0;
-            }
-            
-            // Award or deduct points with streak bonuses
-            if (isCorrect) {
-                // Update streak
-                playerStreaks[answeringPlayer]++;
-                
-                // Base points + streak bonus
-                let points = 10;
-                let streakBonus = 0;
-                
-                if (playerStreaks[answeringPlayer] >= 3) {
-                    streakBonus = Math.min(playerStreaks[answeringPlayer] * 2, 20); // Max 20 bonus
-                    points += streakBonus;
-                }
-                
-                playerScores[answeringPlayer] += points;
-                playCorrectSound();
-                
-                // Reset other players' streaks
-                currentPlayers.forEach(player => {
-                    if (player !== answeringPlayer) {
-                        playerStreaks[player] = 0;
-                    }
-                });
-                
-                // Announce in both languages
-                const chineseName = answeringPlayer.split(' / ')[0];
-                const englishName = answeringPlayer.split(' / ')[1] || chineseName;
-                
-                // First announce correct in English
-                let announcement = `Excellent! Correct answer!`;
-                if (streakBonus > 0) {
-                    announcement += ` ${playerStreaks[answeringPlayer]} in a row! Streak bonus: ${streakBonus} points!`;
-                }
-                speak(announcement);
-                
-                // Then announce player name and points in Chinese
-                setTimeout(() => {
-                    let chineseAnnouncement = `${chineseName}，答对了！加${points}分！`;
-                    if (streakBonus > 0) {
-                        chineseAnnouncement += `连续${playerStreaks[answeringPlayer]}题正确！奖励${streakBonus}分！`;
-                    }
-                    speakChinese(chineseAnnouncement);
-                }, 2000);
-                
-                // Finally announce in English
-                setTimeout(() => {
-                    speak(`${englishName} gets ${points} points!`);
-                }, 4000);
-                
-                // Create flying tokens to the player's score
-                createFlyingTokens(buttons[choiceIndex], getPlayerScoreElement(answeringPlayer), `+${points}`);
-                
-                // Create extra streak effects
-                if (streakBonus > 0) {
-                    createStreakEffects(buttons[choiceIndex]);
-                }
-            } else {
-                // Reset answering player's streak
-                playerStreaks[answeringPlayer] = 0;
-                
-                // Incorrect answer: -5 points to answering player, +5 points to other players
-                playerScores[answeringPlayer] -= 5;
-                currentPlayers.forEach(player => {
-                    if (player !== answeringPlayer) {
-                        playerScores[player] += 5;
-                        // Create flying tokens for other players
-                        createFlyingTokens(buttons[choiceIndex], getPlayerScoreElement(player), '+5');
-                    }
-                });
-                playWrongSound();
-                
-                // Announce in both languages
-                const chineseName = answeringPlayer.split(' / ')[0];
-                const englishName = answeringPlayer.split(' / ')[1] || chineseName;
-                
-                // First announce incorrect in English
-                speak(`Sorry, that's incorrect.`);
-                
-                // Then announce in Chinese
-                setTimeout(() => {
-                    speakChinese(`${chineseName}，答错了。减五分，其他人加五分。`);
-                }, 2000);
-                
-                // Finally announce in English
-                setTimeout(() => {
-                    speak(`${englishName} loses 5 points, others gain 5 points.`);
-                }, 4000);
-                
-                // Create negative tokens for wrong answerer
-                createFlyingTokens(buttons[choiceIndex], getPlayerScoreElement(answeringPlayer), '-5');
-            }
-            
-            // Update display
-            updatePlayerDisplay();
-            updateStreakDisplay();
-            
-            // Move to next question - give more time for feedback
-            setTimeout(() => {
-                currentQuestion++;
-                startNewQuestion();
-            }, 6000);
-        }
-
-        // Create streak effects
+        
         function createStreakEffects(button) {
             const rect = button.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
 
-            // Create fire emojis for streak
             const fireEmojis = ['🔥', '⚡', '💥', '✨', '🌟'];
             for (let i = 0; i < 10; i++) {
                 setTimeout(() => {
@@ -1853,14 +1873,11 @@
                     fire.style.fontSize = '36px';
                     document.body.appendChild(fire);
 
-                    setTimeout(() => {
-                        fire.remove();
-                    }, 2000);
+                    setTimeout(() => fire.remove(), 2000);
                 }, i * 100);
             }
         }
 
-        // Create fireworks effect
         function createFireworks(button) {
             const rect = button.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
@@ -1874,16 +1891,12 @@
                     firework.style.top = centerY + (Math.random() - 0.5) * 200 + 'px';
                     document.body.appendChild(firework);
 
-                    setTimeout(() => {
-                        firework.remove();
-                    }, 2000);
+                    setTimeout(() => firework.remove(), 2000);
                 }, i * 100);
             }
         }
 
-        // Create winner fireworks for round winner
         function createWinnerFireworks() {
-            // Create massive fireworks display
             for (let i = 0; i < 50; i++) {
                 setTimeout(() => {
                     const firework = document.createElement('div');
@@ -1892,13 +1905,10 @@
                     firework.style.top = Math.random() * window.innerHeight + 'px';
                     document.body.appendChild(firework);
 
-                    setTimeout(() => {
-                        firework.remove();
-                    }, 3000);
+                    setTimeout(() => firework.remove(), 3000);
                 }, i * 100);
             }
 
-            // Create celebration emoji bursts
             const celebrationEmojis = ['🎉', '🎊', '🏆', '👑', '🥇', '⭐', '✨', '🌟', '💫', '🔥'];
             for (let i = 0; i < 30; i++) {
                 setTimeout(() => {
@@ -1909,14 +1919,11 @@
                     burst.style.top = Math.random() * window.innerHeight + 'px';
                     document.body.appendChild(burst);
 
-                    setTimeout(() => {
-                        burst.remove();
-                    }, 2000);
+                    setTimeout(() => burst.remove(), 2000);
                 }, i * 150);
             }
         }
 
-        // Create sparkles effect
         function createSparkles(button) {
             const rect = button.getBoundingClientRect();
 
@@ -1928,13 +1935,10 @@
                     sparkle.style.top = rect.top + Math.random() * rect.height + 'px';
                     document.body.appendChild(sparkle);
 
-                    setTimeout(() => {
-                        sparkle.remove();
-                    }, 1000);
+                    setTimeout(() => sparkle.remove(), 1000);
                 }, i * 50);
             }
             
-            // Add glitter effects
             for (let i = 0; i < 30; i++) {
                 setTimeout(() => {
                     const glitter = document.createElement('div');
@@ -1943,14 +1947,11 @@
                     glitter.style.top = rect.top + Math.random() * rect.height + 'px';
                     document.body.appendChild(glitter);
 
-                    setTimeout(() => {
-                        glitter.remove();
-                    }, 2000);
+                    setTimeout(() => glitter.remove(), 2000);
                 }, i * 30);
             }
         }
 
-        // Get player score element
         function getPlayerScoreElement(playerName) {
             const playerIndex = currentPlayers.indexOf(playerName);
             if (playerIndex === 0) return document.getElementById('score1');
@@ -1959,7 +1960,6 @@
             return null;
         }
 
-        // Create flying tokens
         function createFlyingTokens(fromElement, toElement, points) {
             if (!fromElement || !toElement) return;
             
@@ -1974,183 +1974,38 @@
                     token.style.left = fromRect.left + fromRect.width / 2 + 'px';
                     token.style.top = fromRect.top + fromRect.height / 2 + 'px';
                     
-                    // Calculate trajectory
-                    const deltaX = toRect.left + toRect.width / 2 - (fromRect.left + fromRect.width / 2);
-                    const deltaY = toRect.top + toRect.height / 2 - (fromRect.top + fromRect.height / 2);
-                    
-                    token.style.setProperty('--deltaX', deltaX + 'px');
-                    token.style.setProperty('--deltaY', deltaY + 'px');
-                    
-                    // Custom animation for flying to target
-                    token.style.animation = 'none';
-                    token.style.transition = 'all 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                    
                     document.body.appendChild(token);
                     
-                    // Animate to target
                     setTimeout(() => {
+                        token.style.transition = 'all 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                         token.style.left = toRect.left + toRect.width / 2 + 'px';
                         token.style.top = toRect.top + toRect.height / 2 + 'px';
                         token.style.transform = 'scale(0.5)';
                         token.style.opacity = '0';
                     }, 50);
 
-                    setTimeout(() => {
-                        token.remove();
-                    }, 1600);
+                    setTimeout(() => token.remove(), 1600);
                 }, i * 100);
             }
         }
 
-        // Create shake effect for wrong answers
         function createShakeEffect(button) {
-            const rect = button.getBoundingClientRect();
-            
-            // Create red X marks
             for (let i = 0; i < 5; i++) {
                 setTimeout(() => {
                     const xMark = document.createElement('div');
                     xMark.innerHTML = '❌';
                     xMark.style.position = 'absolute';
-                    xMark.style.left = rect.left + Math.random() * rect.width + 'px';
-                    xMark.style.top = rect.top + Math.random() * rect.height + 'px';
+                    xMark.style.left = button.getBoundingClientRect().left + Math.random() * button.getBoundingClientRect().width + 'px';
+                    xMark.style.top = button.getBoundingClientRect().top + Math.random() * button.getBoundingClientRect().height + 'px';
                     xMark.style.fontSize = '24px';
                     xMark.style.zIndex = '1001';
                     xMark.style.pointerEvents = 'none';
                     xMark.style.animation = 'fadeOut 1.5s ease-out forwards';
                     document.body.appendChild(xMark);
 
-                    setTimeout(() => {
-                        xMark.remove();
-                    }, 1500);
+                    setTimeout(() => xMark.remove(), 1500);
                 }, i * 100);
             }
-        }
-
-        // Handle time up
-        function timeUp() {
-            gameActive = false;
-            if (!currentQuestionData) return;
-            
-            // Reset all players' streaks on timeout
-            currentPlayers.forEach(player => {
-                playerStreaks[player] = 0;
-            });
-            
-            const buttons = document.querySelectorAll('.choice-button');
-            
-            // Show correct answer across all columns
-            buttons.forEach((button, index) => {
-                const buttonText = button.querySelector('span') ? button.querySelector('span').textContent : button.textContent;
-                if (buttonText === currentQuestionData.correctTime.display) {
-                    button.classList.add('correct');
-                    createSparkles(button);
-                }
-                button.disabled = true;
-            });
-            
-            // Announce time up in both languages
-            speak("Time's up! The correct answer was " + currentQuestionData.correctTime.spoken);
-            
-            setTimeout(() => {
-                speakChinese("时间到！正确答案是" + currentQuestionData.correctTime.display);
-            }, 3000);
-            
-            // Update displays
-            updatePlayerDisplay();
-            updateStreakDisplay();
-            
-            setTimeout(() => {
-                currentQuestion++;
-                startNewQuestion();
-            }, 6000);
-        }
-
-        // End round and show leaderboard
-        function endRound() {
-            const leaderboard = document.getElementById('leaderboard');
-            const content = document.getElementById('leaderboardContent');
-            const globalContent = document.getElementById('globalScores');
-            
-            // Update global leaderboard
-            currentPlayers.forEach(player => {
-                if (!globalLeaderboard[player]) {
-                    globalLeaderboard[player] = 0;
-                }
-                globalLeaderboard[player] += playerScores[player];
-            });
-            
-            // Sort players by current round score
-            const sortedPlayers = currentPlayers.sort((a, b) => playerScores[b] - playerScores[a]);
-            
-            let leaderboardHTML = '<h3>Round Scores:</h3>';
-            sortedPlayers.forEach((player, index) => {
-                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
-                leaderboardHTML += `<div style="margin: 10px 0; font-size: 20px;">${medal} ${player.split(' / ')[0]}: ${playerScores[player]} points</div>`;
-            });
-            
-            // Sort global leaderboard
-            const globalSorted = Object.entries(globalLeaderboard)
-                .sort(([,a], [,b]) => b - a)
-                .slice(0, 10); // Top 10
-            
-            let globalHTML = '';
-            globalSorted.forEach(([player, score], index) => {
-                const medal = index === 0 ? '👑' : index === 1 ? '🥇' : index === 2 ? '🥈' : index === 3 ? '🥉' : '⭐';
-                globalHTML += `<div style="margin: 5px 0; font-size: 16px;">${medal} ${player.split(' / ')[0]}: ${score} total points</div>`;
-            });
-            
-            content.innerHTML = leaderboardHTML;
-            globalContent.innerHTML = globalHTML;
-            leaderboard.style.display = 'block';
-            
-            // Announce winner in both languages with fireworks
-            const winner = sortedPlayers[0];
-            const winnerChinese = winner.split(' / ')[0];
-            const winnerEnglish = winner.split(' / ')[1] || winnerChinese;
-            const winnerScore = playerScores[winner];
-            
-            // Create massive fireworks display for the winner
-            createWinnerFireworks();
-            
-            // First in English
-            speak(`Congratulations! Round winner!`);
-            
-            // Then in Chinese with score
-            setTimeout(() => {
-                speakChinese(`恭喜${winnerChinese}！本轮获胜！得分${winnerScore}分！`);
-            }, 2000);
-            
-            // Finally announce in English with name and score
-            setTimeout(() => {
-                speak(`${winnerEnglish} is the round champion with ${winnerScore} points!`);
-            }, 4000);
-            
-            // Automatically start next round after 5 seconds
-            setTimeout(() => {
-                nextRound();
-            }, 5000);
-        }
-
-        // Next round with automatic player shuffling
-        function nextRound() {
-            document.getElementById('leaderboard').style.display = 'none';
-            document.getElementById('streakIndicator').style.display = 'none';
-            
-            currentRound++;
-            currentQuestion = 1;
-            document.getElementById('currentRound').textContent = currentRound;
-            
-            // Reset scores and streaks for all players
-            Object.keys(playerScores).forEach(player => {
-                playerScores[player] = 0;
-            });
-            Object.keys(playerStreaks).forEach(player => {
-                playerStreaks[player] = 0;
-            });
-            
-            // Automatically select new players for next round
-            selectNewPlayers();
         }
 
         // Sound effects
@@ -2189,7 +2044,6 @@
         function playCorrectSound() {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             
-            // Play a triumphant melody
             const notes = [523, 659, 784, 1047]; // C, E, G, C
             notes.forEach((freq, index) => {
                 setTimeout(() => {
@@ -2246,42 +2100,11 @@
             }
         }
 
-        // Text-to-speech functions
-        function speak(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                const availableVoices = speechSynthesis.getVoices();
-                utterance.voice = availableVoices.find(voice => 
-                    voice.name === voices[currentVoiceIndex] || 
-                    voice.name.includes('Ava') || 
-                    voice.name.includes('Brian') || 
-                    voice.name.includes('William') || 
-                    voice.name.includes('Andrew') || 
-                    voice.name.includes('Emma')
-                ) || availableVoices.find(voice => voice.lang.includes('en')) || availableVoices[0];
-                utterance.rate = 0.85;
-                utterance.pitch = 1;
-                speechSynthesis.speak(utterance);
-                
-                currentVoiceIndex = (currentVoiceIndex + 1) % voices.length;
-            }
-        }
-
-        function speakChinese(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'zh-CN';
-                utterance.rate = 0.8;
-                utterance.pitch = 1;
-                speechSynthesis.speak(utterance);
-            }
-        }
-
         // Initialize game when page loads
         window.addEventListener('load', () => {
             setTimeout(initGame, 1000);
-            // Menu is shown by default, game container is hidden
+            ensureVoicesReady(); // Pre-load voices
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9818b49aa120945f',t:'MTc1ODI4MDk0OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
