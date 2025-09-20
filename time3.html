@@ -1329,9 +1329,6 @@
 
             updateStreakDisplay();
             startTimer();
-
-            const difficultyText = currentQuestionData.difficulty.charAt(0).toUpperCase() + currentQuestionData.difficulty.slice(1);
-            await speak(`Question ${currentQuestion}. ${difficultyText} level. Listen carefully.`);
             
             // Only play audio if the timer is still running
             if (gameActive) {
@@ -1407,8 +1404,6 @@
                 if (streakBonus > 0) chineseAnnouncement += `连续${playerStreaks[answeringPlayer]}题正确！奖励${streakBonus}分！`;
                 await speakChinese(chineseAnnouncement);
 
-                await speak(`${answeringPlayer.split(' / ')[1]} gets ${points} points!`);
-
                 createFlyingTokens(buttons[choiceIndex], getPlayerScoreElement(answeringPlayer), `+${points}`);
                 if (streakBonus > 0) createStreakEffects(buttons[choiceIndex]);
             } else {
@@ -1424,7 +1419,6 @@
                 
                 await speak(`Sorry, that's incorrect.`);
                 await speakChinese(`${answeringPlayer.split(' / ')[0]}，答错了。减五分，其他人加五分。`);
-                await speak(`${answeringPlayer.split(' / ')[1]} loses 5 points, others gain 5 points.`);
                  
                 createFlyingTokens(buttons[choiceIndex], getPlayerScoreElement(answeringPlayer), '-5');
             }
@@ -1459,7 +1453,6 @@
                 button.disabled = true;
             });
 
-            await speak(`Time's up! The correct answer was ${currentQuestionData.correctTime.spoken}`);
             await speakChinese(`时间到！正确答案是${currentQuestionData.correctTime.display}`);
             
             updatePlayerDisplay();
@@ -1505,14 +1498,12 @@
             
             const winner = sortedPlayers[0];
             const winnerChinese = winner.split(' / ')[0];
-            const winnerEnglish = winner.split(' / ')[1] || winnerChinese;
             const winnerScore = playerScores[winner];
             
             createWinnerFireworks();
 
             await speak(`Congratulations! Round winner!`);
             await speakChinese(`恭喜${winnerChinese}！本轮获胜！得分${winnerScore}分！`);
-            await speak(`${winnerEnglish} is the round champion with ${winnerScore} points!`);
             // --- [End of Original Logic] ---
             
             makeTimeout(() => { nextRound(); }, 2000);
@@ -1762,7 +1753,6 @@
                     playCorrectSound();
                     
                     await speakChinese(selectedPlayer.split(' / ')[0]);
-                    await speak(`Player ${playerIndex + 1}: ${selectedPlayer.split(' / ')[1] || selectedPlayer.split(' / ')[0]}`);
                     
                     setTimeout(() => {
                         selectPlayersSequentially(availablePlayers, playerIndex + 1);
