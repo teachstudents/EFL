@@ -809,7 +809,7 @@
                 </div>
             </div>
             <div class="round-info-display">
-                R: <span id="currentRound">1</span>/8 | Q: <span id="currentQuestion">1</span>/10
+                R: <span id="currentRound">1</span>/<span id="totalRounds">8</span> | Q: <span id="currentQuestion">1</span>/10
             </div>
         </div>
 
@@ -1134,6 +1134,7 @@
         // ======= STATE =======
         let currentGrade = null;
         let studentNames = [];
+        let totalRounds = 8;
         let currentRound = 1;
         let currentQuestion = 1;
         let currentPlayers = [];
@@ -1151,6 +1152,7 @@
         let currentVoiceIndex = 0;
 
         const voiceNames = [
+          'Microsoft Eva Online (Natural) - English (United States)',
           'Microsoft Ava Online (Natural) - English (United States)',
           'Microsoft Brian Online (Natural) - English (United States)',
           'Microsoft William Online (Natural) - English (United States)',
@@ -1234,10 +1236,11 @@
                 if (cachedVoices.length > 0) {
                     let selectedVoice;
                     if (lang === 'zh-CN') {
-                        selectedVoice = cachedVoices.find(v => v.lang === 'zh-CN');
+                        selectedVoice = cachedVoices.find(v => v.name.includes('Xiaoxiao')) || cachedVoices.find(v => v.lang === 'zh-CN');
                     } else {
                          selectedVoice = cachedVoices.find(v =>
                             v.name === voiceNames[currentVoiceIndex] ||
+                            v.name.includes('Eva') ||
                             v.name.includes('Ava') ||
                             v.name.includes('Brian') ||
                             v.name.includes('William') ||
@@ -1502,11 +1505,20 @@
             
             createWinnerFireworks();
 
-            await speak(`Congratulations! Round winner!`);
-            await speakChinese(`恭喜${winnerChinese}！本轮获胜！得分${winnerScore}分！`);
-            // --- [End of Original Logic] ---
-            
-            makeTimeout(() => { nextRound(); }, 2000);
+            if (currentRound < totalRounds) {
+                await speak(`Congratulations! Round winner!`);
+                await speakChinese(`恭喜${winnerChinese}！本轮获胜！得分${winnerScore}分！`);
+                makeTimeout(() => { nextRound(); }, 5000);
+            } else {
+                const champion = globalSorted[0];
+                if (champion) {
+                    const championName = champion[0].split(' / ')[0];
+                    const championScore = champion[1];
+                    await speak("And now, the grand champion!");
+                    await speakChinese(`总冠军是... ${championName}！总分 ${championScore} 分!`);
+                }
+                makeTimeout(() => { backToMenu(); }, 8000);
+            }
         }
 
         function nextRound() {
@@ -1515,13 +1527,64 @@
             document.getElementById('streakIndicator').style.display = 'none';
 
             currentRound++;
+
+            if (currentRound > totalRounds) {
+                backToMenu();
+                return;
+            }
+            
             currentQuestion = 1;
             document.getElementById('currentRound').textContent = currentRound;
 
             Object.keys(playerScores).forEach(player => { playerScores[player] = 0; });
             Object.keys(playerStreaks).forEach(player => { playerStreaks[player] = 0; });
 
-            selectNewPlayers();
+            if (currentRound === totalRounds) {
+                startFinalRound();
+            } else {
+                selectNewPlayers();
+            }
+        }
+        
+        function startFinalRound() {
+            const shuffleDiv = document.getElementById('nameShuffle');
+            const titleDiv = shuffleDiv.querySelector('.shuffle-title');
+            const containerDiv = document.getElementById('shuffleContainer');
+            const selectedPlayersDiv = document.getElementById('selectedPlayers');
+            
+            titleDiv.innerHTML = '🏆 FINAL ROUND! 🏆';
+            containerDiv.innerHTML = '<div style="font-size: 24px; color: #666;">Featuring the top players!</div>';
+            selectedPlayersDiv.innerHTML = '';
+
+            let topPlayers = Object.entries(globalLeaderboard)
+                                .sort(([, a], [, b]) => b - a)
+                                .map(([player]) => player)
+                                .slice(0, 3);
+
+            if (topPlayers.length < 3) {
+                const existingPlayerNames = topPlayers;
+                const availablePlayers = studentNames.filter(name => !existingPlayerNames.includes(name));
+                while (topPlayers.length < 3 && availablePlayers.length > 0) {
+                    let randomIndex = Math.floor(Math.random() * availablePlayers.length);
+                    topPlayers.push(availablePlayers.splice(randomIndex, 1)[0]);
+                }
+            }
+
+            currentPlayers = topPlayers;
+            speak("Now, for the final round, let's welcome our top players!");
+
+            currentPlayers.forEach((player, index) => {
+                const selectedDiv = document.createElement('div');
+                selectedDiv.className = 'selected-player';
+                selectedDiv.textContent = `Player ${index + 1}: ${player.split(' / ')[0]}`;
+                selectedPlayersDiv.appendChild(selectedDiv);
+            });
+            
+            shuffleDiv.style.display = 'block';
+
+            makeTimeout(() => {
+                showPlayerCountdown(true);
+            }, 4000);
         }
 
         // ======= ALL YOUR EXISTING EFFECTS, ANIMATIONS, AND OTHER FUNCTIONS ARE PRESERVED BELOW =======
@@ -1551,6 +1614,12 @@
         function selectGrade(grade) {
             currentGrade = grade;
             studentNames = studentsByGrade[grade];
+            if (grade === 10) {
+                totalRounds = 6;
+            } else {
+                totalRounds = 5;
+            }
+            document.getElementById('totalRounds').textContent = totalRounds;
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('gameContainer').style.display = 'flex';
             selectNewPlayers();
@@ -1568,6 +1637,7 @@
             usedPlayers = [];
             playerScores = {};
             playerStreaks = {};
+            globalLeaderboard = {};
             
             document.getElementById('leaderboard').style.display = 'none';
             document.getElementById('learningPhase').style.display = 'none';
@@ -1772,22 +1842,23 @@
             document.getElementById('nameShuffle').style.display = 'none';
         }
 
-        function showPlayerCountdown() {
+        function showPlayerCountdown(isFinalRound = false) {
             const shuffleDiv = document.getElementById('nameShuffle');
             const titleDiv = shuffleDiv.querySelector('.shuffle-title');
             const containerDiv = shuffleDiv.querySelector('.shuffle-container');
             
-            containerDiv.innerHTML = '';
+            if (!isFinalRound) containerDiv.innerHTML = '';
             
             let countdown = 10;
-            titleDiv.textContent = `Get Ready! Game starts in ${countdown} seconds`;
+            const titleText = isFinalRound ? 'Final Round Starts In' : 'Get Ready! Game starts in';
+            titleDiv.textContent = `${titleText} ${countdown} seconds`;
             
-            const countdownInterval = setInterval(() => {
+            const countdownInterval = makeInterval(() => {
                 countdown--;
-                titleDiv.textContent = `Get Ready! Game starts in ${countdown} seconds`;
+                titleDiv.textContent = `${titleText} ${countdown} seconds`;
                 
                 if (countdown <= 0) {
-                    clearInterval(countdownInterval);
+                    clearTimer(countdownInterval);
                     
                     currentPlayers.forEach(player => {
                         playerScores[player] = 0;
