@@ -82,7 +82,7 @@
         @keyframes slideDownFadeOut { from { opacity: 1; bottom: 20px; } to { opacity: 0; bottom: 0; } }
 
         /* Certificate Canvas */
-        #fireworks-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        #completion-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
         
         /* Final Project Hub Styles */
         .phase-card {
@@ -167,27 +167,25 @@
     </div>
     
     <!-- 
-        Best Practice: AudioWorklet for generating sound effects.
+        Best Practice: AudioWorklet for generating sound effect sequences.
         This runs on a separate audio thread, ensuring smooth, responsive audio 
         without blocking the main UI thread, preventing clicks and lag.
     -->
-    <script id="sound-effect-processor" type="worklet-script">
-        class SoundEffectProcessor extends AudioWorkletProcessor {
+    <script id="sequence-processor" type="worklet-script">
+        class SequenceProcessor extends AudioWorkletProcessor {
             constructor() {
                 super();
-                this._phase = 0;
-                this._amplitude = 0;
-                this._frequency = 440;
-                this._durationInSamples = 0;
-                this._sampleCount = 0;
+                this._sequence = [];
+                this._currentNoteIndex = 0;
+                this._samplesUntilNextStep = 0;
+                this._isPlaying = false;
 
                 this.port.onmessage = (event) => {
-                    const { type, frequency, duration } = event.data;
-                    if (type === 'play') {
-                        this._amplitude = 0.2; // Start with some volume
-                        this._frequency = frequency;
-                        this._durationInSamples = duration * sampleRate;
-                        this._sampleCount = 0; // Reset sample count to start playing
+                    if (event.data.type === 'play') {
+                        this._sequence = event.data.sequence;
+                        this._currentNoteIndex = 0;
+                        this._samplesUntilNextStep = 0;
+                        this._isPlaying = true;
                     }
                 };
             }
@@ -196,35 +194,39 @@
                 const output = outputs[0];
                 const outputChannel = output[0];
 
-                if (this._amplitude === 0) {
-                    return true; // Nothing to play, keep processor alive
+                if (!this._isPlaying) {
+                    return true;
                 }
 
                 for (let i = 0; i < outputChannel.length; i++) {
-                    if (this._sampleCount < this._durationInSamples) {
-                        const wave = Math.sin((2 * Math.PI * this._frequency * this._phase) / sampleRate);
-                        outputChannel[i] = wave * this._amplitude;
-                        this._phase++;
-                        this._sampleCount++;
-                        // Simple fade out at the very end to prevent clicks
-                        if (this._sampleCount > this._durationInSamples - 256) {
-                            this._amplitude *= 0.99;
-                        }
-                    } else {
-                        outputChannel[i] = 0; // Silence after duration
+                    if (this._samplesUntilNextStep <= 0 && this._currentNoteIndex < this._sequence.length) {
+                        const note = this._sequence[this._currentNoteIndex];
+                        
+                        this.port.postMessage({
+                            type: 'noteOn',
+                            freq: note.freq,
+                            dur: note.dur || 0.3,
+                            vol: note.vol || 0.5,
+                            waveType: note.type || 'sine'
+                        });
+
+                        const gap = note.gap || note.dur || 0.3;
+                        this._samplesUntilNextStep = gap * sampleRate;
+                        this._currentNoteIndex++;
                     }
-                }
-                
-                // If we've finished playing, reset amplitude to 0
-                if (this._sampleCount >= this._durationInSamples) {
-                    this._amplitude = 0;
-                    this._phase = 0;
+
+                    this._samplesUntilNextStep--;
+                    outputChannel[i] = 0; // The main thread will generate the actual sound
                 }
 
-                return true; // Keep the processor alive
+                if (this._currentNoteIndex >= this._sequence.length && this._samplesUntilNextStep <= - (0.3 * sampleRate) ) {
+                    this._isPlaying = false;
+                }
+
+                return true;
             }
         }
-        registerProcessor('sound-effect-processor', SoundEffectProcessor);
+        registerProcessor('sequence-processor', SequenceProcessor);
     </script>
 
 
@@ -276,51 +278,51 @@
                 
                 // STAGE 1 & 2
                 { id: 'learning-goals', type: 'html-content', content: { title: 'Stage 1: Desired Results <span aria-hidden="true">🎯</span>', html: `
-                    <p><strong class="text-rose-600">Topic:</strong> Animal Bridges and Wildlife Corridors</p>
-                    <p><strong class="text-rose-600">Theme:</strong> Human-Wildlife Coexistence and Conservation Engineering</p>
-                    <p><strong class="text-rose-600">Essential Question:</strong> How can innovative engineering and design help humans and wildlife coexist safely and support biodiversity in a developing world?</p>
-                    <p><strong class="text-rose-600">Learning Intention:</strong> We are learning to analyze how roads and cities create problems for wildlife and to design an engineering solution that helps animals move safely.</p>
-                    <hr class="my-4">
-                    <h3 class="text-2xl font-bold text-rose-600 mb-3">Success Criteria</h3>
-                    <ul class="list-disc list-inside space-y-2 text-xl">
-                        <li>I can define “habitat fragmentation” and explain why it is a problem for animals.</li>
-                        <li>I can describe two different types of wildlife crossings and how they work.</li>
-                        <li>I can collaborate to design a wildlife bridge and explain its key features.</li>
-                    </ul>` } },
+                        <p><strong class="text-rose-600">Topic:</strong> Animal Bridges and Wildlife Corridors</p>
+                        <p><strong class="text-rose-600">Theme:</strong> Human-Wildlife Coexistence and Conservation Engineering</p>
+                        <p><strong class="text-rose-600">Essential Question:</strong> How can innovative engineering and design help humans and wildlife coexist safely and support biodiversity in a developing world?</p>
+                        <p><strong class="text-rose-600">Learning Intention:</strong> We are learning to analyze how roads and cities create problems for wildlife and to design an engineering solution that helps animals move safely.</p>
+                        <hr class="my-4">
+                        <h3 class="text-2xl font-bold text-rose-600 mb-3">Success Criteria</h3>
+                        <ul class="list-disc list-inside space-y-2 text-xl">
+                            <li>I can define “habitat fragmentation” and explain why it is a problem for animals.</li>
+                            <li>I can describe two different types of wildlife crossings and how they work.</li>
+                            <li>I can collaborate to design a wildlife bridge and explain its key features.</li>
+                        </ul>` } },
                 
                 // STAGE 3 - W, H, E
                 { id: 'warm-up', type: 'html-content', content: { title: 'Hook & Engage: Warm-Up', html: `
-                    <h3 class="text-2xl font-bold text-sky-600 mb-3">Background-Building Questions</h3>
-                    <ol class="list-decimal list-inside space-y-4 text-xl">
-                        <li>Have you ever seen an animal (other than a bird) trying to cross a busy road? What happened? What were the dangers?</li>
-                        <li>Look at a map of your city. Where are the green spaces (parks, forests)? Are they connected, or are they islands separated by roads and buildings?</li>
-                        <li>If you were an animal, what would be the most difficult part of living in a city?</li>
-                    </ol>` } },
+                        <h3 class="text-2xl font-bold text-sky-600 mb-3">Background-Building Questions</h3>
+                        <ol class="list-decimal list-inside space-y-4 text-xl">
+                            <li>Have you ever seen an animal (other than a bird) trying to cross a busy road? What happened? What were the dangers?</li>
+                            <li>Look at a map of your city. Where are the green spaces (parks, forests)? Are they connected, or are they islands separated by roads and buildings?</li>
+                            <li>If you were an animal, what would be the most difficult part of living in a city?</li>
+                        </ol>` } },
                 { id: 'vocab-start', type: 'simple', content: { title: 'Unit Vocabulary <span aria-hidden="true">📚</span>', text: 'Let\'s learn the key terms for this unit. Click "Next" in the header to cycle through the words.' } },
                 { id: 'vocab-match', type: 'quiz-mcq', content: { title: 'Vocabulary Practice: Matching', questions: [] } },
                 { id: 'reading-main', type: 'html-content', content: { title: 'Reading: Tiered Texts <span aria-hidden="true">📖</span>', html: `
-                    <div class="mb-8">
-                        <h3 class="text-2xl font-bold text-blue-600 mb-3">Pre-Reading Questions</h3>
-                        <ol class="list-decimal list-inside space-y-2 text-xl">
-                            <li>Why can’t animals just stay on one side of a road?</li>
-                            <li>What kind of features would a bridge for animals need to have?</li>
-                            <li>Do you think building a bridge for animals is a good use of money? Why or why not?</li>
-                        </ol>
-                    </div>
-                    <div class="space-y-6">
-                        <div class="bg-blue-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-xl text-blue-800">Text 1: A Safe Path for Animals</h4>
-                            <p>When we build a big road, it can cut a forest in two. This is called habitat fragmentation. It is a problem for animals. They cannot move to find food or meet other animals. It is also dangerous for them to cross the road. To help, we can build special bridges for animals. A bridge that goes over the road is an overpass. A tunnel that goes under the road is an underpass. These bridges are covered with grass and trees to make them feel like a real habitat. This helps animals cross safely.</p>
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-blue-600 mb-3">Pre-Reading Questions</h3>
+                            <ol class="list-decimal list-inside space-y-2 text-xl">
+                                <li>Why can’t animals just stay on one side of a road?</li>
+                                <li>What kind of features would a bridge for animals need to have?</li>
+                                <li>Do you think building a bridge for animals is a good use of money? Why or why not?</li>
+                            </ol>
                         </div>
-                        <div class="bg-yellow-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-xl text-yellow-800">Text 2: Connecting a Fragmented World</h4>
-                            <p>Human infrastructure, like highways and railways, is essential for our lives. However, it creates a serious problem for wildlife: habitat fragmentation. When a road cuts through a forest, it creates two smaller, isolated islands of land. This is dangerous for the biodiversity of the area. Animal populations can become trapped, unable to access food, water, or mates in the other part of their habitat. This can lead to a decline in their numbers. The solution is to create wildlife corridors. These are safe passages that connect fragmented habitats. The most famous examples are wildlife overpasses—large bridges covered in native vegetation—and underpasses. These structures allow for the safe migration of animals, from large deer to small amphibians, promoting human-wildlife coexistence and preventing vehicle collisions.</p>
-                        </div>
-                        <div class="bg-red-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-xl text-red-800">Text 3: Engineering for Coexistence: The Science of Wildlife Corridors</h4>
-                            <p>As human development expands, the integrity of natural ecosystems is increasingly threatened by habitat fragmentation. This phenomenon, primarily caused by linear infrastructure like highways, isolates wildlife populations, which restricts genetic exchange and can lead to local extinctions. This loss of connectivity is one of the greatest threats to global biodiversity. Effective conservation strategies must therefore address this challenge directly. The most successful interventions are wildlife corridors, engineered structures that restore landscape connectivity. These range from large-scale vegetated overpasses that mimic natural habitat for large mammals, to smaller culverts and underpasses designed for amphibians and small mammals. The design of these corridors is a science in itself. Factors such as location, width, noise-dampening barriers, and the type of vegetation are all critical for success. By providing safe passage, these structures not only protect wildlife but also enhance human safety by significantly reducing the number of dangerous and costly wildlife-vehicle collisions. They are a prime example of innovative engineering promoting coexistence in a crowded world.</p>
-                        </div>
-                    </div>` } },
+                        <div class="space-y-6">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-xl text-blue-800">Text 1: A Safe Path for Animals</h4>
+                                <p>When we build a big road, it can cut a forest in two. This is called habitat fragmentation. It is a problem for animals. They cannot move to find food or meet other animals. It is also dangerous for them to cross the road. To help, we can build special bridges for animals. A bridge that goes over the road is an overpass. A tunnel that goes under the road is an underpass. These bridges are covered with grass and trees to make them feel like a real habitat. This helps animals cross safely.</p>
+                            </div>
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-xl text-yellow-800">Text 2: Connecting a Fragmented World</h4>
+                                <p>Human infrastructure, like highways and railways, is essential for our lives. However, it creates a serious problem for wildlife: habitat fragmentation. When a road cuts through a forest, it creates two smaller, isolated islands of land. This is dangerous for the biodiversity of the area. Animal populations can become trapped, unable to access food, water, or mates in the other part of their habitat. This can lead to a decline in their numbers. The solution is to create wildlife corridors. These are safe passages that connect fragmented habitats. The most famous examples are wildlife overpasses—large bridges covered in native vegetation—and underpasses. These structures allow for the safe migration of animals, from large deer to small amphibians, promoting human-wildlife coexistence and preventing vehicle collisions.</p>
+                            </div>
+                            <div class="bg-red-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-xl text-red-800">Text 3: Engineering for Coexistence: The Science of Wildlife Corridors</h4>
+                                <p>As human development expands, the integrity of natural ecosystems is increasingly threatened by habitat fragmentation. This phenomenon, primarily caused by linear infrastructure like highways, isolates wildlife populations, which restricts genetic exchange and can lead to local extinctions. This loss of connectivity is one of the greatest threats to global biodiversity. Effective conservation strategies must therefore address this challenge directly. The most successful interventions are wildlife corridors, engineered structures that restore landscape connectivity. These range from large-scale vegetated overpasses that mimic natural habitat for large mammals, to smaller culverts and underpasses designed for amphibians and small mammals. The design of these corridors is a science in itself. Factors such as location, width, noise-dampening barriers, and the type of vegetation are all critical for success. By providing safe passage, these structures not only protect wildlife but also enhance human safety by significantly reducing the number of dangerous and costly wildlife-vehicle collisions. They are a prime example of innovative engineering promoting coexistence in a crowded world.</p>
+                            </div>
+                        </div>` } },
                 { id: 'reading-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Comprehension: Gap Fill', sentences: [] } },
                 { id: 'reading-quiz-tfng', type: 'quiz-tfng', content: { title: 'Comprehension: True/False', questions: [] } },
                 { id: 'reading-quiz-mcq', type: 'quiz-mcq', content: { title: 'Comprehension: Multiple Choice', questions: [] } },
@@ -346,65 +348,65 @@
 
                 // STAGE 3 - R, E, T, O
                 { id: 'thinking-prompts', type: 'html-content', content: { title: 'Rethink, Revise, Reflect <span aria-hidden="true">📝</span>', html: `
-                    <div class="mb-6">
-                        <h3 class="text-2xl font-bold text-purple-600 mb-3">Harkness Discussion Prompt</h3>
-                        <p class="text-xl italic">“When there is a conflict between human development (like a new highway or housing project) and wildlife conservation, which should be the priority? Is compromise always possible?”</p>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-purple-600 mb-3">Higher-Order Thinking Questions</h3>
-                        <ul class="list-disc list-inside space-y-2 text-lg">
-                            <li><b>Remembering:</b> What are two types of wildlife crossings?</li>
-                            <li><b>Understanding:</b> Explain in your own words why habitat fragmentation is a threat to biodiversity.</li>
-                            <li><b>Applying:</b> Choose a local park or green space near you. If a new road were to cut through it, where would you propose building a wildlife corridor and why?</li>
-                            <li><b>Analyzing:</b> Compare the needs of a large migrating animal (like a bear) with a small, slow-moving animal (like a turtle) when designing a wildlife corridor. How would the designs differ?</li>
-                            <li><b>Evaluating:</b> Argue whether it is more effective to build one very large, expensive wildlife overpass or many small, cheaper underpasses. Justify your reasoning.</li>
-                            <li><b>Creating:</b> You are an animal that has just used a wildlife bridge for the first time. Write a short story or a poem about your journey.</li>
-                        </ul>
-                    </div>` } },
+                        <div class="mb-6">
+                            <h3 class="text-2xl font-bold text-purple-600 mb-3">Harkness Discussion Prompt</h3>
+                            <p class="text-xl italic">“When there is a conflict between human development (like a new highway or housing project) and wildlife conservation, which should be the priority? Is compromise always possible?”</p>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-purple-600 mb-3">Higher-Order Thinking Questions</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li><b>Remembering:</b> What are two types of wildlife crossings?</li>
+                                <li><b>Understanding:</b> Explain in your own words why habitat fragmentation is a threat to biodiversity.</li>
+                                <li><b>Applying:</b> Choose a local park or green space near you. If a new road were to cut through it, where would you propose building a wildlife corridor and why?</li>
+                                <li><b>Analyzing:</b> Compare the needs of a large migrating animal (like a bear) with a small, slow-moving animal (like a turtle) when designing a wildlife corridor. How would the designs differ?</li>
+                                <li><b>Evaluating:</b> Argue whether it is more effective to build one very large, expensive wildlife overpass or many small, cheaper underpasses. Justify your reasoning.</li>
+                                <li><b>Creating:</b> You are an animal that has just used a wildlife bridge for the first time. Write a short story or a poem about your journey.</li>
+                            </ul>
+                        </div>` } },
                 { id: 'exam-practice', type: 'html-content', content: { title: 'Connections to IELTS & TOEFL', html: `
-                    <div class="space-y-6">
-                        <div>
-                            <h3 class="text-2xl font-bold text-purple-600 mb-3">IELTS Speaking Practice</h3>
-                            <p><b>Part 1:</b> Do you like animals? What is your country’s most famous animal? Do you think it’s important to protect wild animals?</p>
-                            <p><b>Part 2 (Cue Card):</b> Describe a time when you saw a wild animal. You should say: what the animal was, where you saw it, what it was doing, and explain how you felt about the experience.</p>
-                            <p><b>Part 3:</b> What are the main reasons why some animals are endangered? How can humans help protect endangered species? Do you think zoos are good or bad for animals?</p>
-                        </div>
-                        <div>
-                            <h3 class="text-2xl font-bold text-purple-600 mb-3">TOEFL Independent Speaking</h3>
-                            <p>Some people think that governments should spend money on protecting wild animals, while others think the money should be spent on human needs. Which view do you agree with and why?</p>
-                        </div>
-                    </div>` } },
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-2xl font-bold text-purple-600 mb-3">IELTS Speaking Practice</h3>
+                                <p><b>Part 1:</b> Do you like animals? What is your country’s most famous animal? Do you think it’s important to protect wild animals?</p>
+                                <p><b>Part 2 (Cue Card):</b> Describe a time when you saw a wild animal. You should say: what the animal was, where you saw it, what it was doing, and explain how you felt about the experience.</p>
+                                <p><b>Part 3:</b> What are the main reasons why some animals are endangered? How can humans help protect endangered species? Do you think zoos are good or bad for animals?</p>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-purple-600 mb-3">TOEFL Independent Speaking</h3>
+                                <p>Some people think that governments should spend money on protecting wild animals, while others think the money should be spent on human needs. Which view do you agree with and why?</p>
+                            </div>
+                        </div>` } },
                 { id: 'final-project-hub', type: 'html-content', content: { title: 'Final Project Hub <span aria-hidden="true">✍️</span>', html: `
-                    <div class="bg-gradient-to-br from-green-50 to-teal-50">
-                        <header class="bg-white shadow-lg border-b-4 border-green-500">
-                            <div class="max-w-7xl mx-auto px-6 py-8">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h1 class="text-4xl font-bold text-gray-800 mb-2"><span aria-hidden="true">🌉🐾</span> Bridging Worlds</h1>
-                                        <p class="text-xl text-gray-600">Final Project Guide</p>
-                                    </div>
-                                    <div class="rooftop-animation">
-                                        <svg class="w-24 h-24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 70 C 30 50, 70 50, 90 70" stroke="#8d6e63" stroke-width="6" fill="none"/><path d="M10 70 V 90 H 20 V 70 Z" fill="#a1887f"/><path d="M80 70 V 90 H 90 V 70 Z" fill="#a1887f"/><path d="M20 60 Q 50 40, 80 60" stroke="#4caf50" stroke-width="12" fill="none" stroke-linecap="round"/><text x="30" y="55" font-size="10">🌳</text><text x="50" y="50" font-size="10">🌲</text><text x="70" y="55" font-size="10">🌳</text></svg>
+                        <div class="bg-gradient-to-br from-green-50 to-teal-50">
+                            <header class="bg-white shadow-lg border-b-4 border-green-500">
+                                <div class="max-w-7xl mx-auto px-6 py-8">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h1 class="text-4xl font-bold text-gray-800 mb-2"><span aria-hidden="true">🌉🐾</span> Bridging Worlds</h1>
+                                            <p class="text-xl text-gray-600">Final Project Guide</p>
+                                        </div>
+                                        <div class="rooftop-animation">
+                                            <svg class="w-24 h-24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 70 C 30 50, 70 50, 90 70" stroke="#8d6e63" stroke-width="6" fill="none"/><path d="M10 70 V 90 H 20 V 70 Z" fill="#a1887f"/><path d="M80 70 V 90 H 90 V 70 Z" fill="#a1887f"/><path d="M20 60 Q 50 40, 80 60" stroke="#4caf50" stroke-width="12" fill="none" stroke-linecap="round"/><text x="30" y="55" font-size="10">🌳</text><text x="50" y="50" font-size="10">🌲</text><text x="70" y="55" font-size="10">🌳</text></svg>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </header>
-                        <section class="max-w-7xl mx-auto px-6 py-12">
-                            <div class="bg-white rounded-2xl shadow-xl p-8 mb-12">
-                                <h2 class="text-3xl font-bold text-center text-gray-800 mb-8"><span aria-hidden="true">🎯</span> Big Ideas & Understanding</h2>
-                                <div class="grid md:grid-cols-2 gap-8"><div class="bg-gradient-to-r from-green-100 to-teal-100 p-6 rounded-xl"><h3 class="text-xl font-semibold text-gray-800 mb-4"><span aria-hidden="true">🌍</span> Enduring Understanding</h3><p class="text-gray-700 leading-relaxed">Thoughtful design and infrastructure can solve complex conflicts between human development and natural ecosystems.</p></div><div class="bg-gradient-to-r from-teal-100 to-cyan-100 p-6 rounded-xl"><h3 class="text-xl font-semibold text-gray-800 mb-4"><span aria-hidden="true">💡</span> Big Idea</h3><p class="text-gray-700 leading-relaxed">We can build our world in harmony with nature.</p></div></div>
-                            </div>
-                            <div class="bg-white rounded-2xl shadow-xl p-8 mb-12">
-                                <h2 class="text-3xl font-bold text-center text-gray-800 mb-8"><span aria-hidden="true">🎓</span> Transferable KSA Skills</h2>
-                                <div class="grid md:grid-cols-3 gap-6"><div class="text-center p-6 bg-red-50 rounded-xl"><div class="text-4xl mb-4"><span aria-hidden="true">🧠</span></div><h3 class="text-xl font-semibold text-red-700 mb-3">Knowledge</h3><p class="text-gray-700 text-sm">Habitat fragmentation, types of animal crossings, urban planning, ecological corridors.</p></div><div class="text-center p-6 bg-blue-50 rounded-xl"><div class="text-4xl mb-4"><span aria-hidden="true">🛠️</span></div><h3 class="text-xl font-semibold text-blue-700 mb-3">Skills</h3><p class="text-gray-700 text-sm">Collaborative problem-solving, critical analysis, persuasive communication, research, technical design.</p></div><div class="text-center p-6 bg-green-50 rounded-xl"><div class="text-4xl mb-4"><span aria-hidden="true">❤️</span></div><h3 class="text-xl font-semibold text-green-700 mb-3">Attitudes</h3><p class="text-gray-700 text-sm">Environmental stewardship, curiosity, responsibility, confidence to advocate for creative solutions.</p></div></div>
-                            </div>
-                            <div class="mb-12">
-                                <h2 class="text-3xl font-bold text-center text-gray-800 mb-8"><span aria-hidden="true">🚀</span> Project-Based Learning Journey</h2>
-                                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6"><div class="phase-card rounded-2xl p-6 text-white cursor-pointer" onclick="showPhase(1)"><div class="text-4xl mb-4"><span aria-hidden="true">🔍</span></div><h3 class="text-xl font-bold mb-2">Phase 1</h3><p class="text-sm opacity-90">Identifying Problems & Initial Inquiry</p></div><div class="phase-card rounded-2xl p-6 text-white cursor-pointer" onclick="showPhase(2)"><div class="text-4xl mb-4"><span aria-hidden="true">📚</span></div><h3 class="text-xl font-bold mb-2">Phase 2</h3><p class="text-sm opacity-90">Researching Solutions & Concepts</p></div><div class="phase-card rounded-2xl p-6 text-white cursor-pointer" onclick="showPhase(3)"><div class="text-4xl mb-4"><span aria-hidden="true">📐</span></div><h3 class="text-xl font-bold mb-2">Phase 3</h3><p class="text-sm opacity-90">Planning & Design</p></div><div class="phase-card rounded-2xl p-6 text-white cursor-pointer" onclick="showPhase(4)"><div class="text-4xl mb-4"><span aria-hidden="true">📊</span></div><h3 class="text-xl font-bold mb-2">Phase 4</h3><p class="text-sm opacity-90">Evaluation & Communication</p></div></div>
-                            </div>
-                            <div id="phaseContent" class="bg-white rounded-2xl shadow-xl p-8"></div>
-                        </section>
-                    </div>` } },
+                            </header>
+                            <section class="max-w-7xl mx-auto px-6 py-12">
+                                <div class="bg-white rounded-2xl shadow-xl p-8 mb-12">
+                                    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8"><span aria-hidden="true">🎯</span> Big Ideas & Understanding</h2>
+                                    <div class="grid md:grid-cols-2 gap-8"><div class="bg-gradient-to-r from-green-100 to-teal-100 p-6 rounded-xl"><h3 class="text-xl font-semibold text-gray-800 mb-4"><span aria-hidden="true">🌍</span> Enduring Understanding</h3><p class="text-gray-700 leading-relaxed">Thoughtful design and infrastructure can solve complex conflicts between human development and natural ecosystems.</p></div><div class="bg-gradient-to-r from-teal-100 to-cyan-100 p-6 rounded-xl"><h3 class="text-xl font-semibold text-gray-800 mb-4"><span aria-hidden="true">💡</span> Big Idea</h3><p class="text-gray-700 leading-relaxed">We can build our world in harmony with nature.</p></div></div>
+                                </div>
+                                <div class="bg-white rounded-2xl shadow-xl p-8 mb-12">
+                                    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8"><span aria-hidden="true">🎓</span> Transferable KSA Skills</h2>
+                                    <div class="grid md:grid-cols-3 gap-6"><div class="text-center p-6 bg-red-50 rounded-xl"><div class="text-4xl mb-4"><span aria-hidden="true">🧠</span></div><h3 class="text-xl font-semibold text-red-700 mb-3">Knowledge</h3><p class="text-gray-700 text-sm">Habitat fragmentation, types of animal crossings, urban planning, ecological corridors.</p></div><div class="text-center p-6 bg-blue-50 rounded-xl"><div class="text-4xl mb-4"><span aria-hidden="true">🛠️</span></div><h3 class="text-xl font-semibold text-blue-700 mb-3">Skills</h3><p class="text-gray-700 text-sm">Collaborative problem-solving, critical analysis, persuasive communication, research, technical design.</p></div><div class="text-center p-6 bg-green-50 rounded-xl"><div class="text-4xl mb-4"><span aria-hidden="true">❤️</span></div><h3 class="text-xl font-semibold text-green-700 mb-3">Attitudes</h3><p class="text-gray-700 text-sm">Environmental stewardship, curiosity, responsibility, confidence to advocate for creative solutions.</p></div></div>
+                                </div>
+                                <div class="mb-12">
+                                    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8"><span aria-hidden="true">🚀</span> Project-Based Learning Journey</h2>
+                                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6"><div class="phase-card rounded-2xl p-6 text-white cursor-pointer" onclick="showPhase(1)"><div class="text-4xl mb-4"><span aria-hidden="true">🔍</span></div><h3 class="text-xl font-bold mb-2">Phase 1</h3><p class="text-sm opacity-90">Identifying Problems & Initial Inquiry</p></div><div class="phase-card rounded-2xl p-6 text-white cursor-pointer" onclick="showPhase(2)"><div class="text-4xl mb-4"><span aria-hidden="true">📚</span></div><h3 class="text-xl font-bold mb-2">Phase 2</h3><p class="text-sm opacity-90">Researching Solutions & Concepts</p></div><div class="phase-card rounded-2xl p-6 text-white cursor-pointer" onclick="showPhase(3)"><div class="text-4xl mb-4"><span aria-hidden="true">📐</span></div><h3 class="text-xl font-bold mb-2">Phase 3</h3><p class="text-sm opacity-90">Planning & Design</p></div><div class="phase-card rounded-2xl p-6 text-white cursor-pointer" onclick="showPhase(4)"><div class="text-4xl mb-4"><span aria-hidden="true">📊</span></div><h3 class="text-xl font-bold mb-2">Phase 4</h3><p class="text-sm opacity-90">Evaluation & Communication</p></div></div>
+                                </div>
+                                <div id="phaseContent" class="bg-white rounded-2xl shadow-xl p-8"></div>
+                            </section>
+                        </div>` } },
                 { id: 'writing-task', type: 'writing-task', content: { 
                     title: 'Writing Activity <span aria-hidden="true">✍️</span>', 
                     prompt: 'A new high-speed railway is being planned to go through a rural area near your town. Write a formal letter to your local government representative expressing your concern about habitat fragmentation and persuading them to include wildlife corridors in the railway’s design.', 
@@ -412,33 +414,33 @@
                     wordBank: ['accident', 'benefit', 'biodiversity', 'bridge', 'coexist', 'connect', 'conservation', 'corridor', 'cost', 'design', 'ecosystem', 'engineering', 'environment', 'fragmentation', 'future', 'habitat', 'highway', 'human', 'infrastructure', 'local', 'migration', 'population', 'protect', 'safety', 'wildlife']
                 } },
                 { id: 'self-assessment', type: 'html-content', content: { title: 'Self-Assessment & Rubric <span aria-hidden="true">🧑‍🏫</span>', html: `
-                    <div class="mb-8">
-                        <h3 class="text-2xl font-bold text-purple-600 mb-3">Metacognitive Self-Assessment</h3>
-                        <ol class="list-decimal list-inside space-y-4 text-xl">
-                            <li>“Which activity helped me understand the problem of habitat fragmentation the most? Why was it effective for me?”</li>
-                            <li>“On a scale of 1-5, how confident am I that I could explain the purpose of a wildlife bridge to a family member in English? What one keyword do I need to practice more?”</li>
-                        </ol>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-purple-600 mb-3">Final Project Rubric (KASE-C)</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-purple-50">
-                                        <th class="border-b-2 p-2 w-1/4">Criterion</th>
-                                        <th class="border-b-2 p-2">5 - Exemplary</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td class="border-b p-2 font-semibold">K – Knowledge</td><td class="border-b p-2">The proposal demonstrates a deep, nuanced understanding of habitat fragmentation and the specific ecological needs of the target species. It expertly analyzes the landscape and problem.</td></tr>
-                                    <tr><td class="border-b p-2 font-semibold">A – Analysis</td><td class="border-b p-2">The proposed bridge design is highly creative, technically sound, and perfectly tailored to the context. It demonstrates exceptional critical thinking and innovative, nature-inspired engineering.</td></tr>
-                                    <tr><td class="border-b p-2 font-semibold">S – Structure</td><td class="border-b p-2">The presentation is exceptionally clear, engaging, and persuasive. It uses powerful rhetorical strategies and a compelling narrative to connect with a technical and political audience.</td></tr>
-                                    <tr><td class="border-b p-2 font-semibold">E – Evidence</td><td class="border-b p-2">All claims are consistently supported by strong, relevant, and well-integrated evidence from ecological research and engineering principles. The proposal uses data and diagrams effectively.</td></tr>
-                                    <tr><td class="border-b p-2 font-semibold">C – Clarity</td><td class="border-b p-2">The student demonstrates a masterful command of English, using a wide and precise range of scientific and technical vocabulary and complex sentence structures accurately and effectively.</td></tr>
-                                </tbody>
-                            </table>
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-purple-600 mb-3">Metacognitive Self-Assessment</h3>
+                            <ol class="list-decimal list-inside space-y-4 text-xl">
+                                <li>“Which activity helped me understand the problem of habitat fragmentation the most? Why was it effective for me?”</li>
+                                <li>“On a scale of 1-5, how confident am I that I could explain the purpose of a wildlife bridge to a family member in English? What one keyword do I need to practice more?”</li>
+                            </ol>
                         </div>
-                    </div>` } },
+                        <div>
+                            <h3 class="text-2xl font-bold text-purple-600 mb-3">Final Project Rubric (KASE-C)</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-purple-50">
+                                            <th class="border-b-2 p-2 w-1/4">Criterion</th>
+                                            <th class="border-b-2 p-2">5 - Exemplary</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td class="border-b p-2 font-semibold">K – Knowledge</td><td class="border-b p-2">The proposal demonstrates a deep, nuanced understanding of habitat fragmentation and the specific ecological needs of the target species. It expertly analyzes the landscape and problem.</td></tr>
+                                        <tr><td class="border-b p-2 font-semibold">A – Analysis</td><td class="border-b p-2">The proposed bridge design is highly creative, technically sound, and perfectly tailored to the context. It demonstrates exceptional critical thinking and innovative, nature-inspired engineering.</td></tr>
+                                        <tr><td class="border-b p-2 font-semibold">S – Structure</td><td class="border-b p-2">The presentation is exceptionally clear, engaging, and persuasive. It uses powerful rhetorical strategies and a compelling narrative to connect with a technical and political audience.</td></tr>
+                                        <tr><td class="border-b p-2 font-semibold">E – Evidence</td><td class="border-b p-2">All claims are consistently supported by strong, relevant, and well-integrated evidence from ecological research and engineering principles. The proposal uses data and diagrams effectively.</td></tr>
+                                        <tr><td class="border-b p-2 font-semibold">C – Clarity</td><td class="border-b p-2">The student demonstrates a masterful command of English, using a wide and precise range of scientific and technical vocabulary and complex sentence structures accurately and effectively.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>` } },
                 { id: 'certificate', type: 'certificate', content: { title: 'Module Complete! <span aria-hidden="true">🎉</span>', text: 'You have successfully completed the "Bridging Worlds" module.', certificateTitle: 'Certificate of Completion' } }
             ]
         };
@@ -498,39 +500,39 @@
             let selectedWord = { element: null, text: '' };
 
             // --- AUDIO & TTS ENGINE ---
-            let audioContext, speechService, soundEffectNode;
+            let audioContext, speechService, sequenceNode;
             
-            /**
-             * SpeechService v5.0 (Robust and organized)
-             */
+            // --- SOUND & PHRASE CONTENT ---
+            const correctPhrases = [ "Stellar work!", "You've got it!", "Absolutely brilliant!", "That's the one!", "Incredible!", "You're a genius!", "Keep it up!", "Outstanding!", "Perfectly done!", "You're on fire!" ];
+            const incorrectPhrases = [ "That was a great attempt! Let's try another.", "Not this time, but you're getting warmer!", "Every try is a step forward. Keep going!", "Mistakes are proof that you are trying. Don't stop!", "That's not the answer, but I believe in you!", "So close! What's your next idea?", "Don't worry, the best discoveries come after a few tries.", "That's a learning opportunity! Try again.", "Your persistence is inspiring. Let's go again.", "Even experts get it wrong sometimes. You've got this!" ];
+            const correctSounds = [ {name: "Bright Ding", seq: [{freq:880,dur:0.3}]}, {name: "Double Chime", seq: [{freq:660,dur:0.2},{freq:880,dur:0.2}]}, {name: "Sparkle Sweep", seq: [{freq:500,dur:0.3},{freq:1500,dur:0.1}]}, {name: "Bell Ping", seq: [{freq:784,dur:0.4}]}, {name: "Arcade Win", seq: [{freq:880,type:'square',dur:0.15},{freq:1320,type:'square',dur:0.15}]}, {name: "Coin Drop", seq: [{freq:1200,type:'sawtooth',dur:0.15},{freq:1800,type:'sawtooth',dur:0.15}]}, {name: "Harp Pluck", seq: [{freq:660,dur:0.15},{freq:880,dur:0.15},{freq:990,dur:0.15}]}, {name: "Pop Click", seq: [{freq:1000,type:'square',dur:0.05}]}, {name: "Magic Twinkle", seq: [{freq:1200,dur:0.1},{freq:2000,dur:0.1}]}, {name: "Level Up", seq: [{freq:660,dur:0.15},{freq:880,dur:0.15},{freq:1320,dur:0.15}]}, {name: "Rising Arpeggio", seq: [{freq:523, dur:0.1}, {freq:659, dur:0.1}, {freq:784, dur:0.1}, {freq:1046, dur:0.1}]}, {name: "Quick Trill", seq: [{freq:988, dur:0.05, gap: 0.05}, {freq:1046, dur:0.05, gap: 0.05}, {freq:988, dur:0.05, gap: 0.05}, {freq:1046, dur:0.05}]}, {name: "Fanfare", seq: [{freq:784, dur:0.15}, {freq:1046, dur:0.25}]}, {name: "Confirm Beep", seq: [{freq:600, type:'triangle', dur:0.1}, {freq:1200, type:'triangle', dur:0.1, gap: 0.1}]}, {name: "Synth Pluck", seq: [{freq:900, type:'sawtooth', vol: 0.3, dur:0.2}]}, {name: "Bell Tree", seq: [{freq:2000, dur:0.05}, {freq:2500, dur:0.05, gap:0.1}, {freq:3000, dur:0.05}]}, {name: "Scale Up", seq: [{freq:440, dur:0.1}, {freq:550, dur:0.1}, {freq:660, dur:0.1}]}, {name: "Shimmer", seq: [{freq:1500, dur:0.4, vol: 0.4}, {freq:1510, dur:0.4, vol:0.4, gap: -0.4}]}, {name: "Power Up", seq: [{freq:330, type:'square', dur:0.1}, {freq:440, type:'square', dur:0.1}, {freq:660, type:'square', dur:0.2}]}, {name: "Complete Chime", seq: [{freq:1046, dur:0.5}]}, {name: "Success Chord", seq: [{freq:523.25, dur:0.4}, {freq:659.25, dur:0.4, gap: -0.4}, {freq:783.99, dur:0.4, gap: -0.4}]}, {name: "Laser Zap", seq: [{freq:1500, type:'sawtooth', dur:0.01}, {freq:500, type:'sawtooth', dur:0.1}]}, {name: "Soft Bell", seq: [{freq:1046.50, dur:0.5, vol: 0.4}]}, {name: "Echo Ping", seq: [{freq:1200, dur:0.1, gap: 0.2}, {freq:1200, dur:0.1, vol: 0.2}]}, {name: "Bubble Pop", seq: [{freq:800, type:'triangle', dur:0.05, vol:0.8}]}, {name: "Achievement", seq: [{freq:392, dur:0.1}, {freq:523, dur:0.1}, {freq:784, dur:0.2}]}, {name: "Positive Chirp", seq: [{freq:2000, type:'sine', dur:0.1}]}, {name: "Digital OK", seq: [{freq:880, type:'square', dur:0.15}, {freq:1108, type:'square', dur:0.15}]}, {name: "Crystal Clear", seq: [{freq:3000, dur:0.2, vol:0.3}]}, {name: "Triumph", seq: [{freq:523.25, type:'sawtooth', dur:0.6}]}, {name: "Glimmer", seq: [{freq:2000, dur:0.3}, {freq:2010, dur:0.3, gap: -0.3}]}, {name: "Double Pop", seq: [{freq:1000, type:'square', dur:0.05, gap:0.05}, {freq:1200, type:'square', dur:0.05}]}, {name: "Ascend", seq: [{freq:440, dur:0.05}, {freq:554, dur:0.05}, {freq:659, dur:0.05}, {freq:880, dur:0.1}]}, {name: "Mission Done", seq: [{freq:261, dur:0.15}, {freq:392, dur:0.15}, {freq:523, dur:0.3}]}, {name: "Harp Cascade", seq: [{freq:1046, dur:0.1}, {freq:784, dur:0.1}, {freq:659, dur:0.1}, {freq:523, dur:0.1}]}, {name: "Victory", seq: [{freq:523, dur:0.1}, {freq:523, dur:0.1, gap:0.1}, {freq:784, dur:0.2}, {freq:659, dur:0.3}]}, {name: "Simple OK", seq: [{freq:700, type:'triangle', dur:0.2}]}, {name: "Gleam", seq: [{freq:4000, dur:0.05, vol:0.2}]}, {name: "Prize Reveal", seq: [{freq:1200, dur:0.1}, {freq:1600, dur:0.1}, {freq:2000, dur:0.2}]}, {name: "Final Ding", seq: [{freq:1046.50, dur:0.4}]} ];
+            const incorrectSounds = [ {name: "Buzzer", seq: [{freq:200,type:'square',dur:0.5}]}, {name: "Double Buzz", seq: [{freq:200,type:'square',dur:0.2},{freq:200,type:'square',dur:0.2}]}, {name: "Descending Wah", seq: [{freq:600,dur:0.2},{freq:200,dur:0.3}]}, {name: "Flat Fail", seq: [{freq:150,dur:0.4}]}, {name: "Error Beep", seq: [{freq:400,type:'sawtooth',dur:0.3}]}, {name: "Glitch Zap", seq: [{freq:1000,type:'square',dur:0.05},{freq:300,type:'square',dur:0.05}]}, {name: "Sad Trombone", seq: [{freq:400,dur:0.2},{freq:300,dur:0.2},{freq:200,dur:0.3}]}, {name: "Reject Click", seq: [{freq:100,type:'square',dur:0.05}]}, {name: "Alarm Chirp", seq: [{freq:500,dur:0.2},{freq:500,dur:0.2}]}, {name: "Drop Off", seq: [{freq:800,dur:0.2},{freq:100,dur:0.3}]}, {name: "Wobble", seq: [{freq:300, dur:0.4}, {freq:290, dur:0.4, gap: -0.4}]}, {name: "Downward Slide", seq: [{freq:500, type:'sawtooth', dur:0.05}, {freq:400, type:'sawtooth', dur:0.05}, {freq:300, type:'sawtooth', dur:0.05}, {freq:200, type:'sawtooth', dur:0.2}]}, {name: "Detuned Chord", seq: [{freq:220, dur:0.5}, {freq:225, dur:0.5, gap: -0.5}]}, {name: "Muted Thud", seq: [{freq:100, type:'triangle', dur:0.2, vol: 0.8}]}, {name: "Static Burst", seq: [{freq:1800, type:'sawtooth', dur:0.05}, {freq:1900, type:'sawtooth', dur:0.05, gap: -0.05}, {freq:1700, type:'sawtooth', dur:0.05, gap: -0.05}]}, {name: "Game Over", seq: [{freq:330, dur:0.2}, {freq:220, dur:0.2}, {freq:110, dur:0.3}]}, {name: "Clank", seq: [{freq:800, type:'square', dur:0.1}, {freq:810, type:'square', dur:0.1, gap: -0.1}]}, {name: "Wrong Synth", seq: [{freq:155, type:'sawtooth', dur:0.4}]}, {name: "Fail Arpeggio", seq: [{freq:523, dur:0.1}, {freq:392, dur:0.1}, {freq:261, dur:0.2}]}, {name: "Rattle", seq: [{freq:900, type:'square', dur:0.02, gap:0.02}, {freq:900, type:'square', dur:0.02, gap:0.02}, {freq:900, type:'square', dur:0.02}]}, {name: "Wrong Chord", seq: [{freq:261.63, dur:0.5}, {freq:311.13, dur:0.5, gap:-0.5}, {freq:369.99, dur:0.5, gap:-0.5}]}, {name: "System Error", seq: [{freq:110, type:'square', dur:0.6}]}, {name: "Mechanical Fail", seq: [{freq:250, type:'sawtooth', dur:0.2}, {freq:240, type:'sawtooth', dur:0.2, gap:-0.2}]}, {name: "Short Circuit", seq: [{freq:1800, type:'square', dur:0.02}, {freq:1850, type:'square', dur:0.02, gap:-0.02}]}, {name: "Deflated", seq: [{freq:500, dur:0.1}, {freq:400, dur:0.1}, {freq:300, dur:0.1}, {freq:200, dur:0.2}]}, {name: "Denied", seq: [{freq:220, dur:0.2, gap:0.1}, {freq:220, dur:0.2}]}, {name: "Alert Beep", seq: [{freq:1000, type:'sawtooth', dur:0.1, gap:0.1}, {freq:1000, type:'sawtooth', dur:0.1}]}, {name: "Low Drone", seq: [{freq:80, dur:0.8}]}, {name: "Scrape", seq: [{freq:600, type:'sawtooth', dur:0.3}, {freq:610, type:'sawtooth', dur:0.3, gap:-0.3}]}, {name: "Bonk", seq: [{freq:150, type:'triangle', dur:0.15, vol:0.9}]}, {name: "Glitchy Signal", seq: [{freq:800, type:'square', dur:0.03}, {freq:400, type:'square', dur:0.03}, {freq:1200, type:'square', dur:0.03}]}, {name: "Sad Beep", seq: [{freq:440, dur:0.3}, {freq:415, dur:0.3, gap:-0.3}]}, {name: "Error Chord", seq: [{freq:440, dur:0.4}, {freq:466, dur:0.4, gap:-0.4}]}, {name: "System Halt", seq: [{freq:100, type:'sawtooth', dur:0.6}]}, {name: "Warning Siren", seq: [{freq:800, dur:0.2, gap:0.1}, {freq:700, dur:0.2}]}, {name: "Interference", seq: [{freq:2500, type:'square', dur:0.2, vol:0.2}, {freq:2550, type:'square', dur:0.2, vol:0.2, gap:-0.2}]}, {name: "Shutdown", seq: [{freq:400, type:'square', dur:0.1}, {freq:300, type:'square', dur:0.1}, {freq:200, type:'square', dur:0.2}]}, {name: "Muted Error", seq: [{freq:120, dur:0.2}]}, {name: "Dissonant Ring", seq: [{freq:1000, dur:0.4}, {freq:1015, dur:0.4, gap:-0.4}]}, {name: "Final Buzz", seq: [{freq:120, type:'square', dur:0.5}]} ];
+
+            /** * SpeechService v6.1 — Patched for fixed Microsoft Natural Online voices and corrected Australian voice */
             class SpeechService {
                 constructor() {
                     this.synth = window.speechSynthesis;
                     this.isInitialized = false;
                     this.isTtsEnabled = true;
-                    this.voices = {};
+                    this.voices = [];
                     this.speechRate = 0.85;
-                    this.maleNameHints = ['john', 'mike', 'david', 'brian', 'tom', 'chris', 'alex', 'robert', 'mark', 'james', 'paul', 'leo', 'onyx', 'alloy', 'sterling', 'carter', 'daniel', 'lachlan'];
-                    this.femaleNameHints = ['mary', 'lisa', 'susan', 'jane', 'sarah', 'emma', 'eva', 'allison', 'ava', 'samantha', 'kate', 'linda', 'mia', 'sofia', 'chen', 'fable', 'shimmer', 'li', 'maria', 'sharma', 'elizabeth'];
-                }
 
-                _getBrowserVoicePriorities() {
-                    return {
-                        edge: {
-                            female: ['Microsoft Ava Online (Natural) - English (United States)', 'Microsoft Aria Online (Natural) - English (United States)'],
-                            male: ['Microsoft Brian Online (Natural) - English (United States)', 'Microsoft Guy Online (Natural) - English (United States)']
-                        },
-                        safari: { female: ['Samantha', 'Ava (Premium)', 'Allison'], male: ['Alex', 'Tom'] },
-                        chrome: { female: ['Google US English'], male: ['Google US English'] }
+                    this.speakerVoiceMap = {
+                        'ava':     { names: ['Microsoft Ava Online (Natural) - English (United States)'], lang: 'en-US' },
+                        'emma':    { names: ['Microsoft Emma Online (Natural) - English (United States)'], lang: 'en-US' },
+                        'brian':   { names: ['Microsoft Brian Online (Natural) - English (United States)'], lang: 'en-US' },
+                        'andrew':  { names: ['Microsoft Andrew Online (Natural) - English (United States)'], lang: 'en-US' },
+                        'chris':   { names: ['Microsoft William Online (Natural) - English (Australia)'], lang: 'en-AU' },
+                        'chen':    { names: ['Microsoft Andrew Online (Natural) - English (United States)'], lang: 'en-US' },
+                        'sofia':   { names: ['Microsoft Ava Online (Natural) - English (United States)'], lang: 'en-US' },
+                        'lecturer':{ names: ['Microsoft Brian Online (Natural) - English (United States)'], lang: 'en-US' },
+                        'professor':{ names: ['Microsoft Brian Online (Natural) - English (United States)'], lang: 'en-US' },
+                        'alex':    { names: ['Microsoft Andrew Online (Natural) - English (United States)'], lang: 'en-US' },
+                        'sarah':   { names: ['Microsoft Emma Online (Natural) - English (United States)'], lang: 'en-US' },
+                        'david':   { names: ['Microsoft Brian Online (Natural) - English (United States)'], lang: 'en-US' },
+                        'leo':     { names: ['Microsoft Andrew Online (Natural) - English (United States)'], lang: 'en-US' },
+                        'mia':     { names: ['Microsoft Ava Online (Natural) - English (United States)'], lang: 'en-US' }
                     };
-                }
-
-                _getBrowser() {
-                    const ua = navigator.userAgent;
-                    if (ua.includes("Edg/")) return "edge";
-                    if (ua.includes("Chrome") && !ua.includes("Chromium")) return "chrome";
-                    if (ua.includes("Safari") && !ua.includes("Chrome")) return "safari";
-                    return "other";
                 }
 
                 async _setupVoices() {
@@ -538,136 +540,125 @@
                         if (this.synth.getVoices().length) return resolve(this.synth.getVoices());
                         this.synth.onvoiceschanged = () => resolve(this.synth.getVoices());
                     });
-                    const availableVoices = await voicesPromise;
-                    if (!availableVoices.length) { console.warn("No voices available."); return; }
-                    
-                    const browser = this._getBrowser();
-                    const priorities = this._getBrowserVoicePriorities();
-                    const keywordPriorities = ['natural', 'premium', 'enhanced', 'google', 'microsoft'];
-                    
-                    const usEnglish = availableVoices.filter(v => v.lang === 'en-US');
 
-                    const findBest = (voiceList, gender) => {
-                        const browserPriorityNames = priorities[browser]?.[gender] || [];
-                        for (const name of browserPriorityNames) {
-                            const found = voiceList.find(v => v.name === name);
-                            if (found) return found;
-                        }
-                        for (const tag of keywordPriorities) {
-                            const found = voiceList.find(v => v.name.toLowerCase().includes(tag));
-                            if (found) return found;
-                        }
-                        return voiceList[0] || null;
-                    };
-
-                    this.voices['male'] = findBest(usEnglish, 'male');
-                    this.voices['female'] = findBest(usEnglish, 'female');
-                    
-                    this.voices['default'] = this.voices['female'] || this.voices['male'] || usEnglish[0] || availableVoices.find(v => v.lang.startsWith('en'));
-
-                    if (!this.voices['male']) this.voices['male'] = this.voices['default'];
-                    if (!this.voices['female']) this.voices['female'] = this.voices['default'];
-                }
-                
-                async init() {
-                    if (this.isInitialized) return;
-                    try {
-                        await this._setupVoices();
-                        // Warm-up synthesis engine on some browsers
-                        const warmUp = new SpeechSynthesisUtterance(' ');
-                        warmUp.volume = 0;
-                        this.synth.speak(warmUp);
-                        this.synth.cancel();
-                        this.isInitialized = true;
-                    } catch (e) { console.error("Speech synthesis setup failed:", e); }
-                }
-                
-                _getVoiceKeyForSpeaker(speakerName) {
-                    const lower = speakerName.toLowerCase().replace(/dr\.|mr\./g, '').trim();
-                    if (this.maleNameHints.some(h => lower.includes(h))) return this.voices['male'];
-                    if (this.femaleNameHints.some(h => lower.includes(h))) return this.voices['female'];
-
-                    const ukEnglish = this.synth.getVoices().filter(v => v.lang.startsWith('en-GB'));
-                    const auEnglish = this.synth.getVoices().filter(v => v.lang.startsWith('en-AU'));
-                    const voiceMap = {
-                         'professor': ukEnglish.find(v => /daniel|oliver/i.test(v.name)) || ukEnglish[0],
-                         'lecturer': ukEnglish.find(v => /daniel|oliver/i.test(v.name)) || ukEnglish[0],
-                         'chris': auEnglish.find(v => /lee|russell/i.test(v.name)) || auEnglish[0]
-                    };
-                    if(voiceMap[lower]) return voiceMap[lower];
-
-                    return this.voices['default'];
-                }
-
-                async speak(text, { onEndCallback = null } = {}) {
-                    if (!this.isInitialized || !this.isTtsEnabled || !text) {
-                        if (onEndCallback) onEndCallback();
+                    this.voices = await voicesPromise;
+                    if (!this.voices.length) {
+                        console.warn("No voices available.");
                         return;
                     }
+                    
+                    const warmUp = new SpeechSynthesisUtterance(' ');
+                    warmUp.volume = 0;
+                    this.synth.speak(warmUp);
                     this.synth.cancel();
-                    await new Promise(resolve => setTimeout(resolve, 150)); // Delay to prevent race conditions
+
+                    this.isInitialized = true;
+                    console.log("Voices loaded and speech engine warmed up:", this.voices.map(v => v.name));
+                }
+
+                _getVoiceForSpeaker(speakerName) {
+                    if (!speakerName) return null;
+                    const key = speakerName.toLowerCase();
+                    const entry = this.speakerVoiceMap[key];
+                    if (!entry) return null;
+
+                    for (const preferredName of entry.names) {
+                        const match = this.voices.find(v => v.name === preferredName);
+                        if (match) return match;
+                    }
+                    return this.voices.find(v => v.lang === entry.lang) || null;
+                }
+
+                speak(text, speakerName = null, rate = this.speechRate) {
+                    if (!this.isTtsEnabled || !text || !text.trim()) {
+                        return;
+                    }
+                    if (!this.isInitialized) {
+                        console.warn("SpeechService not initialized yet.");
+                        return;
+                    }
+                
+                    this.synth.cancel();
+                
                     const utter = new SpeechSynthesisUtterance(text);
-                    utter.voice = this.voices['default'];
-                    utter.rate = this.speechRate;
-                    if (onEndCallback) utter.onend = onEndCallback;
+                    utter.rate = rate;
+                
+                    const finalSpeakerName = speakerName || 'brian';
+                    const voice = this._getVoiceForSpeaker(finalSpeakerName);
+                
+                    if (voice) {
+                        utter.voice = voice;
+                    } else {
+                        utter.voice = this.voices.find(v => v.lang === 'en-US') || this.voices[0];
+                        console.warn(`Voice for speaker "${finalSpeakerName}" not found. Using fallback: ${utter.voice?.name}`);
+                    }
+                
                     utter.onerror = (e) => {
                         if (e.error !== 'canceled') {
-                           console.error('SpeechSynthesisUtterance.onerror', e);
+                           console.error("SpeechSynthesisUtterance.onerror", e);
                         }
-                        if (onEndCallback) onEndCallback();
                     };
                     this.synth.speak(utter);
                 }
 
-                async speakDialogue(text) {
-                    if (!this.isInitialized || !this.isTtsEnabled || !text) return;
-
-                    this.synth.cancel();
-                    await new Promise(resolve => setTimeout(resolve, 150)); // Delay to prevent race conditions
-                    const lines = text.split('\n').filter(line => line.trim() !== '');
-                    const queue = lines.map(line => {
-                        const [speaker, ...dialogueParts] = line.split(':');
-                        const dialogue = dialogueParts.join(':').trim();
-                        if (!dialogue) return null;
-
-                        const utter = new SpeechSynthesisUtterance(dialogue);
-                        utter.voice = this._getVoiceKeyForSpeaker(speaker.trim());
-                        utter.rate = this.speechRate;
-                        
-                        utter.onerror = (e) => {
-                            if (e.error !== 'canceled') {
-                                console.error('SpeechSynthesisUtterance.onerror (dialogue)', e);
-                            }
-                        };
-                        
-                        return utter;
-                    }).filter(item => item !== null);
-
-                    const playNext = () => {
-                        if (queue.length > 0 && this.isTtsEnabled) {
-                            const item = queue.shift();
-                            item.onend = playNext;
-                            this.synth.speak(item);
-                        }
-                    };
-                    playNext();
-                }
-                
-                cancel() { if (this.synth) this.synth.cancel(); }
-
-                toggleTTS(forceState) {
-                    this.isTtsEnabled = forceState === undefined ? !this.isTtsEnabled : forceState;
-                    if (!this.isTtsEnabled) {
-                        this.cancel();
-                    }
-                    return this.isTtsEnabled;
+                toggleTts() {
+                    this.isTtsEnabled = !this.isTtsEnabled;
                 }
             }
+            
+            async function speakDialogue(text) {
+                if (!speechService || !speechService.isInitialized || !speechService.isTtsEnabled || !text) {
+                    return;
+                }
+                
+                if (speechService.synth) speechService.synth.cancel();
+                await new Promise(resolve => setTimeout(resolve, 150)); 
 
+                const lines = text.split('\n').filter(line => line.trim() !== '');
+                const queue = lines.map(line => {
+                    const parts = line.split(':');
+                    const speaker = parts.length > 1 ? parts[0].trim() : null;
+                    const dialogue = (parts.length > 1 ? parts.slice(1).join(':') : line).trim();
+
+                    if (!dialogue) return null;
+
+                    const utter = new SpeechSynthesisUtterance(dialogue);
+                    utter.rate = speechService.speechRate;
+                    
+                    const voice = speechService._getVoiceForSpeaker(speaker);
+                    if (voice) {
+                        utter.voice = voice;
+                    } else {
+                        utter.voice = speechService.voices.find(v => v.lang === 'en-US') || speechService.voices[0];
+                    }
+                    
+                    utter.onerror = (e) => {
+                        if (e.error !== 'canceled') {
+                            console.error('SpeechSynthesisUtterance.onerror (dialogue)', e);
+                        }
+                    };
+                    
+                    return utter;
+                }).filter(item => item !== null);
+
+                let currentUtteranceIndex = 0;
+
+                const playNext = () => {
+                    if (currentUtteranceIndex < queue.length && speechService.isTtsEnabled) {
+                        const item = queue[currentUtteranceIndex];
+                        item.onend = playNext;
+                        speechService.synth.speak(item);
+                        currentUtteranceIndex++;
+                    }
+                };
+                playNext();
+            }
 
             window.toggleTTS = (button) => {
                 if (!speechService) return;
-                const isNowEnabled = speechService.toggleTTS();
+                speechService.toggleTts();
+                const isNowEnabled = speechService.isTtsEnabled;
+
                 const iconPath = isNowEnabled 
                     ? "M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 5.858a3 3 0 104.243 4.243M9 12l4.243 4.243"
                     : "M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707a1 1 0 011.414 0v14a1 1 0 01-1.414 0L5.586 15z M17 14l-4-4m0 4l4-4";
@@ -677,9 +668,35 @@
 
                 if (isNowEnabled) {
                     const pageData = lessonData.pages.find(p => p.id === currentPage);
-                    if (pageData && pageData.type === 'dialogue') {
-                        speechService.speakDialogue(pageData.content.dialogue);
+                     if(pageData) {
+                        if (pageData.type === 'dialogue') {
+                            speakDialogue(pageData.content.dialogue);
+                        } else {
+                            const targetPage = document.getElementById(`page-${currentPage}`);
+                            let textToSpeak = '';
+                            if (pageData.id === 'reading-main') {
+                                const readingContainer = targetPage.querySelector('.space-y-6');
+                                if (readingContainer) {
+                                    textToSpeak = Array.from(readingContainer.querySelectorAll('h4, p'))
+                                        .map(el => el.textContent)
+                                        .join(' \n ');
+                                }
+                            } else { 
+                                const readableContent = targetPage.querySelector('.readable-content');
+                                const titleElement = targetPage.querySelector('h2, h3');
+                                if (readableContent) {
+                                    textToSpeak = readableContent.innerHTML;
+                                } else if (titleElement) {
+                                    textToSpeak = titleElement.innerHTML;
+                                }
+                            }
+                            if (textToSpeak) {
+                                speechService.speak(stripHtmlAndEmojis(textToSpeak), 'brian');
+                            }
+                        }
                     }
+                } else {
+                    if (speechService.synth) speechService.synth.cancel();
                 }
             };
             
@@ -688,19 +705,16 @@
                 try {
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     
-                    // Load the sound effect processor from the inline script tag
-                    const processorScript = document.getElementById('sound-effect-processor').textContent;
+                    const processorScript = document.getElementById('sequence-processor').textContent;
                     const blob = new Blob([processorScript], { type: 'application/javascript' });
                     const workletURL = URL.createObjectURL(blob);
                     await audioContext.audioWorklet.addModule(workletURL);
 
-                    // Create the AudioWorkletNode for sound effects
-                    soundEffectNode = new AudioWorkletNode(audioContext, 'sound-effect-processor');
-                    soundEffectNode.connect(audioContext.destination);
-
-                    // Initialize speech synthesis service
+                    sequenceNode = new AudioWorkletNode(audioContext, 'sequence-processor');
+                    sequenceNode.connect(audioContext.destination);
+                    
                     speechService = new SpeechService();
-                    await speechService.init();
+                    await speechService._setupVoices();
 
                 } catch (e) {
                     console.error("Audio/Speech initialization failed:", e);
@@ -708,16 +722,15 @@
             }
 
             const playSound = (isCorrect) => {
-                if (!soundEffectNode) return;
-                // Best practice: AudioContext must be resumed after a user gesture.
+                if (!sequenceNode) return;
                 if (audioContext.state === 'suspended') {
                     audioContext.resume();
                 }
-                
-                soundEffectNode.port.postMessage({
+                const soundBank = isCorrect ? correctSounds : incorrectSounds;
+                const sound = soundBank[Math.floor(Math.random() * soundBank.length)];
+                sequenceNode.port.postMessage({
                     type: 'play',
-                    frequency: isCorrect ? 523.25 : 261.63, // C5 for correct, C4 for incorrect
-                    duration: 0.15,
+                    sequence: sound.seq
                 });
             }
 
@@ -747,7 +760,7 @@
             animateBackground();
 
             function runCompletionAnimation() {
-                const canvas = document.getElementById('fireworks-canvas');
+                const canvas = document.getElementById('completion-canvas');
                 if (!canvas) return;
                 const ctx = canvas.getContext('2d');
                 canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
@@ -809,7 +822,7 @@
                 if (pageId === currentPage) return;
                 
                 clearInterval(timerInterval);
-                if(speechService) speechService.cancel();
+                if(speechService && speechService.synth) speechService.synth.cancel();
 
                 document.getElementById(`page-${currentPage}`)?.classList.remove('active');
                 targetPage.classList.add('active');
@@ -827,19 +840,34 @@
                 }
 
                 if (speechService) {
-                    if (pageData.type === 'certificate') {
-                        runCompletionAnimation();
-                    }
                     if (pageData.type === 'dialogue') {
-                        speechService.speakDialogue(pageData.content.dialogue);
+                        speakDialogue(pageData.content.dialogue);
                     } else {
-                        const readableContent = targetPage.querySelector('.readable-content');
-                        const titleElement = targetPage.querySelector('h2, h3');
                         let textToSpeak = '';
-                        if (readableContent) textToSpeak = readableContent.innerHTML;
-                        else if (titleElement) textToSpeak = titleElement.innerHTML;
+                        if (pageData.id === 'reading-main') {
+                            const readingContainer = targetPage.querySelector('.space-y-6');
+                            if (readingContainer) {
+                                textToSpeak = Array.from(readingContainer.querySelectorAll('h4, p'))
+                                    .map(el => el.textContent)
+                                    .join(' \n ');
+                            }
+                        } else { 
+                            const readableContent = targetPage.querySelector('.readable-content');
+                            const titleElement = targetPage.querySelector('h2, h3');
+                            if (readableContent) {
+                                textToSpeak = readableContent.innerHTML;
+                            } else if (titleElement) {
+                                textToSpeak = titleElement.innerHTML;
+                            }
+                        }
                         
-                        if (textToSpeak) speechService.speak(stripHtmlAndEmojis(textToSpeak));
+                        if (textToSpeak) {
+                            speechService.speak(stripHtmlAndEmojis(textToSpeak), 'brian');
+                        }
+
+                        if (pageData.type === 'certificate') {
+                            runCompletionAnimation();
+                        }
                     }
                 }
 
@@ -873,19 +901,20 @@
             
             // --- UI FEEDBACK, BADGES, & SCORE ---
             function showFeedbackMessage(isCorrect) {
-                const correctFeedback = ["That's right!", "You got it!", "Excellent!", "Perfect!", "Great job!", "You're on fire!"];
-                const incorrectFeedback = ["Not quite!", "Give it another look!", "Keep trying!", "Don't give up!", "You'll get the next one!"];
-                const message = isCorrect ? correctFeedback[Math.floor(Math.random() * correctFeedback.length)] : incorrectFeedback[Math.floor(Math.random() * incorrectFeedback.length)];
+                const phrases = isCorrect ? correctPhrases : incorrectPhrases;
+                const message = phrases[Math.floor(Math.random() * phrases.length)];
                 
                 const toast = document.createElement('div');
                 toast.textContent = message;
                 toast.className = `feedback-toast ${isCorrect ? 'correct' : 'encouraging'}`;
-                // Best Practice: Use ARIA roles for accessibility.
-                // This ensures screen readers announce the dynamic feedback.
                 toast.setAttribute('role', 'status');
                 toast.setAttribute('aria-live', 'assertive');
                 document.body.appendChild(toast);
-                setTimeout(() => toast.remove(), 4500); // Remove after animations complete
+                setTimeout(() => toast.remove(), 4500);
+
+                if (speechService) {
+                    speechService.speak(message);
+                }
             }
 
             function updateScore(points) {
@@ -1056,7 +1085,7 @@
 
                 // Reading Comprehension Quizzes
                 lessonData.pages.find(p => p.id === 'reading-quiz-gap-fill').content.sentences = [
-                   { text: ['A bridge for animals that goes over a road is called an', '.'], answer: 'Overpass' }, { text: ['Human', 'like roads and railways can divide natural areas.'], answer: 'Infrastructure' }, { text: ['The variety of life in an area is known as', '.'], answer: 'Biodiversity' }, { text: ['When a forest is cut into separate pieces, it is called habitat', '.'], answer: 'Fragmentation' }, { text: ['Wildlife crossings help humans and animals', 'safely.'], answer: 'Coexistence' }
+                    { text: ['A bridge for animals that goes over a road is called an', '.'], answer: 'Overpass' }, { text: ['Human', 'like roads and railways can divide natural areas.'], answer: 'Infrastructure' }, { text: ['The variety of life in an area is known as', '.'], answer: 'Biodiversity' }, { text: ['When a forest is cut into separate pieces, it is called habitat', '.'], answer: 'Fragmentation' }, { text: ['Wildlife crossings help humans and animals', 'safely.'], answer: 'Coexistence' }
                 ];
                 lessonData.pages.find(p => p.id === 'reading-quiz-tfng').content.questions = [
                     { statement: 'Habitat fragmentation helps animals find more food.', correctAnswer: 'False' }, { statement: 'An underpass is a tunnel that goes under a road.', correctAnswer: 'True' }, { statement: 'Wildlife corridors only benefit animals and not humans.', correctAnswer: 'False' }, { statement: 'The design of a wildlife corridor does not need to consider vegetation.', correctAnswer: 'False' }, { statement: 'Wildlife crossings can help reduce car accidents.', correctAnswer: 'True' },
@@ -1093,7 +1122,7 @@
                     { statement: "Sarah is from Los Angeles, California.", correctAnswer: 'True' }, { statement: "David believes the farmland is more important than the sacred land.", correctAnswer: 'True' }, { statement: "Emma says the indigenous community has already agreed to relocate.", correctAnswer: 'False' }, { statement: "The group discusses the possibility of negotiating with both communities.", correctAnswer: 'True' }, { statement: "Dr. Chen is present during the discussion.", correctAnswer: 'False' }
                 ];
                 lessonData.pages.find(p => p.id === 'dilemma-solar-farm-quiz-gap-fill').content.sentences = [
-                    { text: ['David describes the dilemma as a conflict between utilitarian and', 'ethics.'], answer: 'deontological' }, { text: ['Emma argues that the sacred land is', 'because of its cultural and historical value.'], answer: 'irreplaceable' }, { text: ['Sarah believes that losing the farmland would be devastating to the rural town’s', '.'], answer: 'livelihoods' }, { text: ['Emma refers to the trauma of the', 'Generations as a real-world example.'], answer: 'Stolen' }, { text: ['David suggests exploring smaller, distributed solar projects to reduce the', 'footprint.'], answer: 'physical' }
+                    { text: ['David describes the dilemma as a conflict between utilitarian and', 'ethics.'], answer: 'deontological' }, { text: ['Emma argues that the sacred land is', 'because of its cultural and historical value.'], answer: 'irreplaceable' }, { text: ['Sarah believes that losing the farmland would be devastating to the rural town’s', '.'], answer: 'livelihoods' }, { text: ['Emma refers to the trauma of the', 'Generations as a real-world example.'], answer: 'Stolen' }, { text: ['David suggests exploring smaller, distributed solar projects to reduce the massive', '.'], answer: 'footprint' }
                 ];
 
                 lessonData.pages.find(p => p.id === 'dilemma-wind-farm-quiz-mcq').content.questions = [
@@ -1208,7 +1237,7 @@
                             pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><div class="readable-content"><h2 class="text-4xl font-bold text-center text-indigo-700 mb-6">${page.content.title}</h2><div class="text-lg leading-relaxed space-y-4 bg-gray-50 p-6 rounded-lg"><h3 class="font-bold text-xl text-indigo-600">Prompt:</h3><p>${page.content.prompt}</p><h3 class="font-bold text-xl text-indigo-600 mt-4">Sentence Starters:</h3><ul class="list-disc list-inside ml-4">${startersHTML}</ul>${wordBankHTML}</div></div><div class="text-center mt-6"><button onclick="goNext()" class="action-button bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-xl hover:bg-blue-700">Continue to Final Reflection</button></div></div>`;
                             break;
                         case 'certificate':
-                            pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-center pt-16 relative overflow-hidden"><canvas id="fireworks-canvas"></canvas><div class="relative z-10"><div class="readable-content"><h2 class="text-4xl font-bold text-amber-600 mb-4">${page.content.title}</h2><p class="text-xl text-gray-600 mb-6">${page.content.text}</p></div><div id="certificate-to-print" class="bg-green-50 border-4 border-dashed border-green-300 rounded-lg p-8 max-w-2xl mx-auto"><div class="flex justify-center mb-4"><span class="text-6xl">🌉</span></div><h3 class="text-3xl font-bold text-green-800">${page.content.certificateTitle}</h3><p class="mt-4 text-lg">This certificate is awarded to</p><p id="certificate-name" class="text-2xl font-bold text-green-600 my-2 border-b-2 border-gray-400 pb-2">[Enter Your Name Here]</p><p class="mt-4 text-lg">for successfully completing this lesson.</p><p class="mt-6 text-md"><strong>Final Score:</strong> <span id="certificate-score" class="font-bold"></span> points</p><p class="text-sm mt-1"><strong>Date of Completion:</strong> <span id="certificate-date"></span></p></div><div id="cert-controls" class="mt-6"><div id="cert-initial-controls"><input type="text" id="name-input-cert" placeholder="Enter your name for the certificate" class="text-center p-2 border rounded-lg w-full max-w-md"><button onclick="generateCertificate()" class="action-button mt-4 bg-green-600 text-white font-bold py-2 px-6 rounded-full hover:bg-green-700">Generate Certificate</button></div><div id="cert-generated-controls" class="hidden mt-4 flex flex-wrap justify-center gap-4"><button onclick="downloadCertificateAsImage()" class="action-button bg-blue-600 text-white font-bold py-2 px-4 rounded-full text-sm">Download Image</button></div></div></div></div>`;
+                            pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-center pt-16 relative overflow-hidden"><canvas id="completion-canvas"></canvas><div class="relative z-10"><div class="readable-content"><h2 class="text-4xl font-bold text-amber-600 mb-4">${page.content.title}</h2><p class="text-xl text-gray-600 mb-6">${page.content.text}</p></div><div id="certificate-to-print" class="bg-green-50 border-4 border-dashed border-green-300 rounded-lg p-8 max-w-2xl mx-auto"><div class="flex justify-center mb-4"><span class="text-6xl">🌉</span></div><h3 class="text-3xl font-bold text-green-800">${page.content.certificateTitle}</h3><p class="mt-4 text-lg">This certificate is awarded to</p><p id="certificate-name" class="text-2xl font-bold text-green-600 my-2 border-b-2 border-gray-400 pb-2">[Enter Your Name Here]</p><p class="mt-4 text-lg">for successfully completing this lesson.</p><p class="mt-6 text-md"><strong>Final Score:</strong> <span id="certificate-score" class="font-bold"></span> points</p><p class="text-sm mt-1"><strong>Date of Completion:</strong> <span id="certificate-date"></span></p></div><div id="cert-controls" class="mt-6"><div id="cert-initial-controls"><input type="text" id="name-input-cert" placeholder="Enter your name for the certificate" class="text-center p-2 border rounded-lg w-full max-w-md"><button onclick="generateCertificate()" class="action-button mt-4 bg-green-600 text-white font-bold py-2 px-6 rounded-full hover:bg-green-700">Generate Certificate</button></div><div id="cert-generated-controls" class="hidden mt-4 flex flex-wrap justify-center gap-4"><button onclick="downloadCertificateAsImage()" class="action-button bg-blue-600 text-white font-bold py-2 px-4 rounded-full text-sm">Download Image</button></div></div></div></div>`;
                             break;
                     }
                     if (pageHTML) {
