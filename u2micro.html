@@ -79,6 +79,16 @@
             background-color: #FF764A;
             transform: translateY(-2px);
         }
+        .tts-button.speaking-button::after {
+            border: none;
+            width: 12px;
+            height: 12px;
+            background-color: white;
+            margin-left: 0;
+        }
+        .tts-button.bg-white.speaking-button::after {
+            background-color: #003F5C;
+        }
         @keyframes section-glow {
             0% { box-shadow: 0 0 5px #FFA600, 0 5px 15px rgba(0,0,0,0.1); }
             50% { box-shadow: 0 0 20px #FFA600, 0 0 30px #EF5675, 0 5px 15px rgba(0,0,0,0.1); }
@@ -179,7 +189,7 @@
             <section class="content-card readable-section text-left bg-[#003F5C] text-white rounded-lg shadow-lg p-8">
                 <h2 class="text-3xl font-bold text-white mb-4">Breaking the Cycle</h2>
                 <p class="max-w-3xl text-lg mb-6">The challenge is immense, but not insurmountable. A combination of global policy, industry innovation, and individual action can turn the tide on plastic pollution. Supporting fishing villages in their transition to sustainable practices is key to protecting both their livelihoods and our shared oceans.</p>
-                <button class="tts-button bg-white text-[#003F5C] hover:bg-gray-200"></button>
+                <button class="tts-button bg-white"></button>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
                     <div class="bg-[#374C80] p-4 rounded-lg">
                         <h4 class="font-bold text-xl mb-2">Reduce & Refuse</h4>
@@ -235,14 +245,19 @@
             let targetVoice = null;
             let utteranceQueue = [];
             let currentSpeakingSection = null;
+            let currentSpeakingButton = null;
 
             function stopSpeech() {
-                window.speechSynthesis.cancel();
                 if (currentSpeakingSection) {
                     currentSpeakingSection.classList.remove('speaking');
                 }
+                if (currentSpeakingButton) {
+                    currentSpeakingButton.classList.remove('speaking-button');
+                }
                 utteranceQueue = [];
                 currentSpeakingSection = null;
+                currentSpeakingButton = null;
+                window.speechSynthesis.cancel();
             }
 
             function loadVoices() {
@@ -260,11 +275,8 @@
             loadVoices();
 
             function speakNextInQueue() {
-                if (utteranceQueue.length === 0) {
-                    if (currentSpeakingSection) {
-                        currentSpeakingSection.classList.remove('speaking');
-                        currentSpeakingSection = null;
-                    }
+                if (utteranceQueue.length === 0 || !currentSpeakingSection) {
+                    stopSpeech();
                     return;
                 }
 
@@ -275,28 +287,30 @@
                     stopSpeech();
                 };
                 
-                window.speechSynthesis.resume();
                 window.speechSynthesis.speak(utterance);
             }
 
-            function speakText(text, sectionElement) {
-                stopSpeech();
-
+            function speakText(text, sectionElement, buttonElement) {
                 if (!text || !targetVoice) {
                     console.error("Speech synthesis voice not ready or no text provided.");
                     alert("The reading voice isn't ready. Please try again in a moment.");
                     return;
                 }
+                
+                currentSpeakingSection = sectionElement;
+                currentSpeakingButton = buttonElement;
 
                 setTimeout(() => {
+                    if (currentSpeakingSection !== sectionElement) return;
+
                     const sentences = text.match(/[^.!?]+[.!?\n]+/g) || [text];
                     const cleanedSentences = sentences.map(s => s.trim()).filter(s => s.length > 0);
 
-                    if (cleanedSentences.length === 0) return;
-
-                    currentSpeakingSection = sectionElement;
-                    currentSpeakingSection.classList.add('speaking');
-
+                    if (cleanedSentences.length === 0) {
+                        stopSpeech();
+                        return;
+                    }
+                    
                     cleanedSentences.forEach(sentence => {
                         const utterance = new SpeechSynthesisUtterance(sentence);
                         utterance.voice = targetVoice;
@@ -304,22 +318,29 @@
                         utteranceQueue.push(utterance);
                     });
 
+                    currentSpeakingSection.classList.add('speaking');
+                    currentSpeakingButton.classList.add('speaking-button');
                     speakNextInQueue();
-                }, 150);
+                }, 100);
             }
 
             document.querySelectorAll('.tts-button').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const section = e.target.closest('.readable-section');
-                    if (section) {
-                        if (section === currentSpeakingSection) {
-                            stopSpeech();
-                        } else {
-                            const clone = section.cloneNode(true);
-                            clone.querySelector('.tts-button')?.remove();
-                            const textToRead = clone.textContent.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s+/g, ' ').trim();
-                            speakText(textToRead, section);
-                        }
+                    if (!section) return;
+
+                    const wasSpeaking = currentSpeakingSection !== null;
+                    const clickedSameSection = section === currentSpeakingSection;
+
+                    if (wasSpeaking) {
+                        stopSpeech();
+                    }
+
+                    if (!clickedSameSection) {
+                        const clone = section.cloneNode(true);
+                        clone.querySelector('.tts-button')?.remove();
+                        const textToRead = clone.textContent.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s+/g, ' ').trim();
+                        speakText(textToRead, section, button);
                     }
                 });
             });
