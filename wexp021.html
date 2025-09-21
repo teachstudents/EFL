@@ -569,7 +569,7 @@
             let infographicChartsInitialized = false;
 
             // --- AUDIO & TTS ENGINE (UNIFIED) ---
-            let audioContext, speechService, soundEffectNode, infographicTTSVoice;
+            let audioContext, speechService, soundEffectNode;
             
             class SpeechService {
                 constructor() {
@@ -581,6 +581,7 @@
                     this.isAndroid = /Android/i.test(navigator.userAgent);
                     this.currentSpeakingSection = null;
                     this.currentSpeakingButton = null;
+                    this.infographicTTSVoice = null;
 
                     this.speakerVoiceMap = {
                         'alex':      { names: this.isAndroid ? ['Google US English'] : ['Microsoft Brian Online (Natural)'], lang: 'en-US' },
@@ -604,7 +605,7 @@
                         this.synth.onvoiceschanged = () => resolve(this.synth.getVoices());
                     });
                     this.voices = await voicesPromise;
-                    infographicTTSVoice = this._findVoice(['Andrew', 'Brian', 'Google US English'], 'en-US') || this.voices.find(v => v.lang.startsWith('en'));
+                    this.infographicTTSVoice = this._findVoice(['Andrew', 'Brian', 'Google US English'], 'en-US') || this.voices.find(v => v.lang.startsWith('en'));
                     this.isInitialized = true;
                 }
 
@@ -702,7 +703,7 @@
                         buttonElement.classList.add('speaking-button');
 
                         const utterance = new SpeechSynthesisUtterance(textToRead);
-                        utterance.voice = infographicTTSVoice;
+                        utterance.voice = this.infographicTTSVoice;
                         utterance.rate = this.speechRate;
                         utterance.onend = () => this.cancel();
                         utterance.onerror = (e) => {
@@ -711,6 +712,51 @@
                         };
                         this.synth.speak(utterance);
                     }, 150);
+                }
+
+                speakInfographic(pageElement) {
+                    if (!this.isInitialized || !this.isTtsEnabled) return;
+                    this.cancel();
+
+                    const sections = Array.from(pageElement.querySelectorAll('.readable-section'));
+                    const utteranceQueue = [];
+
+                    sections.forEach(section => {
+                        const button = section.querySelector('.tts-button');
+                        const clone = section.cloneNode(true);
+                        clone.querySelector('.tts-button')?.remove();
+                        const textToRead = clone.textContent.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s+/g, ' ').trim();
+                        
+                        if (textToRead) {
+                            const utterance = new SpeechSynthesisUtterance(textToRead);
+                            utterance.voice = this.infographicTTSVoice;
+                            utterance.rate = this.speechRate;
+
+                            utterance.onstart = () => {
+                                document.querySelectorAll('.speaking').forEach(el => el.classList.remove('speaking'));
+                                document.querySelectorAll('.speaking-button').forEach(el => el.classList.remove('speaking-button'));
+                                
+                                this.currentSpeakingSection = section;
+                                this.currentSpeakingButton = button;
+                                section.classList.add('speaking');
+                                if (button) button.classList.add('speaking-button');
+                            };
+                            
+                            utteranceQueue.push(utterance);
+                        }
+                    });
+
+                    const playNextInQueue = () => {
+                        if (utteranceQueue.length > 0) {
+                            const nextUtterance = utteranceQueue.shift();
+                            nextUtterance.onend = playNextInQueue;
+                            this.synth.speak(nextUtterance);
+                        } else {
+                            this.cancel();
+                        }
+                    };
+                    
+                    playNextInQueue();
                 }
             }
             
@@ -860,13 +906,15 @@
                     initializeInfographicCharts();
                 }
 
-                if (speechService && pageData.type !== 'infographic') {
+                if (speechService) {
                     if (pageData.type === 'dialogue') {
                         speechService.speakDialogue(pageData.content.dialogue);
                     } else if (pageData.type === 'certificate') {
                         runCompletionAnimation();
-                        const textToSpeak = targetPage.querySelector('.readable-content')?.innerText;
-                        if(textToSpeak) speechService.speak(stripHtmlAndEmojis(textToSpeak));
+                        speechService.speak(stripHtmlAndEmojis(targetPage.querySelector('.readable-content')?.innerText || ''));
+                    } else if (pageData.type === 'infographic') {
+                        const pageElement = document.getElementById(`page-${pageId}`);
+                        if (pageElement) speechService.speakInfographic(pageElement);
                     } else {
                         const readableContent = targetPage.querySelector('.readable-content');
                         const titleElement = targetPage.querySelector('h2, h3');
