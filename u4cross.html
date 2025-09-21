@@ -26,10 +26,16 @@
             transition: all 0.1s ease-in-out;
             display: inline-block;
             margin-top: 1rem;
+            width: 150px; /* Fixed width for consistency */
+            text-align: center;
         }
         .tts-button:active {
             transform: translateY(2px);
             box-shadow: 0 2px #357ABD;
+        }
+        .tts-button.playing {
+            background-color: #e53e3e; /* Red color when playing */
+            box-shadow: 0 4px #c53030;
         }
         .card {
             background-color: white;
@@ -182,6 +188,7 @@
             const collisionContainer = document.getElementById('collision-animation');
             const solutionContainer = document.getElementById('solution-animation');
 
+            // --- Animation Logic (remains the same) ---
             const cars = ['🚗', '🚙', '🚚', '🚓', '🚑', '🏎️'];
             const animals = ['🦌', '🦊', '🦝', '🐇', '🐨', '🐿️']; 
             
@@ -249,48 +256,118 @@
                     });
                 });
             }
-
             setInterval(checkCollisions, 100);
 
-            // --- TTS Logic ---
+            // --- FIXED, MORE ROBUST TTS Logic ---
             const synth = window.speechSynthesis;
+            const buttons = document.querySelectorAll('.tts-button');
             let voices = [];
             let targetVoice = null;
+            let activeButton = null;
 
             function populateVoiceList() {
                 voices = synth.getVoices();
-                targetVoice = voices.find(voice => voice.name.includes('Andrew')) || 
-                              voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Male')) || 
-                              voices.find(voice => voice.lang === 'en-US');
+                if(voices.length > 0) {
+                    targetVoice = voices.find(voice => voice.name.includes('Andrew')) || 
+                                  voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Male')) || 
+                                  voices.find(voice => voice.lang === 'en-US');
+                }
             }
 
             populateVoiceList();
             if (synth.onvoiceschanged !== undefined) {
                 synth.onvoiceschanged = populateVoiceList;
             }
+            // Fallback timer to populate voices if onvoiceschanged isn't fired.
+            setTimeout(populateVoiceList, 250);
 
-            function speak(text) {
-                if (synth.speaking) {
-                    synth.cancel(); 
-                }
-                const utterThis = new SpeechSynthesisUtterance(text);
-                if (targetVoice) {
-                    utterThis.voice = targetVoice;
-                }
-                utterThis.pitch = 1;
-                utterThis.rate = 0.85;
-                synth.speak(utterThis);
+            function resetAllButtons() {
+                buttons.forEach(btn => {
+                    btn.classList.remove('playing');
+                    btn.textContent = 'Read Aloud';
+                });
             }
+            
+            // This is a known workaround for a Chrome bug where the speech engine can go silent.
+            // Periodically "pinging" it can keep it active.
+            setInterval(() => {
+                if (synth && !synth.speaking) {
+                    synth.resume();
+                }
+            }, 14000);
 
-            const buttons = document.querySelectorAll('.tts-button');
+
             buttons.forEach(button => {
                 button.addEventListener('click', () => {
                     const textId = button.getAttribute('data-text-id');
                     const textElement = document.getElementById(textId);
-                    if (textElement) {
-                        speak(textElement.innerText.trim());
+                    if (!textElement) return;
+
+                    // If this button is already active and speech is happening, stop it.
+                    if (activeButton === button && synth.speaking) {
+                        synth.cancel();
+                        return;
+                    }
+
+                    const speakNow = () => {
+                        // Double-check that nothing is speaking, as state can change during the timeout
+                        if (synth.speaking) {
+                           return;
+                        }
+
+                        const textToSpeak = textElement.innerText.trim();
+                        const utterThis = new SpeechSynthesisUtterance(textToSpeak);
+                        
+                        activeButton = button;
+                        
+                        if (targetVoice) {
+                            utterThis.voice = targetVoice;
+                        }
+                        utterThis.pitch = 1;
+                        utterThis.rate = 0.85; 
+
+                        utterThis.onstart = () => {
+                            resetAllButtons();
+                            button.classList.add('playing');
+                            button.textContent = 'Stop ◼';
+                        };
+
+                        utterThis.onend = () => {
+                            // Only reset if this was the utterance that was meant to be active.
+                            // This prevents a delayed 'onend' from a cancelled utterance from
+                            // resetting the UI for a newly started one.
+                            if (activeButton === button) {
+                                resetAllButtons();
+                                activeButton = null;
+                            }
+                        };
+                        
+                        utterThis.onerror = (event) => {
+                            console.error('SpeechSynthesisUtterance.onerror', event);
+                            if (activeButton === button) {
+                                resetAllButtons();
+                                activeButton = null;
+                            }
+                        };
+                        
+                        synth.speak(utterThis);
+                    };
+
+                    // If speech is active, cancel it. Then wait a moment for the engine to
+                    // fully stop and clear its state before starting the new speech.
+                    if (synth.speaking) {
+                        synth.cancel();
+                        setTimeout(speakNow, 250); // A robust delay to prevent race conditions.
+                    } else {
+                        // If nothing is playing, we can start immediately.
+                        speakNow();
                     }
                 });
+            });
+
+            // Safety net: if user navigates away, stop speaking.
+            window.addEventListener('beforeunload', () => {
+                synth.cancel();
             });
         });
     </script>
