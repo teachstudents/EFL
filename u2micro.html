@@ -279,14 +279,12 @@
                     stopSpeech();
                     return;
                 }
-
                 const utterance = utteranceQueue.shift();
                 utterance.onend = speakNextInQueue;
                 utterance.onerror = (event) => {
                     console.error('SpeechSynthesisUtterance.onerror', event);
                     stopSpeech();
                 };
-                
                 window.speechSynthesis.speak(utterance);
             }
 
@@ -297,31 +295,26 @@
                     return;
                 }
                 
+                const sentences = text.match(/[^.!?]+[.!?\n]+/g) || [text];
+                const cleanedSentences = sentences.map(s => s.trim()).filter(s => s.length > 0);
+
+                if (cleanedSentences.length === 0) {
+                    return;
+                }
+                
                 currentSpeakingSection = sectionElement;
                 currentSpeakingButton = buttonElement;
+                currentSpeakingSection.classList.add('speaking');
+                currentSpeakingButton.classList.add('speaking-button');
 
-                setTimeout(() => {
-                    if (currentSpeakingSection !== sectionElement) return;
+                cleanedSentences.forEach(sentence => {
+                    const utterance = new SpeechSynthesisUtterance(sentence);
+                    utterance.voice = targetVoice;
+                    utterance.rate = 0.85;
+                    utteranceQueue.push(utterance);
+                });
 
-                    const sentences = text.match(/[^.!?]+[.!?\n]+/g) || [text];
-                    const cleanedSentences = sentences.map(s => s.trim()).filter(s => s.length > 0);
-
-                    if (cleanedSentences.length === 0) {
-                        stopSpeech();
-                        return;
-                    }
-                    
-                    cleanedSentences.forEach(sentence => {
-                        const utterance = new SpeechSynthesisUtterance(sentence);
-                        utterance.voice = targetVoice;
-                        utterance.rate = 0.85;
-                        utteranceQueue.push(utterance);
-                    });
-
-                    currentSpeakingSection.classList.add('speaking');
-                    currentSpeakingButton.classList.add('speaking-button');
-                    speakNextInQueue();
-                }, 100);
+                speakNextInQueue();
             }
 
             document.querySelectorAll('.tts-button').forEach(button => {
@@ -329,18 +322,17 @@
                     const section = e.target.closest('.readable-section');
                     if (!section) return;
 
-                    const wasSpeaking = currentSpeakingSection !== null;
-                    const clickedSameSection = section === currentSpeakingSection;
+                    const isCurrentlySpeakingThis = section === currentSpeakingSection;
+                    
+                    stopSpeech();
 
-                    if (wasSpeaking) {
-                        stopSpeech();
-                    }
-
-                    if (!clickedSameSection) {
-                        const clone = section.cloneNode(true);
-                        clone.querySelector('.tts-button')?.remove();
-                        const textToRead = clone.textContent.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s+/g, ' ').trim();
-                        speakText(textToRead, section, button);
+                    if (!isCurrentlySpeakingThis) {
+                        setTimeout(() => {
+                            const clone = section.cloneNode(true);
+                            clone.querySelector('.tts-button')?.remove();
+                            const textToRead = clone.textContent.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s+/g, ' ').trim();
+                            speakText(textToRead, section, button);
+                        }, 250);
                     }
                 });
             });
@@ -348,4 +340,3 @@
     </script>
 </body>
 </html>
-
