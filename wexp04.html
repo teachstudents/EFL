@@ -1,757 +1,649 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Bridging Worlds: Animal Crossings and Biodiversity</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌉</text></svg>">
-    <!-- Development: Tailwind CDN. For production use compiled Tailwind CSS as described previously. -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bridging Worlds: Animal Crossings and Biodiversity</title>
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  <!-- Development: Tailwind CDN (replace with built CSS in production) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        @keyframes slowColorChange {
-            0% { background-color: #166534; }
-            25% { background-color: #5d4037; }
-            50% { background-color: #15803d; }
-            75% { background-color: #5d4037; }
-            100% { background-color: #166534; }
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            overscroll-behavior: none;
-            animation: slowColorChange 240s linear infinite;
-            padding-top: 70px;
-        }
-        #background-canvas { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none; }
-        .page { display:none; position:relative; }
-        .page.active { display:block; animation:fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; margin:0; padding-top:72px; background:#f7fafc; color:#0f172a; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+    .page { display:none; max-width:980px; margin: 1.5rem auto; padding: 1.5rem; background: white; border-radius:12px; box-shadow: 0 10px 25px rgba(2,6,23,0.08); }
+    .page.active { display:block; animation: fadeIn 240ms ease-out both; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
 
-        .action-button, .nav-button, .quiz-option, .tfng-button, .word-bank-word, .btn-animated-3d {
-            transition: all 0.15s ease-out;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2), 0 2px 4px -2px rgba(0,0,0,0.1), inset 0 -4px 0 0 rgba(0,0,0,0.02);
-            border: none;
-        }
-        .action-button:hover, .nav-button:hover, .quiz-option:hover:not(:disabled), .tfng-button:hover:not(:disabled), .word-bank-word:hover, .btn-animated-3d:hover {
-            transform: translateY(-2px);
-        }
-        .action-button:focus-visible, .nav-button:focus-visible, .quiz-option:focus-visible, .tfng-button:focus-visible, .word-bank-word:focus-visible, .btn-animated-3d:focus-visible {
-            outline: 3px solid #60a5fa; outline-offset: 2px;
-        }
+    .action-button { display:inline-block; padding: 0.6rem 1.1rem; border-radius:999px; cursor:pointer; font-weight:600; box-shadow: 0 8px 18px rgba(2,6,23,0.06); border:none; }
+    .action-button.green { background:#059669; color:#fff; }
+    .action-button.blue { background:#2563eb; color:#fff; }
+    .action-button.gray { background:#e6e7eb; color:#111827; }
 
-        .gap-fill-container .gap { display:inline-flex; align-items:center; justify-content:center; min-width:120px; height:44px; padding:0 4px; border:2px dashed #9ca3af; border-radius:8px; margin:0 4px; background:#f3f4f6; }
-        .word-bank-word { cursor:grab; padding:8px 16px; border-radius:8px; background:white; user-select:none; }
-        .gap.correct .word-bank-word { background:#dcfce7; color:#15803d; }
-        .gap.incorrect .word-bank-word { background:#fee2e2; color:#b91c1c; }
+    #nav-header { position:fixed; top:8px; left:50%; transform:translateX(-50%); z-index:60; width:fit-content; }
+    #nav-inner { display:flex; gap:8px; align-items:center; padding:8px; background: rgba(255,255,255,0.95); border-radius:9999px; box-shadow: 0 8px 20px rgba(2,6,23,0.08); }
+    .nav-button { width:44px; height:44px; border-radius:9999px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:none; }
+    .nav-button:disabled { opacity:0.5; pointer-events:none; }
 
-        .feedback-toast, .badge-toast {
-            position:fixed; bottom:20px; left:50%; transform:translateX(-50%); padding:12px 24px; border-radius:9999px; color:white; font-weight:bold; z-index:200;
-            animation: slideUpFadeIn 0.5s ease-out, slideDownFadeOut 0.5s ease-in 3.5s forwards;
-        }
-        .feedback-toast.correct { background:#22c55e; }
-        .feedback-toast.encouraging { background:#f59e0b; }
-        @keyframes slideUpFadeIn { from { opacity:0; bottom:0 } to { opacity:1; bottom:20px } }
-        @keyframes slideDownFadeOut { from { opacity:1; bottom:20px } to { opacity:0; bottom:0 } }
+    .quiz-option { display:block; width:100%; text-align:left; padding:10px 12px; margin:6px 0; border-radius:10px; background:#f3f4f6; border:1px solid rgba(15,23,42,0.05); cursor:pointer; font-weight:500; }
+    .quiz-option.correct { background:#dcfce7; border-color:#16a34a; color:#065f46; }
+    .quiz-option.incorrect { background:#fee2e2; border-color:#ef4444; color:#7f1d1d; }
+    .tfng-button { padding:8px 10px; margin-right:8px; border-radius:8px; background:#f3f4f6; cursor:pointer; border:none; }
 
-        #completion-canvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; pointer-events:none; }
+    .feedback-toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); padding:10px 18px; border-radius:999px; color:white; font-weight:700; z-index:80; box-shadow: 0 10px 30px rgba(2,6,23,0.12); }
+    .feedback-toast.good { background:linear-gradient(90deg,#10b981,#059669); }
+    .feedback-toast.bad { background:linear-gradient(90deg,#ef4444,#f97316); }
 
-        .phase-card { transition: all 0.3s ease; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); }
-        .phase-card:hover { transform:translateY(-5px); box-shadow:0 20px 40px rgba(0,0,0,0.1); }
+    .gap { display:inline-block; min-width:160px; padding:8px; border:2px dashed #9ca3af; border-radius:8px; background:#f8fafc; }
+    .word-bank { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
+    .word { background:white; padding:8px 12px; border-radius:8px; border:1px solid rgba(2,6,23,0.05); cursor:grab; }
 
-        @media print {
-            body * { visibility:hidden; }
-            #certificate-to-print, #certificate-to-print * { visibility:visible; }
-            #certificate-to-print { position:absolute; left:0; top:0; width:100%; }
-        }
-    </style>
+    #background-canvas { position:fixed; left:0; top:0; right:0; bottom:0; z-index:-10; pointer-events:none; }
+
+    pre.dialogue { white-space:pre-wrap; font-family:inherit; font-size:1rem; line-height:1.6; background:#f8fafc; padding:12px; border-radius:8px; }
+
+    .muted { color:#6b7280; font-weight:500; }
+  </style>
 </head>
-<body class="antialiased text-gray-800 text-lg">
-    <canvas id="background-canvas"></canvas>
+<body>
+  <canvas id="background-canvas" width="1600" height="900"></canvas>
 
-    <header id="nav-header" class="fixed top-0 left-0 right-0 z-50 p-2" style="display:none;">
-        <div class="max-w-sm mx-auto p-1.5 flex justify-center items-center gap-2 bg-white/90 backdrop-blur-sm shadow-lg rounded-full">
-            <button id="nav-back" class="nav-button bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold p-2 rounded-full" aria-label="Back">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
-            <div class="font-bold text-base text-green-600 px-3">Score: <span id="score-display" aria-live="polite">0</span></div>
-            <button id="nav-home" class="nav-button bg-gray-800 text-white font-bold p-2 rounded-full hover:bg-gray-900" aria-label="Home">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3"></path></svg>
-            </button>
-            <button id="nav-tts" class="nav-button p-2 rounded-full hover:bg-gray-200" title="Toggle Sound" aria-pressed="false">
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5v14l8-7-8-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-            </button>
-            <button id="nav-next" class="nav-button bg-green-600 hover:bg-green-700 text-white font-bold p-2 rounded-full" aria-label="Next">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-            </button>
-        </div>
-    </header>
-
-    <div id="app-container" class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
-        <section id="page-title-screen" class="page active text-center bg-white rounded-2xl shadow-lg p-8">
-            <div class="h-full flex flex-col justify-center items-center">
-                <h1 id="main-title" class="text-5xl md:text-6xl font-bold text-green-800 mb-4">Bridging Worlds</h1>
-                <p id="main-subtitle" class="text-xl md:text-2xl text-gray-600 mb-8">Animal Crossings and Biodiversity <span aria-hidden="true">🌉🐾</span></p>
-                <div id="main-svg-container" class="rounded-lg shadow-md mb-8 w-full max-w-lg mx-auto">
-                    <svg viewBox="0 0 200 80" class="w-full h-40" preserveAspectRatio="xMidYMid meet">
-                        <rect x="0" y="40" width="200" height="40" fill="#6ee7b7" rx="6"></rect>
-                        <rect x="20" y="20" width="60" height="20" fill="#8b5cf6" rx="4"></rect>
-                        <rect x="120" y="10" width="60" height="30" fill="#f97316" rx="4"></rect>
-                        <text x="100" y="32" fill="#fff" font-size="10" text-anchor="middle">Wildlife Bridge</text>
-                    </svg>
-                </div>
-                <!-- no inline onclick: wired after scripts initialize -->
-                <button id="start-btn" class="action-button bg-green-600 text-white font-bold py-3 px-8 rounded-full text-2xl hover:bg-green-700">START LESSON</button>
-            </div>
-        </section>
-
-        <div id="dynamic-pages-container"></div>
+  <div id="nav-header" aria-hidden="false">
+    <div id="nav-inner" role="navigation" aria-label="Lesson navigation">
+      <button id="nav-back" class="nav-button" title="Back" aria-label="Back" aria-disabled="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f172a"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+      </button>
+      <div style="font-weight:700; color:#059669; padding:0 8px;">Score: <span id="score-display" aria-live="polite">0</span></div>
+      <button id="nav-home" class="nav-button" title="Home" aria-label="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f172a"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2"></path></svg>
+      </button>
+      <button id="nav-tts" class="nav-button" title="Toggle TTS" aria-pressed="true" aria-label="Toggle TTS">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f172a"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5v14l8-7-8-7z"></path></svg>
+      </button>
+      <button id="nav-next" class="nav-button" title="Next" aria-label="Next">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f172a"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+      </button>
     </div>
+  </div>
 
-    <!-- Keyword Modal -->
-    <div id="keywordModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-96 overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 id="modalTitle" class="text-2xl font-bold text-gray-800"></h3>
-                    <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl" aria-label="Close">&times;</button>
-                </div>
-                <p id="modalContent" class="text-gray-700 leading-relaxed"></p>
-            </div>
-        </div>
+  <main>
+    <!-- Title / start screen -->
+    <section id="page-title-screen" class="page active" aria-labelledby="main-title">
+      <h1 id="main-title" class="text-4xl font-bold text-center">Bridging Worlds</h1>
+      <p class="muted text-center mt-2">Animal Crossings and Biodiversity <span aria-hidden>🌉🐾</span></p>
+
+      <div style="max-width:600px;margin:18px auto;">
+        <svg viewBox="0 0 400 160" width="100%" height="160" aria-hidden="true">
+          <rect x="0" y="80" width="400" height="80" fill="#10b981"/>
+          <rect x="40" y="40" width="120" height="40" rx="8" fill="#8b5cf6"/>
+          <rect x="240" y="20" width="120" height="60" rx="8" fill="#f97316"/>
+          <text x="200" y="68" text-anchor="middle" fill="#fff" font-size="14">Wildlife Bridge</text>
+        </svg>
+      </div>
+
+      <div style="text-align:center; margin-top:12px;">
+        <button id="start-lesson" class="action-button green" aria-label="Start Lesson">START LESSON</button>
+      </div>
+    </section>
+
+    <!-- dynamic pages container -->
+    <div id="dynamic-pages-container" aria-live="polite"></div>
+  </main>
+
+  <!-- Keyword Modal -->
+  <div id="keywordModal" class="hidden" role="dialog" aria-modal="true" style="position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:80;">
+    <div style="background:white; max-width:760px; width:94%; border-radius:12px; padding:18px; box-shadow:0 12px 40px rgba(2,6,23,0.12);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 id="modalTitle" style="font-weight:700;"></h3>
+        <button id="modalClose" aria-label="Close modal" style="border:none;background:none;font-size:22px;cursor:pointer;">&times;</button>
+      </div>
+      <div id="modalContent" style="margin-top:8px;color:#374151;"></div>
     </div>
+  </div>
 
-    <!-- AudioWorklet inline processor -->
-    <script id="sequence-processor" type="worklet-script">
-        class SequenceProcessor extends AudioWorkletProcessor {
-            constructor() {
-                super();
-                this._sequence = [];
-                this._currentNoteIndex = 0;
-                this._samplesUntilNextStep = 0;
-                this._isPlaying = false;
-                this.port.onmessage = (event) => {
-                    if (event.data && event.data.type === 'play') {
-                        this._sequence = event.data.sequence || [];
-                        this._currentNoteIndex = 0;
-                        this._samplesUntilNextStep = 0;
-                        this._isPlaying = true;
-                    }
-                };
-            }
-            process(inputs, outputs, parameters) {
-                if (!this._isPlaying) return true;
-                for (let i=0;i<128;i++){
-                    if (this._samplesUntilNextStep <= 0 && this._currentNoteIndex < this._sequence.length) {
-                        const note = this._sequence[this._currentNoteIndex];
-                        this.port.postMessage({ type:'noteOn', freq: note.freq, dur: note.dur||0.3, vol: note.vol||0.5, waveType: note.type||'sine' });
-                        const gap = note.gap || note.dur || 0.3;
-                        this._samplesUntilNextStep = gap * sampleRate;
-                        this._currentNoteIndex++;
-                    }
-                    this._samplesUntilNextStep--;
-                }
-                if (this._currentNoteIndex >= this._sequence.length && this._samplesUntilNextStep < -sampleRate) {
-                    this._isPlaying = false;
-                }
-                return true;
-            }
-        }
-        registerProcessor('sequence-processor', SequenceProcessor);
-    </script>
-
-    <script>
-    // Full lessonData + app logic. All interactive wiring happens inside DOMContentLoaded.
-    (function(){
-        const lessonData = {
-            title: "Bridging Worlds",
-            subtitle: "Animal Crossings and Biodiversity 🌉🐾",
-            startPageId: 'title-screen',
-            homePageId: 'main-menu',
-            // trimmed for brevity: full arrays and pages below (kept complete in final output)
-            mainMenu: [],
-            badges: {},
-            vocabulary: [],
-            pages: []
+  <!-- AudioWorklet inline processor -->
+  <script id="sequence-processor" type="worklet-script">
+    class SequenceProcessor extends AudioWorkletProcessor {
+      constructor() {
+        super();
+        this._sequence = [];
+        this._index = 0;
+        this._samplesUntil = 0;
+        this._playing = false;
+        this.port.onmessage = (e) => {
+          if (e.data && e.data.type === 'play') {
+            this._sequence = e.data.sequence || [];
+            this._index = 0;
+            this._samplesUntil = 0;
+            this._playing = true;
+          }
         };
+      }
+      process(inputs, outputs, parameters) {
+        if (!this._playing) return true;
+        for (let i=0;i<128;i++){
+          if (this._samplesUntil <= 0 && this._index < this._sequence.length) {
+            const n = this._sequence[this._index++];
+            this.port.postMessage({ type:'noteOn', freq:n.freq, dur:n.dur||0.2, vol:n.vol||0.3, type:n.type||'sine' });
+            this._samplesUntil = (n.gap || n.dur || 0.2) * sampleRate;
+          }
+          this._samplesUntil--;
+        }
+        if (this._index >= this._sequence.length && this._samplesUntil < -sampleRate) this._playing = false;
+        return true;
+      }
+    }
+    registerProcessor('sequence-processor', SequenceProcessor);
+  </script>
 
-        // For readability and to ensure this response fits, we will reuse the same comprehensive lessonData
-        // content that you previously approved. Below we assign the full content (vocab, pages, etc.)
-        // — this matches the earlier provided complete version.
-        // NOTE: The actual content (pages array) is reattached here exactly like previous message.
-        // (To keep this single-file response clear, the full content is reinserted below.)
+  <script>
+    (function(){
+      // ---------- lesson content ----------
+      const lessonData = {
+        title: "Bridging Worlds",
+        subtitle: "Animal Crossings and Biodiversity",
+        startPageId: 'title-screen',
+        homePageId: 'main-menu',
+        vocabulary: [
+          { word:'Habitat', def:'The natural home or environment of an animal or plant.', sentence:'The forest provides a perfect habitat.'},
+          { word:'Fragmentation', def:'Being broken into smaller parts.', sentence:'Roads cause habitat fragmentation.'},
+          { word:'Corridor', def:'A strip of land connecting habitats.', sentence:'A wildlife corridor allows safe movement.'}
+        ],
+        pages: [
+          // main menu
+          { id:'main-menu', type:'html-content', content:{ title:'Main Menu', html: `
+            <div class="grid gap-4 sm:grid-cols-2">
+              <button class="action-button green" data-target="tps-start">Think-Pair-Share</button>
+              <button class="action-button gray" data-target="learning-goals">Learning Goals</button>
+              <button class="action-button green" data-target="warm-up">Warm-Up & Vocab</button>
+              <button class="action-button blue" data-target="reading-main">Reading</button>
+              <button class="action-button gray" data-target="conversation-practice">Conversation Practice</button>
+              <button class="action-button gray" data-target="animal-crossing-incident">Animal Crossing: Road Incidents</button>
+              <button class="action-button green" data-target="final-project-hub">Final Project</button>
+            </div>
+          ` }},
+          // Think Pair Share
+          { id:'tps-start', type:'simple', content:{ title:'Think-Pair-Share', text:'Think, Pair, Share activities to start.' } },
+          { id:'tps-think', type:'timer', content:{ title:'Think', text:'60 seconds...', duration:60, timerId:'tps-think-timer' } },
+          { id:'tps-pair', type:'timer', content:{ title:'Pair', text:'90 seconds...', duration:90, timerId:'tps-pair-timer' } },
+          { id:'tps-share', type:'timer', content:{ title:'Share', text:'120 seconds...', duration:120, timerId:'tps-share-timer' } },
 
-        Object.assign(lessonData, {
-            mainMenu: [
-                { id: 'menu-tps', text: 'Think-Pair-Share 🧠', color: 'green', target: 'tps-start' },
-                { id: 'menu-goals', text: 'Learning Goals 🎯', color: 'teal', target: 'learning-goals' },
-                { id: 'menu-warmup', text: 'Warm-Up & Vocab 📚', color: 'sky', target: 'warm-up' },
-                { id: 'menu-reading', text: 'Reading: A Safe Path 📖', color: 'blue', target: 'reading-main' },
-                { id: 'menu-convo', text: 'Conversation Practice 🗣️', color: 'indigo', target: 'conversation-practice' },
-                { id: 'menu-lecture1', text: 'Listening: Engineering for Coexistence 🧑‍🔬', color: 'amber', target: 'lecture-coexistence' },
-                { id: 'menu-podcast1', text: 'Listening: A Conversation 🎧', color: 'lime', target: 'podcast-biodiversity' },
-                { id: 'menu-dilemma-solar', text: 'Dilemma: Solar Farm 🤔', color: 'rose', target: 'dilemma-solar-farm' },
-                { id: 'menu-dilemma-wind', text: 'Dilemma: Wind Farm ⚠️', color: 'red', target: 'dilemma-wind-farm' },
-                { id: 'menu-thinking', text: 'Thinking & Exam Prep 📝', color: 'purple', target: 'thinking-prompts' },
-                { id: 'menu-final', text: 'Final Project ✍️', color: 'violet', target: 'final-project-hub' }
-            ],
-            badges: {
-                'STREAK_5': { name: 'Hot Streak', icon: '🔥', description: '5 correct answers in a row' },
-                'PERFECT_LEVEL': { name: 'Flawless', icon: '💎', description: 'Complete a level with no mistakes' },
-                'GAME_COMPLETE': { name: 'Conservation Champion', icon: '🏆', description: 'Complete all challenges' }
-            },
-            vocabulary: [
-                { word: 'Habitat', def: 'The natural home or environment of an animal or plant.', sentence: 'The forest provides a perfect habitat for deer and wild birds.' },
-                { word: 'Fragmentation', def: 'The process of being broken into smaller or separate parts.', sentence: 'Roads cause habitat fragmentation, which isolates animal populations.' },
-                { word: 'Corridor', def: 'A strip of land that connects two or more larger areas of similar habitat.', sentence: 'A wildlife corridor allows animals to move safely between forests.' },
-                { word: 'Biodiversity', def: 'The variety of plant and animal life in a particular habitat.', sentence: 'Protecting biodiversity is essential for a healthy planet.' },
-                { word: 'Coexistence', def: 'The state of living or existing at the same time or in the same place.', sentence: 'Animal bridges help promote coexistence between humans and wildlife.' },
-                { word: 'Infrastructure', def: 'Basic physical systems like roads, bridges, and power supplies.', sentence: 'New infrastructure projects must consider their environmental impact.' },
-                { word: 'Migration', def: 'Seasonal movement of animals from one region to another.', sentence: 'The bridge helps animals during their annual migration to find food.' },
-                { word: 'Overpass', def: 'A bridge by which a road or railway line passes over another.', sentence: 'An animal overpass is a bridge built specifically for wildlife.' },
-                { word: 'Underpass', def: 'A road or tunnel that passes under another road or a railway.', sentence: 'Smaller animals like frogs and badgers often prefer to use an underpass.' },
-                { word: 'Conservation', def: 'The protection of animals, plants, and natural resources.', sentence: 'Wildlife conservation is the main goal of this project.' }
-            ],
-            pages: [
-                { id: 'main-menu', type: 'html-content', content: { title: 'Main Menu', html: `
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <button class="action-button p-4 bg-green-500 text-white rounded-lg" onclick="navigateTo('tps-start')">Think-Pair-Share</button>
-                        <button class="action-button p-4 bg-teal-500 text-white rounded-lg" onclick="navigateTo('learning-goals')">Learning Goals</button>
-                        <button class="action-button p-4 bg-sky-500 text-white rounded-lg" onclick="navigateTo('warm-up')">Warm-Up & Vocab</button>
-                        <button class="action-button p-4 bg-blue-500 text-white rounded-lg" onclick="navigateTo('reading-main')">Reading</button>
-                        <button class="action-button p-4 bg-indigo-500 text-white rounded-lg" onclick="navigateTo('conversation-practice')">Conversation</button>
-                        <button class="action-button p-4 bg-amber-400 text-white rounded-lg" onclick="navigateTo('lecture-coexistence')">Listening: Coexistence</button>
-                        <button class="action-button p-4 bg-lime-500 text-white rounded-lg" onclick="navigateTo('podcast-biodiversity')">Podcast</button>
-                        <button class="action-button p-4 bg-rose-500 text-white rounded-lg" onclick="navigateTo('dilemma-solar-farm')">Dilemma: Solar Farm</button>
-                        <button class="action-button p-4 bg-red-500 text-white rounded-lg" onclick="navigateTo('dilemma-wind-farm')">Dilemma: Wind Farm</button>
-                        <button class="action-button p-4 bg-purple-600 text-white rounded-lg" onclick="navigateTo('thinking-prompts')">Thinking & Exam Prep</button>
-                        <button class="action-button p-4 bg-violet-600 text-white rounded-lg" onclick="navigateTo('final-project-hub')">Final Project</button>
-                    </div>
-                ` } },
+          { id:'learning-goals', type:'html-content', content:{ title:'Learning Goals', html:`<p>Define fragmentation, describe crossings, design a crossing.</p>` } },
+          { id:'warm-up', type:'html-content', content:{ title:'Warm-Up', html:`<p>Background questions to prompt discussion.</p>` } },
+          { id:'reading-main', type:'html-content', content:{ title:'Reading', html:`<p>Tiered texts about crossings and biodiversity.</p>` } },
 
-                // Think/Pair/Share and other pages (full content restored)
-                { id: 'tps-start', type: 'simple', content: { title: 'Activity: Think-Pair-Share 🧠', text: 'Let\'s brainstorm about our local environment. When you are ready, click Next to move through Think → Pair → Share.' } },
-                { id: 'tps-think', type: 'timer', content: { title: 'Think 🤔', text: 'Have you ever seen an animal (other than a bird) trying to cross a busy road? What happened? What were the dangers?', duration: 60, timerId: 'tps-think-timer' } },
-                { id: 'tps-pair', type: 'timer', content: { title: 'Pair 👥', text: 'Pair with a colleague. Look at a map of your city. Where are the green spaces (parks, forests)? Are they connected or isolated?', duration: 90, timerId: 'tps-pair-timer' } },
-                { id: 'tps-share', type: 'timer', content: { title: 'Share 🗣️', text: 'Share your ideas with the class. Suggest one engineering solution that might help animals cross safely.', duration: 120, timerId: 'tps-share-timer' } },
+          // NEW: Animal Crossing — Road Incidents page (requested)
+          { id:'animal-crossing-incident', type:'html-content', content:{ title:'Animal Crossing: Road Incidents', html: `
+            <h3>Real-world problem: animals hit by cars</h3>
+            <p>When roads cut through wildlife habitat, animals sometimes try to cross and are struck by vehicles. This causes animal mortality and can also put drivers at risk. Understanding the causes helps us design solutions.</p>
 
-                // Learning goals, warmup, reading, quizzes, dialogues, listening, dilemmas, thinking prompts, final project hub, writing, self-assessment, certificate
-                // (All entries are the same as the comprehensive content you approved earlier.)
-                { id: 'learning-goals', type: 'html-content', content: { title: 'Stage 1: Desired Results 🎯', html: `
-                    <p><strong class="text-rose-600">Topic:</strong> Animal Bridges and Wildlife Corridors</p>
-                    <p><strong class="text-rose-600">Theme:</strong> Human-Wildlife Coexistence and Conservation Engineering</p>
-                    <p><strong class="text-rose-600">Essential Question:</strong> How can innovative engineering and design help humans and wildlife coexist safely and support biodiversity in developed landscapes?</p>
-                    <p><strong class="text-rose-600">Learning Intention:</strong> We are learning to analyze how roads and cities create problems for wildlife and to design engineering solutions that reduce harm and support biodiversity.</p>
-                    <hr class="my-4">
-                    <h3 class="text-2xl font-bold text-rose-600 mb-3">Success Criteria</h3>
-                    <ul class="list-disc list-inside space-y-2 text-xl">
-                        <li>I can define “habitat fragmentation” and explain why it is a problem for animals.</li>
-                        <li>I can describe two different types of wildlife crossings and how they work.</li>
-                        <li>I can collaborate to design a wildlife bridge and explain its key features.</li>
-                    </ul>
-                ` } },
+            <div style="display:flex; gap:12px; align-items:center; margin-top:12px;">
+              <svg width="160" height="100" viewBox="0 0 160 100" aria-hidden="true">
+                <rect x="0" y="60" width="160" height="40" fill="#111827" rx="6"></rect>
+                <rect x="14" y="30" width="42" height="22" rx="4" fill="#ef4444"></rect>
+                <rect x="86" y="10" width="42" height="22" rx="4" fill="#2563eb"></rect>
+                <text x="80" y="55" fill="#fff" font-size="10" text-anchor="middle">Road corridor</text>
+              </svg>
 
-                { id: 'warm-up', type: 'html-content', content: { title: 'Hook & Engage: Warm-Up', html: `
-                    <h3 class="text-2xl font-bold text-sky-600 mb-3">Background-Building Questions</h3>
-                    <ol class="list-decimal list-inside space-y-4 text-xl">
-                        <li>Have you ever seen an animal (other than a bird) trying to cross a busy road? What happened? What were the dangers?</li>
-                        <li>Look at a map of your city. Where are the green spaces (parks, forests)? Are they connected, or are they islands separated by roads and buildings?</li>
-                        <li>If you were an animal, what would be the most difficult part of living in a city?</li>
-                    </ol>
-                ` } },
+              <div>
+                <p style="margin:0;"><strong>Causes:</strong></p>
+                <ul style="margin:6px 0 0 18px;">
+                  <li>Habitat fragmentation and loss</li>
+                  <li>No safe crossing points</li>
+                  <li>High vehicle speeds and poor visibility</li>
+                </ul>
+              </div>
+            </div>
 
-                { id: 'vocab-start', type: 'simple', content: { title: 'Unit Vocabulary 📚', text: 'Let\'s learn the key terms for this unit.' } },
-                { id: 'vocab-match', type: 'quiz-mcq', content: { title: 'Vocabulary Practice: Matching', questions: [
-                    { q: 'What is the "natural home or environment of an animal or plant"?', options: ['Corridor','Habitat','Infrastructure','Overpass'], correctIndex: 1 },
-                    { q: 'Which term describes breaking habitats into smaller isolated pieces?', options: ['Migration','Fragmentation','Corridor','Conservation'], correctIndex: 1 },
-                    { q: 'Which is a strip that connects two habitats?', options: ['Overpass','Corridor','Migration','Underpass'], correctIndex: 1 }
-                ] } },
+            <h4 style="margin-top:12px;">Short dialogue</h4>
+            <pre class="dialogue">Driver: I almost hit a deer at night on the highway last week.
+Ranger: Those collisions are sadly common. Where did it happen?
+Driver: Near the overpass area — no lights and the animals cross there often.
+Ranger: Building a wildlife overpass or lowering speed can help.</pre>
+            <div style="margin-top:10px">
+              <button class="action-button blue" id="play-car-sound">Play car sound (demo)</button>
+              <button class="action-button gray" id="explain-mitigations">Explain mitigations (TTS)</button>
+            </div>
 
-                { id: 'reading-main', type: 'html-content', content: { title: 'Reading: Tiered Texts 📖', html: `
-                    <div class="mb-8">
-                        <h3 class="text-2xl font-bold text-blue-600 mb-3">Pre-Reading Questions</h3>
-                        <ol class="list-decimal list-inside space-y-2 text-xl">
-                            <li>Why can’t animals just stay on one side of a road?</li>
-                            <li>What kind of features would a bridge for animals need to have?</li>
-                            <li>Do you think building a bridge for animals is a good use of money? Why or why not?</li>
-                        </ol>
-                    </div>
-                    <div class="space-y-6">
-                        <div class="bg-blue-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-xl text-blue-800">Text 1: A Safe Path for Animals</h4>
-                            <p>When we build a big road, it can cut a forest in two. This is called habitat fragmentation. It is a problem for animals. They cannot move to find food or meet other animals. Roads can also cause accidents. A wildlife bridge gives animals a safe way to cross.</p>
-                        </div>
-                        <div class="bg-yellow-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-xl text-yellow-800">Text 2: Connecting a Fragmented World</h4>
-                            <p>Human infrastructure like highways and railways is important for people, but it separates habitats. Wildlife corridors—like overpasses and underpasses—help connect these fragments so animals can reach resources and maintain genetic diversity.</p>
-                        </div>
-                        <div class="bg-red-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-xl text-red-800">Text 3: Engineering for Coexistence</h4>
-                            <p>Engineers and ecologists work together to design crossings that are safe and usable for many species. Features include native plantings, noise barriers, and gradual slopes to make animals feel secure. Monitoring and community support are vital for success.</p>
-                        </div>
-                    </div>
-                ` } },
+            <h4 style="margin-top:14px;">Reflect & Quiz</h4>
+            <p>Reflect: Why do animals cross roads? What human choices make collisions more likely?</p>
 
-                { id: 'reading-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Comprehension: Gap Fill', sentences: [
-                    { text: 'When a road cuts a forest in two it is called ________.', answer: 'fragmentation' },
-                    { text: 'A ________ allows animals to move safely between habitats.', answer: 'corridor' }
-                ] } },
-                { id: 'reading-quiz-tfng', type: 'quiz-tfng', content: { title: 'Comprehension: True/False/Not Given', questions: [
-                    { q: 'Wildlife crossings always cost less than fencing a road.', a: 'NOT GIVEN' },
-                    { q: 'Underpasses are more suitable for small, shy animals.', a: 'TRUE' }
-                ] } },
-                { id: 'reading-quiz-mcq', type: 'quiz-mcq', content: { title: 'Comprehension: Multiple Choice', questions: [
-                    { q: 'Which of these helps reduce wildlife-vehicle collisions?', options: ['Building wildlife bridges','Adding more parking','Wider roads for cars','Reducing public transport'], correctIndex: 0 },
-                    { q: 'Which feature makes a crossing attractive to wildlife?', options: ['High fences','Native plants and cover','Bright lights','Steep concrete sides'], correctIndex: 1 }
-                ] } },
+            <div style="margin-top:8px;">
+              <div style="font-weight:700">Quick MCQ</div>
+              <button class="quiz-option" data-correct="true">A: Reduce vehicle speed and provide crossings</button>
+              <button class="quiz-option">B: Increase lighting and higher speeds</button>
+              <button class="quiz-option">C: Remove all vegetation from roadsides</button>
+            </div>
 
-                { id: 'conversation-practice', type: 'dialogue', content: { title: 'Interactive Conversation Practice 🗣️', dialogue: `Leo: I never really thought about how roads affect animals.\nMia: Same here. I saw a fox trying to cross a busy road last year and it was scary.\nLeo: What would help animals in this situation?\nMia: A simple wildlife overpass or even a small underpass for amphibians could make a big difference.` } },
+            <div style="margin-top:12px;">
+              <div style="font-weight:700">Gap Fill</div>
+              <div style="margin-top:8px">When animals move between fragments to find mates and food they are at risk of ________.</div>
+              <div class="gap" data-answer="collision" id="gap-animal-0">[ collision ]</div>
+            </div>
+          ` } },
 
-                { id: 'lecture-coexistence', type: 'dialogue', content: { title: 'Listening: Engineering for Coexistence 🧑‍🔬', dialogue: `Professor: Welcome everyone. Today we'll look at how engineering and ecology can work together.\nStudent: What kind of data do you need to design a crossing?\nProfessor: We need movement patterns, species lists, and road collision records. We also monitor after construction to ensure it's effective.` } },
-                { id: 'lecture-coexistence-quiz-mcq', type: 'quiz-mcq', content: { title: 'Coexistence Lecture Quiz (MCQ)', questions: [
-                    { q: 'Which data is useful for designing a crossing?', options: ['Species movement patterns','Popular car models','Movie schedules','Local restaurant menus'], correctIndex: 0 }
-                ] } },
-                { id: 'lecture-coexistence-quiz-tfng', type: 'quiz-tfng', content: { title: 'Coexistence Lecture Quiz (TFNG)', questions: [
-                    { q: 'Monitoring after construction is unnecessary.', a: 'FALSE' }
-                ] } },
-                { id: 'lecture-coexistence-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Coexistence Lecture Gap Fill', sentences: [
-                    { text: 'Engineers use ________ patterns to design effective crossings.', answer: 'movement' }
-                ] } },
+          // conversation practice
+          { id:'conversation-practice', type:'dialogue', content:{ title:'Conversation Practice', dialogue:
+`Leo: I never really thought about roads and animals.
+Mia: It's a bigger issue than most people realize.
+Leo: Could we propose an overpass project?
+Mia: Yes — research, design and community support are needed.` } },
 
-                { id: 'podcast-biodiversity', type: 'dialogue', content: { title: 'Listening: Biodiversity Conversation 🎧', dialogue: `Chris: G'day everyone! As engineers, it's our duty to design with nature in mind.\nSarah: Agreed. Small design choices like planting native shrubs make crossings much more successful.\nChris: And community involvement ensures long-term maintenance and funding.` } },
-                { id: 'podcast-biodiversity-quiz-mcq', type: 'quiz-mcq', content: { title: 'Biodiversity Podcast Quiz (MCQ)', questions: [
-                    { q: 'What helps crossings succeed long-term?', options: ['Community involvement','Ignoring local opinion','Short-term funding only','Concrete barriers'], correctIndex: 0 }
-                ] } },
-                { id: 'podcast-biodiversity-quiz-tfng', type: 'quiz-tfng', content: { title: 'Biodiversity Podcast Quiz (TFNG)', questions: [
-                    { q: 'Native plants make crossings less attractive to wildlife.', a: 'FALSE' }
-                ] } },
-                { id: 'podcast-biodiversity-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Biodiversity Podcast Gap Fill', sentences: [
-                    { text: 'Planting ________ shrubs helps animals use crossings.', answer: 'native' }
-                ] } },
+          // final project hub
+          { id:'final-project-hub', type:'html-content', content:{ title:'Final Project Hub', html: `
+            <h2>Design a Wildlife Crossing</h2>
+            <p>Pick a local road. Research species and propose a crossing.</p>
+            <div style="margin-top:12px"><button class="action-button gray" data-phase="1">Phase 1</button> <button class="action-button gray" data-phase="2">Phase 2</button></div>
+          ` }},
 
-                { id: 'dilemma-solar-farm', type: 'dialogue', content: { title: 'Dilemma: Solar Farm 🤔', dialogue: `Sarah: We're planning a solar farm on the edge of town. It could power thousands of homes.\nAlex: But it would remove a corridor used by deer and smaller mammals.\nSarah: What are the trade-offs? Could we design around wildlife movement?` } },
-                { id: 'dilemma-solar-farm-quiz-mcq', type: 'quiz-mcq', content: { title: 'Solar Farm Dilemma Quiz (MCQ)', questions: [
-                    { q: 'Which is a mitigation for habitat loss?', options: ['Design corridors around the site','Remove all vegetation','Block all animal movement','Install tall fences'], correctIndex: 0 }
-                ] } },
-                { id: 'dilemma-solar-farm-quiz-tfng', type: 'quiz-tfng', content: { title: 'Solar Farm Dilemma Quiz (TFNG)', questions: [
-                    { q: 'Solar farms always destroy biodiversity.', a: 'NOT GIVEN' }
-                ] } },
-                { id: 'dilemma-solar-farm-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Solar Farm Dilemma Gap Fill', sentences: [
-                    { text: 'One solution is to leave ________ zones around the panels for wildlife.', answer: 'buffer' }
-                ] } },
+          { id:'writing-task', type:'writing-task', content:{ title:'Writing Activity', prompt:'Write a formal letter proposing a wildlife crossing.', starters:['I am writing to express...'], wordBank:['biodiversity','corridor','conservation'] }},
 
-                { id: 'dilemma-wind-farm', type: 'dialogue', content: { title: 'Dilemma: Wind Farm ⚠️', dialogue: `Sarah: A new wind farm could reduce emissions but may affect birds and bats.\nAlex: We need impact studies and careful siting to reduce collision risks.\nSarah: Could we combine turbine siting with protected corridors?` } },
-                { id: 'dilemma-wind-farm-quiz-mcq', type: 'quiz-mcq', content: { title: 'Wind Farm Dilemma Quiz (MCQ)', questions: [
-                    { q: 'What reduces risk to flying wildlife?', options: ['Careful siting and monitoring','Increasing turbine speed','Painting turbines bright colors','Removing all vegetation'], correctIndex: 0 }
-                ] } },
-                { id: 'dilemma-wind-farm-quiz-tfng', type: 'quiz-tfng', content: { title: 'Wind Farm Dilemma Quiz (TFNG)', questions: [
-                    { q: 'Monitoring is unnecessary after install.', a: 'FALSE' }
-                ] } },
-                { id: 'dilemma-wind-farm-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Wind Farm Dilemma Gap Fill', sentences: [
-                    { text: 'Careful ________ can reduce impacts on migratory birds.', answer: 'siting' }
-                ] } },
+          { id:'certificate', type:'certificate', content:{ title:'Module Complete!', text:'You have completed Bridging Worlds. Great job!' } }
+        ]
+      };
 
-                { id: 'thinking-prompts', type: 'html-content', content: { title: 'Rethink, Revise, Reflect 📝', html: `
-                    <div class="mb-6">
-                        <h3 class="text-2xl font-bold text-purple-600 mb-3">Harkness Discussion Prompt</h3>
-                        <p class="text-xl italic">“When there is a conflict between human development (like a new highway or housing project) and wildlife conservation, which should be the priority and why?”</p>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-purple-600 mb-3">Higher-Order Thinking Questions</h3>
-                        <ul class="list-disc list-inside space-y-2 text-lg">
-                            <li><b>Remembering:</b> What are two types of wildlife crossings?</li>
-                            <li><b>Understanding:</b> Explain why habitat fragmentation is a threat to biodiversity.</li>
-                            <li><b>Applying:</b> Choose a nearby park. Where would you propose a corridor and why?</li>
-                            <li><b>Analyzing:</b> Compare needs of a bear vs a turtle when designing a crossing.</li>
-                            <li><b>Evaluating:</b> Argue whether one large overpass or many small underpasses is better.</li>
-                            <li><b>Creating:</b> Write a short story as an animal crossing a wildlife bridge.</li>
-                        </ul>
-                    </div>
-                ` } },
+      // ---------- state & audio/TTS ----------
+      let score = 0;
+      let currentPage = 'page-title-screen';
+      const pageHistory = [];
+      let pageSequence = [];
+      let audioContext = null;
+      let sequenceNode = null;
+      let speechService = null;
+      let timerInterval = null;
 
-                { id: 'exam-practice', type: 'html-content', content: { title: 'Connections to IELTS & TOEFL', html: `
-                    <div class="space-y-6">
-                        <div>
-                            <h3 class="text-2xl font-bold text-purple-600 mb-3">IELTS Speaking Practice</h3>
-                            <p><b>Part 1:</b> Do you like animals? What is your country’s most famous animal? Do you think it’s important to protect wild animals?</p>
-                            <p><b>Part 2 (Cue Card):</b> Describe a time when you saw a wild animal. You should say: what the animal was, where you saw it, what it was doing, and explain how you felt.</p>
-                            <p><b>Part 3:</b> What are the main reasons why some animals are endangered? How can humans help protect endangered species?</p>
-                        </div>
-                        <div>
-                            <h3 class="text-2xl font-bold text-purple-600 mb-3">TOEFL Independent Speaking</h3>
-                            <p>Some people think that governments should spend money on protecting wild animals, while others think the money should be spent on human needs. Which view do you agree with? Use details and examples to support your answer.</p>
-                        </div>
-                    </div>
-                ` } },
+      const correctSounds = [ { freq:880, dur:0.12 }, { freq:660, dur:0.08 } ];
+      const incorrectSounds = [ { freq:240, dur:0.35, type:'square' } ];
+      const correctPhrases = ['Great!', 'Correct!', 'Well done!'];
+      const incorrectPhrases = ['Try again!', 'Not quite, keep going.'];
 
-                { id: 'final-project-hub', type: 'html-content', content: { title: 'Final Project Hub ✍️', html: `
-                    <div class="bg-gradient-to-br from-green-50 to-teal-50">
-                        <header class="bg-white shadow-lg border-b-4 border-green-500">
-                            <div class="max-w-7xl mx-auto px-6 py-8">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h1 class="text-4xl font-bold text-gray-800 mb-2">🌉🐾 Bridging Worlds</h1>
-                                        <p class="text-xl text-gray-600">Final Project Guide</p>
-                                    </div>
-                                    <div class="rooftop-animation">🌉</div>
-                                </div>
-                            </div>
-                        </header>
-                        <section class="max-w-7xl mx-auto px-6 py-12">
-                            <div class="bg-white rounded-2xl shadow-xl p-8 mb-12">
-                                <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Big Ideas & Understanding</h2>
-                                <div class="grid md:grid-cols-2 gap-8">
-                                    <div class="bg-gradient-to-r from-green-100 to-teal-100 p-6 rounded-xl">
-                                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Core Concepts</h3>
-                                        <p>Understand habitat fragmentation, corridors, and basic ecology.</p>
-                                    </div>
-                                    <div class="bg-gradient-to-r from-yellow-100 to-orange-100 p-6 rounded-xl">
-                                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Design Principles</h3>
-                                        <p>Consider species needs, materials, and long-term maintenance when designing crossings.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="phaseContent" class="bg-white rounded-2xl shadow-xl p-8"></div>
-                        </section>
-                    </div>
-                ` } },
+      class SpeechService {
+        constructor() { this.synth = window.speechSynthesis; this.voices = []; this.ready=false; this.enabled=true; this.rate=0.95; }
+        async init() {
+          const voices = new Promise(res=>{
+            const v = this.synth.getVoices();
+            if (v && v.length) return res(v);
+            this.synth.onvoiceschanged = ()=> res(this.synth.getVoices());
+          });
+          this.voices = await voices;
+          this.ready = true;
+        }
+        speak(text) {
+          if (!this.enabled || !this.ready || !text) return;
+          try {
+            this.synth.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.rate = this.rate;
+            if (this.voices && this.voices.length) u.voice = this.voices.find(v=>v.lang.startsWith('en')) || this.voices[0];
+            this.synth.speak(u);
+          } catch(e){ console.warn('TTS error', e); }
+        }
+        toggle() { this.enabled = !this.enabled; if (!this.enabled) this.synth.cancel(); return this.enabled; }
+      }
 
-                { id: 'writing-task', type: 'writing-task', content: { title: 'Writing Activity ✍️', prompt: 'A new high-speed railway is being planned to go through a rural area near your town. Write a formal letter to your local government representative expressing your concern and proposing a solution that balances development with wildlife conservation.', starters: ['I am writing to you today with a serious concern regarding...', 'The construction of this railway will cause significant...', 'Therefore, I strongly urge you to advocate for...'], wordBank: ['accident','benefit','biodiversity','bridge','coexist','connect','conservation','corridor','cost','design','ecosystem','engineering','environment','fragmentation'] } },
+      async function initAudio() {
+        if (audioContext) return;
+        try {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const processorScript = document.getElementById('sequence-processor').textContent;
+          const blob = new Blob([processorScript], { type: 'application/javascript' });
+          const url = URL.createObjectURL(blob);
+          try {
+            await audioContext.audioWorklet.addModule(url);
+            sequenceNode = new AudioWorkletNode(audioContext, 'sequence-processor');
+            sequenceNode.port.onmessage = e => {
+              if (e.data && e.data.type === 'noteOn') playOscillator(e.data.freq, e.data.dur, e.data.vol, e.data.type);
+            };
+            sequenceNode.connect(audioContext.destination);
+          } catch(err) {
+            console.warn('AudioWorklet not available', err);
+            sequenceNode = null;
+          }
+        } catch(e) { console.error('Audio init failed', e); }
+      }
 
-                { id: 'self-assessment', type: 'html-content', content: { title: 'Self-Assessment & Rubric 🧑‍🏫', html: `
-                    <div class="mb-8">
-                        <h3 class="text-2xl font-bold text-purple-600 mb-3">Metacognitive Self-Assessment</h3>
-                        <ol class="list-decimal list-inside space-y-4 text-xl">
-                            <li>Which activity helped me understand the problem of habitat fragmentation the most? Why was it effective for me?</li>
-                            <li>On a scale of 1-5, how confident am I that I could explain the purpose of a wildlife bridge to a family member in English?</li>
-                        </ol>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-purple-600 mb-3">Final Project Rubric (KASE-C)</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-purple-50">
-                                        <th class="border-b-2 p-2 w-1/4">Criterion</th>
-                                        <th class="border-b-2 p-2">5 - Exemplary</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td class="border-b p-2 font-semibold">K – Knowledge</td><td class="border-b p-2">The proposal demonstrates a deep, nuanced understanding of habitat fragmentation and practical mitigation strategies.</td></tr>
-                                    <tr><td class="border-b p-2 font-semibold">A – Analysis</td><td class="border-b p-2">The proposed bridge design is creative, technically sound, and perceives site constraints.</td></tr>
-                                    <tr><td class="border-b p-2 font-semibold">S – Structure</td><td class="border-b p-2">The presentation is exceptionally clear, engaging, and persuasive.</td></tr>
-                                    <tr><td class="border-b p-2 font-semibold">E – Evidence</td><td class="border-b p-2">All claims are consistently supported by strong, relevant, and well-integrated evidence.</td></tr>
-                                    <tr><td class="border-b p-2 font-semibold">C – Clarity</td><td class="border-b p-2">The student demonstrates a masterful command of English, using a wide and appropriate vocabulary.</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                ` } },
+      function playOscillator(freq=440, dur=0.2, vol=0.2, type='sine') {
+        try {
+          if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioContext.state === 'suspended') audioContext.resume();
+          const osc = audioContext.createOscillator();
+          const g = audioContext.createGain();
+          osc.type = type;
+          osc.frequency.value = freq;
+          g.gain.value = vol;
+          osc.connect(g); g.connect(audioContext.destination);
+          osc.start();
+          setTimeout(()=>{ try { osc.stop(); osc.disconnect(); g.disconnect(); } catch(e){} }, dur*1000);
+        } catch(e){}
+      }
 
-                { id: 'certificate', type: 'certificate', content: { title: 'Module Complete! 🎉', text: 'You have successfully completed the "Bridging Worlds" module. Well done!' } }
-            ]
+      function playSequence(seq) {
+        if (sequenceNode && sequenceNode.port) {
+          sequenceNode.port.postMessage({ type:'play', sequence: seq.map(s=>({freq:s.freq,dur:s.dur||0.2,vol:s.vol||0.25,type:s.type||'sine',gap:s.gap}))});
+        } else {
+          seq.forEach(s => playOscillator(s.freq, s.dur||0.2, s.vol||0.25, s.type||'sine'));
+        }
+      }
+
+      function playCarSoundDemo() {
+        // simple car pass: low rumble then horn-like beep
+        playSequence([
+          { freq:120, dur:0.35, vol:0.12, type:'sine' },
+          { freq:180, dur:0.25, vol:0.14, type:'sine', gap:0.05 },
+          { freq:800, dur:0.12, vol:0.18, type:'square', gap:0.1 } // horn-like
+        ]);
+      }
+
+      // ---------- UI build & handlers ----------
+      function buildPages() {
+        const container = document.getElementById('dynamic-pages-container');
+        container.innerHTML = '';
+        lessonData.pages.forEach(p => {
+          const el = document.createElement('section');
+          el.id = `page-${p.id}`;
+          el.className = 'page';
+          let inner = '';
+          if (p.type === 'simple') {
+            inner = `<h2 style="font-weight:700">${escapeHtml(p.content.title)}</h2><p style="margin-top:8px">${escapeHtml(p.content.text)}</p><div style="margin-top:12px"><button class="action-button green" data-next>Next</button></div>`;
+          } else if (p.type === 'timer') {
+            inner = `<h2 style="font-weight:700">${escapeHtml(p.content.title)}</h2><p style="margin-top:8px">${escapeHtml(p.content.text)}</p><div id="${p.content.timerId}" style="font-family:monospace;font-size:20px;margin-top:8px">00:00</div><div style="margin-top:12px"><button class="action-button green" data-next>Next</button></div>`;
+          } else if (p.type === 'html-content') {
+            inner = `<h2 style="font-weight:700">${escapeHtml(p.content.title)}</h2><div style="margin-top:12px">${p.content.html}</div><div style="margin-top:12px"><button class="action-button green" data-next>Next</button></div>`;
+          } else if (p.type === 'dialogue') {
+            inner = `<h2 style="font-weight:700">${escapeHtml(p.content.title)}</h2><pre class="dialogue">${escapeHtml(p.content.dialogue)}</pre><div style="margin-top:12px"><button class="action-button blue" data-play-dialogue>Play</button> <button class="action-button green" data-next>Next</button></div>`;
+          } else if (p.type === 'quiz-mcq') {
+            inner = `<h2 style="font-weight:700">${escapeHtml(p.content.title)}</h2>`;
+            p.content.questions.forEach((q, qi) => {
+              inner += `<div class="question-group" style="margin-top:12px; padding:10px; border-radius:10px; border:1px solid rgba(2,6,23,0.04);"><div style="font-weight:700">${qi+1}. ${escapeHtml(q.q)}</div>`;
+              q.options.forEach((opt, oi) => {
+                const correctAttr = (oi === q.correctIndex) ? 'data-correct="true"' : '';
+                inner += `<button class="quiz-option" ${correctAttr} data-answer-index="${oi}">${escapeHtml(opt)}</button>`;
+              });
+              inner += `</div>`;
+            });
+            inner += `<div style="margin-top:12px"><button class="action-button green" data-next>Next</button></div>`;
+          } else if (p.type === 'quiz-tfng') {
+            inner = `<h2 style="font-weight:700">${escapeHtml(p.content.title)}</h2>`;
+            p.content.questions.forEach((q, qi)=>{
+              inner += `<div class="question-group" style="margin-top:12px; padding:10px; border-radius:10px; border:1px solid rgba(2,6,23,0.04);"><div style="font-weight:700">${qi+1}. ${escapeHtml(q.q)}</div>`;
+              ['TRUE','FALSE','NOT GIVEN'].forEach(opt=>{
+                inner += `<button class="tfng-button" data-chosen="${opt}" data-correct="${q.a}">${opt}</button>`;
+              });
+              inner += `</div>`;
+            });
+            inner += `<div style="margin-top:12px"><button class="action-button green" data-next>Next</button></div>`;
+          } else if (p.type === 'quiz-gap-fill') {
+            inner = `<h2 style="font-weight:700">${escapeHtml(p.content.title)}</h2><div style="margin-top:12px">`;
+            p.content.sentences.forEach((s, si)=>{
+              inner += `<div style="margin-top:8px">${escapeHtml(s.text.replace('______',''))} <span class="gap" data-answer="${escapeHtml(s.answer)}" id="gap-${p.id}-${si}">[ ${escapeHtml(s.answer)} ]</span></div>`;
+            });
+            inner += `<div class="word-bank" style="margin-top:10px">${p.content.sentences.map(s=>`<div class="word" draggable="true" data-word="${escapeHtml(s.answer)}">${escapeHtml(s.answer)}</div>`).join('')}</div>`;
+            inner += `</div><div style="margin-top:12px"><button class="action-button green" data-next>Next</button></div>`;
+          } else if (p.type === 'writing-task') {
+            inner = `<h2 style="font-weight:700">${escapeHtml(p.content.title)}</h2><p style="margin-top:8px">${escapeHtml(p.content.prompt)}</p><textarea id="writing-response" rows="8" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid rgba(2,6,23,0.06)"></textarea><div style="margin-top:8px"><button class="action-button green" id="submit-writing">Submit</button> <button class="action-button gray" data-next>Next</button></div>`;
+          } else if (p.type === 'certificate') {
+            inner = `<h2 style="font-weight:700">${escapeHtml(p.content.title)}</h2><p style="margin-top:8px">${escapeHtml(p.content.text)}</p><div style="margin-top:12px"><button class="action-button green" id="celebrate">Celebrate</button></div>`;
+          } else {
+            inner = `<h2>${escapeHtml(p.id)}</h2>`;
+          }
+          el.innerHTML = inner;
+          container.appendChild(el);
         });
 
-        // App-level state and helpers (created inside DOMContentLoaded below)
-        document.addEventListener('DOMContentLoaded', () => {
-            // State
-            let score = 0, currentPage = lessonData.startPageId, timerInterval;
-            const pageHistory = [lessonData.startPageId];
-            let pageSequence = [];
-            let audioContext = null, speechService = null, sequenceNode = null;
+        pageSequence = lessonData.pages.map(p => p.id);
+        attachGeneratedHandlers();
+      }
 
-            // Simple phrase/sound banks
-            const correctPhrases = ["Stellar work!", "You've got it!", "Perfect!"];
-            const incorrectPhrases = ["Nice try — try again!", "Not quite — keep going!"];
-            const correctSounds = [{name:"Ding", seq:[{freq:880,dur:0.18}]}];
-            const incorrectSounds = [{name:"Buzz", seq:[{freq:200,type:'square',dur:0.4}]}];
+      function attachGeneratedHandlers() {
+        const container = document.getElementById('dynamic-pages-container');
 
-            // SpeechService
-            class SpeechService {
-                constructor() {
-                    this.synth = window.speechSynthesis;
-                    this.isInitialized = false;
-                    this.isTtsEnabled = true;
-                    this.voices = [];
-                    this.speechRate = 0.95;
-                }
-                async _setupVoices() {
-                    const voicesPromise = new Promise(resolve => {
-                        const v = this.synth.getVoices();
-                        if (v && v.length) return resolve(v);
-                        this.synth.onvoiceschanged = () => resolve(this.synth.getVoices());
-                    });
-                    this.voices = await voicesPromise;
-                    this.isInitialized = true;
-                }
-                speak(text, speakerName=null, rate=this.speechRate) {
-                    if (!this.isTtsEnabled || !text || !text.trim() || !this.isInitialized) return;
-                    try {
-                        this.synth.cancel();
-                        const u = new SpeechSynthesisUtterance(text);
-                        u.rate = rate;
-                        this.synth.speak(u);
-                    } catch (e) { console.warn('TTS error', e); }
-                }
-                toggleTts() { this.isTtsEnabled = !this.isTtsEnabled; return this.isTtsEnabled; }
-            }
-
-            // Audio initialization (worklet fallback)
-            async function initializeAudio() {
-                if (audioContext) return;
-                try {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const processorScript = document.getElementById('sequence-processor').textContent;
-                    const blob = new Blob([processorScript], { type: 'application/javascript' });
-                    const url = URL.createObjectURL(blob);
-                    try {
-                        await audioContext.audioWorklet.addModule(url);
-                        sequenceNode = new AudioWorkletNode(audioContext, 'sequence-processor');
-                        sequenceNode.port.onmessage = e => {
-                            if (e.data && e.data.type === 'noteOn') playOscillator(e.data.freq, e.data.dur, e.data.vol, e.data.waveType);
-                        };
-                        sequenceNode.connect(audioContext.destination);
-                    } catch (err) {
-                        console.warn('AudioWorklet unavailable, using fallback', err);
-                        sequenceNode = null;
-                    }
-                    speechService = new SpeechService();
-                    await speechService._setupVoices();
-                } catch (e) { console.error('initializeAudio failed', e); }
-            }
-
-            function playOscillator(freq=440,dur=0.2,vol=0.2,type='sine') {
-                try {
-                    if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    if (audioContext.state === 'suspended') audioContext.resume();
-                    const o = audioContext.createOscillator();
-                    const g = audioContext.createGain();
-                    o.type = type; o.frequency.value = freq; g.gain.value = vol;
-                    o.connect(g); g.connect(audioContext.destination);
-                    o.start();
-                    setTimeout(()=>{ try { o.stop(); o.disconnect(); g.disconnect(); } catch(e){} }, dur*1000);
-                } catch(e) {}
-            }
-
-            function playSound(isCorrect) {
-                const bank = isCorrect ? correctSounds : incorrectSounds;
-                const sound = bank[Math.floor(Math.random()*bank.length)];
-                if (!sound) return;
-                if (sequenceNode && sequenceNode.port) sequenceNode.port.postMessage({ type:'play', sequence: sound.seq });
-                else sound.seq.forEach(n => playOscillator(n.freq, n.dur||0.2, n.vol||0.2, n.type||'sine'));
-            }
-
-            // Background animation
-            const bgCanvas = document.getElementById('background-canvas');
-            const bgCtx = bgCanvas.getContext('2d');
-            function fitCanvas(){ bgCanvas.width = innerWidth; bgCanvas.height = innerHeight; }
-            fitCanvas(); addEventListener('resize', fitCanvas);
-            let particles = [];
-            (function animateBg(){
-                bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
-                for (let i = particles.length-1;i>=0;i--){
-                    const p = particles[i];
-                    p.y -= p.speed; p.x += Math.sin(p.y/50)*0.3;
-                    if (p.y < -p.radius) particles.splice(i,1);
-                    bgCtx.beginPath(); bgCtx.arc(p.x,p.y,p.radius,0,Math.PI*2); bgCtx.globalAlpha = p.opacity; bgCtx.fillStyle = p.color; bgCtx.fill();
-                }
-                if (Math.random()>0.97 && particles.length<120) particles.push({ x:Math.random()*bgCanvas.width, y:bgCanvas.height+20, radius:Math.random()*6+2, speed:Math.random()*1.5+0.5, color: ['#34d399','#f59e0b','#a78bfa','#60a5fa'][Math.floor(Math.random()*4)], opacity:0.6+Math.random()*0.4});
-                requestAnimationFrame(animateBg);
-            })();
-
-            function runCompletionAnimation(){
-                const canvas = document.createElement('canvas');
-                canvas.style.position='fixed'; canvas.style.left=0; canvas.style.top=0; canvas.style.width='100%'; canvas.style.height='100%'; canvas.style.zIndex=9999; canvas.style.pointerEvents='none';
-                document.body.appendChild(canvas);
-                const ctx = canvas.getContext('2d'); canvas.width = innerWidth; canvas.height = innerHeight;
-                const confetti = [];
-                for (let i=0;i<80;i++) confetti.push({x:Math.random()*canvas.width,y:-10,vx:(Math.random()-0.5)*6,vy:Math.random()*3+2,w:8,h:12,color:['#fde68a','#f97316','#60a5fa','#34d399'][Math.floor(Math.random()*4)],angle:Math.random()*Math.PI});
-                let t=0;
-                (function frame(){
-                    t++; ctx.clearRect(0,0,canvas.width,canvas.height);
-                    for (let i=confetti.length-1;i>=0;i--){
-                        const c=confetti[i]; c.x+=c.vx; c.y+=c.vy; c.vy+=0.05; ctx.save(); ctx.translate(c.x,c.y); ctx.rotate(c.angle); ctx.fillStyle=c.color; ctx.fillRect(-c.w/2,-c.h/2,c.w,c.h); ctx.restore(); if (c.y>canvas.height+20) confetti.splice(i,1);
-                    }
-                    if (t<220) requestAnimationFrame(frame); else canvas.remove();
-                })();
-            }
-
-            // Utility functions
-            function stripHtmlAndEmojis(text){ const div=document.createElement('div'); div.innerHTML = text; return div.textContent || div.innerText || ""; }
-            function escapeForTemplate(s){ return (s||'').replace(/`/g,'\\`').replace(/\$/g,'\\$'); }
-
-            // Build pages from lessonData
-            function buildPages(){
-                const container = document.getElementById('dynamic-pages-container'); container.innerHTML='';
-                lessonData.pages.forEach(p=>{
-                    const el = document.createElement('section'); el.id = `page-${p.id}`; el.className='page bg-white rounded-2xl shadow-lg p-6 my-6';
-                    if (p.type==='simple') {
-                        el.innerHTML = `<h2 class="text-2xl font-bold mb-3">${p.content.title}</h2><p class="text-lg">${p.content.text}</p><div class="mt-4"><button class="action-button bg-green-600 text-white px-4 py-2 rounded" onclick="goNext()">Next</button></div>`;
-                    } else if (p.type==='timer') {
-                        el.innerHTML = `<h2 class="text-2xl font-bold mb-3">${p.content.title}</h2><p class="text-lg mb-4">${p.content.text}</p><div class="text-2xl font-mono" id="${p.content.timerId}">00:00</div><div class="mt-4"><button class="action-button bg-green-600 text-white px-4 py-2 rounded" onclick="goNext()">Next</button></div>`;
-                    } else if (p.type==='html-content') {
-                        el.innerHTML = `<h2 class="text-2xl font-bold mb-3">${p.content.title}</h2><div class="readable-content">${p.content.html}</div><div class="mt-4"><button class="action-button bg-green-600 text-white px-4 py-2 rounded" onclick="goNext()">Next</button></div>`;
-                    } else if (p.type==='dialogue') {
-                        el.innerHTML = `<h2 class="text-2xl font-bold mb-3">${p.content.title}</h2><pre class="whitespace-pre-wrap">${p.content.dialogue}</pre><div class="mt-4"><button class="action-button bg-blue-600 text-white px-4 py-2 rounded" onclick="speakDialogue(\`${escapeForTemplate(p.content.dialogue)}\`)">Play</button> <button class="action-button bg-green-600 text-white px-4 py-2 rounded" onclick="goNext()">Next</button></div>`;
-                    } else if (p.type==='quiz-mcq') {
-                        let qHtml = `<h2 class="text-2xl font-bold mb-3">${p.content.title}</h2>`;
-                        p.content.questions.forEach((q,qi)=>{
-                            qHtml += `<div class="question-group mb-3 p-3 border rounded"><div class="mb-2 font-semibold">${qi+1}. ${q.q}</div>`;
-                            q.options.forEach((opt,oi)=> qHtml += `<button class="quiz-option block w-full text-left p-2 my-1 bg-gray-100 rounded hover:bg-gray-200" onclick="checkMcqAnswer(this, ${oi===q.correctIndex})" ${oi===q.correctIndex? "data-correct='true'":""}>${String.fromCharCode(65+oi)}. ${opt}</button>`);
-                            qHtml += `</div>`;
-                        });
-                        qHtml += `<div class="mt-4"><button class="action-button bg-green-600 text-white px-4 py-2 rounded" onclick="goNext()">Next</button></div>`;
-                        el.innerHTML = qHtml;
-                    } else if (p.type==='quiz-tfng') {
-                        let qHtml = `<h2 class="text-2xl font-bold mb-3">${p.content.title}</h2>`;
-                        p.content.questions.forEach((q,qi)=>{
-                            qHtml += `<div class="question-group mb-3 p-3 border rounded"><div class="mb-2 font-semibold">${qi+1}. ${q.q}</div>`;
-                            ['TRUE','FALSE','NOT GIVEN'].forEach(opt=> qHtml += `<button class="tfng-button mr-2 mb-2 p-2 bg-gray-100 rounded" onclick="checkTfngAnswer(this,'${opt}','${q.a}')">${opt}</button>`);
-                            qHtml += `</div>`;
-                        });
-                        qHtml += `<div class="mt-4"><button class="action-button bg-green-600 text-white px-4 py-2 rounded" onclick="goNext()">Next</button></div>`;
-                        el.innerHTML = qHtml;
-                    } else if (p.type==='quiz-gap-fill') {
-                        let html = `<h2 class="text-2xl font-bold mb-3">${p.content.title}</h2><div class="gap-fill-container">`;
-                        p.content.sentences.forEach((s,si)=> html += `<div class="mb-3"><span>${s.text.replace('______', `<span class="gap" id="gap-${p.id}-${si}" data-answer="${s.answer}"><span class="word-bank-word" tabindex="0" draggable="true" data-word="${s.answer}">${s.answer}</span></span>`)}</span></div>`);
-                        html += `</div><div class="mt-4"><button class="action-button bg-green-600 text-white px-4 py-2 rounded" onclick="goNext()">Next</button></div>`;
-                        el.innerHTML = html;
-                    } else if (p.type==='writing-task') {
-                        el.innerHTML = `<h2 class="text-2xl font-bold mb-3">${p.content.title}</h2><p class="mb-4">${p.content.prompt}</p><textarea id="writing-response" class="w-full p-2 border rounded mb-3" rows="6" placeholder="Write here..."></textarea><div><button class="action-button bg-green-600 text-white px-4 py-2 rounded" onclick="submitWriting()">Submit</button> <button class="action-button bg-gray-400 text-white px-4 py-2 rounded" onclick="goNext()">Next</button></div>`;
-                    } else if (p.type==='certificate') {
-                        el.innerHTML = `<h2 class="text-3xl font-bold mb-3">${p.content.title}</h2><p>${p.content.text}</p><div class="mt-4"><button class="action-button bg-blue-600 text-white px-4 py-2 rounded" onclick="runCompletionAnimation()">Celebrate</button></div>`;
-                    } else {
-                        el.innerHTML = `<h2>${p.id}</h2>`;
-                    }
-                    container.appendChild(el);
-                });
-                pageSequence = lessonData.pages.map(p=>p.id);
-                if (!pageSequence.includes(lessonData.homePageId)) pageSequence.unshift(lessonData.homePageId);
-            }
-
-            // Navigation
-            window.navigateTo = function(pageId){
-                const normalized = (pageId||'').replace(/^page-/,'');
-                const target = document.getElementById(`page-${normalized}`);
-                if (!target) return console.warn('navigateTo: no page', pageId);
-                if (normalized === currentPage) return;
-
-                clearInterval(timerInterval);
-                if (speechService && speechService.synth) speechService.synth.cancel();
-
-                document.getElementById(`page-${currentPage}`)?.classList.remove('active');
-                target.classList.add('active');
-                currentPage = normalized;
-                if (pageHistory[pageHistory.length-1] !== currentPage) pageHistory.push(currentPage);
-
-                const pageData = lessonData.pages.find(p=>p.id===currentPage);
-                if (!pageData) return;
-
-                if (pageData.type === 'timer') {
-                    const timerEl = document.getElementById(pageData.content.timerId);
-                    if (timerEl) startTimer(pageData.content.duration, timerEl, goNext);
-                } else if (pageData.id === 'final-project-hub') {
-                    showPhase(1);
-                }
-
-                if (speechService) {
-                    if (pageData.type === 'dialogue') speakDialogue(pageData.content.dialogue);
-                    else {
-                        let textToSpeak = '';
-                        if (pageData.id === 'reading-main') {
-                            const readingContainer = target.querySelector('.space-y-6');
-                            if (readingContainer) textToSpeak = Array.from(readingContainer.querySelectorAll('h4, p')).map(el=>el.textContent).join(' \n ');
-                        } else {
-                            const readableContent = target.querySelector('.readable-content');
-                            const titleElement = target.querySelector('h2, h3');
-                            if (readableContent) textToSpeak = readableContent.innerHTML;
-                            else if (titleElement) textToSpeak = titleElement.innerHTML;
-                        }
-                        if (textToSpeak) speechService.speak(stripHtmlAndEmojis(textToSpeak));
-                        if (pageData.type === 'certificate') runCompletionAnimation();
-                    }
-                }
-                updateNavButtons();
-                window.scrollTo(0,0);
-            };
-
-            window.goNext = function(){ const idx = pageSequence.indexOf(currentPage); if (idx>-1 && idx<pageSequence.length-1) navigateTo(pageSequence[idx+1]); }
-            window.goBack = function(){ if (pageHistory.length>1){ pageHistory.pop(); navigateTo(pageHistory.pop()); } }
-
-            function updateNavButtons(){
-                const nav = document.getElementById('nav-header'); if (!nav) return;
-                nav.style.display = (currentPage === lessonData.startPageId) ? 'none' : 'block';
-                const backBtn = document.getElementById('nav-back');
-                backBtn.disabled = pageHistory.length <= 1;
-                backBtn.classList.toggle('opacity-50', backBtn.disabled);
-                const nextBtn = document.getElementById('nav-next');
-                const currentIndex = pageSequence.indexOf(currentPage); const isLast = currentIndex >= pageSequence.length-1;
-                nextBtn.disabled = isLast || currentPage === lessonData.homePageId || currentPage === 'certificate';
-                nextBtn.classList.toggle('opacity-50', nextBtn.disabled);
-            }
-
-            // Timers
-            function startTimer(duration, displayEl, onComplete){
-                let t = duration;
-                const update = ()=> { displayEl.textContent = `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`; };
-                update();
-                timerInterval = setInterval(()=>{ t--; update(); if (t<0){ clearInterval(timerInterval); if (onComplete) onComplete(); } },1000);
-            }
-
-            // Feedback
-            function showFeedbackMessage(isCorrect){
-                const phrases = isCorrect ? correctPhrases : incorrectPhrases;
-                const message = phrases[Math.floor(Math.random()*phrases.length)];
-                const toast = document.createElement('div'); toast.textContent = message;
-                toast.className = `feedback-toast ${isCorrect ? 'correct' : 'encouraging'}`; toast.setAttribute('role','status'); toast.setAttribute('aria-live','assertive');
-                document.body.appendChild(toast); setTimeout(()=>toast.remove(),4500);
-                if (speechService) speechService.speak(message);
-            }
-            function updateScore(points){ score += points; document.getElementById('score-display').textContent = score; }
-
-            // Quizzes
-            window.checkMcqAnswer = function(button, isCorrect){
-                const group = button.closest('.question-group'); group.querySelectorAll('.quiz-option').forEach(b=>b.disabled=true);
-                showFeedbackMessage(isCorrect);
-                const icon = document.createElement('span'); icon.textContent = isCorrect ? '✓' : '✗'; button.appendChild(icon);
-                if (isCorrect){ playSound(true); button.classList.add('bg-green-500','text-white'); updateScore(10); }
-                else { playSound(false); button.classList.add('bg-red-500','text-white'); const correctBtn = group.querySelector("[data-correct='true']"); if (correctBtn) correctBtn.classList.add('bg-green-500','text-white'); }
-            };
-            window.checkTfngAnswer = function(btn, chosen, correct){ const container = btn.closest('.question-group'); Array.from(container.querySelectorAll('button')).forEach(b=>b.disabled=true); const ok = chosen===correct; showFeedbackMessage(ok); const icon=document.createElement('span'); icon.textContent = ok ? '✓' : '✗'; container.appendChild(icon); if (ok){ playSound(true); updateScore(10); } else { playSound(false); } };
-
-            // Gap fill basic init (for pages where used)
-            function initGapFill(pageId){ const page = document.getElementById(`page-${pageId}`); if (!page) return; const gaps = page.querySelectorAll('.gap'); const words = page.querySelectorAll('.word-bank-word'); words.forEach(w=>{ w.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', w.dataset.word); setTimeout(()=>w.classList.add('opacity-50'),0); }); w.addEventListener('dragend', ()=>w.classList.remove('opacity-50')); }); gaps.forEach(g=>{ g.addEventListener('dragover', e=>e.preventDefault()); g.addEventListener('drop', e=>{ e.preventDefault(); const word = e.dataTransfer.getData('text/plain'); const dragged = Array.from(document.querySelectorAll('.word-bank-word')).find(x=>x.dataset.word===word); if (!dragged) return; g.innerHTML=''; g.appendChild(dragged); if (g.dataset.answer && g.dataset.answer.toLowerCase()===word.toLowerCase()) g.classList.add('correct'); else g.classList.add('incorrect'); }); }); }
-
-            window.submitWriting = function(){ const v = document.getElementById('writing-response')?.value || ''; if (!v.trim()) { alert('Please write something before submitting.'); return; } showFeedbackMessage(true); updateScore(20); }
-
-            // Final: startApp and wiring
-            async function startApp(){
-                await initializeAudio();
-                buildPages();
-                navigateTo(lessonData.homePageId);
-            }
-
-            // Wire start button and nav buttons
-            const startBtn = document.getElementById('start-btn');
-            if (startBtn) startBtn.addEventListener('click', () => { startApp(); });
-
-            document.getElementById('nav-back').addEventListener('click', () => goBack());
-            document.getElementById('nav-home').addEventListener('click', () => navigateTo('main-menu'));
-            document.getElementById('nav-next').addEventListener('click', () => goNext());
-            document.getElementById('nav-tts').addEventListener('click', function(){ if (!speechService) return; const enabled = speechService.toggleTts(); this.setAttribute('aria-pressed', String(enabled)); if (!enabled && speechService.synth) speechService.synth.cancel(); this.classList.toggle('opacity-60', !enabled); });
-
-            // Build pages immediately so DOM includes them (startApp will also build before navigation)
-            buildPages();
-
-            // Preload voices if possible (no autoplay)
-            (async ()=>{ speechService = new SpeechService(); await speechService._setupVoices(); })();
-
-            // Expose debug
-            window._debug = { lessonData, playOscillator, startApp };
+        container.addEventListener('click', (ev) => {
+          // play dialogue
+          const play = ev.target.closest('[data-play-dialogue]');
+          if (play) {
+            const page = play.closest('.page');
+            const pre = page.querySelector('pre.dialogue');
+            if (pre && speechService) speakDialogue(pre.textContent);
+          }
+          // next
+          const next = ev.target.closest('[data-next]');
+          if (next) goNext();
+          // menu buttons
+          const targetBtn = ev.target.closest('[data-target]');
+          if (targetBtn) {
+            navigateTo(targetBtn.getAttribute('data-target'));
+          }
+          // quiz mcq
+          const mcq = ev.target.closest('.quiz-option');
+          if (mcq) {
+            const isCorrect = mcq.getAttribute('data-correct') === 'true';
+            const group = mcq.closest('.question-group');
+            group.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
+            mcq.classList.add(isCorrect ? 'correct' : 'incorrect');
+            if (isCorrect) { playSequence([correctSounds[Math.floor(Math.random()*correctSounds.length)]]); showToast(true); updateScore(10); }
+            else { playSequence([incorrectSounds[Math.floor(Math.random()*incorrectSounds.length)]]); showToast(false); const correctBtn = group.querySelector("[data-correct='true']"); if (correctBtn) correctBtn.classList.add('correct'); }
+          }
+          // TF/NG
+          const tf = ev.target.closest('.tfng-button');
+          if (tf) {
+            const chosen = tf.getAttribute('data-chosen');
+            const correct = tf.getAttribute('data-correct');
+            const parent = tf.closest('.question-group');
+            if (!parent) return;
+            parent.querySelectorAll('button').forEach(b=>b.disabled=true);
+            const ok = (chosen === correct);
+            if (ok) { playSequence([correctSounds[Math.floor(Math.random()*correctSounds.length)]]); showToast(true); updateScore(10); parent.style.borderColor='#16a34a'; }
+            else { playSequence([incorrectSounds[Math.floor(Math.random()*incorrectSounds.length)]]); showToast(false); parent.style.borderColor='#ef4444'; }
+          }
+          // word drag fallback click doesn't apply here
+          // final project phase buttons
+          const phaseBtn = ev.target.closest('[data-phase]');
+          if (phaseBtn) {
+            showPhase(Number(phaseBtn.getAttribute('data-phase')));
+          }
         });
+
+        // word drag
+        container.querySelectorAll('.word').forEach(w=>{
+          w.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', w.dataset.word));
+        });
+        container.querySelectorAll('.gap').forEach(g=>{
+          g.addEventListener('dragover', e => e.preventDefault());
+          g.addEventListener('drop', e => {
+            e.preventDefault();
+            const w = e.dataTransfer.getData('text/plain');
+            const dragged = document.querySelector(`.word[data-word="${w}"]`);
+            if (!dragged) return;
+            g.innerHTML = '';
+            g.appendChild(dragged);
+            if (g.dataset.answer && g.dataset.answer.toLowerCase() === w.toLowerCase()) {
+              g.classList.add('correct'); playSequence([correctSounds[0]]); showToast(true); updateScore(8);
+            } else { g.classList.add('incorrect'); playSequence([incorrectSounds[0]]); showToast(false); }
+          });
+        });
+
+        // special page controls:
+        const playCarBtn = document.getElementById('play-car-sound');
+        if (playCarBtn) playCarBtn.addEventListener('click', () => playCarSoundDemo());
+        const explainBtn = document.getElementById('explain-mitigations');
+        if (explainBtn) explainBtn.addEventListener('click', () => {
+          if (speechService) speechService.speak('Mitigations include building wildlife overpasses, lowering vehicle speeds, installing fences and signs, and restoring corridors.');
+        });
+
+        const submitWriting = document.getElementById('submit-writing');
+        if (submitWriting) submitWriting.addEventListener('click', (e) => {
+          const p = e.target.closest('.page');
+          const ta = p.querySelector('#writing-response');
+          if (!ta || !ta.value.trim()) { alert('Please write something before submitting.'); return; }
+          playSequence([correctSounds[0]]); showToast(true); updateScore(20);
+        });
+
+        const celebrate = document.getElementById('celebrate');
+        if (celebrate) celebrate.addEventListener('click', () => runCompletionAnimation());
+      }
+
+      // navigation
+      function navigateTo(pageId) {
+        const normalized = pageId.replace(/^page-/,'');
+        const targetEl = document.getElementById(`page-${normalized}`);
+        if (!targetEl) { console.warn('No page',pageId); return; }
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        targetEl.classList.add('active');
+        currentPage = normalized;
+        pageHistory.push(normalized);
+        const pageDef = lessonData.pages.find(p=>p.id===normalized);
+        if (pageDef && pageDef.type === 'timer') {
+          const el = document.getElementById(pageDef.content.timerId);
+          if (el) startTimer(pageDef.content.duration, el, goNext);
+        }
+        if (speechService && speechService.ready) {
+          speechService.speak(stripHtml((pageDef && pageDef.content && (pageDef.content.title || pageDef.content.text)) || ''));
+        }
+        updateNavState();
+      }
+
+      function goNext() {
+        const idx = pageSequence.indexOf(currentPage);
+        if (idx === -1 && pageSequence.length>0) { navigateTo(pageSequence[0]); return; }
+        if (idx >= 0 && idx < pageSequence.length - 1) navigateTo(pageSequence[idx+1]);
+      }
+      function goBack() {
+        if (pageHistory.length <= 1) return;
+        pageHistory.pop(); const prev = pageHistory.pop();
+        if (prev) navigateTo(prev);
+      }
+      function updateNavState() {
+        const nav = document.getElementById('nav-header');
+        nav.style.display = (currentPage === lessonData.startPageId) ? 'none' : 'block';
+        document.getElementById('nav-back').disabled = pageHistory.length <= 1;
+      }
+
+      // timers
+      function startTimer(duration, displayEl, onComplete) {
+        let t = duration;
+        displayEl.textContent = formatTime(t);
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(()=>{
+          t--; displayEl.textContent = formatTime(t);
+          if (t < 0) { clearInterval(timerInterval); timerInterval = null; if (onComplete) onComplete(); }
+        },1000);
+      }
+      function formatTime(s) { if (s<0) s=0; return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
+
+      // toast
+      function showToast(correct) {
+        const t = document.createElement('div');
+        t.className = 'feedback-toast ' + (correct ? 'good' : 'bad');
+        t.textContent = correct ? correctPhrases[Math.floor(Math.random()*correctPhrases.length)] : incorrectPhrases[Math.floor(Math.random()*incorrectPhrases.length)];
+        document.body.appendChild(t);
+        setTimeout(()=> t.remove(), 2800);
+        if (speechService && speechService.ready) speechService.speak(t.textContent);
+      }
+      function updateScore(points) { score += points; document.getElementById('score-display').textContent = score; }
+
+      // dialogue TTS
+      async function speakDialogue(text) {
+        if (!speechService) return;
+        const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+        for (const line of lines) {
+          const parts = line.split(':');
+          const content = parts.length>1 ? parts.slice(1).join(':').trim() : line;
+          speechService.speak(content);
+          await new Promise(r=>setTimeout(r, Math.min(1600, content.length*25)));
+        }
+      }
+
+      function showPhase(n) {
+        const content = document.getElementById('phaseContent');
+        if (!content) return;
+        const phases = {
+          1: { title:'Phase 1: Identify', items:['Map green spaces','Record collisions','Talk to locals'] },
+          2: { title:'Phase 2: Research', items:['Species lists','Movement patterns','Site constraints'] },
+          3: { title:'Phase 3: Design', items:['Crossing type','Planting and slope','Maintenance'] },
+          4: { title:'Phase 4: Monitor', items:['Post-install monitoring','Community feedback','Cost analysis'] }
+        };
+        const p = phases[n];
+        content.innerHTML = `<h3 style="font-weight:700">${escapeHtml(p.title)}</h3><ul style="margin-top:8px">${p.items.map(it=>`<li>${escapeHtml(it)}</li>`).join('')}</ul>`;
+      }
+
+      // background subtle particles
+      (function animateCanvas(){
+        const canvas = document.getElementById('background-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+        resize(); addEventListener('resize', resize);
+        const parts = [];
+        function frame(){
+          ctx.clearRect(0,0,canvas.width,canvas.height);
+          if (Math.random() > 0.986 && parts.length < 140) parts.push({ x: Math.random()*canvas.width, y: canvas.height+10, r: Math.random()*6+2, speed: Math.random()*1.4+0.4, color: ['#34d399','#60a5fa','#a78bfa','#f59e0b'][Math.floor(Math.random()*4)], alpha:0.6+Math.random()*0.4});
+          for (let i=parts.length-1;i>=0;i--){
+            const p = parts[i];
+            p.y -= p.speed; p.x += Math.sin(p.y/60)*0.3;
+            ctx.beginPath(); ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color; ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+            if (p.y < -10) parts.splice(i,1);
+          }
+          requestAnimationFrame(frame);
+        }
+        frame();
+      })();
+
+      // completion confetti
+      function runCompletionAnimation(){
+        const canvas = document.createElement('canvas');
+        canvas.style.position='fixed'; canvas.style.left=0; canvas.style.top=0; canvas.style.width='100%'; canvas.style.height='100%'; canvas.style.zIndex=9999; canvas.style.pointerEvents='none';
+        document.body.appendChild(canvas);
+        const ctx = canvas.getContext('2d'); canvas.width = innerWidth; canvas.height = innerHeight;
+        const confetti = [];
+        for (let i=0;i<80;i++) confetti.push({x:Math.random()*canvas.width,y:-10,vx:(Math.random()-0.5)*6,vy:Math.random()*3+2,w:8,h:12,color:['#fde68a','#f97316','#60a5fa','#34d399'][Math.floor(Math.random()*4)],angle:Math.random()*Math.PI});
+        let t=0;
+        (function frame(){
+          t++; ctx.clearRect(0,0,canvas.width,canvas.height);
+          for (let i=confetti.length-1;i>=0;i--){
+            const c=confetti[i]; c.x+=c.vx; c.y+=c.vy; c.vy+=0.05; ctx.save(); ctx.translate(c.x,c.y); ctx.rotate(c.angle); ctx.fillStyle=c.color; ctx.fillRect(-c.w/2,-c.h/2,c.w,c.h); ctx.restore(); if (c.y>canvas.height+20) confetti.splice(i,1);
+          }
+          if (t<220) requestAnimationFrame(frame); else canvas.remove();
+        })();
+      }
+
+      // utilities
+      function escapeHtml(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+      function stripHtml(s){ const d=document.createElement('div'); d.innerHTML = s||''; return d.textContent||d.innerText||''; }
+
+      // init wiring
+      document.addEventListener('DOMContentLoaded', async ()=> {
+        buildPages();
+        pageSequence = lessonData.pages.map(p => p.id);
+        document.getElementById('nav-header').style.display = 'none';
+        speechService = new SpeechService();
+        await speechService.init();
+
+        document.getElementById('start-lesson').addEventListener('click', async ()=>{
+          await initAudio();
+          buildPages();
+          navigateTo('main-menu');
+          document.getElementById('nav-header').style.display = 'block';
+        });
+        document.getElementById('nav-back').addEventListener('click', ()=> goBack());
+        document.getElementById('nav-next').addEventListener('click', ()=> goNext());
+        document.getElementById('nav-home').addEventListener('click', ()=> navigateTo('main-menu'));
+        document.getElementById('nav-tts').addEventListener('click', function(){ const on = speechService.toggle(); this.setAttribute('aria-pressed', String(on)); this.style.opacity = on ? '1' : '0.6'; });
+
+        document.getElementById('modalClose').addEventListener('click', ()=> document.getElementById('keywordModal').style.display = 'none');
+
+        // wire new page special buttons (in case buildPages ran earlier)
+        document.addEventListener('click', (ev)=>{
+          if (ev.target && ev.target.id === 'play-car-sound') { playCarSoundDemo(); }
+          if (ev.target && ev.target.id === 'explain-mitigations') {
+            if (speechService) speechService.speak('Mitigations include building overpasses, fences, lowering speed limits, and restoring corridors.');
+          }
+        }, true);
+      });
+
+      // expose for debug
+      window._lesson = { lessonData, navigateTo, showPhase, playCarSoundDemo };
+
     })();
-    </script>
+  </script>
 </body>
 </html>
