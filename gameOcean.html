@@ -1,382 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Ocean Cleanup Challenge</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%);
-            overflow: hidden;
-            height: 100vh;
-            position: relative;
-        }
-
-        /* Ocean Background Layers */
-        .ocean-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
-        .sky-layer { position: absolute; top: 0; left: 0; width: 100%; height: 40%; background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 50%, #87CEEB 100%); animation: skyFloat 20s ease-in-out infinite; }
-        .far-sea-layer { position: absolute; top: 30%; left: 0; width: 100%; height: 70%; background: linear-gradient(180deg, #4682B4 0%, #2F4F4F 50%, #191970 100%); animation: farSeaFloat 15s ease-in-out infinite; }
-        .mid-sea-layer { position: absolute; top: 50%; left: 0; width: 100%; height: 50%; background: linear-gradient(180deg, rgba(70,130,180,0.8) 0%, rgba(25,25,112,0.9) 100%); animation: midSeaFloat 12s ease-in-out infinite; }
-        .near-water-layer { position: absolute; top: 70%; left: 0; width: 100%; height: 30%; background: linear-gradient(180deg, rgba(0,191,255,0.6) 0%, rgba(0,100,200,0.8) 100%); animation: nearWaterFloat 8s ease-in-out infinite; }
-        .caustic-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background:
-            radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 60%, rgba(255,255,255,0.08) 0%, transparent 50%),
-            radial-gradient(circle at 40% 80%, rgba(255,255,255,0.06) 0%, transparent 50%);
-            animation: causticShimmer 6s ease-in-out infinite; pointer-events: none; }
-
-        @keyframes skyFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
-        @keyframes farSeaFloat { 0%,100%{transform:translateY(0) translateX(0)} 33%{transform:translateY(-3px) translateX(2px)} 66%{transform:translateY(2px) translateX(-1px)} }
-        @keyframes midSeaFloat { 0%,100%{transform:translateY(0) translateX(0)} 50%{transform:translateY(-8px) translateX(3px)} }
-        @keyframes nearWaterFloat { 0%,100%{transform:translateY(0) translateX(0)} 25%{transform:translateY(-12px) translateX(-4px)} 75%{transform:translateY(8px) translateX(2px)} }
-        @keyframes causticShimmer { 0%,100%{opacity:0.3;transform:scale(1) rotate(0)} 33%{opacity:0.5;transform:scale(1.1) rotate(2deg)} 66%{opacity:0.2;transform:scale(0.9) rotate(-1deg)} }
-
-        /* Modal Styles */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; z-index:1000; }
-        .modal-content { background: white; padding: 2rem; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 400px; width: 90%; }
-        .grade-button { background: linear-gradient(45deg,#4CAF50,#45a049); color:white; border:none; padding:15px 30px; margin:10px; border-radius:10px; font-size:18px; cursor:pointer; transition: transform .2s; }
-        .grade-button:hover { transform: scale(1.05); }
-
-        /* Game Container */
-        .game-container { width: 100%; height: 100vh; position: relative; display: none; }
-
-        /* Header UI */
-        .header { position:absolute; top:0; left:0; right:0; height:80px; background: rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center; padding:0 20px; z-index:100; }
-        .timer-container { display:flex; align-items:center; gap:15px; }
-        .timer { background: rgba(255,255,255,0.9); padding:10px 20px; border-radius:25px; font-size:24px; font-weight:bold; color:#333; box-shadow:0 4px 15px rgba(0,0,0,0.2); transition: all .3s ease; }
-        .stop-button { background: linear-gradient(45deg,#FF6B6B,#FF8E8E); color:white; border:none; padding:10px 15px; border-radius:20px; font-size:16px; font-weight:bold; cursor:pointer; box-shadow:0 4px 15px rgba(0,0,0,0.2); transition: all .3s ease; min-width:80px; }
-        .stop-button:hover { transform: scale(1.05); box-shadow:0 6px 20px rgba(255,107,107,0.4); }
-        .team-info { background: rgba(255,255,255,0.9); padding:10px 15px; border-radius:15px; min-width:200px; }
-        .team-left { background: linear-gradient(45deg,#FF6B6B,#FF8E8E); color:white; }
-        .team-right { background: linear-gradient(45deg,#4ECDC4,#6FDDDD); color:white; }
-        .player-name { font-weight:bold; font-size:16px; }
-        .player-score { font-size:14px; opacity:0.9; }
-
-        /* Ocean Panels */
-        .ocean-container { position:absolute; top:80px; left:0; right:0; bottom:0; display:flex; }
-        .ocean-panel { flex:1; position:relative; background:transparent; overflow:hidden; transition: all .3s ease; }
-
-        /* Particle Systems */
-        .bubble-container { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
-        .bubble { position:absolute; background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 70%, transparent 100%); border-radius:50%; animation: bubbleFloat 8s linear infinite; }
-        .sparkle { position:absolute; width:8px; height:8px; background: radial-gradient(circle,#FFD700 0%, transparent 70%); border-radius:50%; animation: sparkleEffect 1s ease-out forwards; pointer-events:none; z-index:1000; }
-        .confetti { position:absolute; width:6px; height:6px; animation: confettiFall 3s ease-out forwards; pointer-events:none; z-index:1000; }
-        .success-burst { position:absolute; width:60px; height:60px; border-radius:50%; background: radial-gradient(circle, rgba(76,175,80,0.6) 0%, transparent 70%); animation: successBurst 0.6s ease-out forwards; pointer-events:none; z-index:999; }
-
-        @keyframes bubbleFloat { 0%{transform:translateY(100vh) scale(0);opacity:0} 10%{opacity:1;transform:translateY(90vh) scale(1)} 90%{opacity:1;transform:translateY(-10vh) scale(1)} 100%{transform:translateY(-20vh) scale(0);opacity:0} }
-        @keyframes sparkleEffect { 0%{transform:scale(0) rotate(0);opacity:1} 50%{transform:scale(1.5) rotate(180deg);opacity:0.8} 100%{transform:scale(0) rotate(360deg);opacity:0} }
-        @keyframes confettiFall { 0%{transform:translateY(-20px) rotate(0);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
-        @keyframes successBurst { 0%{transform:scale(0);opacity:0.8} 50%{transform:scale(1.2);opacity:0.4} 100%{transform:scale(2);opacity:0} }
-
-        .ocean-panel.flash-red { background: rgba(244,67,54,0.3); animation: flashRed 0.5s ease-out; }
-        @keyframes flashRed { 0%{background:rgba(244,67,54,0.6)} 100%{background:linear-gradient(180deg,#87CEEB 0%, #4682B4 50%, #191970 100%)} }
-
-        .divider { width:4px; background: linear-gradient(180deg,#FFD700,#FFA500); box-shadow:0 0 20px rgba(255,215,0,0.5); }
-
-        /* Bins */
-        .bins-container { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); display:flex; gap:20px; }
-        .bin { width:80px; height:100px; border-radius:15px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition: all .3s ease; border:3px solid transparent; }
-        .recycling-bin { background: linear-gradient(145deg,#4CAF50,#45a049); color:white; }
-        .garbage-bin { background: linear-gradient(145deg,#757575,#616161); color:white; }
-        .bin.hover-glow { box-shadow:0 0 30px currentColor, inset 0 0 20px rgba(255,255,255,0.3); transform:scale(1.15); border:3px solid rgba(255,255,255,0.8); }
-        .bin.correct-hover { box-shadow:0 0 40px #4CAF50, inset 0 0 25px rgba(76,175,80,0.4); border:3px solid #4CAF50; animation: correctPulse .5s ease-in-out; }
-        .bin.magnetism { animation: magnetPull .3s ease-out; }
-        @keyframes correctPulse { 0%,100%{transform:scale(1.1)} 50%{transform:scale(1.2)} }
-        @keyframes magnetPull { 0%{transform:scale(1)} 50%{transform:scale(1.05)} 100%{transform:scale(1.1)} }
-        .bin-icon { font-size:24px; margin-bottom:5px; }
-        .bin-label { font-size:12px; font-weight:bold; }
-
-        /* Game Objects */
-        .game-object { position:absolute; cursor:grab; transition: transform .12s ease; user-select:none; will-change:transform, opacity; }
-        .game-object:hover { transform: scale(1.1); }
-        .game-object.dragging { cursor:grabbing; z-index:1000; transform:scale(1.2); filter: drop-shadow(0 8px 25px rgba(0,0,0,0.4)); animation: none; }
-        .game-object.correct-outline { outline:3px solid #4CAF50; outline-offset:2px; box-shadow:0 0 15px rgba(76,175,80,0.6); }
-        .game-object.magnetic-pull { animation: magneticPull .2s ease-out; }
-        @keyframes magneticPull { 0%{transform:scale(1)} 100%{transform:scale(1.1)} }
-        .plastic-item, .trash-item, .sea-creature { background:transparent; border:none; padding:8px; font-size:24px; }
-        .sea-creature { cursor:not-allowed; transition: all .3s ease; }
-        .sea-creature.schooling { animation: schoolingPath 50s ease-in-out infinite; }
-        .sea-creature.darting { animation: dartingMotion .8s ease-out; }
-        @keyframes schoolingPath { 0%,100%{transform:translateX(0) translateY(0) rotate(0)} 25%{transform:translateX(0.3px) translateY(-0.2px) rotate(.05deg)} 50%{transform:translateX(0.5px) translateY(0.2px) rotate(-.05deg)} 75%{transform:translateX(0.3px) translateY(0.3px) rotate(.05deg)} }
-        @keyframes dartingMotion { 0%{transform:translateX(0) translateY(0)} 30%{transform:translateX(-3px) translateY(-2px)} 60%{transform:translateX(2px) translateY(3px)} 100%{transform:translateX(0) translateY(0)} }
-
-        /* Slower, mostly vertical fall for emoji-like items (final version) */
-        @keyframes emojiFall {
-            0% { transform: translateY(-15vh) translateX(0); opacity: 0; }
-            3% { opacity: 1; }
-            97% { transform: translateY(calc(100vh - 220px)) translateX(var(--drift-x, 0px)); opacity: 1; }
-            100% { transform: translateY(calc(100vh - 200px)) translateX(var(--drift-x, 0px)); opacity: 0; }
-        }
-
-        /* Class to apply to emoji/game-object items for a very slow, near-vertical descent */
-        .emoji-fall { animation: emojiFall 60s linear infinite; --drift-x: 0px; }
-        /* Keep .natural-fall compatibility but point it to the same gentle behavior */
-        .natural-fall { animation: emojiFall 60s linear infinite; --drift-x: 0px; }
-
-        @keyframes gentleRotate { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
-        .gentle-rotate { animation: gentleRotate 20s linear infinite; }
-
-        @keyframes avoidCursor { 0%{transform:translate(0,0)} 50%{transform:translate(var(--avoid-x,0), var(--avoid-y,0))} 100%{transform:translate(0,0)} }
-        @keyframes currentBurst { 0%{transform:translateX(0)} 100%{transform:translateX(var(--burst-distance,50px))} }
-        .avoiding { animation: avoidCursor 1s ease-out; }
-        .current-burst { animation: currentBurst 2s ease-out; }
-
-        /* Countdown / Overlays / UI (unchanged) */
-        .countdown { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 120px; font-weight: bold; color: #FFD700; text-shadow: 3px 3px 6px rgba(0,0,0,0.5); z-index: 500; display: none; }
-        .next-players-container, .name-shuffle-container { display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:1000; justify-content:center; align-items:center; flex-direction:column; }
-        .name-shuffle-container { background: linear-gradient(135deg, rgba(0,0,0,0.95), rgba(25,25,112,0.9)); z-index:1001; }
-        .shuffle-title { color:#FFD700; font-size:42px; font-weight:bold; margin-bottom:60px; text-align:center; text-shadow:2px 2px 8px rgba(0,0,0,0.7); animation: shuffleTitlePulse 1.5s ease-in-out infinite alternate; }
-        @keyframes shuffleTitlePulse { 0%{transform:scale(1); text-shadow:2px 2px 8px rgba(255,215,0,0.3)} 100%{transform:scale(1.05); text-shadow:2px 2px 15px rgba(255,215,0,0.8)} }
-        .shuffle-names { display:flex; gap:120px; margin-bottom:60px; }
-        .shuffle-player { text-align:center; min-width:350px; }
-        .shuffle-label { color:#87CEEB; font-size:24px; font-weight:bold; margin-bottom:20px; text-shadow:1px 1px 4px rgba(0,0,0,0.5); }
-        .shuffle-name { background: linear-gradient(45deg,#FF6B6B,#4ECDC4); color:white; padding:25px 30px; border-radius:20px; font-size:22px; font-weight:bold; min-height:60px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 25px rgba(0,0,0,0.3); animation:shuffleFlicker 0.1s ease-in-out infinite; border:3px solid rgba(255,255,255,0.3); }
-        @keyframes shuffleFlicker { 0%{transform:scale(1)} 50%{transform:scale(1.02)} 100%{transform:scale(1)} }
-        .shuffle-name.selected { animation: shuffleSelected .8s ease-out; background:linear-gradient(45deg,#4CAF50,#45a049); border:3px solid #FFD700; box-shadow:0 0 30px rgba(76,175,80,0.6); }
-        @keyframes shuffleSelected { 0%{transform:scale(1)} 50%{transform:scale(1.15)} 100%{transform:scale(1.05)} }
-        .shuffle-progress { width:400px; height:8px; background: rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; margin-top:20px; }
-        .shuffle-bar { height:100%; background: linear-gradient(90deg,#FFD700,#FFA500); width:0%; border-radius:4px; transition: width .1s ease; box-shadow:0 0 10px rgba(255,215,0,0.5); }
-        .shuffle-timer { color:#FFD700; font-size:36px; font-weight:bold; margin-top:20px; text-shadow:2px 2px 8px rgba(0,0,0,0.7); }
-        .next-players-title { color:white; font-size:36px; margin-bottom:40px; text-align:center; }
-        .next-players-names { display:flex; gap:80px; margin-bottom:40px; }
-        .next-player { background: linear-gradient(45deg,#FF6B6B,#4ECDC4); color:white; padding:30px 40px; border-radius:20px; font-size:28px; font-weight:bold; text-align:center; min-width:300px; animation: playerPulse 1s ease-in-out infinite alternate; }
-        @keyframes playerPulse { 0%{transform:scale(1)} 100%{transform:scale(1.05)} }
-        .next-countdown { color:#FFD700; font-size:48px; font-weight:bold; text-shadow:2px 2px 4px rgba(0,0,0,0.5); }
-        .results-modal { display:none; }
-        .leaderboard { margin:20px 0; text-align:left; }
-        .leaderboard-item { padding:10px; background:#f0f0f0; margin:5px 0; border-radius:8px; display:flex; justify-content:space-between; }
-        .high-contrast { filter: contrast(150%) brightness(120%); }
-        .accessibility-toggle { position: fixed; top:10px; right:10px; background: rgba(0,0,0,0.7); color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; z-index:1001; }
-
-        /* Responsive */
-        @media (max-width:768px) {
-            .header { height:60px; padding:0 10px; }
-            .timer { font-size:18px; padding:8px 15px; }
-            .team-info { min-width:150px; padding:8px 12px; }
-            .bin { width:60px; height:80px; }
-            .countdown { font-size:80px; }
-            .next-players-names { flex-direction:column; gap:30px; }
-            .next-player { min-width:250px; font-size:24px; padding:25px 30px; }
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Grade Selection Modal -->
-    <div id="gradeModal" class="modal">
-        <div class="modal-content">
-            <h2>选择年级 / Select Grade Level</h2>
-            <p>Choose your grade to start the Ocean Cleanup Challenge!</p>
-            <button class="grade-button" onclick="selectGrade(10)">Grade 10 (17 students)</button>
-            <button class="grade-button" onclick="selectGrade(11)">Grade 11 (14 students)</button>
-            <button class="grade-button" onclick="selectGrade(12)">Grade 12 (13 students)</button>
-        </div>
-    </div>
-
-    <!-- Next Players Display -->
-    <div id="nextPlayersContainer" class="next-players-container">
-        <div class="next-players-title">下一轮选手 / Next Players</div>
-        <div class="next-players-names">
-            <div class="next-player" id="nextPlayerLeft">Player 1</div>
-            <div class="next-player" id="nextPlayerRight">Player 2</div>
-        </div>
-        <div class="next-countdown" id="nextCountdown">10</div>
-    </div>
-
-    <!-- Name Shuffling Display -->
-    <div id="nameShuffleContainer" class="name-shuffle-container">
-        <div class="shuffle-title">🎲 选择选手中... / Selecting Players... 🎲</div>
-        <div class="shuffle-names">
-            <div class="shuffle-player" id="shufflePlayerLeft">
-                <div class="shuffle-label">左队 / Left Team</div>
-                <div class="shuffle-name" id="shuffleNameLeft">---</div>
-            </div>
-            <div class="shuffle-player" id="shufflePlayerRight">
-                <div class="shuffle-label">右队 / Right Team</div>
-                <div class="shuffle-name" id="shuffleNameRight">---</div>
-            </div>
-        </div>
-        <div class="shuffle-progress"><div class="shuffle-bar" id="shuffleBar"></div></div>
-        <div class="shuffle-timer" id="shuffleTimer">5</div>
-    </div>
-
-    <!-- Ocean Background -->
-    <div class="ocean-background">
-        <div class="sky-layer"></div>
-        <div class="far-sea-layer"></div>
-        <div class="mid-sea-layer"></div>
-        <div class="near-water-layer"></div>
-        <div class="caustic-overlay"></div>
-    </div>
-
-    <!-- Game Container -->
-    <div id="gameContainer" class="game-container">
-
-        <!-- Header UI -->
-        <div class="header">
-            <div class="team-info team-left">
-                <div class="player-name" id="leftPlayerName">Left Team</div>
-                <div class="player-score" id="leftPlayerScore">Score: 0</div>
-            </div>
-
-            <div class="timer-container">
-                <div class="timer" id="gameTimer">2:00</div>
-                <button class="stop-button" id="stopButton" onclick="toggleGamePause()">⏸️ STOP</button>
-            </div>
-
-            <div class="team-info team-right">
-                <div class="player-name" id="rightPlayerName">Right Team</div>
-                <div class="player-score" id="rightPlayerScore">Score: 0</div>
-            </div>
-        </div>
-
-        <!-- Ocean Container -->
-        <div class="ocean-container">
-            <!-- Left Ocean Panel -->
-            <div class="ocean-panel" id="leftOcean">
-                <div class="bubble-container" id="leftBubbles"></div>
-                <div class="bins-container">
-                    <div class="bin recycling-bin" data-type="recycling" data-team="left">
-                        <div class="bin-icon">♻️</div>
-                        <div class="bin-label">Recycling</div>
-                    </div>
-                    <div class="bin garbage-bin" data-type="garbage" data-team="left">
-                        <div class="bin-icon">🗑️</div>
-                        <div class="bin-label">Garbage</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Central Divider -->
-            <div class="divider"></div>
-
-            <!-- Right Ocean Panel -->
-            <div class="ocean-panel" id="rightOcean">
-                <div class="bubble-container" id="rightBubbles"></div>
-                <div class="bins-container">
-                    <div class="bin recycling-bin" data-type="recycling" data-team="right">
-                        <div class="bin-icon">♻️</div>
-                        <div class="bin-label">Recycling</div>
-                    </div>
-                    <div class="bin garbage-bin" data-type="garbage" data-team="right">
-                        <div class="bin-icon">🗑️</div>
-                        <div class="bin-label">Garbage</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Countdown Display -->
-    <div id="countdown" class="countdown">3</div>
-
-    <!-- Results Modal -->
-    <div id="resultsModal" class="modal results-modal">
-        <div class="modal-content">
-            <h2>本轮结束 / Round Complete!</h2>
-            <div id="roundResults"></div>
-            <div class="leaderboard">
-                <h3>排行榜 / Leaderboard</h3>
-                <div id="leaderboardList"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Accessibility Toggle -->
-    <button class="accessibility-toggle" id="accessibilityToggle" aria-pressed="false">Contrast</button>
-
-    <!-- Core game scripts and helpers -->
-    <script>
-        // Helper script: automatically tag emoji-like elements so they use the slow near-vertical fall.
-        (function () {
-            // Simple emoji detection (covers many common emoji ranges)
-            const emojiRegex = /[\u{1F300}-\u{1F6FF}\u{1F900}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u;
-
-            function applyEmojiFallToNode(node) {
-                if (!(node instanceof HTMLElement)) return;
-                // Skip if already handled
-                if (node.classList.contains('emoji-fall') || node.classList.contains('natural-fall')) return;
-
-                // If element explicitly flagged as emoji via data attribute
-                if (node.dataset && (node.dataset.emoji === 'true' || node.dataset.emoji === 'emoji')) {
-                    node.classList.add('emoji-fall', 'game-object');
-                    return;
-                }
-
-                // If text contains emoji characters, apply the class
-                try {
-                    const txt = (node.textContent || '').trim();
-                    if (txt && emojiRegex.test(txt)) {
-                        node.classList.add('emoji-fall', 'game-object');
-                        // set zero drift by default for strict vertical motion
-                        node.style.setProperty('--drift-x', '0px');
-                    }
-                } catch (e) {
-                    // ignore read errors
-                }
-            }
-
-            function scanExisting() {
-                // Add to all existing elements that look like emoji items
-                document.querySelectorAll('.game-object, [data-emoji], .emoji, .emoji-item').forEach(el => applyEmojiFallToNode(el));
-                // Also scan any elements that contain emoji characters
-                document.querySelectorAll('body *:not(script):not(style)').forEach(el => {
-                    applyEmojiFallToNode(el);
-                });
-            }
-
-            const observer = new MutationObserver(muts => {
-                for (const m of muts) {
-                    if (m.type === 'childList') {
-                        m.addedNodes.forEach(n => {
-                            if (n.nodeType !== Node.ELEMENT_NODE) return;
-                            applyEmojiFallToNode(n);
-                            if (n.querySelectorAll) n.querySelectorAll('*').forEach(c => applyEmojiFallToNode(c));
-                        });
-                    } else if (m.type === 'attributes' && m.target) {
-                        applyEmojiFallToNode(m.target);
-                    }
-                }
-            });
-
-            observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-emoji','class'] });
-
-            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scanExisting);
-            else scanExisting();
-
-            // Expose a helper for your game code to mark created elements explicitly
-            window.markAsEmojiFall = function (el, opts) {
-                if (!el) return;
-                el.classList.add('emoji-fall', 'game-object');
-                const drift = opts && typeof opts.driftX !== 'undefined' ? opts.driftX : 0;
-                el.style.setProperty('--drift-x', (drift) + 'px');
-            };
-
-            // Accessibility toggle
-            const accBtn = document.getElementById('accessibilityToggle');
-            if (accBtn) {
-                accBtn.addEventListener('click', () => {
-                    document.body.classList.toggle('high-contrast');
-                    const pressed = document.body.classList.contains('high-contrast');
-                    accBtn.setAttribute('aria-pressed', pressed ? 'true' : 'false');
-                });
-            }
-        })();
-    </script>
-
-    <!-- Your main game script should come after the helpers above.
-         To ensure slow near-vertical fall for new emoji objects created by your code:
-           - call markAsEmojiFall(element) OR
-           - add class="game-object emoji-fall" to the element OR
-           - set data-emoji="true" on the element before appending it.
-         Drift is set to 0px by default; if you want a tiny side-to-side drift, pass markAsEmojiFall(el, { driftX: 1 }) -->
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ocean Cleanup Challenge</title>
@@ -903,97 +527,28 @@
             transition: all 0.3s ease;
         }
 
-        .sea-creature.schooling {
-            animation: schoolingPath 50s ease-in-out infinite;
-        }
 
-        .sea-creature.darting {
-            animation: dartingMotion 0.8s ease-out;
-        }
 
-        @keyframes schoolingPath {
-            0%, 100% { 
-                transform: translateX(0px) translateY(0px) rotate(0deg); 
-            }
-            25% { 
-                transform: translateX(0.3px) translateY(-0.2px) rotate(0.05deg); 
-            }
-            50% { 
-                transform: translateX(0.5px) translateY(0.2px) rotate(-0.05deg); 
-            }
-            75% { 
-                transform: translateX(0.3px) translateY(0.3px) rotate(0.05deg); 
-            }
-        }
-
-        @keyframes dartingMotion {
+        /* Simple Slow Fall Animation */
+        @keyframes slowFall {
             0% { 
-                transform: translateX(0px) translateY(0px); 
-            }
-            30% { 
-                transform: translateX(-3px) translateY(-2px); 
-            }
-            60% { 
-                transform: translateX(2px) translateY(3px); 
-            }
-            100% { 
-                transform: translateX(0px) translateY(0px); 
-            }
-        }
-
-        /* Natural Fall and Float Animation */
-        @keyframes naturalFall {
-            0% { 
-                transform: translateY(-50px) translateX(0px);
+                transform: translateY(-50px);
                 opacity: 0;
             }
-            5% {
-                opacity: 1;
-            }
-            95% { 
-                transform: translateY(calc(100vh - 350px)) translateX(var(--drift-x, 0px));
+            10% {
                 opacity: 1;
             }
             100% { 
-                transform: translateY(calc(100vh - 300px)) translateX(var(--drift-x, 0px));
-                opacity: 0;
+                transform: translateY(calc(100vh - 350px));
+                opacity: 1;
             }
         }
 
-        @keyframes gentleRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .natural-fall {
-            animation: naturalFall 60s ease-in-out infinite;
-            --drift-x: 0px;
-        }
-
-        .gentle-rotate {
-            animation: gentleRotate 20s linear infinite;
-        }
-
-        @keyframes avoidCursor {
-            0% { transform: translate(0, 0); }
-            50% { transform: translate(var(--avoid-x, 0), var(--avoid-y, 0)); }
-            100% { transform: translate(0, 0); }
-        }
-
-        @keyframes currentBurst {
-            0% { transform: translateX(0px); }
-            100% { transform: translateX(var(--burst-distance, 50px)); }
+        .slow-fall {
+            animation: slowFall 180s linear infinite;
         }
 
 
-
-        .avoiding {
-            animation: avoidCursor 1s ease-out;
-        }
-
-        .current-burst {
-            animation: currentBurst 2s ease-out;
-        }
 
         /* Countdown */
         .countdown {
@@ -1393,8 +948,8 @@
             gamePaused: false,
             timeRemaining: 120,
             gameObjects: [],
-            targetObjectCount: 20,
-            currentSpeed: 0.1,
+            targetObjectCount: 12, // Reduced from 20 to 12 for better balance
+            currentSpeed: 0.05, // Slower default speed
             mousePosition: { x: 0, y: 0 },
             currentBurst: null,
             magnetismRange: 80,
@@ -1404,7 +959,9 @@
             fps: 60,
             roundNumber: 1,
             totalRounds: 0,
-            gameTimer: null
+            gameTimer: null,
+            objectsPerPanel: 8, // Target objects per panel
+            spawnRate: 3000 // Spawn new objects every 3 seconds
         };
 
         // Performance monitoring
@@ -1530,18 +1087,16 @@
 
         // Initialize
         function init() {
-            // Track mouse and touch position for sea life avoidance
+            // Simple mouse tracking for bin hover effects only
             document.addEventListener('mousemove', (e) => {
                 gameState.mousePosition.x = e.clientX;
                 gameState.mousePosition.y = e.clientY;
-                updateSeaLifeAvoidance();
             });
             
             document.addEventListener('touchmove', (e) => {
                 if (e.touches.length > 0) {
                     gameState.mousePosition.x = e.touches[0].clientX;
                     gameState.mousePosition.y = e.touches[0].clientY;
-                    updateSeaLifeAvoidance();
                 }
             }, { passive: true });
 
@@ -1682,14 +1237,24 @@
                 gameState.roundNumber = 1;
             }
             
-            document.getElementById('gradeModal').style.display = 'none';
+            // Hide the grade modal immediately
+            const gradeModal = document.getElementById('gradeModal');
+            if (gradeModal) {
+                gradeModal.style.display = 'none';
+            }
             
             // Auto-enable audio and start game
             gameState.audioEnabled = true;
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (error) {
+                console.warn('Audio context not available:', error);
+            }
             
             // Start first round immediately
-            selectNextPlayers();
+            setTimeout(() => {
+                selectNextPlayers();
+            }, 100);
         }
 
         // Student Roster Data
@@ -2045,7 +1610,10 @@
         function beginGameplay() {
             gameState.gameActive = true;
             gameState.timeRemaining = 120;
-            gameState.currentSpeed = 0.1;
+            gameState.currentSpeed = 0.05;
+            
+            // Adjust difficulty based on grade
+            adjustDifficultyForGrade();
             
             // Initialize magnetism range based on screen size
             updateMagnetismRanges();
@@ -2072,8 +1640,28 @@
             // Start object management
             startObjectManagement();
             
-            // Start current bursts
-            startCurrentBursts();
+            // Emojis just fall slowly - no extra movement
+        }
+
+        function adjustDifficultyForGrade() {
+            // Adjust game parameters based on selected grade
+            switch(gameState.selectedGrade) {
+                case 10:
+                    gameState.objectsPerPanel = 6; // Fewer objects for younger students
+                    gameState.spawnRate = 4000; // Slower spawn rate
+                    break;
+                case 11:
+                    gameState.objectsPerPanel = 8; // Medium difficulty
+                    gameState.spawnRate = 3000;
+                    break;
+                case 12:
+                    gameState.objectsPerPanel = 10; // More challenging
+                    gameState.spawnRate = 2500;
+                    break;
+                default:
+                    gameState.objectsPerPanel = 8;
+                    gameState.spawnRate = 3000;
+            }
         }
 
         function startGameTimer() {
@@ -2087,15 +1675,15 @@
                 gameState.timeRemaining--;
                 updateTimerDisplay();
                 
-                // Timer warnings and speed changes
+                // Timer warnings and gentle speed changes
                 if (gameState.timeRemaining === 30) {
                     playSound('tick');
-                    gameState.currentSpeed = 1.5;
+                    gameState.currentSpeed = 0.2; // Much gentler speed increase
                     document.getElementById('gameTimer').classList.add('warning');
                 } else if (gameState.timeRemaining === 10) {
                     document.getElementById('gameTimer').classList.remove('warning');
                     document.getElementById('gameTimer').classList.add('critical');
-                    gameState.currentSpeed = 2;
+                    gameState.currentSpeed = 0.4; // Still gentle but faster
                 }
                 
                 if (gameState.timeRemaining <= 0) {
@@ -2115,51 +1703,41 @@
         }
 
         function startObjectManagement() {
-            // Initial spawn - just start the maintenance
-            maintainObjectDensity();
+            // Start spawning immediately when game begins
+            setTimeout(() => {
+                // Initial burst of emojis
+                spawnInPanel('leftOcean', 'left');
+                spawnInPanel('rightOcean', 'right');
+                setTimeout(() => {
+                    spawnInPanel('leftOcean', 'left');
+                    spawnInPanel('rightOcean', 'right');
+                }, 1000);
+            }, 0);
             
-            // Regular maintenance - slower interval
-            setInterval(() => {
-                if (gameState.gameActive) {
-                    maintainObjectDensity();
-                    cleanupOffscreenObjects();
+            // Regular spawning every 2 seconds
+            const spawnInterval = setInterval(() => {
+                if (gameState.gameActive && !gameState.gamePaused) {
+                    // Spawn one emoji in each panel every 2 seconds
+                    spawnInPanel('leftOcean', 'left');
+                    spawnInPanel('rightOcean', 'right');
                 }
-            }, 2000); // Increased from 800ms to 2000ms
+            }, 2000);
             
-            // Add 10 more emojis every 10 seconds
+            // Cleanup interval
             setInterval(() => {
                 if (gameState.gameActive && !gameState.gamePaused) {
-                    // Add 5 emojis to each panel
-                    for (let i = 0; i < 5; i++) {
-                        setTimeout(() => spawnInPanel('leftOcean', 'left'), i * 150);
-                        setTimeout(() => spawnInPanel('rightOcean', 'right'), i * 150);
-                    }
+                    cleanupOffscreenObjects();
                 }
-            }, 10000); // Every 10 seconds
+            }, 5000);
+            
+            // Store interval for cleanup
+            gameState.spawnInterval = spawnInterval;
         }
 
         function maintainObjectDensity() {
-            if (gameState.gamePaused) return; // Don't spawn when paused
-            
-            const leftObjects = document.querySelectorAll('#leftOcean .game-object').length;
-            const rightObjects = document.querySelectorAll('#rightOcean .game-object').length;
-            
-            const targetPerPanel = 25; // Increased for more emojis
-            
-            // Spawn more objects at once
-            if (leftObjects < targetPerPanel) {
-                const toSpawn = Math.min(3, targetPerPanel - leftObjects); // Max 3 at once
-                for (let i = 0; i < toSpawn; i++) {
-                    setTimeout(() => spawnInPanel('leftOcean', 'left'), i * 300); // Slower stagger spawning
-                }
-            }
-            
-            if (rightObjects < targetPerPanel) {
-                const toSpawn = Math.min(3, targetPerPanel - rightObjects); // Max 3 at once
-                for (let i = 0; i < toSpawn; i++) {
-                    setTimeout(() => spawnInPanel('rightOcean', 'right'), i * 300); // Slower stagger spawning
-                }
-            }
+            // This function is no longer needed as we use regular interval spawning
+            // Keeping for compatibility but not actively managing density
+            return;
         }
 
         function cleanupOffscreenObjects() {
@@ -2212,10 +1790,17 @@
             
             const object = document.createElement('div');
             object.className = `game-object ${type === 'plastic' ? 'plastic-item' : type === 'trash' ? 'trash-item' : 'sea-creature'}`;
-            object.textContent = objectData.emoji; // Use textContent instead of innerHTML for emojis
+            object.textContent = objectData.emoji;
             object.dataset.type = type;
             object.dataset.team = team;
             object.title = objectData.name;
+            
+            // Ensure visibility
+            object.style.fontSize = '32px';
+            object.style.zIndex = '10';
+            object.style.position = 'absolute';
+            object.style.pointerEvents = 'auto';
+            object.style.userSelect = 'none';
             
             // Always spawn from top for natural falling motion
             let startX, startY;
@@ -2227,20 +1812,11 @@
             object.style.left = startX + 'px';
             object.style.top = startY + 'px';
             
-            // Add natural fall-and-float behavior
-            object.classList.add('natural-fall');
+            // Add simple slow fall animation
+            object.classList.add('slow-fall');
             
-            // Add slight rotation for items (not sea creatures)
-            if (type !== 'sealife' && Math.random() < 0.4) {
-                object.classList.add('gentle-rotate');
-            }
-            
-            // Set random drift and animation duration
-            const driftX = (Math.random() - 0.5) * 100; // -50px to +50px horizontal drift
-            object.style.setProperty('--drift-x', driftX + 'px');
-            
-            // Much slower animation duration for variety
-            const duration = 100 + Math.random() * 80; // 100-180 seconds (even slower)
+            // Moderate fall duration for better gameplay
+            const duration = 60; // 1 minute to fall slowly
             
             if (gameState.gamePaused) {
                 object.style.animationPlayState = 'paused';
@@ -2250,31 +1826,16 @@
             
             panel.appendChild(object);
             
-            // Add physics properties - ultra slow default
-            object.physics = {
-                vx: gameState.gamePaused ? 0 : (Math.random() - 0.5) * 0.00001,
-                vy: gameState.gamePaused ? 0 : (Math.random() - 0.5) * 0.00001,
-                mass: type === 'sealife' ? 0.5 : 1,
-                paused: gameState.gamePaused,
-                maxY: window.innerHeight - 350 // Keep above bins
-            };
-            
-            // Set animation state based on pause
-            if (gameState.gamePaused) {
-                object.style.animationPlayState = 'paused';
-            } else {
-                object.style.animationDuration = `${duration}s`;
-            }
-            
-            // Add drag functionality
+            // Add drag functionality - NO PHYSICS
             if (type !== 'sealife') {
                 makeDraggable(object);
             } else {
+                // Make sure sea creatures are clickable
+                object.style.pointerEvents = 'auto';
+                object.style.cursor = 'not-allowed';
                 object.addEventListener('mousedown', handleSeaLifeClick);
+                object.addEventListener('touchstart', handleSeaLifeClick, { passive: false });
             }
-            
-            // Start physics simulation
-            startObjectPhysics(object);
         }
 
         function spawnSeaCreature(panelId, team) {
@@ -2331,8 +1892,8 @@
             const driftX = (Math.random() - 0.5) * 100; // -50px to +50px horizontal drift
             object.style.setProperty('--drift-x', driftX + 'px');
             
-            // Much slower animation duration for variety
-            const duration = 80 + Math.random() * 60; // 80-140 seconds (much slower)
+            // Even slower animation duration for better gameplay
+            const duration = 120 + Math.random() * 80; // 120-200 seconds (very slow)
             
             if (gameState.gamePaused) {
                 object.style.animationPlayState = 'paused';
@@ -2362,11 +1923,23 @@
             let isDragging = false;
             let startX, startY, initialX, initialY;
             
+            // Ensure element can receive events
+            element.style.pointerEvents = 'auto';
+            element.style.userSelect = 'none';
+            element.style.touchAction = 'none';
+            
             element.addEventListener('mousedown', startDrag);
             element.addEventListener('touchstart', startDrag, { passive: false });
             
             function startDrag(e) {
                 if (!gameState.gameActive) return;
+                
+                // Stop all animations and physics immediately
+                element.style.animation = 'none';
+                element.classList.remove('natural-fall', 'gentle-rotate');
+                if (element.physics) {
+                    element.physics.paused = true;
+                }
                 
                 isDragging = true;
                 element.classList.add('dragging');
@@ -2386,6 +1959,7 @@
                 document.addEventListener('touchend', stopDrag);
                 
                 e.preventDefault();
+                e.stopPropagation();
             }
             
             function drag(e) {
@@ -2510,7 +2084,7 @@
             bins.forEach(bin => {
                 const rect = bin.getBoundingClientRect();
                 const isDropped = x >= rect.left - 25 && x <= rect.right + 25 && 
-                                  y >= rect.top - 25 && y <= rect.bottom + 25;
+                                y >= rect.top - 25 && y <= rect.bottom + 25;
                 
                 if (isDropped) {
                     const binType = bin.dataset.type;
@@ -2523,14 +2097,11 @@
                     if ((binType === 'recycling' && objectType === 'plastic') ||
                         (binType === 'garbage' && objectType === 'trash')) {
                         // Correct drop
-                        gameState.playerScores[team] += 1;
-                        gameState.scores[team] += 1;
-                        gameState.combos[team]++;
-                        
                         let points = 1;
                         let feedback = '+1';
                         
                         // Combo bonus
+                        gameState.combos[team]++;
                         if (gameState.combos[team] >= 5 && gameState.combos[team] % 5 === 0) {
                             points += 2;
                             feedback = '+3 COMBO!';
@@ -2538,6 +2109,10 @@
                         } else {
                             playSound('correct');
                         }
+                        
+                        // Add the calculated points to both scores
+                        gameState.playerScores[team] += points;
+                        gameState.scores[team] += points;
                         
                         showFeedback(feedback, element, 'green');
                         
@@ -2633,8 +2208,14 @@
         }
 
         function handleSeaLifeClick(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
             const team = e.target.dataset.team;
             const panel = document.getElementById(team + 'Ocean');
+            
+            // Stop any animations on this creature
+            e.target.style.animation = 'none';
             
             // Flash red screen
             panel.classList.add('flash-red');
@@ -2644,7 +2225,7 @@
             
             // Play buzzer and voice
             playSound('buzzer');
-            speak("That's an ocean creature!", team === 'left' ? 'Ava' : 'Andrew');
+            speakWithFallback("That's an ocean creature!", team === 'left' ? 'Ava' : 'Andrew');
             
             // Show feedback
             showFeedback("That's an ocean creature!", e.target, 'orange');
@@ -2661,12 +2242,6 @@
                 if (e.target.parentNode) {
                     e.target.style.pointerEvents = 'auto';
                 }
-            }, 1000);
-            
-            // Avoidance animation
-            e.target.classList.add('avoiding');
-            setTimeout(() => {
-                e.target.classList.remove('avoiding');
             }, 1000);
         }
 
@@ -2915,172 +2490,9 @@
             showResults();
         }
 
-        // Physics and Movement Functions
-        function startObjectPhysics(object) {
-            if (!object.physics) return;
-            
-            const updatePhysics = () => {
-                if (!object.parentNode || !gameState.gameActive || gameState.gamePaused || object.physics.paused) return;
-                
-                const rect = object.getBoundingClientRect();
-                const parentRect = object.parentNode.getBoundingClientRect();
-                
-                // Update position based on velocity
-                let newX = parseFloat(object.style.left) + object.physics.vx;
-                let newY = parseFloat(object.style.top) + object.physics.vy;
-                
-                // Define bin exclusion zone - keep emojis floating above bins
-                const binZoneLeft = parentRect.width * 0.15;
-                const binZoneRight = parentRect.width * 0.85;
-                const binZoneTop = parentRect.height - 250; // Even larger exclusion zone
-                
-                // Check bin area collision - gentle repulsion
-                if (newX > binZoneLeft && newX < binZoneRight && newY > binZoneTop) {
-                    // Gentle bounce away from bin area
-                    if (object.physics.vy > 0) object.physics.vy = -Math.abs(object.physics.vy) * 1; // Gentle bounce up
-                    if (newX < (binZoneLeft + binZoneRight) / 2) {
-                        object.physics.vx -= 0.0001; // Very gentle push left
-                    } else {
-                        object.physics.vx += 0.0001; // Very gentle push right
-                    }
-                    // Add gentle upward force to keep floating
-                    object.physics.vy -= 0.001;
-                }
-                
-                // Boundary collision
-                if (newX < 0 || newX > parentRect.width - 50) {
-                    object.physics.vx *= -0.9; // Bounce with damping
-                }
-                if (newY < 100 || newY > binZoneTop) {
-                    object.physics.vy *= -0.9;
-                }
-                
-                // Keep in bounds and floating above bins
-                newX = Math.max(0, Math.min(parentRect.width - 50, newX));
-                newY = Math.max(100, Math.min(binZoneTop - 50, newY)); // Keep even further above bins
-                
-                // Additional bin area enforcement - force floating with stronger repulsion
-                if (newY > binZoneTop - 80) {
-                    newY = binZoneTop - 80; // Force floating well above bins
-                    object.physics.vy = -Math.abs(object.physics.vy) * 1.5; // Strong upward push
-                    // Add continuous upward drift in bin area
-                    object.physics.vy -= 0.005;
-                }
-                
-                object.style.left = newX + 'px';
-                object.style.top = newY + 'px';
-                
-                // Apply drag
-                object.physics.vx *= 0.99;
-                object.physics.vy *= 0.99;
-                
-                // Check for collisions with other objects
-                handleSoftCollisions(object);
-                
-                // Continue physics
-                requestAnimationFrame(updatePhysics);
-            };
-            
-            requestAnimationFrame(updatePhysics);
-        }
+        // No physics - emojis just fall slowly and stop when clicked
 
-        function handleSoftCollisions(object) {
-            const siblings = object.parentNode.querySelectorAll('.game-object');
-            const objectRect = object.getBoundingClientRect();
-            
-            siblings.forEach(other => {
-                if (other === object || !other.physics) return;
-                
-                const otherRect = other.getBoundingClientRect();
-                const dx = objectRect.left - otherRect.left;
-                const dy = objectRect.top - otherRect.top;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distance < 60 && distance > 0) {
-                    // Gentle separation force
-                    const force = (60 - distance) * 0.01;
-                    const angle = Math.atan2(dy, dx);
-                    
-                    object.physics.vx += Math.cos(angle) * force;
-                    object.physics.vy += Math.sin(angle) * force;
-                    
-                    other.physics.vx -= Math.cos(angle) * force;
-                    other.physics.vy -= Math.sin(angle) * force;
-                }
-            });
-        }
-
-        function updateSeaLifeAvoidance() {
-            if (!gameState.gameActive) return;
-            
-            document.querySelectorAll('.sea-creature').forEach(creature => {
-                const rect = creature.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                
-                const dx = gameState.mousePosition.x - centerX;
-                const dy = gameState.mousePosition.y - centerY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distance < 80 && distance > 0) {
-                    // Much gentler avoidance - only move 8-12px away
-                    const avoidX = -(dx / distance) * 8;
-                    const avoidY = -(dy / distance) * 8;
-                    
-                    creature.style.setProperty('--avoid-x', avoidX + 'px');
-                    creature.style.setProperty('--avoid-y', avoidY + 'px');
-                    
-                    if (!creature.classList.contains('avoiding') && !creature.classList.contains('darting')) {
-                        // Chance for darting behavior when cursor gets very close
-                        if (distance < 40 && Math.random() < 0.2) {
-                            creature.classList.add('darting');
-                            setTimeout(() => {
-                                creature.classList.remove('darting');
-                            }, 800);
-                        } else {
-                            creature.classList.add('avoiding');
-                            setTimeout(() => {
-                                creature.classList.remove('avoiding');
-                            }, 1000);
-                        }
-                    }
-                }
-            });
-        }
-
-        function startCurrentBursts() {
-            if (!gameState.gameActive) return;
-            
-            setInterval(() => {
-                if (!gameState.gameActive) return;
-                
-                // Random current burst
-                if (Math.random() < 0.3) {
-                    const panels = ['leftOcean', 'rightOcean'];
-                    const panel = panels[Math.floor(Math.random() * panels.length)];
-                    triggerCurrentBurst(panel);
-                }
-            }, 8000);
-        }
-
-        function triggerCurrentBurst(panelId) {
-            const objects = document.querySelectorAll(`#${panelId} .game-object`);
-            const burstDistance = (Math.random() - 0.5) * 100;
-            
-            objects.forEach(obj => {
-                if (obj.physics) {
-                    obj.physics.vx += (Math.random() - 0.5) * 0.006;
-                    obj.physics.vy += (Math.random() - 0.5) * 0.004;
-                }
-                
-                obj.style.setProperty('--burst-distance', burstDistance + 'px');
-                obj.classList.add('current-burst');
-                
-                setTimeout(() => {
-                    obj.classList.remove('current-burst');
-                }, 2000);
-            });
-        }
+        // No movement functions - emojis just fall straight down slowly
 
         function updateLeaderboard() {
             const leftPlayer = gameState.currentPlayers.left;
@@ -3113,9 +2525,9 @@
 
         function showResults() {
             const winner = gameState.scores.left > gameState.scores.right ? 
-                            gameState.currentPlayers.left : 
-                            gameState.scores.right > gameState.scores.left ?
-                            gameState.currentPlayers.right : 'Tie';
+                          gameState.currentPlayers.left : 
+                          gameState.scores.right > gameState.scores.left ?
+                          gameState.currentPlayers.right : 'Tie';
             
             const resultsHTML = `
                 <h3>第${gameState.roundNumber}轮结果 / Round ${gameState.roundNumber} Results</h3>
@@ -3412,5 +2824,5 @@
             // Voices are now loaded
         });
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'984132cd919836e8',t:'MTc1ODcwNTU0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
