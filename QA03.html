@@ -16,23 +16,6 @@
             overflow: hidden; /* Prevent body from scrolling */
             position: relative;
         }
-        /* Snowfall effect */
-        .snowflake {
-            color: #fff;
-            font-size: 1em;
-            font-family: Arial, sans-serif;
-            text-shadow: 0 0 5px #000;
-            position: fixed;
-            top: -10%;
-            z-index: 0;
-            user-select: none;
-            animation: snowfall linear infinite;
-        }
-
-        @keyframes snowfall {
-            0% { transform: translateY(0) rotate(0deg); }
-            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
-        }
         .timer-circle {
             stroke-dasharray: 283;
             stroke-dashoffset: 0;
@@ -70,29 +53,15 @@
         audio::-webkit-media-controls-time-remaining-display {
             margin: 0 2px;
         }
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #4f46e5;
-            animation: spin 1s ease-in-out infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        /* Make sure app content is above the snow */
+        /* Make sure app content is above the background */
         #app-container {
             position: relative;
             z-index: 10;
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
+<body class="bg-gray-100 dark:bg-gradient-to-br dark:from-gray-900 dark:via-indigo-900 dark:to-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
     
-    <div id="snow-container"></div>
-
     <div id="app-container" class="w-full max-w-xl mx-auto text-center h-full">
         
         <!-- Welcome Screen -->
@@ -105,9 +74,9 @@
             <div id="topic-selection-container" class="hidden">
                  <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">Hello, <span id="user-name-display"></span>!</h1>
                  <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                      <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
-                      <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
-                      <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
+                         <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
+                         <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
+                         <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
                  </div>
                 <div id="topic-selection" class="grid grid-cols-3 gap-4">
                     <!-- Topic buttons will be injected here -->
@@ -118,8 +87,22 @@
         <!-- Main Practice Screen -->
         <div id="practice-screen" class="hidden bg-white dark:bg-gray-800 dark:shadow-lg rounded-2xl shadow-lg app-shell p-3 sm:p-4">
             <header class="flex-shrink-0">
-                <div class="flex justify-between items-center mb-1">
-                    <button id="back-to-topics-btn" class="text-indigo-500 hover:text-indigo-700"><i class="fas fa-arrow-left mr-2"></i>Topics</button>
+                <div class="flex justify-between items-center mb-2">
+                    <div class="w-1/3 text-left">
+                         <button id="back-to-topics-btn" class="text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-1 px-3 rounded-lg shadow-sm">
+                            <i class="fas fa-arrow-left mr-2"></i>Topics
+                        </button>
+                    </div>
+                    <div class="w-1/3 text-center">
+                         <button id="samples-btn" class="hidden text-sm bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg shadow-md">
+                             <i class="fas fa-comment-dots mr-1"></i>Sample Answers
+                         </button>
+                    </div>
+                    <div class="w-1/3 text-right">
+                         <button id="next-btn" class="hidden text-sm bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 rounded-lg shadow-sm disabled:bg-indigo-400 dark:disabled:bg-indigo-800 disabled:cursor-not-allowed">
+                            Next<i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
                 </div>
                 <!-- Timer Display -->
                 <div class="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-2 flex-shrink-0">
@@ -152,26 +135,26 @@
                     <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-2">
                         <audio id="audio-player" controls class="w-full max-w-xs"></audio>
                         <div class="flex flex-col gap-3 w-full max-w-xs">
-                           <!-- Smart Download button -->
-                           <button id="download-btn"
-                                   class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
-                               <i class="fas fa-download mr-1"></i>Download Recording / Open Folder
-                           </button>
-                           
-                           <!-- Upload button -->
-                           <a id="sharepoint-upload-link"
-                                 href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ"
-                                 target="_blank"
-                                 rel="noopener noreferrer"
-                                 class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-green-500/50 focus:ring-2 focus:ring-green-400 focus:outline-none active:scale-95 flex items-center justify-center">
-                               <i class="fas fa-upload mr-1"></i>Upload to Folder
-                           </a>
+                            <!-- Smart Download button -->
+                            <button id="download-btn"
+                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                                <i class="fas fa-download mr-1"></i>Download Audio & Text
+                            </button>
+                            
+                            <!-- Upload button -->
+                            <a id="sharepoint-upload-link"
+                               href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-green-500/50 focus:ring-2 focus:ring-green-400 focus:outline-none active:scale-95 flex items-center justify-center">
+                                <i class="fas fa-upload mr-1"></i>Upload to Folder
+                            </a>
                         </div>
                     </div>
                 </div>
                  <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold mb-1">
-                      <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
-                      Recording...
+                     <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
+                     Recording...
                  </div>
             </header>
             
@@ -192,20 +175,19 @@
                     </div>
                 </div>
 
+                <!-- Transcription Display -->
+                <div id="transcription-container" class="hidden text-left mt-2">
+                    <h3 class="text-sm font-bold mb-1 text-center">Your Answer (Live Transcript)</h3>
+                    <div id="transcription-output" class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg min-h-[60px] text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap"></div>
+                </div>
+
                 <!-- Sample Answers Display -->
                 <div id="samples-container" class="hidden text-left">
                     <h3 class="text-sm font-bold mb-1 text-center flex-shrink-0">Sample Responses</h3>
-                    <ul id="samples-list" class="space-y-2 list-disc list-inside bg-indigo-900/70 dark:bg-indigo-900/90 p-3 rounded-lg max-h-28 sm:max-h-32 overflow-y-auto">
+                    <ul id="samples-list" class="space-y-2 list-inside bg-indigo-900/70 dark:bg-indigo-900/90 p-3 rounded-lg max-h-28 sm:max-h-32 overflow-y-auto">
                     </ul>
                 </div>
             </main>
-
-            <footer class="flex-shrink-0 mt-2">
-                <!-- Next Button -->
-                <div id="controls-container">
-                     <button id="next-btn" class="hidden w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg text-lg shadow-md">Next</button>
-                </div>
-            </footer>
         </div>
 
         <!-- Certificate Screen -->
@@ -226,183 +208,271 @@
 
     </div>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 text-center max-w-sm w-full">
+            <h3 id="modal-title" class="text-lg font-bold mb-4">Are you sure?</h3>
+            <p id="modal-message" class="text-gray-600 dark:text-gray-400 mb-6">Returning to the topic list will stop your current practice.</p>
+            <div class="flex justify-center gap-4">
+                <button id="modal-confirm-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg">Yes</button>
+                <button id="modal-cancel-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- DATA: Questions and Sample Answers for Part 03 ---
         const practiceData = {
-            "Technology's Impact": [
+            "Rooftop Gardens": [
                 { 
-                    question: "How has social media changed the way we communicate with each other?", 
-                    starters: ["I think social media has made it easier to...", "On one hand..., but on the other hand...", "A major change is...", "Compared to before, we now..."], 
-                    wordBank: ["stay connected", "superficial", "misunderstanding", "instant communication", "less face-to-face", "global", "pressure", "curated", "authentic"], 
+                    question: "If you could design a rooftop garden for our school, what would you include and why?", 
+                    starters: ["In my ideal rooftop garden, I would include...", "I think it's important to have...", "One feature I would add is...", "The main purpose of the garden would be..."], 
+                    wordBank: ["vegetable patches", "fruit trees", "relaxation area", "solar panels", "study space", "biodiversity", "urban farming", "sustainable", "community"], 
                     samples: [
-                        "I think social media has made it easier to stay connected with friends who live far away, because you can see what they are doing instantly.",
-                        "On one hand, communication is faster, but on the other hand, it can feel more superficial because you're just liking a photo instead of having a real conversation.",
-                        "A major change is that there's more pressure to present a perfect life online, which isn't always authentic and can make others feel bad."
+                        "I would include comfortable benches and tables to create a quiet study space, because it would be a peaceful place for students to do homework away from noisy classrooms.",
+                        "In my design, I would add several vegetable patches where students could learn about urban farming and grow their own food, which could then be used in the school cafeteria.",
+                        "I think it's important to have native flowers and plants to attract bees and butterflies, because this would increase biodiversity in our urban environment."
                     ] 
                 },
                 { 
-                    question: "Are you excited or worried about the future of Artificial Intelligence (AI)? Why?", 
-                    starters: ["I'm mostly excited about AI because...", "What worries me about AI is...", "I think AI could be very helpful for...", "The biggest risk, in my opinion, is..."], 
-                    wordBank: ["automation", "efficiency", "job displacement", "creativity", "problem-solving", "ethical concerns", "potential", "tool", "unpredictable"], 
+                    question: "What are the biggest benefits of having more green spaces like rooftop gardens in big cities like Beijing?", 
+                    starters: ["One of the main benefits is...", "Green spaces can significantly improve...", "From an environmental perspective...", "For the community, it provides..."], 
+                    wordBank: ["air quality", "reduce heat", "mental health", "recreation", "wildlife habitat", "community building", "aesthetic value", "educational", "sustainability"], 
                     samples: [
-                        "I'm mostly excited about AI because it has the potential to solve big problems, for example, in medicine and scientific research.",
-                        "What worries me about AI is job displacement, because many routine tasks could be automated, and people will need to learn new skills.",
-                        "I see AI as a powerful tool that can help human creativity, for instance, by generating ideas or handling boring tasks so we can focus on more interesting work."
+                        "One of the biggest benefits is the improvement in air quality, because plants absorb carbon dioxide and other pollutants, which is very important in a large city.",
+                        "These gardens can significantly reduce the urban heat island effect, as plants cool the surrounding air, making the city more comfortable during hot summers.",
+                        "For residents, it provides a valuable space for relaxation and recreation, which can improve mental health by reducing stress and anxiety from busy city life."
                     ] 
                 }
             ],
-            "Environmental Issues": [
+            "Microplastics": [
                 { 
-                    question: "What is one environmental problem you are concerned about, and why?", 
-                    starters: ["The environmental issue that concerns me most is...", "I'm worried about... because it affects...", "One problem I've learned about is...", "It's important to address... because..."], 
-                    wordBank: ["plastic pollution", "climate change", "deforestation", "loss of biodiversity", "sustainability", "impact", "future generations", "consequences", "urgent"], 
+                    question: "What is one change you could make in your daily life to reduce your personal use of plastics?", 
+                    starters: ["One change I can make is to...", "I could try to avoid buying...", "Instead of using..., I could...", "I plan to be more conscious about..."], 
+                    wordBank: ["reusable water bottle", "cloth shopping bags", "avoid single-use plastics", "food containers", "plastic straws", "packaging", "conscious consumer", "sustainable alternatives", "reduce"], 
                     samples: [
-                        "The environmental issue that concerns me most is plastic pollution in the oceans, because it harms marine life and can take hundreds of years to break down.",
-                        "I'm worried about climate change because the consequences, like extreme weather events, are becoming more and more common around the world.",
-                        "I think the loss of biodiversity is a serious problem, because every species plays a role in the ecosystem, and losing them can have unpredictable effects."
+                        "One simple change I can make is to always carry a reusable water bottle, so I don't have to buy plastic bottles of water when I'm outside.",
+                        "I could try to avoid buying fruits and vegetables that are wrapped in excessive plastic packaging and choose loose ones instead.",
+                        "Instead of using disposable plastic food containers for lunch, I could use a stainless steel or glass container which can be washed and reused many times."
+                    ] 
+                },
+                { 
+                    question: "Why do you think the problem of microplastic pollution is so difficult to solve?", 
+                    starters: ["I think it's difficult because...", "One major challenge is that...", "The problem is widespread due to...", "It's a complex issue involving..."], 
+                    wordBank: ["invisible", "widespread", "food chain", "ocean currents", "difficult to filter", "consumer habits", "industrial reliance", "global problem", "long-term effects"], 
+                    samples: [
+                        "I think it's difficult because microplastics are tiny and almost invisible, making them nearly impossible to clean up from the oceans and soil once they are there.",
+                        "One major challenge is our global reliance on plastic for everything from packaging to clothing, so changing this requires huge industrial and economic shifts.",
+                        "The problem is so widespread because plastic doesn't biodegrade; it just breaks down into smaller pieces that are then carried everywhere by wind and ocean currents."
+                    ] 
+                }
+            ],
+            "Mid-Autumn Festival": [
+                { 
+                    question: "Besides eating mooncakes, what is your favorite family tradition during the Mid-Autumn Festival?", 
+                    starters: ["My favorite tradition is when my family...", "I always look forward to...", "Something special we do is...", "For my family, the festival is a time for..."], 
+                    wordBank: ["family reunion", "gazing at the full moon", "lighting lanterns", "telling stories", "sharing a meal", "hometown", "togetherness", "celebration", "tradition"], 
+                    samples: [
+                        "My favorite tradition is gathering with all my relatives for a big family dinner because it's one of the few times a year we are all together in one place.",
+                        "I always look forward to going to a local park with my family to gaze at the full moon, because my grandparents tell us old stories and legends about the moon goddess, Chang'e.",
+                        "Something special we do is that each family member writes a wish on a paper lantern and we light them together. It's a beautiful and hopeful moment."
                     ] 
                 },
                  { 
-                    question: "What is a small change people can make in their daily lives to be more environmentally friendly?", 
-                    starters: ["A simple change is to...", "People could try to... because...", "One effective habit is...", "Instead of..., we could..."], 
-                    wordBank: ["reduce, reuse, recycle", "reusable bags", "save energy", "public transport", "less meat", "conscious consumer", "small steps", "collective action", "make a difference"], 
+                    question: "If you had to explain the meaning of the Mid-Autumn Festival to a foreign friend, what would you say?", 
+                    starters: ["I would explain that it's like...", "The most important theme is...", "It's a festival that celebrates...", "I would tell them it's a time when..."], 
+                    wordBank: ["harvest moon", "family unity", "gratitude", "reunion", "similar to Thanksgiving", "cultural heritage", "legends", "full moon", "togetherness"], 
                     samples: [
-                        "A simple change is to carry a reusable water bottle and coffee cup, because this can significantly reduce single-use plastic waste.",
-                        "People could try to use public transport or ride a bike more often, because it reduces carbon emissions from cars.",
-                        "One effective habit is to be more conscious about saving energy at home, for example, by turning off lights when leaving a room."
+                        "I would explain that it's similar to Thanksgiving in America, because the most important theme is family reunion and being grateful for the harvest and for each other.",
+                        "I'd say it's a festival that celebrates the full moon, which symbolizes completeness and unity. It's a time when families get together, no matter how far apart they live.",
+                        "I would tell them it's a very old and important part of our culture, based on legends about the moon, and we celebrate it by eating special pastries called mooncakes and enjoying the moonlight."
                     ] 
                 }
             ],
-            "The World of Work": [
+            "The Gaokao": [
                 { 
-                    question: "What is more important in a job: a high salary or job satisfaction?", 
-                    starters: ["I believe job satisfaction is more important because...", "Although a high salary is nice, I think...", "For me, the most important thing is...", "It's a balance, but I would prioritize..."], 
-                    wordBank: ["passion", "fulfillment", "work-life balance", "financial security", "motivation", "stress", "long-term happiness", "career growth", "purpose"], 
+                    question: "How do you and your friends deal with the pressure of preparing for the Gaokao?", 
+                    starters: ["To deal with the pressure, we...", "One way I relax is by...", "My friends and I support each other by...", "It's very stressful, but we try to..."], 
+                    wordBank: ["study groups", "taking breaks", "playing sports", "listening to music", "talking to each other", "immense pressure", "staying positive", "time management", "support system"], 
                     samples: [
-                        "I believe job satisfaction is more important because if you enjoy what you do, you will be more motivated and less stressed every day.",
-                        "Although a high salary is important for financial security, I think long-term happiness comes from feeling a sense of purpose in your work.",
-                        "For me, it's about finding a balance, but I would prioritize a job that offers good work-life balance over a high-paying but extremely stressful one."
+                        "To deal with the pressure, my friends and I make sure to take short breaks to play basketball, because physical activity helps us clear our minds.",
+                        "We support each other by forming study groups. When someone is feeling stressed, we talk about it and remind each other that we are all in this together.",
+                        "It is very stressful, but I try to manage my time carefully. Having a schedule for studying, resting, and hobbies makes the pressure feel more manageable."
                     ] 
-                }
-            ],
-            "Defining Success": [
+                },
                 { 
-                    question: "How do you personally define success in life?", 
-                    starters: ["For me, success isn't just about...", "I would feel successful if I...", "Success means having the freedom to...", "My definition of success is..."], 
-                    wordBank: ["happiness", "strong relationships", "making a difference", "personal growth", "achieving goals", "financial stability", "contentment", "learning", "contribution"], 
+                    question: "Some people say the Gaokao is fair, while others say it's too much pressure. What is your opinion?", 
+                    starters: ["In my opinion, the Gaokao is...", "On one hand, I think it's fair because...", "On the other hand, the pressure is...", "I believe it has both pros and cons..."], 
+                    wordBank: ["fair system", "equal opportunity", "immense stress", "mental health", "single exam", "defines future", "merit-based", "creativity", "intense competition"], 
                     samples: [
-                        "For me, success isn't just about money or a fancy title; it's about having strong relationships with family and friends.",
-                        "I would feel successful if I could make a positive contribution to my community through my work or actions.",
-                        "My definition of success is continuous personal growth, always learning new things and challenging myself to be a better person."
+                        "On one hand, I think it's a fair system because it gives every student, regardless of their family background, an equal opportunity to get into a good university.",
+                        "On the other hand, the pressure is immense because our entire future feels like it depends on our performance over just two days, which can negatively affect mental health.",
+                        "I believe it has both pros and cons. While it is a merit-based way to select students, it puts too much focus on rote memorization instead of fostering creativity and critical thinking."
                     ] 
                 }
             ],
-            "Media Influence": [
+            "School-Life Balance": [
                 { 
-                    question: "In what ways can movies or TV shows influence our opinions and beliefs?", 
-                    starters: ["Movies can shape our views by...", "They often influence us subconsciously by...", "One powerful way is through...", "By watching..., we might start to believe..."],
-                    wordBank: ["shaping perceptions", "stereotypes", "empathy", "raising awareness", "perspectives", "glamorize", "social commentary", "subtle messages", "character portrayal"],
+                    question: "What is your favorite activity to do when you take a break from studying?", 
+                    starters: ["When I take a break, my favorite thing to do is...", "To relax my mind, I enjoy...", "I find that... helps me recharge.", "My go-to activity is..."], 
+                    wordBank: ["reading novels", "playing video games", "going for a walk", "drawing", "practicing an instrument", "extracurriculars", "hobby", "recharge", "unwind"], 
                     samples: [
-                        "Movies can shape our perceptions of different cultures or historical events, especially if we don't have other sources of information.",
-                        "They can create empathy by allowing us to see the world from another person's perspective, which can make us more understanding.",
-                        "Sometimes, movies can reinforce negative stereotypes, because the way characters are portrayed can influence how we see real groups of people."
+                        "When I take a break, my favorite thing to do is read a fantasy novel, because it allows me to escape into a different world and forget about schoolwork for a while.",
+                        "To relax my mind, I enjoy going for a walk in a nearby park while listening to my favorite podcasts. The fresh air and interesting stories help me feel refreshed.",
+                        "I find that playing the guitar helps me recharge. Focusing on the music is a form of meditation for me and it completely takes my mind off the stress of exams."
                     ] 
-                }
-            ],
-            "Learning & Growth": [
+                },
                 { 
-                    question: "Describe a time you failed at something and what you learned from the experience.", 
-                    starters: ["I remember one time when I tried to...", "It was a failure, but I learned...", "Although I didn't succeed, the experience taught me...", "Failing at... helped me realize..."],
-                    wordBank: ["resilience", "perseverance", "valuable lesson", "don't give up", "new approach", "humility", "not the end of the world", "try again", "valuable feedback"],
+                    question: "Do you think schools in China should give students more time for hobbies and extracurricular activities? Why or why not?", 
+                    starters: ["Yes, I definitely think schools should because...", "No, I think the current focus is necessary because...", "It's a difficult balance, but I believe...", "More time for hobbies would lead to..."], 
+                    wordBank: ["well-rounded development", "creativity", "soft skills", "academic pressure", "competition", "time management", "personal growth", "mental well-being", "holistic education"], 
                     samples: [
-                        "I once failed an important math exam, and it taught me the importance of consistent study instead of cramming at the last minute.",
-                        "Although our team lost the final match, the experience taught me that teamwork and communication are more important than individual skill.",
-                        "Failing to get into the school band helped me realize that it's okay to not be good at everything, and it encouraged me to find other hobbies I enjoyed more."
+                        "Yes, I definitely think schools should give more time for hobbies, because this would lead to more well-rounded development and help students discover their passions outside of academics.",
+                        "It's a difficult balance due to the competitive environment, but I believe more free time would improve students' mental well-being and actually make their study time more effective.",
+                        "More time for extracurriculars would help students develop important soft skills like teamwork and leadership, which are just as valuable for their future careers as good grades."
                     ] 
                 }
             ],
-            "Global Citizenship": [
-                {
-                    question: "Why is it important for people to learn about different cultures?",
-                    starters: ["Learning about other cultures is important because...", "It helps us to develop...", "By understanding different perspectives, we can...", "It promotes..."],
-                    wordBank: ["tolerance", "empathy", "global perspective", "reduce prejudice", "mutual respect", "interconnected world", "communication", "open-mindedness", "avoid misunderstandings"],
+            "Future Majors": [
+                { 
+                    question: "What subject do you enjoy most in school, and could you see yourself studying it at university?", 
+                    starters: ["The subject I enjoy the most is...", "I'm really passionate about... because...", "I could definitely see myself studying...", "I'm considering a major in..."], 
+                    wordBank: ["computer science", "engineering", "physics", "economics", "literature", "logical thinking", "problem-solving", "career prospects", "personal interest"], 
                     samples: [
-                        "Learning about other cultures is important because it promotes tolerance and reduces prejudice that comes from ignorance.",
-                        "It helps us develop a more global perspective and understand that our own way of seeing things is not the only one.",
-                        "By understanding different cultural norms, we can communicate more effectively and avoid misunderstandings when interacting with people from other countries."
-                    ]
+                        "The subject I enjoy the most is physics, because I love understanding how the world works, and I could definitely see myself studying engineering at university.",
+                        "I'm really passionate about computer science. I enjoy the logical thinking required for coding, and the career prospects in the tech industry are very strong.",
+                        "I'm considering a major in economics because I find it fascinating how global markets work and how decisions by governments can affect our daily lives."
+                    ] 
+                },
+                { 
+                    question: "How much do your parents' expectations influence your choice of a future major or career?", 
+                    starters: ["My parents' expectations are a big factor because...", "They have some influence, but the final decision is...", "I try to balance their advice with...", "My parents hope that I will..., but I..."], 
+                    wordBank: ["parental guidance", "high expectations", "stable career", "financial security", "my own passion", "mutual understanding", "generation gap", "respect their advice", "follow my dreams"], 
+                    samples: [
+                        "My parents' expectations are a big factor, as they hope I choose a stable career like engineering, but they also encourage me to follow my own interests.",
+                        "They have some influence, especially regarding financial security, but they have told me that the final decision is mine as long as I have a clear plan.",
+                        "I try to balance their advice with my own passion. We have had many discussions, and we are working towards a mutual understanding about my future."
+                    ] 
                 }
             ],
-            "Creative Expression": [
-                {
-                    question: "Do you think art, like music, painting, or literature, is important for society? Why?",
-                    starters: ["Yes, I believe art is essential because...", "Art plays a crucial role in...", "Without art, society would be...", "It's important because it allows for..."],
-                    wordBank: ["self-expression", "emotional outlet", "social commentary", "cultural heritage", "inspires creativity", "connects people", "challenges thinking", "beauty", "human experience"],
+            "Digital Life": [
+                { 
+                    question: "What are the advantages and disadvantages of using social media apps like WeChat and Douyin for students?", 
+                    starters: ["One major advantage is...", "On the flip side, a big disadvantage is...", "Social media can be useful for...", "However, it can also be..."], 
+                    wordBank: ["staying connected", "information access", "distraction", "cyberbullying", "entertainment", "time-consuming", "social pressure", "learning resource", "communication"], 
                     samples: [
-                        "Yes, I believe art is essential because it provides a way for people to express emotions and ideas that can't be put into simple words.",
-                        "Art plays a crucial role in preserving cultural heritage and telling the stories of our past for future generations.",
-                        "It challenges us to think differently and see the world from new perspectives, which is important for a healthy society."
-                    ]
+                        "One major advantage of WeChat is that it's an easy way to communicate with classmates for group projects and stay connected with friends.",
+                        "On the flip side, a big disadvantage of Douyin is that it can be a huge distraction from studying, as it's very easy to spend hours watching short videos.",
+                        "Social media can be a useful learning resource if you follow educational accounts, but it can also create social pressure to present a perfect life online."
+                    ] 
+                },
+                { 
+                    question: "How has online learning changed your study habits compared to traditional classroom learning?", 
+                    starters: ["Online learning has made me more...", "One big difference is the need for...", "I've had to learn how to...", "Compared to a classroom, online learning requires..."], 
+                    wordBank: ["self-disciplined", "flexible schedule", "time management", "technical issues", "less interaction", "independent", "stay focused", "motivation", "digital resources"], 
+                    samples: [
+                        "Online learning has forced me to become much more self-disciplined, because there is no teacher physically present to make sure I am paying attention.",
+                        "A big difference is the need for better time management. With a flexible schedule, it's easy to procrastinate if you don't plan your day carefully.",
+                        "Compared to a regular classroom, there is less direct interaction with teachers and classmates, so I've had to be more proactive in asking questions online."
+                    ] 
                 }
             ],
-            "Hypothetical Challenges": [
-                {
-                    question: "If you could have any superpower, what would it be and how would you use it?",
-                    starters: ["If I had a superpower, I would choose...", "I would want the ability to... because...", "The superpower I'd pick is... and I would use it to...", "It would be amazing to be able to..."],
-                    wordBank: ["teleportation", "invisibility", "mind-reading", "super strength", "flying", "healing", "help others", "solve problems", "explore", "for good"],
+            "Parental Expectations": [
+                { 
+                    question: "Describe a time you felt a lot of pressure from your parents about school. How did you handle it?", 
+                    starters: ["I remember before a big exam...", "My parents were worried about my grades, and...", "To handle the pressure, I...", "I communicated with them by..."], 
+                    wordBank: ["high expectations", "pressure to succeed", "disappointing them", "open communication", "study harder", "felt stressed", "explained my feelings", "find a balance", "their perspective"], 
                     samples: [
-                        "If I had a superpower, I would choose teleportation because I could travel the world instantly and visit my family whenever I wanted.",
-                        "I would want the ability to heal people, because I could help those who are sick or injured in hospitals or disaster areas.",
-                        "I think mind-reading would be interesting, but I would only use it to better understand people's feelings and help them when they are sad."
-                    ]
+                        "I remember before my midterm exams, my parents expected me to get a top rank. I felt very stressed, so I talked to them and explained that their pressure was making it harder for me to focus.",
+                        "There was a time my math grade dropped, and my parents were worried. I handled it by creating a detailed study plan and showing it to them to prove I was taking it seriously.",
+                        "To handle the pressure, I try to understand their perspective. I know they just want the best for me, so I listen to their advice but also share my own feelings about the stress it causes."
+                    ] 
+                },
+                { 
+                    question: "In what ways do you think your life goals are different from what your parents want for you?", 
+                    starters: ["My parents value..., whereas I am more interested in...", "One key difference is...", "They hope I have a..., but I dream of...", "Our ideas about success are different because..."], 
+                    wordBank: ["stability", "adventure", "job security", "personal fulfillment", "traditional path", "creative field", "entrepreneurship", "generation gap", "different values"], 
+                    samples: [
+                        "My parents value stability and want me to have a secure job in a big company, whereas I am more interested in the adventure of joining a start-up or even starting my own business.",
+                        "One key difference is their focus on financial security. While I agree it's important, I place a higher value on personal fulfillment and enjoying my daily work.",
+                        "They hope I will stay in our hometown after university, but I dream of working in a different country for a few years to gain international experience."
+                    ] 
+                }
+            ],
+            "Travel & Exploration": [
+                { 
+                    question: "If you could visit any city in China for a weekend, where would you go and why?", 
+                    starters: ["I would love to visit...", "The city I'm most curious about is...", "I would choose... because of its...", "My ideal weekend trip would be to..."], 
+                    wordBank: ["historical sites", "natural scenery", "delicious food", "modern architecture", "cultural experience", "vibrant atmosphere", "ancient capital", "landscapes"], 
+                    samples: [
+                        "I would love to visit Xi'an because I am fascinated by Chinese history, and I want to see the Terracotta Army with my own eyes.",
+                        "I would choose Chengdu because of its famous delicious and spicy food, and I've also heard it has a more relaxed and laid-back atmosphere than other big cities.",
+                        "My ideal weekend trip would be to Guilin to see the incredible natural scenery. The photos of the limestone karst mountains along the Li River look breathtaking."
+                    ] 
+                },
+                { 
+                    question: "What do you think is the most important lesson people learn from traveling to new places?", 
+                    starters: ["I believe the most important lesson is...", "Traveling teaches you to be more...", "By experiencing different cultures, people learn...", "One of the greatest benefits is..."], 
+                    wordBank: ["open-minded", "adaptable", "cultural understanding", "independence", "new perspectives", "appreciation", "step out of your comfort zone", "resilience", "global citizen"], 
+                    samples: [
+                        "I believe the most important lesson is becoming more open-minded. When you see that people live differently, you learn to respect and appreciate other cultures.",
+                        "Traveling teaches you to be more adaptable and independent, because you often have to solve unexpected problems on your own, like navigating a new city or dealing with language barriers.",
+                        "By stepping out of your comfort zone, you gain new perspectives on your own life and a greater appreciation for what you have back home."
+                    ] 
                 }
             ]
         };
 
         // --- DOM Elements ---
-        const welcomeScreen = document.getElementById('welcome-screen');
-        const practiceScreen = document.getElementById('practice-screen');
-        const nameEntryContainer = document.getElementById('name-entry-container');
-        const nameInput = document.getElementById('name-input');
-        const startWithNameBtn = document.getElementById('start-with-name-btn');
-        const topicSelectionContainer = document.getElementById('topic-selection-container');
-        const userNameDisplay = document.getElementById('user-name-display');
-        const topicSelection = document.getElementById('topic-selection');
-        const nextBtn = document.getElementById('next-btn');
-        const backToTopicsBtn = document.getElementById('back-to-topics-btn');
-        
-        const timerDisplay = document.getElementById('timer-display');
-        const timerProgress = document.getElementById('timer-progress');
-        const phaseIndicator = document.getElementById('phase-indicator');
-        
-        const questionContainer = document.getElementById('question-container');
-        const questionText = document.getElementById('question-text');
-        const samplesContainer = document.getElementById('samples-container');
-        const samplesList = document.getElementById('samples-list');
-        const startersContainer = document.getElementById('starters-container');
-        const startersList = document.getElementById('starters-list');
-        const wordBankContainer = document.getElementById('word-bank-container');
-        const wordBankList = document.getElementById('word-bank-list');
-        const errorMessagebox = document.getElementById('error-message-box');
-
-        const recordBtn = document.getElementById('record-btn');
-        const stopRecordBtn = document.getElementById('stop-record-btn');
-        const audioPlayer = document.getElementById('audio-player');
-        const recordingStatus = document.getElementById('recording-status');
-        const postRecordingActions = document.getElementById('post-recording-actions');
-        const downloadBtn = document.getElementById('download-btn');
-        
-        // Certificate UI
-        const certificateScreen = document.getElementById('certificate-screen');
-        const downloadCertificateBtn = document.getElementById('download-certificate-btn');
-        const backToMainMenuBtn = document.getElementById('back-to-main-menu-btn');
+        const ui = {
+            welcomeScreen: document.getElementById('welcome-screen'),
+            practiceScreen: document.getElementById('practice-screen'),
+            nameEntryContainer: document.getElementById('name-entry-container'),
+            nameInput: document.getElementById('name-input'),
+            startWithNameBtn: document.getElementById('start-with-name-btn'),
+            topicSelectionContainer: document.getElementById('topic-selection-container'),
+            userNameDisplay: document.getElementById('user-name-display'),
+            topicSelection: document.getElementById('topic-selection'),
+            nextBtn: document.getElementById('next-btn'),
+            backToTopicsBtn: document.getElementById('back-to-topics-btn'),
+            samplesBtn: document.getElementById('samples-btn'),
+            timerDisplay: document.getElementById('timer-display'),
+            timerProgress: document.getElementById('timer-progress'),
+            phaseIndicator: document.getElementById('phase-indicator'),
+            questionText: document.getElementById('question-text'),
+            samplesContainer: document.getElementById('samples-container'),
+            samplesList: document.getElementById('samples-list'),
+            startersContainer: document.getElementById('starters-container'),
+            startersList: document.getElementById('starters-list'),
+            wordBankContainer: document.getElementById('word-bank-container'),
+            wordBankList: document.getElementById('word-bank-list'),
+            errorMessagebox: document.getElementById('error-message-box'),
+            recordBtn: document.getElementById('record-btn'),
+            stopRecordBtn: document.getElementById('stop-record-btn'),
+            audioPlayer: document.getElementById('audio-player'),
+            recordingStatus: document.getElementById('recording-status'),
+            postRecordingActions: document.getElementById('post-recording-actions'),
+            downloadBtn: document.getElementById('download-btn'),
+            transcriptionContainer: document.getElementById('transcription-container'),
+            transcriptionOutput: document.getElementById('transcription-output'),
+            certificateScreen: document.getElementById('certificate-screen'),
+            downloadCertificateBtn: document.getElementById('download-certificate-btn'),
+            backToMainMenuBtn: document.getElementById('back-to-main-menu-btn'),
+            modal: document.getElementById('confirmation-modal'),
+            modalTitle: document.getElementById('modal-title'),
+            modalMessage: document.getElementById('modal-message'),
+            modalConfirmBtn: document.getElementById('modal-confirm-btn'),
+            modalCancelBtn: document.getElementById('modal-cancel-btn')
+        };
 
 
         // --- State Variables ---
         let userName = '';
         let currentQuestionIndex = 0;
-        let currentQuestions = [];
+        let masterQuestionList = [];
+        let currentQuestions = []; 
         let timerInterval;
         let mediaRecorder;
         let audioChunks = [];
@@ -413,7 +483,6 @@
 
         const FULL_DASH_ARRAY = 283;
         const DEFAULT_RESPONSE_TIME = 60;
-        const READ_TIME = 60;
 
         // --- Text-to-Speech ---
         const synth = window.speechSynthesis;
@@ -460,28 +529,40 @@
             });
         }
 
-        function speak(text, isFeedback = false) {
-            if (!ttsInitialized) return;
+        function speak(text) {
+            if (!ttsInitialized || !synth || !text) {
+                console.warn("TTS not ready or text is empty.");
+                return;
+            }
+
             try {
-                if (synth.speaking) synth.cancel();
-                const utterThis = new SpeechSynthesisUtterance(text);
-                utterThis.onerror = (event) => console.error('SpeechSynthesisUtterance.onerror', event);
-                if (preferredVoice) utterThis.voice = preferredVoice;
-                utterThis.pitch = 1;  
-                utterThis.rate = 0.85; // Slow down speech as requested
-                synth.speak(utterThis);
+                if (synth.speaking) {
+                    synth.cancel();
+                }
+                setTimeout(() => {
+                    const utterThis = new SpeechSynthesisUtterance(text);
+                    utterThis.onerror = (event) => {
+                        console.error(`SpeechSynthesisUtterance.onerror: ${event.error}`, { text: text });
+                    };
+                    if (preferredVoice) {
+                        utterThis.voice = preferredVoice;
+                    }
+                    utterThis.pitch = 1;
+                    utterThis.rate = 0.85;
+                    synth.speak(utterThis);
+                }, 100); 
+
             } catch (e) {
-                console.error("Speech synthesis failed:", e);
+                console.error("Speech synthesis 'speak' function threw an exception:", e);
             }
         }
 
         // --- Local Storage ---
         function loadProgress() {
-            const savedCompletedTopics = localStorage.getItem('languagePracticeCompletedTopics');
+            const savedCompletedTopics = localStorage.getItem('languagePracticeCompletedTopics03');
             if (savedCompletedTopics) {
                 try {
                     const parsed = JSON.parse(savedCompletedTopics);
-                    // Basic validation to ensure it's an object
                     if (typeof parsed === 'object' && parsed !== null) {
                         completedTopics = parsed;
                     } else {
@@ -489,30 +570,30 @@
                     }
                 } catch (e) {
                     console.error("Failed to parse saved progress:", e);
-                    completedTopics = {}; // Reset progress if data is corrupt
+                    completedTopics = {};
                 }
             }
-            const savedName = localStorage.getItem('languagePracticeUserName');
+            const savedName = localStorage.getItem('languagePracticeUserName03');
             if (savedName) {
                  userName = savedName;
-                 nameInput.value = userName;
+                 ui.nameInput.value = userName;
             }
         }
 
         function saveProgress() {
-            localStorage.setItem('languagePracticeCompletedTopics', JSON.stringify(completedTopics));
-            if(userName) localStorage.setItem('languagePracticeUserName', userName);
+            localStorage.setItem('languagePracticeCompletedTopics03', JSON.stringify(completedTopics));
+            if(userName) localStorage.setItem('languagePracticeUserName03', userName);
         }
 
-        // --- UI Initialization ---
+        // --- UI Initialization & Data Setup ---
         function initializeTopics() {
-            topicSelection.innerHTML = '';
+            ui.topicSelection.innerHTML = '';
             for (const topic in practiceData) {
                 const button = document.createElement('button');
                 
                 let checkmark = '';
                 if (completedTopics && completedTopics[topic]) {
-                    checkmark = `<i class="fas fa-check-circle text-green-500 ml-2"></i>`;
+                    checkmark = `<i class="fas fa-check-circle ml-2 text-blue-500"></i>`;
                     button.className = "w-full bg-green-100 dark:bg-green-900/50 p-2 rounded-lg shadow-md hover:bg-green-200 dark:hover:bg-green-800/60 transition-colors flex items-center justify-center";
                 } else {
                     button.className = "w-full bg-white dark:bg-gray-700 p-2 rounded-lg shadow-md hover:bg-indigo-100 dark:hover:bg-indigo-800 transition-all transform hover:scale-105 flex items-center justify-center";
@@ -521,125 +602,124 @@
                 button.innerHTML = `<span class="text-sm font-semibold">${topic}</span> ${checkmark}`;
                 button.dataset.topic = topic;
                 button.addEventListener('click', () => startPractice(topic));
-                topicSelection.appendChild(button);
+                ui.topicSelection.appendChild(button);
+            }
+        }
+        
+        function createMasterList() {
+            masterQuestionList = [];
+            for (const topic in practiceData) {
+                practiceData[topic].forEach(question => {
+                    masterQuestionList.push({ ...question, topicName: topic });
+                });
             }
         }
 
         // --- Core App Logic ---
         function startPractice(topic) {
-            currentQuestions = practiceData[topic];
-            currentQuestions.topicName = topic;
-            currentQuestionIndex = 0;
-            welcomeScreen.classList.add('hidden');
-            practiceScreen.classList.remove('hidden');
-            certificateScreen.classList.add('hidden');
+            const startIndex = masterQuestionList.findIndex(q => q.topicName === topic);
+            currentQuestionIndex = (startIndex !== -1) ? startIndex : 0;
+            currentQuestions = masterQuestionList;
+            
+            ui.welcomeScreen.classList.add('hidden');
+            ui.practiceScreen.classList.remove('hidden');
+            ui.certificateScreen.classList.add('hidden');
+            ui.nextBtn.classList.remove('hidden');
+            ui.samplesBtn.classList.remove('hidden');
             showQuestion();
         }
 
         function showQuestion() {
+            if (currentQuestionIndex > 0) {
+                const prevQuestion = currentQuestions[currentQuestionIndex - 1];
+                const currentQuestion = currentQuestions[currentQuestionIndex];
+                if (currentQuestion && prevQuestion.topicName !== currentQuestion.topicName) {
+                    if (!completedTopics[prevQuestion.topicName]) {
+                        completedTopics[prevQuestion.topicName] = true;
+                        saveProgress();
+                    }
+                }
+            }
+
             if (currentQuestionIndex >= currentQuestions.length) {
-                phaseIndicator.textContent = "Topic Complete!";
-                questionText.textContent = "You've finished this topic. Well done!";
-                completedTopics[currentQuestions.topicName] = true;
-                saveProgress();
-                checkAllTopicsCompleted();
-                resetRecordingUI();
-                nextBtn.classList.add('hidden');
-                speak("You've completed this topic! Well done.");
+                if (currentQuestions.length > 0) {
+                    const lastTopicName = currentQuestions[currentQuestions.length - 1].topicName;
+                     if (!completedTopics[lastTopicName]) {
+                        completedTopics[lastTopicName] = true;
+                        saveProgress();
+                    }
+                }
+                ui.phaseIndicator.textContent = "All topics complete!";
+                ui.questionText.textContent = "You've finished everything. Fantastic work!";
+                speak("You've finished everything. Fantastic work!");
+                ui.nextBtn.classList.add('hidden');
+                ui.samplesBtn.classList.add('hidden');
+                showCertificate();
                 return;
             }
+
+            ui.nextBtn.disabled = true;
 
             const item = currentQuestions[currentQuestionIndex];
             resetUIForNewQuestion();
             
             let fullQuestion = (item.intro ? item.intro + " " : "") + item.question;
-            questionText.textContent = fullQuestion;
-            questionText.classList.add('fade-in');
-            setTimeout(() => questionText.classList.remove('fade-in'), 500);
+            ui.questionText.textContent = fullQuestion;
+            ui.questionText.classList.add('fade-in');
+            setTimeout(() => ui.questionText.classList.remove('fade-in'), 500);
 
             speak(fullQuestion);
             
-            // Populate Sentence Starters
             if (item.starters && item.starters.length > 0) {
-                startersList.innerHTML = '';
+                ui.startersList.innerHTML = '';
                 item.starters.forEach(starter => {
                     const button = document.createElement('button');
                     button.className = 'bg-indigo-500 text-white text-sm font-medium px-2.5 py-1 rounded-full dark:bg-indigo-600 dark:text-white cursor-default';
                     button.textContent = starter;
-                    startersList.appendChild(button);
+                    ui.startersList.appendChild(button);
                 });
-                startersContainer.classList.remove('hidden');
+                ui.startersContainer.classList.remove('hidden');
             }
 
-            // Populate Word Bank
             if (item.wordBank && item.wordBank.length > 0) {
-                wordBankList.innerHTML = '';
+                ui.wordBankList.innerHTML = '';
                 item.wordBank.forEach(word => {
                     const button = document.createElement('button');
                     button.className = 'bg-green-500 text-white text-sm font-medium px-2.5 py-1 rounded-full dark:bg-green-600 dark:text-white cursor-default';
                     button.textContent = word;
-                    wordBankList.appendChild(button);
+                    ui.wordBankList.appendChild(button);
                 });
-                wordBankContainer.classList.remove('hidden');
+                ui.wordBankContainer.classList.remove('hidden');
             }
 
-            const responseTime = item.timer || DEFAULT_RESPONSE_TIME;
-            phaseIndicator.textContent = `Prepare & Record (Question ${currentQuestionIndex + 1} of ${currentQuestions.length})`;
-            startTimer(responseTime, showSampleAnswersAndStartReadTimer);
-        }
-
-        function showSampleAnswersAndStartReadTimer() {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                stopRecording();
-            }
+            ui.phaseIndicator.textContent = `${item.topicName} (Question ${currentQuestionIndex + 1} of ${currentQuestions.length})`;
             
-            phaseIndicator.textContent = "Review";
-            recordBtn.disabled = true;
-            recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
-
-            const item = currentQuestions[currentQuestionIndex];
-            if (item.samples && item.samples.length > 0) {
-                samplesList.innerHTML = '';
-                item.samples.forEach(sample => {
-                    const li = document.createElement('li');
-                    li.textContent = sample;
-                    // Changed to white text as requested
-                    li.className = 'text-white text-sm sm:text-base';
-                    samplesList.appendChild(li);
-                });
-                samplesContainer.classList.remove('hidden');
-            }
-
-
-            startTimer(READ_TIME, () => {
-                phaseIndicator.textContent = "Time's up!";
-                nextBtn.classList.remove('hidden');
+            const responseTime = item.timer || DEFAULT_RESPONSE_TIME;
+            startTimer(responseTime, () => {
+                if (mediaRecorder && mediaRecorder.state === 'recording') {
+                    stopRecording();
+                }
+                ui.phaseIndicator.textContent = "Time's up! Click Next to continue.";
+                ui.recordBtn.disabled = true;
+                ui.recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                ui.nextBtn.disabled = false;
             });
         }
         
-        // --- Certificate Logic ---
-        function checkAllTopicsCompleted() {
-            const totalTopics = Object.keys(practiceData).length;
-            const completedCount = Object.keys(completedTopics).length;
-            if (completedCount === totalTopics) {
-                showCertificate();
-            }
-        }
-        
         function showCertificate() {
-            practiceScreen.classList.add('hidden');
-            welcomeScreen.classList.add('hidden');
-            certificateScreen.classList.remove('hidden');
+            ui.practiceScreen.classList.add('hidden');
+            ui.welcomeScreen.classList.add('hidden');
+            ui.certificateScreen.classList.remove('hidden');
             document.getElementById('certificate-name').textContent = userName;
             document.getElementById('certificate-date').textContent = new Date().toLocaleDateString();
         }
         
         function showErrorMessage(message) {
-            errorMessagebox.textContent = message;
-            errorMessagebox.classList.remove('hidden');
+            ui.errorMessagebox.textContent = message;
+            ui.errorMessagebox.classList.remove('hidden');
             setTimeout(() => {
-                errorMessagebox.classList.add('hidden');
-            }, 5000); // Hide after 5 seconds
+                ui.errorMessagebox.classList.add('hidden');
+            }, 5000);
         }
 
         // --- Recording & Transcription Logic ---
@@ -650,7 +730,6 @@
             }
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                
                 const isMobileEdge = /Edg\/\d+.*Android/.test(navigator.userAgent);
                 let options = {};
                 if (!isMobileEdge) {
@@ -663,9 +742,10 @@
                 mediaRecorder.start();
                 startTranscription();
 
-                recordBtn.classList.add('hidden');
-                stopRecordBtn.classList.remove('hidden');
-                recordingStatus.classList.remove('hidden');
+                ui.recordBtn.classList.add('hidden');
+                ui.stopRecordBtn.classList.remove('hidden');
+                ui.recordingStatus.classList.remove('hidden');
+                ui.transcriptionContainer.classList.remove('hidden');
 
                 audioChunks = [];
                 mediaRecorder.addEventListener("dataavailable", event => {
@@ -675,11 +755,12 @@
                 mediaRecorder.addEventListener("stop", () => {
                     recordedBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
                     const audioUrl = URL.createObjectURL(recordedBlob);
-                    audioPlayer.src = audioUrl;
-                    postRecordingActions.classList.remove('hidden');
-                    recordingStatus.classList.add('hidden');
-                    stopRecordBtn.classList.add('hidden');
-                    recordBtn.classList.add('hidden');
+                    ui.audioPlayer.src = audioUrl;
+                    ui.postRecordingActions.classList.remove('hidden');
+                    ui.recordingStatus.classList.add('hidden');
+                    ui.stopRecordBtn.classList.add('hidden');
+                    ui.recordBtn.classList.add('hidden');
+                    ui.nextBtn.disabled = false;
                 });
             } catch (err) {
                 console.error("Error starting recording:", err);
@@ -700,6 +781,7 @@
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
                 console.warn("Speech recognition not supported — skipping setup.");
+                ui.transcriptionOutput.textContent = "Speech-to-text is not available on this browser.";
                 return;
             }
 
@@ -708,16 +790,20 @@
             speechRecognition.interimResults = true;
             speechRecognition.lang = 'en-US';
             finalTranscript = '';
+            ui.transcriptionOutput.textContent = '';
+
 
             speechRecognition.onresult = (event) => {
                 let interimTranscript = '';
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript;
+                        finalTranscript += event.results[i][0].transcript + ' ';
                     } else {
                         interimTranscript += event.results[i][0].transcript;
                     }
                 }
+                ui.transcriptionOutput.innerHTML = `${finalTranscript}<span class="text-gray-400">${interimTranscript}</span>`;
+
             };
             
             speechRecognition.onerror = (event) => {
@@ -726,6 +812,28 @@
 
             speechRecognition.start();
         }
+        
+        // --- Confirmation Modal ---
+        function showConfirmationModal(title, message, onConfirm) {
+            ui.modalTitle.textContent = title;
+            ui.modalMessage.textContent = message;
+            ui.modal.classList.remove('hidden');
+
+            const confirmHandler = () => {
+                onConfirm();
+                hide();
+            };
+
+            const hide = () => {
+                ui.modal.classList.add('hidden');
+                ui.modalConfirmBtn.removeEventListener('click', confirmHandler);
+                ui.modalCancelBtn.removeEventListener('click', hide);
+            };
+
+            ui.modalConfirmBtn.addEventListener('click', confirmHandler);
+            ui.modalCancelBtn.addEventListener('click', hide);
+        }
+
 
         // --- Timer Functions ---
         function startTimer(duration, onEndCallback) {
@@ -747,78 +855,58 @@
             const minutes = Math.floor(timeLeft / 60);
             let seconds = timeLeft % 60;
             if (seconds < 10) seconds = `0${seconds}`;
-            timerDisplay.textContent = `${minutes}:${seconds}`;
+            ui.timerDisplay.textContent = `${minutes}:${seconds}`;
             
             const fraction = timeLeft / totalDuration;
             const offset = fraction * FULL_DASH_ARRAY;
-            timerProgress.style.strokeDashoffset = FULL_DASH_ARRAY - offset;
+            ui.timerProgress.style.strokeDashoffset = FULL_DASH_ARRAY - offset;
         }
 
         // --- UI Helper Functions ---
         function resetUIForNewQuestion() {
-            samplesContainer.classList.add('hidden');
-            startersContainer.classList.add('hidden');
-            wordBankContainer.classList.add('hidden');
-            nextBtn.classList.add('hidden');
-            errorMessagebox.classList.add('hidden');
-            recordBtn.disabled = false;
-            recordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            ui.samplesContainer.classList.add('hidden');
+            ui.startersContainer.classList.add('hidden');
+            ui.wordBankContainer.classList.add('hidden');
+            ui.transcriptionContainer.classList.add('hidden');
+            ui.errorMessagebox.classList.add('hidden');
+            ui.recordBtn.disabled = false;
+            ui.recordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             resetRecordingUI();
         }
 
         function resetRecordingUI() {
-            recordBtn.classList.remove('hidden');
-            stopRecordBtn.classList.add('hidden');
-            recordingStatus.classList.add('hidden');
-            postRecordingActions.classList.add('hidden');
-            audioPlayer.src = '';
+            ui.recordBtn.classList.remove('hidden');
+            ui.stopRecordBtn.classList.add('hidden');
+            ui.recordingStatus.classList.add('hidden');
+            ui.postRecordingActions.classList.add('hidden');
+            ui.audioPlayer.src = '';
+            ui.transcriptionOutput.textContent = '';
             audioChunks = [];
             recordedBlob = null;
             finalTranscript = '';
         }
 
-        
-        // --- Snowfall Logic ---
-        function createSnow() {
-            const snowContainer = document.getElementById('snow-container');
-            const snowflakeCount = window.innerWidth < 768 ? 15 : 50;
-            for (let i = 0; i < snowflakeCount; i++) {
-                let snowflake = document.createElement('div');
-                snowflake.innerHTML = '❄';
-                snowflake.classList.add('snowflake');
-                snowflake.style.left = Math.random() * 100 + 'vw';
-                snowflake.style.animationDuration = Math.random() * 5 + 5 + 's'; // 5-10 seconds
-                snowflake.style.animationDelay = Math.random() * 5 + 's';
-                snowflake.style.fontSize = Math.random() * 1.5 + 0.5 + 'em';
-                snowflake.style.opacity = Math.random();
-                snowContainer.appendChild(snowflake);
-            }
-        }
-
-
         // --- Event Listeners ---
-        startWithNameBtn.addEventListener('click', () => {
-            userName = nameInput.value.trim();
+        ui.startWithNameBtn.addEventListener('click', () => {
+            userName = ui.nameInput.value.trim();
             if (userName) {
                 saveProgress();
-                nameEntryContainer.classList.add('hidden');
-                userNameDisplay.textContent = userName;
-                topicSelectionContainer.classList.remove('hidden');
+                ui.nameEntryContainer.classList.add('hidden');
+                ui.userNameDisplay.textContent = userName;
+                ui.topicSelectionContainer.classList.remove('hidden');
             } else {
-                // Using a custom message box instead of alert()
                 const nameError = document.createElement('div');
                 nameError.textContent = "Please enter your name.";
                 nameError.className = "text-red-500 text-sm mt-2";
-                startWithNameBtn.insertAdjacentElement('afterend', nameError);
+                ui.startWithNameBtn.insertAdjacentElement('afterend', nameError);
                 setTimeout(() => nameError.remove(), 2000);
             }
         });
 
-        recordBtn.addEventListener('click', startRecording);
-        stopRecordBtn.addEventListener('click', stopRecording);
+        ui.recordBtn.addEventListener('click', startRecording);
+        ui.stopRecordBtn.addEventListener('click', stopRecording);
         
-        // --- Certificate Download ---
-        downloadCertificateBtn.addEventListener('click', () => {
+        ui.downloadCertificateBtn.addEventListener('click', () => {
           const certificateNode = document.getElementById('certificate-to-download');
           const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
           const newTab = isIOS ? window.open() : null;
@@ -831,7 +919,7 @@
               } else {
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `Certificate_of_Completion_${userName.replace(/\s+/g, '_')}.png`;
+                a.download = `Certificate_of_Completion_03_${userName.replace(/\s+/g, '_')}.png`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -841,82 +929,120 @@
           });
         });
 
-        backToMainMenuBtn.addEventListener('click', () => {
-            certificateScreen.classList.add('hidden');
-            welcomeScreen.classList.remove('hidden');
+        ui.backToMainMenuBtn.addEventListener('click', () => {
+            ui.certificateScreen.classList.add('hidden');
+            ui.welcomeScreen.classList.remove('hidden');
             initializeTopics();
         });
 
-        // --- Recording Download ---
-        downloadBtn.addEventListener('click', () => {
-          if (recordedBlob) {
-            const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
-            const sanitizedUserName = userName.replace(/\s+/g, '_');
-            const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
-            const blobUrl = URL.createObjectURL(recordedBlob);
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-            if (isIOS) {
-              // Open tab immediately to avoid Safari popup block
-              const newTab = window.open();
-              if (newTab) newTab.location = blobUrl;
-            } else {
-              const a = document.createElement('a');
-              a.style.display = 'none';
-              a.href = blobUrl;
-              a.download = fileName;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
+        ui.downloadBtn.addEventListener('click', () => {
+            let downloaded = false;
+            // Download audio
+            if (recordedBlob) {
+                const topicName = currentQuestions[currentQuestionIndex].topicName.replace(/\s+/g, '_');
+                const sanitizedUserName = userName.replace(/\s+/g, '_');
+                const fileNameAudio = `P3_${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
+                const blobUrl = URL.createObjectURL(recordedBlob);
+                
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = blobUrl;
+                a.download = fileNameAudio;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+                downloaded = true;
             }
 
-            // Visual feedback
-            const originalText = downloadBtn.innerHTML;
-            downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
-            downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-            downloadBtn.classList.add('bg-green-600');
-            setTimeout(() => {
-              downloadBtn.innerHTML = originalText;
-              downloadBtn.classList.remove('bg-green-600');
-              downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-            }, 2000);
+            // Download transcript
+            if (finalTranscript) {
+                const topicName = currentQuestions[currentQuestionIndex].topicName.replace(/\s+/g, '_');
+                const sanitizedUserName = userName.replace(/\s+/g, '_');
+                const fileNameTxt = `P3_${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.txt`;
+                const textBlob = new Blob([finalTranscript.trim()], { type: 'text/plain' });
+                const textUrl = URL.createObjectURL(textBlob);
 
-          } else {
-            // No recording — open SharePoint folder
-            window.open(
-              'https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ',
-              '_blank'
-            );
-          }
+                const aTxt = document.createElement('a');
+                aTxt.style.display = 'none';
+                aTxt.href = textUrl;
+                aTxt.download = fileNameTxt;
+                document.body.appendChild(aTxt);
+                aTxt.click();
+                document.body.removeChild(aTxt);
+                URL.revokeObjectURL(textUrl);
+                downloaded = true;
+            }
+
+            if (downloaded) {
+                const originalText = ui.downloadBtn.innerHTML;
+                ui.downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
+                ui.downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                ui.downloadBtn.classList.add('bg-green-600');
+                setTimeout(() => {
+                    ui.downloadBtn.innerHTML = originalText;
+                    ui.downloadBtn.classList.remove('bg-green-600');
+                    ui.downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                }, 2000);
+            }
         });
 
-        nextBtn.addEventListener('click', () => {
+        ui.nextBtn.addEventListener('click', () => {
+            ui.nextBtn.disabled = true;
             currentQuestionIndex++;
             showQuestion();
         });
 
-        backToTopicsBtn.addEventListener('click', () => {
-            practiceScreen.classList.add('hidden');
-            welcomeScreen.classList.remove('hidden');
-            clearInterval(timerInterval);
-            initializeTopics();
+        ui.backToTopicsBtn.addEventListener('click', () => {
+            showConfirmationModal(
+                'Return to Topics?',
+                'Are you sure? This will stop your current practice session and any recording will be lost.',
+                () => {
+                    ui.practiceScreen.classList.add('hidden');
+                    ui.welcomeScreen.classList.remove('hidden');
+                    clearInterval(timerInterval);
+                    if (synth && synth.speaking) synth.cancel();
+                    if (mediaRecorder && mediaRecorder.state === 'recording') stopRecording();
+                    initializeTopics();
+                }
+            );
+        });
+
+        ui.samplesBtn.addEventListener('click', () => {
+            if (!ui.samplesContainer.classList.contains('hidden')) {
+                ui.samplesContainer.classList.add('hidden');
+                return;
+            }
+
+            const currentTopicName = masterQuestionList[currentQuestionIndex].topicName;
+            const questionsForCurrentTopic = practiceData[currentTopicName];
+
+            ui.samplesList.innerHTML = ''; 
+            questionsForCurrentTopic.forEach((questionItem, index) => {
+                const questionHeader = document.createElement('h4');
+                questionHeader.textContent = `Q${index + 1}: ${questionItem.question}`;
+                questionHeader.className = 'font-bold text-white text-sm mt-2 first:mt-0';
+                ui.samplesList.appendChild(questionHeader);
+
+                if (questionItem.samples && questionItem.samples.length > 0) {
+                    questionItem.samples.forEach(sample => {
+                        const li = document.createElement('li');
+                        li.textContent = `\u2022 ${sample}`;
+                        li.className = 'text-white text-sm sm:text-base ml-2';
+                        ui.samplesList.appendChild(li);
+                    });
+                }
+            });
+            ui.samplesContainer.classList.remove('hidden');
         });
         
         // --- Initial Load ---
         async function main() {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            if (isIOS) {
-                const sharepointLink = document.getElementById('sharepoint-upload-link');
-                if(sharepointLink) {
-                    sharepointLink.removeAttribute('target');
-                }
-            }
-            
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !SpeechRecognition) {
-                recordBtn.disabled = true;
-                recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                recordBtn.title = "Audio recording or recognition is not supported on this browser.";
+                ui.recordBtn.disabled = true;
+                ui.recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                ui.recordBtn.title = "Audio recording or recognition is not supported on this browser.";
             }
             if (!window.speechSynthesis) {
                  console.warn("Text-to-speech is not supported on this browser.");
@@ -924,7 +1050,7 @@
             
             await initializeTTS().catch(err => console.error(err));
             
-            createSnow();
+            createMasterList();
             loadProgress();
             initializeTopics();
         }
