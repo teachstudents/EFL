@@ -138,7 +138,7 @@
                             <!-- Smart Download button -->
                             <button id="download-btn"
                                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
-                                <i class="fas fa-download mr-1"></i>Download Audio & Text
+                                <i class="fas fa-download mr-1"></i>Download Recording
                             </button>
                             
                             <!-- Upload button -->
@@ -173,12 +173,6 @@
                     <div id="word-bank-list" class="flex flex-wrap gap-2 justify-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">
                         <!-- Buttons will be injected here -->
                     </div>
-                </div>
-
-                <!-- Transcription Display -->
-                <div id="transcription-container" class="hidden text-left mt-2">
-                    <h3 class="text-sm font-bold mb-1 text-center">Your Answer (Live Transcript)</h3>
-                    <div id="transcription-output" class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg min-h-[60px] text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap"></div>
                 </div>
 
                 <!-- Sample Answers Display -->
@@ -369,7 +363,7 @@
                     ] 
                 },
                 { 
-                    question: "How has online learning changed your study habits compared to traditional classroom learning?", 
+                    question: "How has online learning changed your study habits compared to a traditional classroom learning?", 
                     starters: ["Online learning has made me more...", "One big difference is the need for...", "I've had to learn how to...", "Compared to a classroom, online learning requires..."], 
                     wordBank: ["self-disciplined", "flexible schedule", "time management", "technical issues", "less interaction", "independent", "stay focused", "motivation", "digital resources"], 
                     samples: [
@@ -455,8 +449,6 @@
             recordingStatus: document.getElementById('recording-status'),
             postRecordingActions: document.getElementById('post-recording-actions'),
             downloadBtn: document.getElementById('download-btn'),
-            transcriptionContainer: document.getElementById('transcription-container'),
-            transcriptionOutput: document.getElementById('transcription-output'),
             certificateScreen: document.getElementById('certificate-screen'),
             downloadCertificateBtn: document.getElementById('download-certificate-btn'),
             backToMainMenuBtn: document.getElementById('back-to-main-menu-btn'),
@@ -478,8 +470,6 @@
         let audioChunks = [];
         let recordedBlob = null;
         let completedTopics = {};
-        let speechRecognition;
-        let finalTranscript = '';
 
         const FULL_DASH_ARRAY = 283;
         const DEFAULT_RESPONSE_TIME = 60;
@@ -740,12 +730,10 @@
                 
                 mediaRecorder = new MediaRecorder(stream, options);
                 mediaRecorder.start();
-                startTranscription();
 
                 ui.recordBtn.classList.add('hidden');
                 ui.stopRecordBtn.classList.remove('hidden');
                 ui.recordingStatus.classList.remove('hidden');
-                ui.transcriptionContainer.classList.remove('hidden');
 
                 audioChunks = [];
                 mediaRecorder.addEventListener("dataavailable", event => {
@@ -772,45 +760,6 @@
             if (mediaRecorder) {
                 mediaRecorder.stop();
             }
-            if (speechRecognition) {
-                speechRecognition.stop();
-            }
-        }
-
-        function startTranscription() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                console.warn("Speech recognition not supported — skipping setup.");
-                ui.transcriptionOutput.textContent = "Speech-to-text is not available on this browser.";
-                return;
-            }
-
-            speechRecognition = new SpeechRecognition();
-            speechRecognition.continuous = true;
-            speechRecognition.interimResults = true;
-            speechRecognition.lang = 'en-US';
-            finalTranscript = '';
-            ui.transcriptionOutput.textContent = '';
-
-
-            speechRecognition.onresult = (event) => {
-                let interimTranscript = '';
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript + ' ';
-                    } else {
-                        interimTranscript += event.results[i][0].transcript;
-                    }
-                }
-                ui.transcriptionOutput.innerHTML = `${finalTranscript}<span class="text-gray-400">${interimTranscript}</span>`;
-
-            };
-            
-            speechRecognition.onerror = (event) => {
-                 console.error('Speech recognition error detected: ' + event.error);
-            }
-
-            speechRecognition.start();
         }
         
         // --- Confirmation Modal ---
@@ -867,7 +816,6 @@
             ui.samplesContainer.classList.add('hidden');
             ui.startersContainer.classList.add('hidden');
             ui.wordBankContainer.classList.add('hidden');
-            ui.transcriptionContainer.classList.add('hidden');
             ui.errorMessagebox.classList.add('hidden');
             ui.recordBtn.disabled = false;
             ui.recordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -880,10 +828,8 @@
             ui.recordingStatus.classList.add('hidden');
             ui.postRecordingActions.classList.add('hidden');
             ui.audioPlayer.src = '';
-            ui.transcriptionOutput.textContent = '';
             audioChunks = [];
             recordedBlob = null;
-            finalTranscript = '';
         }
 
         // --- Event Listeners ---
@@ -936,8 +882,6 @@
         });
 
         ui.downloadBtn.addEventListener('click', () => {
-            let downloaded = false;
-            // Download audio
             if (recordedBlob) {
                 const topicName = currentQuestions[currentQuestionIndex].topicName.replace(/\s+/g, '_');
                 const sanitizedUserName = userName.replace(/\s+/g, '_');
@@ -952,29 +896,7 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(blobUrl);
-                downloaded = true;
-            }
 
-            // Download transcript
-            if (finalTranscript) {
-                const topicName = currentQuestions[currentQuestionIndex].topicName.replace(/\s+/g, '_');
-                const sanitizedUserName = userName.replace(/\s+/g, '_');
-                const fileNameTxt = `P3_${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.txt`;
-                const textBlob = new Blob([finalTranscript.trim()], { type: 'text/plain' });
-                const textUrl = URL.createObjectURL(textBlob);
-
-                const aTxt = document.createElement('a');
-                aTxt.style.display = 'none';
-                aTxt.href = textUrl;
-                aTxt.download = fileNameTxt;
-                document.body.appendChild(aTxt);
-                aTxt.click();
-                document.body.removeChild(aTxt);
-                URL.revokeObjectURL(textUrl);
-                downloaded = true;
-            }
-
-            if (downloaded) {
                 const originalText = ui.downloadBtn.innerHTML;
                 ui.downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
                 ui.downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
@@ -1038,11 +960,10 @@
         
         // --- Initial Load ---
         async function main() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !SpeechRecognition) {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
                 ui.recordBtn.disabled = true;
                 ui.recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                ui.recordBtn.title = "Audio recording or recognition is not supported on this browser.";
+                ui.recordBtn.title = "Audio recording is not supported on this browser.";
             }
             if (!window.speechSynthesis) {
                  console.warn("Text-to-speech is not supported on this browser.");
