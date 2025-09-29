@@ -222,6 +222,7 @@
             text-align: left;
             height: calc(100vh - 160px);
             overflow-y: auto;
+            scroll-behavior: smooth;
         }
 
         .content-section.active {
@@ -298,8 +299,16 @@
             border: 2px solid #6b7280;
             padding: 10px;
             border-radius: 15px;
-            margin: 10px 0;
+            margin: 5px 0;
             box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .student-card.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .student-card.sarah {
@@ -320,7 +329,7 @@
         .student-card h4 {
             font-size: 20px;
             font-weight: 900;
-            margin-bottom: 5px;
+            margin: 0 0 5px 0;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -332,13 +341,21 @@
         }
 
         .student-card .quote {
-            font-style: italic;
             font-size: 16px;
             margin: 10px 0;
             padding: 10px;
             background: rgba(255,255,255,0.1);
             border-radius: 8px;
             border-left: 4px solid rgba(255,255,255,0.3);
+            line-height: 1.5;
+        }
+
+        .highlight {
+            background-color: rgba(251, 191, 36, 0.7);
+            color: #1f2937;
+            padding: 2px 0;
+            border-radius: 3px;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
         /* Decision Options */
@@ -356,6 +373,10 @@
             font-weight: 700;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             transition: transform 0.3s ease;
+        }
+
+        .option-card h4 {
+             font-size: 16px;
         }
 
         .option-card:hover {
@@ -487,14 +508,14 @@
         /* Audio Indicator */
         .audio-indicator {
             position: fixed;
-            top: 120px;
-            right: 30px;
+            top: 60px;
+            right: 10px;
             background: linear-gradient(145deg, #5b21b6, #4c1d95);
             color: #ffffff;
             border: 2px solid #8b5cf6;
-            padding: 15px 25px;
+            padding: 8px 15px;
             border-radius: 15px;
-            font-size: 18px;
+            font-size: 14px;
             font-weight: 700;
             box-shadow: 0 8px 25px rgba(0,0,0,0.5);
             z-index: 1000;
@@ -519,13 +540,21 @@
             gap: 10px;
             margin: 10px 0;
         }
-
+        
         .stat-box {
             background: rgba(255,255,255,0.1);
             padding: 8px;
             border-radius: 12px;
             text-align: center;
             font-weight: 700;
+        }
+        
+        .stat-box div:first-child {
+            font-size: 18px;
+        }
+        
+        .stat-box div:last-child {
+            font-size: 11px;
         }
     </style>
 </head>
@@ -538,7 +567,7 @@
     <div class="timer-display" id="timerDisplay">20:00</div>
     <div style="position: fixed; top: 10px; right: 120px; background: linear-gradient(145deg, #a55eea, #8854d0); color: white; padding: 8px 15px; border-radius: 10px; font-size: 14px; font-weight: 700; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000;" id="phaseTimer">00:00</div>
     <div class="phase-display" id="phaseDisplay">Select Grade Level</div>
-    <div class="audio-indicator" id="audioIndicator">🎧 Student Discussion</div>
+    <div class="audio-indicator" id="audioIndicator">🎧</div>
     <div class="progress-container">
         <div class="progress-bar" id="progressBar"></div>
     </div>
@@ -584,7 +613,7 @@
         <div id="groupFormation" class="content-section">
             <h2>👥 Form Your Debate Team!</h2>
             <div class="instruction-box">
-                <strong>You have 1 minute to find your teammates and form your ethics debate team!</strong><br>
+                <strong>You have 30 seconds to find your teammates and form your ethics debate team!</strong><br>
                 Look for your assigned team members and gather together.
             </div>
             <div id="formationTeamsDisplay" class="teams-container">
@@ -646,20 +675,20 @@
                     <h4>☀️ Solar Study Hub Solution</h4>
                     <div class="impact-stats">
                         <div class="stat-box">
-                            <div style="font-size: 20px;">💡 LED Lighting</div>
-                            <div style="font-size: 12px;">Evening study sessions</div>
+                            <div>💡 LED Lighting</div>
+                            <div>Evening study sessions</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 20px;">📱 Device Charging</div>
-                            <div style="font-size: 12px;">Access to digital tools</div>
+                            <div>📱 Device Charging</div>
+                            <div>Access to digital tools</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 20px;">🔋 Battery Storage</div>
-                            <div style="font-size: 12px;">24/7 power availability</div>
+                            <div>🔋 Battery Storage</div>
+                            <div>24/7 power availability</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 20px;">🌍 Community Impact</div>
-                            <div style="font-size: 12px;">300+ students benefit</div>
+                            <div>🌍 Community Impact</div>
+                            <div>300+ students benefit</div>
                         </div>
                     </div>
                 </div>
@@ -668,20 +697,20 @@
                     <h4>⚡ Grid Extension Alternative</h4>
                     <div class="impact-stats">
                         <div class="stat-box">
-                            <div style="font-size: 20px;">🏗️ Infrastructure</div>
-                            <div style="font-size: 12px;">Power lines & poles</div>
+                            <div>🏗️ Infrastructure</div>
+                            <div>Power lines & poles</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 20px;">💰 High Cost</div>
-                            <div style="font-size: 12px;">$500K+ investment</div>
+                            <div>💰 High Cost</div>
+                            <div>$500K+ investment</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 20px;">⏰ Long Timeline</div>
-                            <div style="font-size: 12px;">2-3 years to complete</div>
+                            <div>⏰ Long Timeline</div>
+                            <div>2-3 years to complete</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 20px;">🌍 Wider Impact</div>
-                            <div style="font-size: 12px;">Entire region benefits</div>
+                            <div>🌍 Wider Impact</div>
+                            <div>Entire region benefits</div>
                         </div>
                     </div>
                 </div>
@@ -691,40 +720,22 @@
         <!-- Dilemma 1 Debate -->
         <div id="solarDebate" class="content-section">
             <h2>☀️ Solar Study Hub Discussion</h2>
-            
-            <div id="debateContent">
-                <div class="instruction-box">
-                    <strong>🎧 Listen to the renewable energy and education discussion!</strong><br>
-                    Pay attention to their different perspectives on energy equity and implementation.
-                </div>
-
-                <div class="student-card alex">
-                    <h4>🇬🇧 Alex's Optimistic Vision</h4>
-                    <div class="quote">
-                        "Hey everyone, I've been thinking a lot about how decentralized renewable energy could really tackle the digital divide, especially in rural education. It feels like such a powerful solution, doesn't it?"
-                    </div>
-                </div>
-
-                <div class="student-card sarah">
-                    <h4>🇺🇸 Sarah's Educational Equity Focus</h4>
-                    <div class="quote">
-                        "Oh, absolutely, Alex. It's a concept that really excites me. Imagine bringing reliable power and internet access to communities that have been left behind. It feels like a fundamental step towards educational equity, wouldn't you agree, Chris?"
-                    </div>
-                </div>
-
-                <div class="student-card chris">
-                    <h4>🇦🇺 Chris's Practical Concerns</h4>
-                    <div class="quote">
-                        "G'Day, Alex and Sarah. Yeah, I see the potential alright. It's fair dinkum that getting power out bush is a ripper idea for schools. But I'm a bit skeptical about how easy it'll be to actually implement and maintain all that tech and infrastructure in remote spots. What about the costs and the technical know-how needed?"
-                    </div>
-                </div>
-
-                <div class="student-card alex">
-                    <h4>🇬🇧 Alex's Response to Concerns</h4>
-                    <div class="quote">
-                        "That's a valid concern, Chris, and it's something we absolutely need to address. But think about the alternative. Leaving these kids without the digital tools that are becoming essential for learning. It's heartbreaking to think they might miss out. Surely the long-term benefits outweigh the initial hurdles."
-                    </div>
-                </div>
+            <div class="instruction-box">
+                <strong>🎧 Listen to the student debate!</strong>
+            </div>
+            <div id="solarDebateContent">
+                <!-- Dynamic debate content will be inserted here -->
+            </div>
+        </div>
+        
+        <!-- Q&A Session 1 -->
+        <div id="qnaSession1" class="content-section">
+            <h2>🙋 Q&A: Education Dilemma</h2>
+            <div class="instruction-box">
+                <strong>Listen for the question and the student called on to answer!</strong>
+            </div>
+            <div id="qnaContent1" style="text-align: center; font-size: 18px; padding: 20px;">
+                <!-- Q&A content will be dynamically inserted here -->
             </div>
         </div>
 
@@ -732,11 +743,11 @@
         <div id="windDilemma" class="content-section">
             <h2>💨 The Wind Farm Cooperation Challenge</h2>
             
-            <div style="background: linear-gradient(145deg, #667eea, #764ba2); color: white; padding: 25px; border-radius: 20px; margin: 20px 0; box-shadow: 0 15px 35px rgba(0,0,0,0.3);">
-                <h4 style="font-size: 24px; font-weight: 900; margin-bottom: 15px; text-align: center;">
+            <div style="background: linear-gradient(145deg, #667eea, #764ba2); color: white; padding: 15px; border-radius: 20px; margin: 10px 0; box-shadow: 0 15px 35px rgba(0,0,0,0.3);">
+                <h4 style="font-size: 20px; font-weight: 900; margin-bottom: 10px; text-align: center;">
                     <span class="animated-emoji">💨</span> The Cooperation Challenge
                 </h4>
-                <p><strong>Two towns need clean energy and can co-invest in a wind farm. But trust is required...</strong></p>
+                <p style="margin:0; font-size: 13px;"><strong>Two towns need clean energy and can co-invest in a wind farm. But trust is required...</strong></p>
             </div>
 
             <div class="decision-options">
@@ -744,19 +755,19 @@
                     <h4>💰 INVEST</h4>
                     <div class="impact-stats">
                         <div class="stat-box">
-                            <div style="font-size: 20px;">🤝 Both Invest</div>
+                            <div>🤝 Both Invest</div>
                             <div>Clean energy for all</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 20px;">😔 You Invest Alone</div>
+                            <div>😔 You Invest Alone</div>
                             <div>They benefit, you pay</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 20px;">💸 High Cost</div>
+                            <div>💸 High Cost</div>
                             <div>Major financial risk</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 20px;">🌱 Clean Future</div>
+                            <div>🌱 Clean Future</div>
                             <div>Zero emissions goal</div>
                         </div>
                     </div>
@@ -766,19 +777,19 @@
                     <h4>⏳ DON'T INVEST</h4>
                     <div class="impact-stats">
                         <div class="stat-box">
-                            <div style="font-size: 20px;">😊 They Invest Alone</div>
+                            <div>😊 They Invest Alone</div>
                             <div>Free clean energy!</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 20px;">😰 Both Don't Invest</div>
+                            <div>😰 Both Don't Invest</div>
                             <div>Pollution continues</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 20px;">💰 No Cost</div>
+                            <div>💰 No Cost</div>
                             <div>Protect town finances</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 20px;">⚡ Risk</div>
+                            <div>⚡ Risk</div>
                             <div>Blackouts continue</div>
                         </div>
                     </div>
@@ -789,40 +800,22 @@
         <!-- Dilemma 2 Debate -->
         <div id="windDebate" class="content-section">
             <h2>🎙️ Wind Farm Cooperation Debate</h2>
-            
             <div class="instruction-box">
-                <strong>🎧 Listen to the wind farm cooperation discussion!</strong><br>
-                Notice how they balance trust, risk, and environmental benefits.
+                <strong>🎧 Listen to the student debate!</strong>
             </div>
-
-            <div class="student-card alex">
-                <h4>🇬🇧 Alex's Investment Position</h4>
-                <div class="quote">
-                    "A classic collective action problem. As the representative for my town, the best course of action is to agree to invest in the wind farm for clean reliable energy."
-                </div>
+            <div id="windDebateContent">
+                <!-- Dynamic debate content will be inserted here -->
             </div>
-
-            <div class="student-card chris">
-                <h4>🇦🇺 Chris's Cautious Approach</h4>
-                <div class="quote">
-                    "I believe we should choose not to invest, at least not without a very solid agreement. The most ethical choice is protecting our town's money from being exploited. We don't want to pay while they benefit for free."
-                </div>
+        </div>
+        
+        <!-- Q&A Session 2 -->
+        <div id="qnaSession2" class="content-section">
+            <h2>🙋 Q&A: Wind Farm Dilemma</h2>
+            <div class="instruction-box">
+                <strong>Listen for the question and the student called on to answer!</strong>
             </div>
-
-            <div class="student-card sarah">
-                <h4>🇺🇸 Sarah's Risk Assessment</h4>
-                <div class="quote">
-                    "While there's a risk of exploitation if only one invests, the potential for clean reliable energy and avoiding future pollution and blackouts is more critical. Relying on old power sources is increasingly unsustainable."
-                </div>
-            </div>
-
-            <div style="background: linear-gradient(145deg, #26de81, #20bf6b); color: white; padding: 20px; border-radius: 15px; margin: 20px 0;">
-                <h4 style="text-align: center; margin-bottom: 15px;">💡 Creative Solutions Discussed</h4>
-                <ul style="font-size: 16px; line-height: 1.5;">
-                    <li><strong>Phased Investment:</strong> Start small to build trust, then commit fully</li>
-                    <li><strong>Third-Party Mediator:</strong> Oversee investment to ensure both towns contribute</li>
-                    <li><strong>Solid Agreements:</strong> Legal frameworks to prevent exploitation</li>
-                </ul>
+            <div id="qnaContent2" style="text-align: center; font-size: 18px; padding: 20px;">
+                <!-- Q&A content will be dynamically inserted here -->
             </div>
         </div>
 
@@ -863,18 +856,6 @@
             
             <div class="teams-container" id="discussionTeamsDisplay">
                 <!-- Current teams will be shown here -->
-            </div>
-        </div>
-
-        <!-- Q&A Session -->
-        <div id="qnaSession" class="content-section">
-            <h2>🙋 Q&A Session</h2>
-            <div class="instruction-box">
-                <strong>Listen for the question and the students called on to answer!</strong><br>
-                You'll have 30 seconds to prepare and 20 seconds to respond.
-            </div>
-            <div id="qnaContent" style="text-align: center; font-size: 18px; padding: 20px;">
-                <!-- Q&A content will be dynamically inserted here -->
             </div>
         </div>
 
@@ -943,6 +924,7 @@
 
         // TTS Voices
         let voiceAva, voiceBrian, voiceAndrew, voiceEmma;
+        let initialWelcomeSpoken = false;
 
         // Game state
         let currentGrade = null;
@@ -955,61 +937,65 @@
         let phaseInterval = null;
         let isActivityRunning = false;
         
-        const qnaQuestions = [
-            "Which ethical framework, utilitarianism or rights-based ethics, is more useful in the Educational Energy scenario, and why?",
-            "In the Wind Farm scenario, how could the two towns build trust to ensure a successful partnership?",
-            "Besides cost, what is the biggest challenge in implementing renewable energy projects in remote areas?",
-            "Is it ever ethically acceptable for a community to benefit from another's investment without contributing, as in the Wind Farm dilemma?",
-            "How does access to energy directly impact a student's educational opportunities and future?",
-            "What role should governments play in resolving disputes like the ones presented in the two scenarios?",
-            "Can you think of a creative, third solution to the Educational Energy Challenge that balances immediate and long-term needs?",
-            "If you were Chris, the practical realist, what specific guarantees would you need before investing in the wind farm?",
-            "How do the concepts of 'equity' and 'equality' apply differently to the Solar Hub vs. Grid Extension options?",
-            "What is the long-term environmental cost of NOT investing in the wind farm?"
+        const educationQnaQuestions = [
+            "What is the most equitable solution for the students, and why?",
+            "Which option is more sustainable in the long term, and what makes it so?",
+            "Can you think of a creative, third solution that balances immediate and long-term needs?",
+            "How do the concepts of 'equity' and 'equality' apply differently to the Solar Hub vs. Grid Extension options?"
         ];
-        let availableQuestions = [...qnaQuestions];
-
+        
+        const windQnaQuestions = [
+            "How could the two towns build trust to ensure a successful partnership?",
+            "Is the environmental benefit of the wind farm worth the financial risk of being exploited?",
+            "If you were Chris, what specific guarantees would you need before investing in the wind farm?",
+            "What role should governments play in resolving disputes like this one?"
+        ];
+        
+        let availableEducationQuestions = [...educationQnaQuestions];
+        let availableWindQuestions = [...windQnaQuestions];
 
         // Phase configuration (20 minutes / 1200 seconds total)
         const phases = [
             { name: 'Team Assignment', duration: 90, tts: "Welcome to the Energy Ethics Debate! You will hear authentic student perspectives on two energy dilemmas. Let me announce your debate team assignments." },
-            { name: 'Group Formation', duration: 60, tts: 'Now you have 1 minute to find your teammates and form your ethics debate teams. Look for your assigned team members and gather together.' },
-            { name: 'Introduction', duration: 60, tts: "You are about to hear real student discussions about complex energy dilemmas. Three students from different countries will debate two scenarios: the best way to bring power to a remote community for education, and a wind farm cooperation challenge." },
-            { name: 'Student Introductions', duration: 60, tts: "Meet the student debaters. Sarah from the US is a passionate advocate for educational equity. Alex from the UK is optimistic about decentralized energy. And Chris from Australia is a practical realist concerned about costs and implementation." },
-            { name: 'Education Dilemma', duration: 60, tts: "First scenario: An educational energy challenge. A remote community needs power for students to study. Option A is a targeted Solar Study Hub, which is fast and cheap for 300 students. Option B is a full Grid Extension, which is slow and expensive but helps the entire region. Now, listen to their debate." },
+            { name: 'Group Formation', duration: 30, tts: 'Now you have 30 seconds to find your teammates and form your ethics debate teams.' },
+            { name: 'Introduction', duration: 60, tts: "You are about to hear real student discussions about complex energy dilemmas..." },
+            { name: 'Student Introductions', duration: 30, tts: "Meet the student debaters: Sarah from the US, Alex from the UK, and Chris from Australia." },
+            { name: 'Education Dilemma', duration: 60, tts: "First scenario: An educational energy challenge... Now, listen to their debate." },
             { 
                 name: 'Education Debate', 
                 duration: 120, 
-                dialogue: [
-                    { voice: 'Brian', text: "Alright team, looking at this educational challenge, the Solar Study Hub seems like a clear winner for immediate impact. We can get it running quickly and directly help those students who need it right now." },
-                    { voice: 'Ava', text: "I agree, Alex. It's about equity. These students are falling behind because they lack a basic utility. The Solar Hub is a direct intervention that addresses the immediate inequality they face." },
-                    { voice: 'Andrew', text: "Hang on, while a quick fix is nice, are we thinking long-term? The Grid Extension, though slow, empowers the entire community, creating broader opportunities for everyone, not just the students. It feels more sustainable." },
-                    { voice: 'Ava', text: "But sustainability is irrelevant if these students fail their exams next year. Their future is the immediate crisis. We can't ask them to wait three years. The targeted solution is the most ethical one for them." }
-                ]
+                action: () => runDialogue('solarDebateContent', [
+                    { speaker: 'alex', voice: 'Brian', text: "Alright team, the Solar Study Hub seems like a clear winner for immediate impact. We can get it running quickly and directly help the students who need it right now. It's a targeted, effective solution." },
+                    { speaker: 'sarah', voice: 'Ava', text: "I agree, Alex. It's about equity. These students are falling behind because they lack this basic utility. The Hub is a direct intervention that addresses the immediate inequality they face." },
+                    { speaker: 'chris', voice: 'Andrew', text: "Hang on, while a quick fix is nice, are we thinking long-term? The Grid Extension empowers the entire community, creating broader economic and social opportunities for everyone. A rising tide lifts all boats, doesn't it?" },
+                    { speaker: 'sarah', voice: 'Ava', text: "But a rising tide is no good to someone who has already drowned. Their future is the immediate crisis. The targeted solution is the most ethical one for them right now." },
+                    { speaker: 'alex', voice: 'Brian', text: "Chris has a point about long-term vision, though. Perhaps we can propose a hybrid model? Use the Solar Hub as an immediate solution, but build it as the first modular piece of a future, decentralized grid for the whole town." },
+                    { speaker: 'chris', voice: 'Andrew', text: "That's a clever idea, Alex, but it sounds expensive. Who pays for that upgrade path? We need to be realistic about the budget. A project that starts small but has massive hidden costs later isn't practical." }
+                ])
             },
-            { name: 'Wind Farm Dilemma', duration: 60, tts: "Second scenario: Two towns can co-invest in a wind farm. If both invest, both benefit. If only one invests, they pay while the other gets free energy. If neither invests, both suffer pollution and blackouts. Let's hear the discussion." },
+            { name: 'Q&A: Education Dilemma', duration: 180, action: () => runQASession('education', 'qnaContent1') },
+            { name: 'Wind Farm Dilemma', duration: 60, tts: "Second scenario: Two towns can co-invest in a wind farm... Let's hear the discussion." },
             { 
                 name: 'Wind Farm Debate', 
                 duration: 120,
-                dialogue: [
-                    { voice: 'Brian', text: "This is a classic collective action problem. The logical and most beneficial outcome for everyone is to cooperate and invest. We should take the leap of faith for a cleaner future." },
-                    { voice: 'Andrew', text: "A leap of faith with our town's money? No way. That's not responsible. The risk of being taken for a ride is too high. My duty is to protect my community from being exploited. We need a binding agreement first." },
-                    { voice: 'Ava', text: "But Chris, refusing to act also has a cost. The price of continued pollution and blackouts is real. Sometimes, taking a calculated risk is necessary to avoid a guaranteed negative outcome. The greater good requires us to find a way forward, even if it's imperfect." },
-                    { voice: 'Brian', text: "Exactly, Sarah. Perhaps we don't need a leap of faith, but a series of small steps. What if we propose a smaller, phased investment to build trust before committing to the full project?" }
-                ]
+                action: () => runDialogue('windDebateContent', [
+                    { speaker: 'alex', voice: 'Brian', text: "This is a classic collective action problem. The logical outcome for everyone is to cooperate and invest. We should take the leap of faith for a cleaner future and set an example of collaboration." },
+                    { speaker: 'chris', voice: 'Andrew', text: "A leap of faith with our town's money? No way. That's not responsible leadership. The risk of being taken for a ride is too high. My duty is to protect my community. We need a legally binding, phased agreement first." },
+                    { speaker: 'sarah', voice: 'Ava', text: "But Chris, refusing to act also has a definite cost—the price of pollution and blackouts is real. Sometimes, a calculated risk is necessary to avoid a guaranteed negative outcome. The greater good requires us to find a way forward." },
+                    { speaker: 'alex', voice: 'Brian', text: "Exactly, Sarah. Chris, your point on contracts is valid. What if we propose a smaller, joint pilot project to build trust? And bring in a neutral third-party mediator to oversee the funds and ensure fairness for both towns?" },
+                    { speaker: 'chris', voice: 'Andrew', text: "A third-party mediator... that's interesting. That could work. It reduces the risk of one side backing out. It's still a risk, but it's a much more manageable and practical one. I could present that to my town." },
+                     { speaker: 'sarah', voice: 'Ava', text: "See? By focusing on solutions instead of just the risks, we can find a path that serves the collective good while still protecting individual interests. It’s about finding that ethical balance." }
+                ])
             },
-            { name: 'Team Discussion', duration: 150, tts: "Now, debate both scenarios with your team! For the education dilemma, discuss targeted aid versus broad infrastructure. For the wind farm, discuss trust, cooperation, and financial risks versus environmental benefits." },
-            { name: 'Q&A Session', duration: 360, action: runQASession },
-            { name: 'Reflection', duration: 60, tts: "Time for reflection. These discussions show how energy ethics involves balancing competing values: immediate needs versus long-term goals, collective good versus self-protection, and costs versus benefits. Real-world decisions require navigating these complex trade-offs." }
+            { name: 'Q&A: Wind Farm Dilemma', duration: 180, action: () => runQASession('wind', 'qnaContent2') },
+            { name: 'Team Discussion', duration: 150, tts: "Now, debate both scenarios with your team! Discuss targeted aid versus broad infrastructure, and trust versus financial risks." },
+            { name: 'Reflection', duration: 60, tts: "Time for reflection. These discussions show how energy ethics involves balancing competing values... Real-world decisions require navigating these complex trade-offs." }
         ];
 
         // TTS Functions
         function findVoice(name) {
             const voices = speechSynthesis.getVoices();
-            let foundVoice = voices.find(v => v.name.includes(name) && v.name.includes('Microsoft') && v.name.includes('Online'));
-            if (foundVoice) return foundVoice;
-            foundVoice = voices.find(v => v.name.includes(name));
-            return foundVoice;
+            return voices.find(v => v.name.includes(name) && v.name.includes('Microsoft') && v.name.includes('Online')) || voices.find(v => v.name.includes(name));
         }
 
         function initializeVoices() {
@@ -1017,43 +1003,78 @@
             voiceBrian = findVoice('Brian');
             voiceAndrew = findVoice('Andrew');
             voiceEmma = findVoice('Emma');
-            
-            const allVoices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
-            if (!voiceAva && allVoices.length > 0) voiceAva = allVoices[0];
-            if (!voiceBrian && allVoices.length > 1) voiceBrian = allVoices[1 % allVoices.length];
-            if (!voiceAndrew && allVoices.length > 2) voiceAndrew = allVoices[2 % allVoices.length];
-            if (!voiceEmma && allVoices.length > 3) voiceEmma = allVoices[3 % allVoices.length];
+            const allEnVoices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+            if (!voiceAva) voiceAva = allEnVoices[0];
+            if (!voiceBrian) voiceBrian = allEnVoices[1 % allEnVoices.length];
+            if (!voiceAndrew) voiceAndrew = allEnVoices[2 % allEnVoices.length];
+            if (!voiceEmma) voiceEmma = allEnVoices[3 % allEnVoices.length];
         }
 
-        function speak(text, voice = voiceEmma, callback = null) {
+        function speak(text, voice = voiceEmma, callback = null, onBoundary = null) {
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.voice = voice;
-                utterance.rate = 0.85; // Slow down speech
+                utterance.rate = 0.85;
                 utterance.pitch = 1.0;
                 utterance.volume = 1.0;
-                
+                if (onBoundary) utterance.onboundary = onBoundary;
                 utterance.onend = () => { if (callback) callback(); };
                 utterance.onerror = (e) => {
                     console.error("Speech synthesis error:", e);
                     if (callback) callback();
                 };
-                
                 speechSynthesis.speak(utterance);
             } else if (callback) {
                 callback();
             }
         }
-        
-        function speakDialogue(dialogue) {
-            speechSynthesis.cancel();
-            dialogue.forEach(part => {
-                let voiceMap = { 'Ava': voiceAva, 'Brian': voiceBrian, 'Andrew': voiceAndrew, 'Emma': voiceEmma };
-                speak(part.text, voiceMap[part.voice] || voiceEmma);
-            });
+
+        // Visual Effects & Highlighting
+        function highlightWords(quoteElement, fullText) {
+            return (event) => {
+                if (event.name === 'word') {
+                    const charIndex = event.charIndex;
+                    const highlightedText = `<span class="highlight">${fullText.substring(0, charIndex + event.charLength)}</span>`;
+                    const remainingText = fullText.substring(charIndex + event.charLength);
+                    quoteElement.innerHTML = highlightedText + remainingText;
+                }
+            };
         }
 
-        // Visual Effects
+        function runDialogue(containerId, dialogue) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            let currentLine = 0;
+
+            function nextLine() {
+                if (currentLine >= dialogue.length) return;
+                const part = dialogue[currentLine];
+                
+                const card = document.createElement('div');
+                card.className = `student-card ${part.speaker}`;
+                
+                let flag = '';
+                if (part.speaker.includes('sarah') || part.speaker.includes('ava')) flag = '🇺🇸';
+                if (part.speaker.includes('alex') || part.speaker.includes('brian')) flag = '🇬🇧';
+                if (part.speaker.includes('chris') || part.speaker.includes('andrew')) flag = '🇦🇺';
+                
+                card.innerHTML = `<h4>${flag} ${part.speaker.charAt(0).toUpperCase() + part.speaker.slice(1)}</h4><div class="quote">${part.text}</div>`;
+                container.appendChild(card);
+                card.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                setTimeout(() => card.classList.add('visible'), 50);
+
+                const quoteEl = card.querySelector('.quote');
+                const voiceMap = { 'Ava': voiceAva, 'Brian': voiceBrian, 'Andrew': voiceAndrew, 'Emma': voiceEmma };
+                
+                speak(part.text, voiceMap[part.voice], () => {
+                    quoteEl.innerHTML = part.text;
+                    currentLine++;
+                    nextLine();
+                }, highlightWords(quoteEl, part.text));
+            }
+            nextLine();
+        }
+
         function createGlitter() {
             const container = document.getElementById('glitterContainer');
             if (!container) return;
@@ -1062,9 +1083,7 @@
             glitter.style.left = Math.random() * 100 + '%';
             glitter.style.animationDelay = Math.random() * 1 + 's';
             glitter.style.animationDuration = (1.5 + Math.random() * 1) + 's';
-            
             container.appendChild(glitter);
-            
             setTimeout(() => {
                 if (glitter.parentNode) glitter.parentNode.removeChild(glitter);
             }, 3000);
@@ -1072,12 +1091,8 @@
 
         function activateGlowAndGlitter() {
             document.getElementById('glowBackground').classList.add('active');
-            for (let i = 0; i < 15; i++) {
-                setTimeout(() => createGlitter(), i * 50);
-            }
-            setTimeout(() => {
-                document.getElementById('glowBackground').classList.remove('active');
-            }, 2000);
+            for (let i = 0; i < 15; i++) setTimeout(() => createGlitter(), i * 50);
+            setTimeout(() => document.getElementById('glowBackground').classList.remove('active'), 2000);
         }
 
         function showSoundEffect(emoji) {
@@ -1094,13 +1109,8 @@
             setTimeout(() => warning.classList.remove('show'), 2000);
         }
 
-        function showAudioIndicator() {
-            document.getElementById('audioIndicator').classList.add('show');
-        }
-
-        function hideAudioIndicator() {
-            document.getElementById('audioIndicator').classList.remove('show');
-        }
+        function showAudioIndicator() { document.getElementById('audioIndicator').classList.add('show'); }
+        function hideAudioIndicator() { document.getElementById('audioIndicator').classList.remove('show'); }
 
         // Team Management
         function shuffleArray(array) {
@@ -1114,51 +1124,37 @@
 
         function createTeams(grade) {
             const students = shuffleArray(studentData[grade]);
-            const teamNames = [
-                '☀️ Solar Innovators', '💡 Energy Equity Advocates', '🔋 Future Power Group',
-                '🌍 Global Solutions', '📚 Education First', '⚡ Renewable Pioneers',
-                '💨 Wind Warriors', '🌱 Sustainable Futures'
-            ];
-            
-            const totalStudents = students.length;
-            const numTeams = Math.floor(totalStudents / 3);
-            
+            const teamNames = ['☀️ Solar Innovators', '💡 Energy Equity Advocates', '🔋 Future Power Group', '🌍 Global Solutions', '📚 Education First', '⚡ Renewable Pioneers', '💨 Wind Warriors', '🌱 Sustainable Futures'];
+            const numTeams = Math.floor(students.length / 3);
             teams = [];
             let studentIndex = 0;
-            
             for (let i = 0; i < numTeams; i++) {
-                const teamStudents = students.slice(studentIndex, studentIndex + 3);
-                teams.push({ name: teamNames[i % teamNames.length], members: teamStudents });
+                teams.push({ name: teamNames[i % teamNames.length], members: students.slice(studentIndex, studentIndex + 3) });
                 studentIndex += 3;
             }
-            
-            if (studentIndex < totalStudents) {
-                const remainingStudents = students.slice(studentIndex);
-                remainingStudents.forEach((student, index) => {
-                    if (teams[index % teams.length]) {
-                       teams[index % teams.length].members.push(student);
-                    }
+            if (studentIndex < students.length) {
+                students.slice(studentIndex).forEach((student, index) => {
+                    if (teams[index % teams.length]) teams[index % teams.length].members.push(student);
                 });
             }
-            return teams;
         }
 
         function displayTeams(containerId) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
-            teams.forEach((team) => {
-                const teamCard = document.createElement('div');
-                teamCard.className = 'team-card';
+            teams.forEach(team => {
+                const card = document.createElement('div');
+                card.className = 'team-card';
                 let content = `<h4>${team.name}</h4>`;
                 if (containerId === 'formationTeamsDisplay') {
                     content += `<div style="font-size: 16px; margin: 10px 0;"><strong>Find these teammates:</strong><br>${team.members.join(', ')}</div>`;
                 } else if (containerId === 'discussionTeamsDisplay') {
-                    content += `<div style="font-size: 18px; margin: 15px 0;"><strong>Ethical Analysis in Progress...</strong></div><div style="font-size: 14px;">${team.members.join(', ')}</div>`;
+                    content += `<div style="font-size: 18px; margin: 15px 0;"><strong>Ethical Analysis...</strong></div><div style="font-size: 14px;">${team.members.join(', ')}</div>`;
                 } else {
-                    content += team.members.map(member => `<div class="team-member">${member}</div>`).join('');
+                    content += team.members.map(m => `<div class="team-member">${m}</div>`).join('');
                 }
-                teamCard.innerHTML = content;
-                container.appendChild(teamCard);
+                card.innerHTML = content;
+                container.appendChild(card);
             });
         }
 
@@ -1186,16 +1182,17 @@
 
         function startTimer() {
             timerInterval = setInterval(() => {
-                remainingTime--;
-                phaseTimeRemaining--;
-                updateTimer();
-                updatePhaseTimer();
-                
-                if (phaseTimeRemaining === 30) showCountdownWarning();
-                if (phaseTimeRemaining === 10) showSoundEffect('🚨');
-                if (remainingTime <= 0) {
-                    clearInterval(timerInterval);
-                    completeActivity();
+                if (isActivityRunning) {
+                    remainingTime--;
+                    phaseTimeRemaining--;
+                    updateTimer();
+                    updatePhaseTimer();
+                    if (phaseTimeRemaining === 30) showCountdownWarning();
+                    if (phaseTimeRemaining === 10) showSoundEffect('🚨');
+                    if (remainingTime <= 0) {
+                        clearInterval(timerInterval);
+                        completeActivity();
+                    }
                 }
             }, 1000);
         }
@@ -1203,83 +1200,77 @@
         // Phase Management
         function showPhase(phaseIndex) {
             document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
-            
             const phase = phases[phaseIndex];
             document.getElementById('phaseDisplay').textContent = phase.name;
             phaseTimeRemaining = phase.duration;
             updatePhaseTimer();
-            
             (phase.name.toLowerCase().includes('debate')) ? showAudioIndicator() : hideAudioIndicator();
-            
-            const phaseContentMap = {
-                0: 'teamAssignment', 1: 'groupFormation', 2: 'introduction', 3: 'studentIntros',
-                4: 'dilemmaExplanation', 5: 'solarDebate', 6: 'windDilemma', 7: 'windDebate',
-                8: 'teamDiscussion', 9: 'qnaSession', 10: 'debriefDiscussion'
-            };
+
+            const phaseContentMap = { 0: 'teamAssignment', 1: 'groupFormation', 2: 'introduction', 3: 'studentIntros', 4: 'dilemmaExplanation', 5: 'solarDebate', 6: 'qnaSession1', 7: 'windDilemma', 8: 'windDebate', 9: 'qnaSession2', 10: 'teamDiscussion', 11: 'debriefDiscussion' };
             const elementId = phaseContentMap[phaseIndex];
             if (elementId) document.getElementById(elementId).classList.add('active');
 
             if (phaseIndex === 0) displayTeams('teamsContainer');
             if (phaseIndex === 1) displayTeams('formationTeamsDisplay');
-            if (phaseIndex === 8) displayTeams('discussionTeamsDisplay');
+            if (phaseIndex === 10) displayTeams('discussionTeamsDisplay');
 
-            speechSynthesis.cancel(); // Clear any previous speech
-            if (phase.dialogue) {
-                speakDialogue(phase.dialogue);
-            } else if (phase.action) {
-                speak(`Now starting the ${phase.name}.`, voiceEmma, () => phase.action());
+            speechSynthesis.cancel();
+            if (phase.action) {
+                const narration = `Now starting the ${phase.name}.`;
+                speak(narration, voiceEmma, () => phase.action());
             } else if (phase.tts) {
                 const ttsText = phaseIndex === 0 ? `${phase.tts} ${getTeamAnnouncementText()}` : phase.tts;
                 speak(ttsText, voiceEmma);
             }
-            
             activateGlowAndGlitter();
         }
         
         function getTeamAnnouncementText() {
-            return teams.map((team, index) => `Team ${index + 1}, the ${team.name}, has members: ${team.members.join(', ')}.`).join(' ');
+            return teams.map((team, i) => `Team ${i + 1}, the ${team.name}, has members: ${team.members.join(', ')}.`).join(' ');
         }
 
-        function runQASession() {
-            const qnaContent = document.getElementById('qnaContent');
+        function runQASession(topic, containerId) {
+            const qnaContent = document.getElementById(containerId);
+            let questionPool = topic === 'education' ? availableEducationQuestions : availableWindQuestions;
             let questionCount = 0;
-            const maxQuestions = 4;
+            const maxQuestions = 2;
 
             function askNextQuestion() {
-                if (questionCount >= maxQuestions || availableQuestions.length === 0) {
-                    return; // Q&A session over, main timer will advance phase
-                }
+                if (questionCount >= maxQuestions || questionPool.length === 0) return;
                 
-                const qIndex = Math.floor(Math.random() * availableQuestions.length);
-                const question = availableQuestions.splice(qIndex, 1)[0];
-                
-                const students = shuffleArray(studentData[currentGrade]).slice(0, 3);
-                
-                qnaContent.innerHTML = `<h3>Question ${questionCount + 1} of ${maxQuestions}</h3><p>"${question}"</p><h4>Answering: ${students.join(', ')}</h4><div id="qnaTimer" style="font-size: 24px; margin-top: 20px;"></div>`;
-                
-                const announcement = `Question ${questionCount + 1}. ${question}. The following students will answer: ${students.join(', ')}. You have 30 seconds to prepare.`;
+                const qIndex = Math.floor(Math.random() * questionPool.length);
+                const question = questionPool.splice(qIndex, 1)[0];
+                const student = shuffleArray(studentData[currentGrade])[0];
+
+                const qnaTimerDiv = document.createElement('div');
+                qnaTimerDiv.style.fontSize = '24px';
+                qnaTimerDiv.style.marginTop = '20px';
+                qnaContent.innerHTML = `<h3>Question ${questionCount + 1}/${maxQuestions}</h3><p>"${question}"</p><h4>Responding: ${student}</h4>`;
+                qnaContent.appendChild(qnaTimerDiv);
+
+                const announcement = `Question ${questionCount + 1}. ${question}. ${student}, you will have one minute to respond. Your preparation time begins now.`;
                 speak(announcement, voiceEmma);
                 
-                // 30s prep time
-                setTimeout(() => {
-                    speak(`${students[0]}, please give your 20-second answer now.`, voiceEmma);
-                }, 30 * 1000);
-                
-                // 20s for student 1
-                setTimeout(() => {
-                    speak(`Thank you. ${students[1]}, your answer please.`, voiceEmma);
-                }, 50 * 1000);
-
-                // 20s for student 2
-                setTimeout(() => {
-                    speak(`Thank you. And finally, ${students[2]}, your answer.`, voiceEmma);
-                }, 70 * 1000);
-
-                // 20s for student 3, then move to next question
-                setTimeout(() => {
-                    questionCount++;
-                    askNextQuestion();
-                }, 90 * 1000);
+                let prepTime = 15;
+                const prepInterval = setInterval(() => {
+                    qnaTimerDiv.innerHTML = `Time to prepare: ${prepTime}s`;
+                    prepTime--;
+                    if (prepTime < 0) {
+                        clearInterval(prepInterval);
+                        speak(`${student}, please begin your one-minute response.`, voiceEmma);
+                        
+                        let responseTime = 60;
+                        const responseInterval = setInterval(() => {
+                            qnaTimerDiv.innerHTML = `Response Time: ${responseTime}s`;
+                            responseTime--;
+                            if (responseTime < 0) {
+                                clearInterval(responseInterval);
+                                questionCount++;
+                                askNextQuestion();
+                            }
+                        }, 1000);
+                    }
+                }, 1000);
             }
             askNextQuestion();
         }
@@ -1288,17 +1279,14 @@
         function startAutomatedActivity() {
             document.getElementById('gradeSelection').classList.remove('active');
             isActivityRunning = true;
-            currentPhase = 0;
-            
-            startTimer();
+            if (!timerInterval) startTimer();
             showPhase(0);
-            
             phaseInterval = setInterval(() => {
-                if (phaseTimeRemaining <= 0) {
+                if (isActivityRunning && phaseTimeRemaining <= 0) {
                     currentPhase++;
                     if (currentPhase >= phases.length) {
                         clearInterval(phaseInterval);
-                        if(remainingTime > 0) completeActivity(); // End early if phases finish
+                        if (remainingTime > 0) completeActivity();
                         return;
                     }
                     showPhase(currentPhase);
@@ -1312,7 +1300,7 @@
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioCtx.createOscillator();
                 oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime);
                 oscillator.connect(audioCtx.destination);
                 oscillator.start();
                 oscillator.stop(audioCtx.currentTime + 0.5);
@@ -1320,12 +1308,16 @@
         }
 
         function completeActivity() {
+            isActivityRunning = false;
             remainingTime = 0;
             updateTimer();
             clearInterval(timerInterval);
+            timerInterval = null;
             clearInterval(phaseInterval);
+            phaseInterval = null;
             hideAudioIndicator();
             playCompletionSound();
+            speechSynthesis.cancel();
             
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.getElementById('activityComplete').classList.add('active');
@@ -1334,36 +1326,27 @@
             document.getElementById('phaseTimer').textContent = '00:00';
             document.getElementById('phaseDisplay').textContent = 'Complete';
             
-            setTimeout(() => {
-                speak("Time's up! The Energy Ethics Debate is now complete. Thank you for participating!", voiceEmma);
-            }, 1000);
-            
+            setTimeout(() => speak("Time's up! The Energy Ethics Debate is now complete. Thank you for participating!", voiceEmma), 500);
             activateGlowAndGlitter();
         }
         
         function startApp() {
             updateTimer();
             updatePhaseTimer();
-            setTimeout(() => {
+            if (!initialWelcomeSpoken) {
                 speak('Welcome to the Energy Ethics Debate! Please select your grade level to begin the automated 20-minute simulation.', voiceEmma);
-            }, 1000);
+                initialWelcomeSpoken = true;
+            }
         }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             if ('speechSynthesis' in window && speechSynthesis.onvoiceschanged !== undefined) {
-                speechSynthesis.onvoiceschanged = () => {
-                    initializeVoices();
-                    startApp();
-                };
+                speechSynthesis.onvoiceschanged = () => { initializeVoices(); startApp(); };
             } else {
-                setTimeout(() => { // Fallback for browsers that don't fire event
-                    initializeVoices();
-                    startApp();
-                }, 500);
+                setTimeout(() => { initializeVoices(); startApp(); }, 500);
             }
         });
     </script>
 </body>
 </html>
-
