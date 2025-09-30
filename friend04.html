@@ -168,132 +168,92 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-       // --- UPGRADED SPEECH SERVICE (v6.3) with Auto Voice Switching ---
-class SpeechService {
-  constructor() {
-    this.synth = window.speechSynthesis;
-    this.enabled = true;
-    this.utteranceQueue = [];
-    this.isSpeaking = false;
-    this.voices = [];
-    this.selectedVoice = null;
+        // --- UPGRADED SPEECH SERVICE (v6.3) with Auto Voice Switching ---
+        class SpeechService {
+          constructor() {
+            this.synth = window.speechSynthesis;
+            this.enabled = true;
+            this.utteranceQueue = [];
+            this.isSpeaking = false;
+            this.voices = [];
+            this.selectedVoice = null;
 
-    // Load voices when available
-    this.synth.onvoiceschanged = () => {
-      this.voices = this.synth.getVoices();
-      // Default to Brian if available
-      this.setVoiceByName('Microsoft Brian Online (Natural) - English (United States)');
-    };
-  }
+            // Load voices when available
+            this.synth.onvoiceschanged = () => {
+              this.voices = this.synth.getVoices();
+              // Default to Brian if available
+              this.setVoiceByName('Microsoft Brian Online (Natural) - English (United States)');
+            };
+          }
 
-  setVoiceByName(name) {
-    const match = this.voices.find(v => v.name === name);
-    if (match) {
-      this.selectedVoice = match;
-      console.log(`Voice set to: ${match.name}`);
-    } else {
-      console.warn(`Voice "${name}" not found. Using default.`);
-    }
-  }
-
-  // Automatically choose voice based on game
-  setVoiceForGame(gameName) {
-    switch (gameName) {
-      case 'memory':
-        this.setVoiceByName('Microsoft Brian Online (Natural) - English (United States)');
-        break;
-      case 'drop':
-        this.setVoiceByName('Microsoft Ava Online (Natural) - English (United States)');
-        break;
-      case 'scramble':
-        this.setVoiceByName('Microsoft Andrew Online (Natural) - English (United States)');
-        break;
-      case 'listen':
-        this.setVoiceByName('Microsoft Emma Online (Natural) - English (United States)');
-        break;
-      default:
-        this.setVoiceByName('Microsoft Brian Online (Natural) - English (United States)');
-    }
-  }
-
-  speak(text, options = {}) {
-    if (!this.enabled || !text) return;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = options.rate || 0.85;
-    utterance.pitch = options.pitch || 1;
-    if (options.lang) utterance.lang = options.lang;
-    if (this.selectedVoice) utterance.voice = this.selectedVoice;
-
-    utterance.onend = () => {
-      this.isSpeaking = false;
-      this.processQueue();
-    };
-    this.utteranceQueue.push(utterance);
-    if (!this.isSpeaking) {
-      this.processQueue();
-    }
-  }
-
-  processQueue() {
-    if (this.utteranceQueue.length > 0 && !this.isSpeaking) {
-      this.isSpeaking = true;
-      const utterance = this.utteranceQueue.shift();
-      this.synth.speak(utterance);
-    }
-  }
-
-  toggle() {
-    this.enabled = !this.enabled;
-    if (!this.enabled) {
-      this.utteranceQueue = [];
-      this.synth.cancel();
-    }
-    return this.enabled;
-  }
-
-  isEnabled() {
-    return this.enabled;
-  }
-}
-
-            speak(text, options = {}) {
-                if (!this.enabled || !text) return;
-                
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = options.rate || 0.85; // Default slow rate
-                utterance.pitch = options.pitch || 1;
-                
-                utterance.onend = () => {
-                    this.isSpeaking = false;
-                    this.processQueue();
-                };
-
-                this.utteranceQueue.push(utterance);
-                if (!this.isSpeaking) {
-                    this.processQueue();
-                }
+          setVoiceByName(name) {
+            const match = this.voices.find(v => v.name === name);
+            if (match) {
+              this.selectedVoice = match;
+              console.log(`Voice set to: ${match.name}`);
+            } else {
+              console.warn(`Voice "${name}" not found. Using default.`);
             }
-            
-            processQueue() {
-                if (this.utteranceQueue.length > 0 && !this.isSpeaking) {
-                    this.isSpeaking = true;
-                    const utterance = this.utteranceQueue.shift();
-                    this.synth.speak(utterance);
-                }
-            }
+          }
 
-            toggle() {
-                this.enabled = !this.enabled;
-                if (!this.enabled) {
-                    this.utteranceQueue = [];
-                    this.synth.cancel();
-                }
-                return this.enabled;
+          // Automatically choose voice based on game
+          setVoiceForGame(gameName) {
+            switch (gameName) {
+              case 'memory':
+                this.setVoiceByName('Microsoft Brian Online (Natural) - English (United States)');
+                break;
+              case 'drop':
+                this.setVoiceByName('Microsoft Ava Online (Natural) - English (United States)');
+                break;
+              case 'scramble':
+                this.setVoiceByName('Microsoft Andrew Online (Natural) - English (United States)');
+                break;
+              case 'listen':
+                this.setVoiceByName('Microsoft Emma Online (Natural) - English (United States)');
+                break;
+              default:
+                this.setVoiceByName('Microsoft Brian Online (Natural) - English (United States)');
             }
+          }
 
-            isEnabled() {
-                return this.enabled;
+          speak(text, options = {}) {
+            if (!this.enabled || !text) return;
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = options.rate || 0.85;
+            utterance.pitch = options.pitch || 1;
+            if (options.lang) utterance.lang = options.lang;
+            if (this.selectedVoice) utterance.voice = this.selectedVoice;
+
+            utterance.onend = () => {
+              this.isSpeaking = false;
+              this.processQueue();
+            };
+            this.utteranceQueue.push(utterance);
+            if (!this.isSpeaking) {
+              this.processQueue();
             }
+          }
+
+          processQueue() {
+            if (this.utteranceQueue.length > 0 && !this.isSpeaking) {
+              this.isSpeaking = true;
+              const utterance = this.utteranceQueue.shift();
+              this.synth.speak(utterance);
+            }
+          }
+
+          toggle() {
+            this.enabled = !this.enabled;
+            if (!this.enabled) {
+              this.utteranceQueue = [];
+              this.synth.cancel();
+            }
+            return this.enabled;
+          }
+
+          isEnabled() {
+            return this.enabled;
+          }
         }
         const speechService = new SpeechService();
 
@@ -726,78 +686,78 @@ class SpeechService {
              let selectedWordEl = null;
 
              container.innerHTML = `
-                <p class="text-center text-lg text-gray-600 mb-4" onclick="speechService.speak(this.textContent)">Drag & Drop or Tap the word then the emoji.</p>
-                <div id="drop-zone-container" class="grid grid-cols-3 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8"></div>
-                <div id="drop-word-bank" class="flex flex-wrap gap-3 p-4 bg-gray-200 rounded-lg justify-center"></div>
+                 <p class="text-center text-lg text-gray-600 mb-4" onclick="speechService.speak(this.textContent)">Drag & Drop or Tap the word then the emoji.</p>
+                 <div id="drop-zone-container" class="grid grid-cols-3 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8"></div>
+                 <div id="drop-word-bank" class="flex flex-wrap gap-3 p-4 bg-gray-200 rounded-lg justify-center"></div>
              `;
              const dropZoneContainer = container.querySelector('#drop-zone-container');
              const wordBank = container.querySelector('#drop-word-bank');
 
              function handleMatch(zone, word) {
-                playSound('correct');
-                speechService.speak("Correct!", { pitch: 1.2 });
-                animatePointsToScore(zone, 1);
-                setTimeout(() => updateScore(1), 1000);
-                
-                zone.classList.add('correct');
-                zone.innerHTML = `<div class="text-sm font-bold">${word}</div>`;
-                const wordEl = document.getElementById(`word-${word.replace(/\s/g, '-')}`);
-                if(wordEl) wordEl.style.display = 'none';
-                matchedCount++;
-                if (matchedCount === wordEntries.length) endGame(true, 'Great job!');
+                 playSound('correct');
+                 speechService.speak("Correct!", { pitch: 1.2 });
+                 animatePointsToScore(zone, 1);
+                 setTimeout(() => updateScore(1), 1000);
+                 
+                 zone.classList.add('correct');
+                 zone.innerHTML = `<div class="text-sm font-bold">${word}</div>`;
+                 const wordEl = document.getElementById(`word-${word.replace(/\s/g, '-')}`);
+                 if(wordEl) wordEl.style.display = 'none';
+                 matchedCount++;
+                 if (matchedCount === wordEntries.length) endGame(true, 'Great job!');
              }
 
              shuffledEntries.forEach(([word, emoji]) => {
-                const zone = document.createElement('div');
-                zone.className = 'drop-zone bg-sky-200 text-4xl p-2 md:p-4 rounded-lg shadow-md flex items-center justify-center transition-colors duration-300 min-h-[80px]';
-                zone.textContent = emoji;
-                zone.dataset.word = word;
-                zone.addEventListener('dragover', e => { e.preventDefault(); e.target.classList.add('drag-over'); });
-                zone.addEventListener('dragleave', e => e.target.classList.remove('drag-over'));
-                zone.addEventListener('drop', e => {
-                    e.preventDefault();
-                    e.target.classList.remove('drag-over');
-                    const droppedWord = e.dataTransfer.getData('text/plain');
-                    if (droppedWord === zone.dataset.word) {
-                        handleMatch(zone, droppedWord);
-                    } else {
-                        playSound('incorrect');
-                        speechService.speak("Incorrect.", { pitch: 0.8 });
-                        zone.classList.add('incorrect');
-                        setTimeout(() => zone.classList.remove('incorrect'), 500);
-                    }
-                });
-                zone.addEventListener('click', () => {
-                    if (selectedWordEl && selectedWordEl.dataset.word === zone.dataset.word) {
-                        handleMatch(zone, selectedWordEl.dataset.word);
-                        selectedWordEl.classList.remove('selected', 'bg-yellow-300');
-                        selectedWordEl = null;
-                    } else if (selectedWordEl) {
-                        playSound('incorrect');
-                        speechService.speak("Incorrect.", { pitch: 0.8 });
-                        zone.classList.add('incorrect');
-                        setTimeout(() => zone.classList.remove('incorrect'), 500);
-                    }
-                });
-                dropZoneContainer.appendChild(zone);
-             });
+                 const zone = document.createElement('div');
+                 zone.className = 'drop-zone bg-sky-200 text-4xl p-2 md:p-4 rounded-lg shadow-md flex items-center justify-center transition-colors duration-300 min-h-[80px]';
+                 zone.textContent = emoji;
+                 zone.dataset.word = word;
+                 zone.addEventListener('dragover', e => { e.preventDefault(); e.target.classList.add('drag-over'); });
+                 zone.addEventListener('dragleave', e => e.target.classList.remove('drag-over'));
+                 zone.addEventListener('drop', e => {
+                     e.preventDefault();
+                     e.target.classList.remove('drag-over');
+                     const droppedWord = e.dataTransfer.getData('text/plain');
+                     if (droppedWord === zone.dataset.word) {
+                         handleMatch(zone, droppedWord);
+                     } else {
+                         playSound('incorrect');
+                         speechService.speak("Incorrect.", { pitch: 0.8 });
+                         zone.classList.add('incorrect');
+                         setTimeout(() => zone.classList.remove('incorrect'), 500);
+                     }
+                 });
+                 zone.addEventListener('click', () => {
+                     if (selectedWordEl && selectedWordEl.dataset.word === zone.dataset.word) {
+                         handleMatch(zone, selectedWordEl.dataset.word);
+                         selectedWordEl.classList.remove('selected', 'bg-yellow-300');
+                         selectedWordEl = null;
+                     } else if (selectedWordEl) {
+                         playSound('incorrect');
+                         speechService.speak("Incorrect.", { pitch: 0.8 });
+                         zone.classList.add('incorrect');
+                         setTimeout(() => zone.classList.remove('incorrect'), 500);
+                     }
+                 });
+                 dropZoneContainer.appendChild(zone);
+              });
 
              alphabetizedWords.forEach(word => {
-                const wordEl = document.createElement('div');
-                wordEl.id = `word-${word.replace(/\s/g, '-')}`;
-                wordEl.className = 'draggable-word bg-white text-sm font-bold py-1 px-2 rounded-lg shadow-md';
-                wordEl.textContent = word;
-                wordEl.dataset.word = word;
-                wordEl.draggable = true;
-                wordEl.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', word));
-                wordEl.addEventListener('click', () => {
-                    if (selectedWordEl) {
-                        selectedWordEl.classList.remove('selected', 'bg-yellow-300');
-                    }
-                    selectedWordEl = wordEl;
-                    selectedWordEl.classList.add('selected', 'bg-yellow-300');
-                });
-                wordBank.appendChild(wordEl);
+                 const wordEl = document.createElement('div');
+                 wordEl.id = `word-${word.replace(/\s/g, '-')}`;
+                 wordEl.className = 'draggable-word bg-white text-sm font-bold py-1 px-2 rounded-lg shadow-md';
+                 wordEl.textContent = word;
+                 wordEl.dataset.word = word;
+                 wordEl.draggable = true;
+                 wordEl.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', word));
+                 wordEl.addEventListener('click', () => {
+                     if (selectedWordEl) {
+                         selectedWordEl.classList.remove('selected', 'bg-yellow-300');
+                     }
+                     selectedWordEl = wordEl;
+                     selectedWordEl.classList.add('selected', 'bg-yellow-300');
+                 });
+                 wordBank.appendChild(wordEl);
              });
         }
 
@@ -1034,8 +994,8 @@ class SpeechService {
              const score = topicScores[currentTopic] || 0;
              const hasBadge = badges.has(currentTopic);
              feedbackEl.innerHTML = `
-                <p class="font-semibold">Topic Score: ${score}</p>
-                ${hasBadge ? '<p class="text-amber-600 font-bold">🏅 Badge Earned!</p>' : ''}
+                 <p class="font-semibold">Topic Score: ${score}</p>
+                 ${hasBadge ? '<p class="text-amber-600 font-bold">🏅 Badge Earned!</p>' : ''}
              `;
         }
 
