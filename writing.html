@@ -149,16 +149,16 @@
 
         .game-layout {
             display: grid;
-            grid-template-columns: 250px 1fr 250px;
+            grid-template-columns: 200px 1fr 200px;
             gap: 20px;
             height: calc(100vh - 120px);
-            max-height: 800px;
+            max-height: 700px;
         }
 
         .left-panel {
             background: rgba(255,255,255,0.95);
             border-radius: 20px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             overflow-y: auto;
         }
@@ -176,26 +176,26 @@
         .right-panel {
             background: rgba(255,255,255,0.95);
             border-radius: 20px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             overflow-y: auto;
         }
 
         .mnemonic-display {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .mnemonic-letter {
             display: block;
-            font-size: 3rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #667eea;
-            margin: 10px 0;
+            margin: 5px 0;
             cursor: pointer;
             transition: all 0.3s ease;
-            padding: 10px;
-            border-radius: 10px;
+            padding: 6px;
+            border-radius: 8px;
         }
 
         .mnemonic-letter:hover {
@@ -204,9 +204,9 @@
         }
 
         .mnemonic-meaning {
-            font-size: 1.2rem;
+            font-size: 0.9rem;
             color: #333;
-            margin-top: 5px;
+            margin-top: 3px;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -216,7 +216,7 @@
         }
 
         .drag-item {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            background: linear-gradient(135deg, #4CAF50, #45a049);
             color: white;
             padding: 15px 20px;
             border-radius: 25px;
@@ -290,14 +290,14 @@
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 1.1rem;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            margin: 10px;
+            margin: 5px;
         }
 
         .action-button:hover {
@@ -305,12 +305,27 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
 
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
         .score-display {
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
             color: #333;
-            margin: 20px 0;
+            font-weight: bold;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 12px;
+            border-radius: 15px;
         }
 
         .celebration {
@@ -343,15 +358,23 @@
         }
 
         .tips-section {
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         .tip {
             background: rgba(255, 235, 59, 0.2);
             border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 10px 0;
+            padding: 12px;
+            margin: 8px 0;
             border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .tip:hover {
+            background: rgba(255, 235, 59, 0.3);
+            transform: translateX(3px);
         }
 
         .answer-stages {
@@ -485,7 +508,14 @@
 
                 <div class="center-panel">
                     <h2 style="text-align: center; color: #333;">🌳 Build Your Argument Tree</h2>
-                    <div class="score-display">Score: <span id="treeScore">0</span>/10</div>
+                    
+                    <div class="top-nav">
+                        <div class="nav-buttons">
+                            <button class="action-button" onclick="game.nextRound('tree')">Next Challenge</button>
+                            <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                        </div>
+                        <div class="score-display">Score: <span id="treeScore">0</span>/10</div>
+                    </div>
                     
                     <div class="drop-zone" data-type="topic">
                         <span class="placeholder">🎯 Drop Topic Sentence Here</span>
@@ -504,26 +534,21 @@
                         <h3>Available Options:</h3>
                         <div id="treeItems"></div>
                     </div>
-
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="action-button" onclick="game.nextRound('tree')">Next Challenge</button>
-                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
-                    </div>
                 </div>
 
                 <div class="right-panel">
                     <h3>💡 Tips</h3>
                     <div class="tips-section">
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Topic: Start with a clear main idea that tells your position.')">
                             <strong>Topic:</strong> Start with a clear main idea that tells your position.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Reasons: Give 2-3 strong supporting points with evidence.')">
                             <strong>Reasons:</strong> Give 2-3 strong supporting points with evidence.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Ending: Restate your position and summarize your reasons.')">
                             <strong>Ending:</strong> Restate your position and summarize your reasons.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Examine: Check if your argument makes sense and is convincing.')">
                             <strong>Examine:</strong> Check if your argument makes sense and is convincing.
                         </div>
                     </div>
@@ -557,7 +582,14 @@
 
                 <div class="center-panel">
                     <h2 style="text-align: center; color: #333;">🛑 STOP and Think</h2>
-                    <div class="score-display">Score: <span id="stopScore">0</span>/10</div>
+                    
+                    <div class="top-nav">
+                        <div class="nav-buttons">
+                            <button class="action-button" onclick="game.nextRound('stop')">Next Challenge</button>
+                            <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                        </div>
+                        <div class="score-display">Score: <span id="stopScore">0</span>/10</div>
+                    </div>
                     
                     <div class="drop-zone" data-type="suspend">
                         <span class="placeholder">⏸️ Suspend Judgment</span>
@@ -576,26 +608,21 @@
                         <h3>Available Options:</h3>
                         <div id="stopItems"></div>
                     </div>
-
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="action-button" onclick="game.nextRound('stop')">Next Challenge</button>
-                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
-                    </div>
                 </div>
 
                 <div class="right-panel">
                     <h3>💡 Tips</h3>
                     <div class="tips-section">
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Suspend: Don\'t rush to judgment. Consider all sides first.')">
                             <strong>Suspend:</strong> Don't rush to judgment. Consider all sides first.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Take: Choose your position based on the strongest evidence.')">
                             <strong>Take:</strong> Choose your position based on the strongest evidence.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Organize: Group similar ideas together logically.')">
                             <strong>Organize:</strong> Group similar ideas together logically.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Plan: Create an outline before you start writing.')">
                             <strong>Plan:</strong> Create an outline before you start writing.
                         </div>
                     </div>
@@ -629,7 +656,14 @@
 
                 <div class="center-panel">
                     <h2 style="text-align: center; color: #333;">📋 PLAN Your Writing</h2>
-                    <div class="score-display">Score: <span id="planScore">0</span>/10</div>
+                    
+                    <div class="top-nav">
+                        <div class="nav-buttons">
+                            <button class="action-button" onclick="game.nextRound('plan')">Next Challenge</button>
+                            <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                        </div>
+                        <div class="score-display">Score: <span id="planScore">0</span>/10</div>
+                    </div>
                     
                     <div class="drop-zone" data-order="1">
                         <span class="placeholder">1️⃣ First Step</span>
@@ -648,26 +682,21 @@
                         <h3>Available Options:</h3>
                         <div id="planItems"></div>
                     </div>
-
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="action-button" onclick="game.nextRound('plan')">Next Challenge</button>
-                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
-                    </div>
                 </div>
 
                 <div class="right-panel">
                     <h3>💡 Tips</h3>
                     <div class="tips-section">
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Prompt: Read carefully and understand what you need to argue.')">
                             <strong>Prompt:</strong> Read carefully and understand what you need to argue.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('List: Brainstorm all your ideas without judging them yet.')">
                             <strong>List:</strong> Brainstorm all your ideas without judging them yet.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Add: Include specific examples and evidence for each idea.')">
                             <strong>Add:</strong> Include specific examples and evidence for each idea.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Number: Put your ideas in the most logical order.')">
                             <strong>Number:</strong> Put your ideas in the most logical order.
                         </div>
                     </div>
@@ -705,7 +734,14 @@
 
                 <div class="center-panel">
                     <h2 style="text-align: center; color: #333;">✍️ WRITE and Revise</h2>
-                    <div class="score-display">Score: <span id="writeScore">0</span>/10</div>
+                    
+                    <div class="top-nav">
+                        <div class="nav-buttons">
+                            <button class="action-button" onclick="game.nextRound('write')">Next Challenge</button>
+                            <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                        </div>
+                        <div class="score-display">Score: <span id="writeScore">0</span>/10</div>
+                    </div>
                     
                     <div class="drop-zone" data-step="write">
                         <span class="placeholder">✍️ Writing Step</span>
@@ -727,29 +763,24 @@
                         <h3>Available Options:</h3>
                         <div id="writeItems"></div>
                     </div>
-
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="action-button" onclick="game.nextRound('write')">Next Challenge</button>
-                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
-                    </div>
                 </div>
 
                 <div class="right-panel">
                     <h3>💡 Tips</h3>
                     <div class="tips-section">
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Write: Get your ideas down first, don\'t worry about perfection.')">
                             <strong>Write:</strong> Get your ideas down first, don't worry about perfection.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Revise: Look at the big picture - does your argument make sense?')">
                             <strong>Revise:</strong> Look at the big picture - does your argument make sense?
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Improve: Make your writing clearer and more convincing.')">
                             <strong>Improve:</strong> Make your writing clearer and more convincing.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Transform: Strengthen weak arguments and add better evidence.')">
                             <strong>Transform:</strong> Strengthen weak arguments and add better evidence.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Edit: Fix grammar, spelling, and punctuation errors.')">
                             <strong>Edit:</strong> Fix grammar, spelling, and punctuation errors.
                         </div>
                     </div>
@@ -783,7 +814,14 @@
 
                 <div class="center-panel">
                     <h2 style="text-align: center; color: #333;">⚖️ DARE to Debate</h2>
-                    <div class="score-display">Score: <span id="dareScore">0</span>/10</div>
+                    
+                    <div class="top-nav">
+                        <div class="nav-buttons">
+                            <button class="action-button" onclick="game.nextRound('dare')">Next Challenge</button>
+                            <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                        </div>
+                        <div class="score-display">Score: <span id="dareScore">0</span>/10</div>
+                    </div>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div>
@@ -804,26 +842,21 @@
                         <h3>Available Options:</h3>
                         <div id="dareItems"></div>
                     </div>
-
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="action-button" onclick="game.nextRound('dare')">Next Challenge</button>
-                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
-                    </div>
                 </div>
 
                 <div class="right-panel">
                     <h3>💡 Tips</h3>
                     <div class="tips-section">
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Develop: Start each paragraph with a clear topic sentence.')">
                             <strong>Develop:</strong> Start each paragraph with a clear topic sentence.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Add: Include facts, examples, and expert opinions as evidence.')">
                             <strong>Add:</strong> Include facts, examples, and expert opinions as evidence.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Reject: Address counterarguments and explain why they\'re wrong.')">
                             <strong>Reject:</strong> Address counterarguments and explain why they're wrong.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('End: Conclude each paragraph by connecting back to your main argument.')">
                             <strong>End:</strong> Conclude each paragraph by connecting back to your main argument.
                         </div>
                     </div>
@@ -865,7 +898,14 @@
 
                 <div class="center-panel">
                     <h2 style="text-align: center; color: #333;">📝 ANSWER the Prompt</h2>
-                    <div class="score-display">Score: <span id="answerScore">0</span>/10</div>
+                    
+                    <div class="top-nav">
+                        <div class="nav-buttons">
+                            <button class="action-button" onclick="game.nextRound('answer')">Next Challenge</button>
+                            <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                        </div>
+                        <div class="score-display">Score: <span id="answerScore">0</span>/10</div>
+                    </div>
                     
                     <div class="answer-stages">
                         <div class="stage-container">
@@ -915,32 +955,27 @@
                         <h3>Available Options:</h3>
                         <div id="answerItems"></div>
                     </div>
-
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="action-button" onclick="game.nextRound('answer')">Next Challenge</button>
-                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
-                    </div>
                 </div>
 
                 <div class="right-panel">
                     <h3>💡 Tips</h3>
                     <div class="tips-section">
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Analyze: Look for verbs like compare, explain, argue - they tell you what to do.')">
                             <strong>Analyze:</strong> Look for verbs like "compare," "explain," "argue" - they tell you what to do.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Notice: Check for requirements like word count, sources needed, or specific format.')">
                             <strong>Notice:</strong> Check for requirements like word count, sources needed, or specific format.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Set Up: Create a clear outline with introduction, body paragraphs, and conclusion.')">
                             <strong>Set Up:</strong> Create a clear outline with introduction, body paragraphs, and conclusion.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Work in: Add specific examples, evidence, and details to support each point.')">
                             <strong>Work in:</strong> Add specific examples, evidence, and details to support each point.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Engineer: Write your response following your outline and requirements.')">
                             <strong>Engineer:</strong> Write your response following your outline and requirements.
                         </div>
-                        <div class="tip">
+                        <div class="tip" onclick="game.speakText('Review: Check that you answered all parts and met all requirements.')">
                             <strong>Review:</strong> Check that you answered all parts and met all requirements.
                         </div>
                     </div>
@@ -971,13 +1006,101 @@
                     dare: 0,
                     answer: 0
                 };
+                this.currentVoice = 'Ava';
+                this.voices = {
+                    'Ava': 'Microsoft Ava Online (Natural) - English (United States)',
+                    'Brian': 'Microsoft Brian Online (Natural) - English (United States)', 
+                    'Andrew': 'Microsoft Andrew Online (Natural) - English (United States)',
+                    'Emma': 'Microsoft Emma Online (Natural) - English (United States)'
+                };
                 this.init();
                 this.loadCurrentRound();
+                this.initTTS();
             }
 
             init() {
                 this.setupDragAndDrop();
                 this.updateProgress();
+            }
+
+            initTTS() {
+                // Initialize Text-to-Speech functionality
+                if ('speechSynthesis' in window) {
+                    this.speechSynthesis = window.speechSynthesis;
+                    this.loadVoices();
+                    
+                    // Load voices when they become available
+                    if (speechSynthesis.onvoiceschanged !== undefined) {
+                        speechSynthesis.onvoiceschanged = () => this.loadVoices();
+                    }
+                } else {
+                    console.warn('Speech synthesis not supported in this browser');
+                }
+            }
+
+            loadVoices() {
+                const voices = this.speechSynthesis.getVoices();
+                this.availableVoices = {};
+                
+                // Try to find Microsoft voices first, fallback to similar voices
+                const voiceMap = {
+                    'Ava': ['Microsoft Ava', 'Samantha', 'female'],
+                    'Brian': ['Microsoft Brian', 'Alex', 'male'],
+                    'Andrew': ['Microsoft Andrew', 'Daniel', 'male'],
+                    'Emma': ['Microsoft Emma', 'Karen', 'female']
+                };
+
+                Object.keys(voiceMap).forEach(voiceName => {
+                    const [preferred, fallback, gender] = voiceMap[voiceName];
+                    
+                    // Try to find preferred voice
+                    let voice = voices.find(v => v.name.includes(preferred));
+                    
+                    // Fallback to similar voice
+                    if (!voice) {
+                        voice = voices.find(v => v.name.includes(fallback));
+                    }
+                    
+                    // Final fallback based on gender
+                    if (!voice) {
+                        voice = voices.find(v => v.name.toLowerCase().includes(gender) || 
+                                                 (gender === 'female' && v.name.includes('Female')) ||
+                                                 (gender === 'male' && v.name.includes('Male')));
+                    }
+                    
+                    // Use first available voice as last resort
+                    if (!voice && voices.length > 0) {
+                        voice = voices[0];
+                    }
+                    
+                    this.availableVoices[voiceName] = voice;
+                });
+            }
+
+            setVoice(voiceName) {
+                this.currentVoice = voiceName;
+            }
+
+            speakText(text) {
+                if (!this.speechSynthesis) return;
+                
+                // Cancel any ongoing speech
+                this.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Use selected voice if available
+                const selectedVoice = this.availableVoices[this.currentVoice];
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
+                
+                // Set speech parameters
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                utterance.volume = 0.8;
+                
+                this.speechSynthesis.speak(utterance);
             }
 
             goToStation(station) {
@@ -991,9 +1114,14 @@
                     document.getElementById('mainMenu').classList.add('active');
                     this.currentStation = 'main';
                 } else {
-                    document.getElementById(station + 'Page').classList.add('active');
-                    this.currentStation = station;
-                    this.loadCurrentRound();
+                    const targetPage = document.getElementById(station + 'Page');
+                    if (targetPage) {
+                        targetPage.classList.add('active');
+                        this.currentStation = station;
+                        this.loadCurrentRound();
+                    } else {
+                        console.error('Page not found:', station + 'Page');
+                    }
                 }
             }
 
@@ -1804,5 +1932,5 @@
         // Initialize the game
         const game = new WritingArcade();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'988862c8f0d87ad9',t:'MTc1OTQ1MjAwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9888b1fdc46515ae',t:'MTc1OTQ1NTI0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
