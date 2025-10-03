@@ -149,7 +149,7 @@
 
         .game-layout {
             display: grid;
-            grid-template-columns: 200px 1fr 200px;
+            grid-template-columns: 75% 25%;
             gap: 20px;
             height: calc(100vh - 120px);
             max-height: 700px;
@@ -166,11 +166,12 @@
         .center-panel {
             background: rgba(255,255,255,0.95);
             border-radius: 20px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            gap: 10px;
         }
 
         .right-panel {
@@ -179,6 +180,9 @@
             padding: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
         .mnemonic-display {
@@ -251,9 +255,9 @@
             background: rgba(76, 175, 80, 0.1);
             border: 3px dashed #4caf50;
             border-radius: 15px;
-            padding: 20px;
-            margin: 10px 0;
-            min-height: 60px;
+            padding: 8px;
+            margin: 3px 0;
+            min-height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -407,7 +411,7 @@
                 gap: 15px;
             }
             
-            .left-panel, .right-panel {
+            .right-panel {
                 order: 2;
                 max-height: 200px;
             }
@@ -485,37 +489,7 @@
         <!-- TREE Station Page -->
         <div class="page" id="treePage">
             <div class="game-layout">
-                <div class="left-panel">
-                    <div class="mnemonic-display">
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            T
-                            <div class="mnemonic-meaning">Topic Sentence</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            R
-                            <div class="mnemonic-meaning">Reasons</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            E
-                            <div class="mnemonic-meaning">Ending</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            E
-                            <div class="mnemonic-meaning">Examine</div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="center-panel">
-                    <h2 style="text-align: center; color: #333;">🌳 Build Your Argument Tree</h2>
-                    
-                    <div class="top-nav">
-                        <div class="nav-buttons">
-                            <button class="action-button" onclick="game.nextRound('tree')">Next Challenge</button>
-                            <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
-                        </div>
-                        <div class="score-display">Score: <span id="treeScore">0</span>/10</div>
-                    </div>
                     
                     <div class="drop-zone" data-type="topic">
                         <span class="placeholder">🎯 Drop Topic Sentence Here</span>
@@ -537,6 +511,33 @@
                 </div>
 
                 <div class="right-panel">
+                    <h2 style="text-align: center; color: #333; margin-bottom: 15px;">🌳 Build Your Argument Tree</h2>
+                    
+                    <div class="nav-buttons" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                        <button class="action-button" onclick="game.nextRound('tree')">Next Challenge</button>
+                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                    </div>
+                    <div class="score-display" style="text-align: center; margin-bottom: 15px;">Score: <span id="treeScore">0</span>/10</div>
+                    
+                    <div class="mnemonic-display">
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            T
+                            <div class="mnemonic-meaning">Topic Sentence</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            R
+                            <div class="mnemonic-meaning">Reasons</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            E
+                            <div class="mnemonic-meaning">Ending</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            E
+                            <div class="mnemonic-meaning">Examine</div>
+                        </div>
+                    </div>
+
                     <h3>💡 Tips</h3>
                     <div class="tips-section">
                         <div class="tip" onclick="game.speakText('Topic: Start with a clear main idea that tells your position.')">
@@ -559,37 +560,7 @@
         <!-- STOP Station Page -->
         <div class="page" id="stopPage">
             <div class="game-layout">
-                <div class="left-panel">
-                    <div class="mnemonic-display">
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            S
-                            <div class="mnemonic-meaning">Suspend Judgment</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            T
-                            <div class="mnemonic-meaning">Take a Side</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            O
-                            <div class="mnemonic-meaning">Organize Ideas</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            P
-                            <div class="mnemonic-meaning">Plan to Write</div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="center-panel">
-                    <h2 style="text-align: center; color: #333;">🛑 STOP and Think</h2>
-                    
-                    <div class="top-nav">
-                        <div class="nav-buttons">
-                            <button class="action-button" onclick="game.nextRound('stop')">Next Challenge</button>
-                            <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
-                        </div>
-                        <div class="score-display">Score: <span id="stopScore">0</span>/10</div>
-                    </div>
                     
                     <div class="drop-zone" data-type="suspend">
                         <span class="placeholder">⏸️ Suspend Judgment</span>
@@ -611,6 +582,33 @@
                 </div>
 
                 <div class="right-panel">
+                    <h2 style="text-align: center; color: #333; margin-bottom: 15px;">🛑 STOP and Think</h2>
+                    
+                    <div class="nav-buttons" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                        <button class="action-button" onclick="game.nextRound('stop')">Next Challenge</button>
+                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                    </div>
+                    <div class="score-display" style="text-align: center; margin-bottom: 15px;">Score: <span id="stopScore">0</span>/10</div>
+                    
+                    <div class="mnemonic-display">
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            S
+                            <div class="mnemonic-meaning">Suspend Judgment</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            T
+                            <div class="mnemonic-meaning">Take a Side</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            O
+                            <div class="mnemonic-meaning">Organize Ideas</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            P
+                            <div class="mnemonic-meaning">Plan to Write</div>
+                        </div>
+                    </div>
+
                     <h3>💡 Tips</h3>
                     <div class="tips-section">
                         <div class="tip" onclick="game.speakText('Suspend: Don\'t rush to judgment. Consider all sides first.')">
@@ -633,27 +631,6 @@
         <!-- PLAN Station Page -->
         <div class="page" id="planPage">
             <div class="game-layout">
-                <div class="left-panel">
-                    <div class="mnemonic-display">
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            P
-                            <div class="mnemonic-meaning">Pick a side (Prompt)</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            L
-                            <div class="mnemonic-meaning">List ideas</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            A
-                            <div class="mnemonic-meaning">Add details</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            N
-                            <div class="mnemonic-meaning">Number in order</div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="center-panel">
                     <h2 style="text-align: center; color: #333;">📋 PLAN Your Writing</h2>
                     
@@ -685,6 +662,33 @@
                 </div>
 
                 <div class="right-panel">
+                    <h2 style="text-align: center; color: #333; margin-bottom: 15px;">🌳 Build Your Argument Tree</h2>
+                    
+                    <div class="nav-buttons" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                        <button class="action-button" onclick="game.nextRound('tree')">Next Challenge</button>
+                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                    </div>
+                    <div class="score-display" style="text-align: center; margin-bottom: 15px;">Score: <span id="treeScore">0</span>/10</div>
+                    
+                    <div class="mnemonic-display">
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            P
+                            <div class="mnemonic-meaning">Pick a side (Prompt)</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            L
+                            <div class="mnemonic-meaning">List ideas</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            A
+                            <div class="mnemonic-meaning">Add details</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            N
+                            <div class="mnemonic-meaning">Number in order</div>
+                        </div>
+                    </div>
+
                     <h3>💡 Tips</h3>
                     <div class="tips-section">
                         <div class="tip" onclick="game.speakText('Prompt: Read carefully and understand what you need to argue.')">
@@ -707,31 +711,6 @@
         <!-- WRITE Station Page -->
         <div class="page" id="writePage">
             <div class="game-layout">
-                <div class="left-panel">
-                    <div class="mnemonic-display">
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            W
-                            <div class="mnemonic-meaning">Write your draft</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            R
-                            <div class="mnemonic-meaning">Revise content</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            I
-                            <div class="mnemonic-meaning">Improve clarity</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            T
-                            <div class="mnemonic-meaning">Transform weak parts</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            E
-                            <div class="mnemonic-meaning">Edit for errors</div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="center-panel">
                     <h2 style="text-align: center; color: #333;">✍️ WRITE and Revise</h2>
                     
@@ -766,6 +745,37 @@
                 </div>
 
                 <div class="right-panel">
+                    <h2 style="text-align: center; color: #333; margin-bottom: 15px;">🌳 Build Your Argument Tree</h2>
+                    
+                    <div class="nav-buttons" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                        <button class="action-button" onclick="game.nextRound('tree')">Next Challenge</button>
+                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                    </div>
+                    <div class="score-display" style="text-align: center; margin-bottom: 15px;">Score: <span id="treeScore">0</span>/10</div>
+                    
+                    <div class="mnemonic-display">
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            W
+                            <div class="mnemonic-meaning">Write your draft</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            R
+                            <div class="mnemonic-meaning">Revise content</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            I
+                            <div class="mnemonic-meaning">Improve clarity</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            T
+                            <div class="mnemonic-meaning">Transform weak parts</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            E
+                            <div class="mnemonic-meaning">Edit for errors</div>
+                        </div>
+                    </div>
+
                     <h3>💡 Tips</h3>
                     <div class="tips-section">
                         <div class="tip" onclick="game.speakText('Write: Get your ideas down first, don\'t worry about perfection.')">
@@ -791,27 +801,6 @@
         <!-- DARE Station Page -->
         <div class="page" id="darePage">
             <div class="game-layout">
-                <div class="left-panel">
-                    <div class="mnemonic-display">
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            D
-                            <div class="mnemonic-meaning">Develop topic sentence</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            A
-                            <div class="mnemonic-meaning">Add supporting details</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            R
-                            <div class="mnemonic-meaning">Reject arguments for other side</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            E
-                            <div class="mnemonic-meaning">End with concluding sentence</div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="center-panel">
                     <h2 style="text-align: center; color: #333;">⚖️ DARE to Debate</h2>
                     
@@ -845,6 +834,33 @@
                 </div>
 
                 <div class="right-panel">
+                    <h2 style="text-align: center; color: #333; margin-bottom: 15px;">🌳 Build Your Argument Tree</h2>
+                    
+                    <div class="nav-buttons" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                        <button class="action-button" onclick="game.nextRound('tree')">Next Challenge</button>
+                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                    </div>
+                    <div class="score-display" style="text-align: center; margin-bottom: 15px;">Score: <span id="treeScore">0</span>/10</div>
+                    
+                    <div class="mnemonic-display">
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            D
+                            <div class="mnemonic-meaning">Develop topic sentence</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            A
+                            <div class="mnemonic-meaning">Add supporting details</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            R
+                            <div class="mnemonic-meaning">Reject arguments for other side</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            E
+                            <div class="mnemonic-meaning">End with concluding sentence</div>
+                        </div>
+                    </div>
+
                     <h3>💡 Tips</h3>
                     <div class="tips-section">
                         <div class="tip" onclick="game.speakText('Develop: Start each paragraph with a clear topic sentence.')">
@@ -867,35 +883,6 @@
         <!-- ANSWER Station Page -->
         <div class="page" id="answerPage">
             <div class="game-layout">
-                <div class="left-panel">
-                    <div class="mnemonic-display">
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            A
-                            <div class="mnemonic-meaning">Analyze Action Words</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            N
-                            <div class="mnemonic-meaning">Notice Requirements</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            S
-                            <div class="mnemonic-meaning">Set Up Outline</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            W
-                            <div class="mnemonic-meaning">Work in Details</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            E
-                            <div class="mnemonic-meaning">Engineer Answer</div>
-                        </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
-                            R
-                            <div class="mnemonic-meaning">Review Answer</div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="center-panel">
                     <h2 style="text-align: center; color: #333;">📝 ANSWER the Prompt</h2>
                     
@@ -958,6 +945,41 @@
                 </div>
 
                 <div class="right-panel">
+                    <h2 style="text-align: center; color: #333; margin-bottom: 15px;">🌳 Build Your Argument Tree</h2>
+                    
+                    <div class="nav-buttons" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                        <button class="action-button" onclick="game.nextRound('tree')">Next Challenge</button>
+                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                    </div>
+                    <div class="score-display" style="text-align: center; margin-bottom: 15px;">Score: <span id="treeScore">0</span>/10</div>
+                    
+                    <div class="mnemonic-display">
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            A
+                            <div class="mnemonic-meaning">Analyze Action Words</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            N
+                            <div class="mnemonic-meaning">Notice Requirements</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            S
+                            <div class="mnemonic-meaning">Set Up Outline</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            W
+                            <div class="mnemonic-meaning">Work in Details</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            E
+                            <div class="mnemonic-meaning">Engineer Answer</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            R
+                            <div class="mnemonic-meaning">Review Answer</div>
+                        </div>
+                    </div>
+
                     <h3>💡 Tips</h3>
                     <div class="tips-section">
                         <div class="tip" onclick="game.speakText('Analyze: Look for verbs like compare, explain, argue - they tell you what to do.')">
@@ -1932,5 +1954,5 @@
         // Initialize the game
         const game = new WritingArcade();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9888b1fdc46515ae',t:'MTc1OTQ1NTI0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9888e4282288cce4',t:'MTc1OTQ1NzMwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
