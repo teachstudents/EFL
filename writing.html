@@ -720,7 +720,7 @@
             </div>
 
             <div class="station-grid">
-                <button class="station-button" onclick="game.goToStation('tree')">
+                <button class="station-button" onclick="window.game.goToStation('tree')">
                     <div class="progress-ring" id="tree-progress"></div>
                     <div class="station-progress" id="tree-station-progress">0/10</div>
                     <div class="station-icon">🌳</div>
@@ -728,7 +728,7 @@
                     <div class="station-description">Topic, Reasons, Ending, Examine</div>
                 </button>
 
-                <button class="station-button" onclick="game.goToStation('stop')">
+                <button class="station-button" onclick="window.game.goToStation('stop')">
                     <div class="progress-ring" id="stop-progress"></div>
                     <div class="station-progress" id="stop-station-progress">0/10</div>
                     <div class="station-icon">🛑</div>
@@ -736,7 +736,7 @@
                     <div class="station-description">Suspend, Take, Organize, Plan</div>
                 </button>
 
-                <button class="station-button" onclick="game.goToStation('plan')">
+                <button class="station-button" onclick="window.game.goToStation('plan')">
                     <div class="progress-ring" id="plan-progress"></div>
                     <div class="station-progress" id="plan-station-progress">0/10</div>
                     <div class="station-icon">📋</div>
@@ -744,7 +744,7 @@
                     <div class="station-description">Prompt, List, Add, Number</div>
                 </button>
 
-                <button class="station-button" onclick="game.goToStation('write')">
+                <button class="station-button" onclick="window.game.goToStation('write')">
                     <div class="progress-ring" id="write-progress"></div>
                     <div class="station-progress" id="write-station-progress">0/10</div>
                     <div class="station-icon">✍️</div>
@@ -752,7 +752,7 @@
                     <div class="station-description">Write, Revise, Improve, Transform, Edit</div>
                 </button>
 
-                <button class="station-button" onclick="game.goToStation('dare')">
+                <button class="station-button" onclick="window.game.goToStation('dare')">
                     <div class="progress-ring" id="dare-progress"></div>
                     <div class="station-progress" id="dare-station-progress">0/10</div>
                     <div class="station-icon">⚖️</div>
@@ -760,7 +760,7 @@
                     <div class="station-description">Develop, Add, Reject, End</div>
                 </button>
 
-                <button class="station-button" onclick="game.goToStation('answer')">
+                <button class="station-button" onclick="window.game.goToStation('answer')">
                     <div class="progress-ring" id="answer-progress"></div>
                     <div class="station-progress" id="answer-station-progress">0/10</div>
                     <div class="station-icon">📝</div>
@@ -806,25 +806,25 @@
                     </div>
                     
                     <div class="nav-buttons" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
-                        <button class="action-button" onclick="game.nextRound('tree')">Next Challenge</button>
-                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                        <button class="action-button" onclick="window.game.nextRound('tree')">Next Challenge</button>
+                        <button class="action-button" onclick="window.game.goToStation('main')">Back to Menu</button>
                     </div>
                     <div class="score-display" style="margin-bottom: 15px;">Score: <span id="treeScore">0</span>/10</div>
                     
                     <div class="mnemonic-display">
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                        <div class="mnemonic-letter" onclick="window.game.toggleMeaning(this)">
                             T
                             <div class="mnemonic-meaning">Topic Sentence</div>
                         </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                        <div class="mnemonic-letter" onclick="window.game.toggleMeaning(this)">
                             R
                             <div class="mnemonic-meaning">Reasons</div>
                         </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                        <div class="mnemonic-letter" onclick="window.game.toggleMeaning(this)">
                             E
                             <div class="mnemonic-meaning">Ending</div>
                         </div>
-                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                        <div class="mnemonic-letter" onclick="window.game.toggleMeaning(this)">
                             E
                             <div class="mnemonic-meaning">Examine</div>
                         </div>
@@ -832,16 +832,16 @@
 
                     <h3>💡 Tips</h3>
                     <div class="tips-section">
-                        <div class="tip" onclick="game.speakText('Topic: Start with a clear main idea that tells your position.')">
+                        <div class="tip" onclick="window.game.speakText('Topic: Start with a clear main idea that tells your position.')">
                             <strong>Topic:</strong> Start with a clear main idea that tells your position.
                         </div>
-                        <div class="tip" onclick="game.speakText('Reasons: Give 2-3 strong supporting points with evidence.')">
+                        <div class="tip" onclick="window.game.speakText('Reasons: Give 2-3 strong supporting points with evidence.')">
                             <strong>Reasons:</strong> Give 2-3 strong supporting points with evidence.
                         </div>
-                        <div class="tip" onclick="game.speakText('Ending: Restate your position and summarize your reasons.')">
+                        <div class="tip" onclick="window.game.speakText('Ending: Restate your position and summarize your reasons.')">
                             <strong>Ending:</strong> Restate your position and summarize your reasons.
                         </div>
-                        <div class="tip" onclick="game.speakText('Examine: Check if your argument makes sense and is convincing.')">
+                        <div class="tip" onclick="window.game.speakText('Examine: Check if your argument makes sense and is convincing.')">
                             <strong>Examine:</strong> Check if your argument makes sense and is convincing.
                         </div>
                     </div>
@@ -2181,6 +2181,7 @@
 
         // Initialize the enhanced game
         const game = new WritingArcade();
+        window.game = game;
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9889b6d14194cec9',t:'MTc1OTQ2NTkzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'988a939d32137ad9',t:'MTc1OTQ3NDk3NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
