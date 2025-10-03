@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writing Adventure Arcade</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 3rem;
+            color: #fff;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 3px 3px 6px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.3); }
+            to { text-shadow: 3px 3px 6px rgba(0,0,0,0.3), 0 0 30px rgba(255,255,255,0.6); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #e0e6ff;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            width: 0%;
+            transition: width 0.8s ease;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+
+        .station-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .station-button {
+            background: rgba(255,255,255,0.95);
+            border: none;
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .station-button:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .station-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+
+        .station-button:hover::before {
+            animation: shimmer 1.5s ease-in-out;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+        }
+
+        .station-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .station-name {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .station-description {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .game-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr 250px;
+            gap: 20px;
+            height: calc(100vh - 120px);
+            max-height: 800px;
+        }
+
+        .left-panel {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow-y: auto;
+        }
+
+        .center-panel {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-panel {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow-y: auto;
+        }
+
+        .mnemonic-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .mnemonic-letter {
+            display: block;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .mnemonic-letter:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.1);
+        }
+
+        .mnemonic-meaning {
+            font-size: 1.2rem;
+            color: #333;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mnemonic-meaning.show {
+            opacity: 1;
+        }
+
+        .drag-item {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 25px;
+            margin: 8px;
+            cursor: grab;
+            display: block;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            user-select: none;
+            position: relative;
+            text-align: center;
+        }
+
+        .drag-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .drag-item:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .drag-item.used {
+            opacity: 0.3;
+            pointer-events: none;
+            transform: scale(0.8);
+        }
+
+        .drop-zone {
+            background: rgba(76, 175, 80, 0.1);
+            border: 3px dashed #4caf50;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .drop-zone.drag-over {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: #2e7d32;
+            transform: scale(1.02);
+        }
+
+        .drop-zone.correct {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #2e7d32;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .drop-zone.incorrect {
+            background: rgba(244, 67, 54, 0.3);
+            border-color: #d32f2f;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .action-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin: 10px;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .tips-section {
+            margin-top: 20px;
+        }
+
+        .tip {
+            background: rgba(255, 235, 59, 0.2);
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .answer-stages {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+            flex: 1;
+        }
+
+        .stage-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            min-height: 80px;
+        }
+
+        .stage-container h4 {
+            margin: 0 0 8px 0;
+            color: #333;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+                gap: 15px;
+            }
+            
+            .left-panel, .right-panel {
+                order: 2;
+                max-height: 200px;
+            }
+            
+            .center-panel {
+                order: 1;
+                min-height: 400px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .answer-stages {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Menu Page -->
+        <div class="page active" id="mainMenu">
+            <div class="header">
+                <h1 class="title">🎮 Writing Adventure Arcade 🎮</h1>
+                <p class="subtitle">Master the art of writing through interactive games!</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="station-grid">
+                <button class="station-button" onclick="game.goToStation('tree')">
+                    <div class="station-icon">🌳</div>
+                    <div class="station-name">TREE</div>
+                    <div class="station-description">Topic, Reasons, Ending, Examine</div>
+                </button>
+
+                <button class="station-button" onclick="game.goToStation('stop')">
+                    <div class="station-icon">🛑</div>
+                    <div class="station-name">STOP</div>
+                    <div class="station-description">Suspend, Take, Organize, Plan</div>
+                </button>
+
+                <button class="station-button" onclick="game.goToStation('plan')">
+                    <div class="station-icon">📋</div>
+                    <div class="station-name">PLAN</div>
+                    <div class="station-description">Prompt, List, Add, Number</div>
+                </button>
+
+                <button class="station-button" onclick="game.goToStation('write')">
+                    <div class="station-icon">✍️</div>
+                    <div class="station-name">WRITE</div>
+                    <div class="station-description">Write, Revise, Improve, Transform, Edit</div>
+                </button>
+
+                <button class="station-button" onclick="game.goToStation('dare')">
+                    <div class="station-icon">⚖️</div>
+                    <div class="station-name">DARE</div>
+                    <div class="station-description">Develop, Add, Reject, End</div>
+                </button>
+
+                <button class="station-button" onclick="game.goToStation('answer')">
+                    <div class="station-icon">📝</div>
+                    <div class="station-name">ANSWER</div>
+                    <div class="station-description">Analyze, Notice, Set up, Work in, Engineer, Review</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- TREE Station Page -->
+        <div class="page" id="treePage">
+            <div class="game-layout">
+                <div class="left-panel">
+                    <div class="mnemonic-display">
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            T
+                            <div class="mnemonic-meaning">Topic Sentence</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            R
+                            <div class="mnemonic-meaning">Reasons</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            E
+                            <div class="mnemonic-meaning">Ending</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            E
+                            <div class="mnemonic-meaning">Examine</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="center-panel">
+                    <h2 style="text-align: center; color: #333;">🌳 Build Your Argument Tree</h2>
+                    <div class="score-display">Score: <span id="treeScore">0</span>/10</div>
+                    
+                    <div class="drop-zone" data-type="topic">
+                        <span class="placeholder">🎯 Drop Topic Sentence Here</span>
+                    </div>
+                    <div class="drop-zone" data-type="reason1">
+                        <span class="placeholder">💡 Drop First Reason Here</span>
+                    </div>
+                    <div class="drop-zone" data-type="reason2">
+                        <span class="placeholder">💡 Drop Second Reason Here</span>
+                    </div>
+                    <div class="drop-zone" data-type="ending">
+                        <span class="placeholder">🏁 Drop Ending Here</span>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h3>Available Options:</h3>
+                        <div id="treeItems"></div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="action-button" onclick="game.nextRound('tree')">Next Challenge</button>
+                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <h3>💡 Tips</h3>
+                    <div class="tips-section">
+                        <div class="tip">
+                            <strong>Topic:</strong> Start with a clear main idea that tells your position.
+                        </div>
+                        <div class="tip">
+                            <strong>Reasons:</strong> Give 2-3 strong supporting points with evidence.
+                        </div>
+                        <div class="tip">
+                            <strong>Ending:</strong> Restate your position and summarize your reasons.
+                        </div>
+                        <div class="tip">
+                            <strong>Examine:</strong> Check if your argument makes sense and is convincing.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STOP Station Page -->
+        <div class="page" id="stopPage">
+            <div class="game-layout">
+                <div class="left-panel">
+                    <div class="mnemonic-display">
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            S
+                            <div class="mnemonic-meaning">Suspend Judgment</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            T
+                            <div class="mnemonic-meaning">Take a Side</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            O
+                            <div class="mnemonic-meaning">Organize Ideas</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            P
+                            <div class="mnemonic-meaning">Plan to Write</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="center-panel">
+                    <h2 style="text-align: center; color: #333;">🛑 STOP and Think</h2>
+                    <div class="score-display">Score: <span id="stopScore">0</span>/10</div>
+                    
+                    <div class="drop-zone" data-type="suspend">
+                        <span class="placeholder">⏸️ Suspend Judgment</span>
+                    </div>
+                    <div class="drop-zone" data-type="take">
+                        <span class="placeholder">📝 Take a Side</span>
+                    </div>
+                    <div class="drop-zone" data-type="organize">
+                        <span class="placeholder">📊 Organize Ideas</span>
+                    </div>
+                    <div class="drop-zone" data-type="plan">
+                        <span class="placeholder">🎯 Plan to Write</span>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h3>Available Options:</h3>
+                        <div id="stopItems"></div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="action-button" onclick="game.nextRound('stop')">Next Challenge</button>
+                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <h3>💡 Tips</h3>
+                    <div class="tips-section">
+                        <div class="tip">
+                            <strong>Suspend:</strong> Don't rush to judgment. Consider all sides first.
+                        </div>
+                        <div class="tip">
+                            <strong>Take:</strong> Choose your position based on the strongest evidence.
+                        </div>
+                        <div class="tip">
+                            <strong>Organize:</strong> Group similar ideas together logically.
+                        </div>
+                        <div class="tip">
+                            <strong>Plan:</strong> Create an outline before you start writing.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLAN Station Page -->
+        <div class="page" id="planPage">
+            <div class="game-layout">
+                <div class="left-panel">
+                    <div class="mnemonic-display">
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            P
+                            <div class="mnemonic-meaning">Pick a side (Prompt)</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            L
+                            <div class="mnemonic-meaning">List ideas</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            A
+                            <div class="mnemonic-meaning">Add details</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            N
+                            <div class="mnemonic-meaning">Number in order</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="center-panel">
+                    <h2 style="text-align: center; color: #333;">📋 PLAN Your Writing</h2>
+                    <div class="score-display">Score: <span id="planScore">0</span>/10</div>
+                    
+                    <div class="drop-zone" data-order="1">
+                        <span class="placeholder">1️⃣ First Step</span>
+                    </div>
+                    <div class="drop-zone" data-order="2">
+                        <span class="placeholder">2️⃣ Second Step</span>
+                    </div>
+                    <div class="drop-zone" data-order="3">
+                        <span class="placeholder">3️⃣ Third Step</span>
+                    </div>
+                    <div class="drop-zone" data-order="4">
+                        <span class="placeholder">4️⃣ Fourth Step</span>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h3>Available Options:</h3>
+                        <div id="planItems"></div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="action-button" onclick="game.nextRound('plan')">Next Challenge</button>
+                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <h3>💡 Tips</h3>
+                    <div class="tips-section">
+                        <div class="tip">
+                            <strong>Prompt:</strong> Read carefully and understand what you need to argue.
+                        </div>
+                        <div class="tip">
+                            <strong>List:</strong> Brainstorm all your ideas without judging them yet.
+                        </div>
+                        <div class="tip">
+                            <strong>Add:</strong> Include specific examples and evidence for each idea.
+                        </div>
+                        <div class="tip">
+                            <strong>Number:</strong> Put your ideas in the most logical order.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WRITE Station Page -->
+        <div class="page" id="writePage">
+            <div class="game-layout">
+                <div class="left-panel">
+                    <div class="mnemonic-display">
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            W
+                            <div class="mnemonic-meaning">Write your draft</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            R
+                            <div class="mnemonic-meaning">Revise content</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            I
+                            <div class="mnemonic-meaning">Improve clarity</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            T
+                            <div class="mnemonic-meaning">Transform weak parts</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            E
+                            <div class="mnemonic-meaning">Edit for errors</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="center-panel">
+                    <h2 style="text-align: center; color: #333;">✍️ WRITE and Revise</h2>
+                    <div class="score-display">Score: <span id="writeScore">0</span>/10</div>
+                    
+                    <div class="drop-zone" data-step="write">
+                        <span class="placeholder">✍️ Writing Step</span>
+                    </div>
+                    <div class="drop-zone" data-step="revise">
+                        <span class="placeholder">🔄 Revising Step</span>
+                    </div>
+                    <div class="drop-zone" data-step="improve">
+                        <span class="placeholder">⬆️ Improving Step</span>
+                    </div>
+                    <div class="drop-zone" data-step="transform">
+                        <span class="placeholder">🔄 Transforming Step</span>
+                    </div>
+                    <div class="drop-zone" data-step="edit">
+                        <span class="placeholder">✏️ Editing Step</span>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h3>Available Options:</h3>
+                        <div id="writeItems"></div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="action-button" onclick="game.nextRound('write')">Next Challenge</button>
+                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <h3>💡 Tips</h3>
+                    <div class="tips-section">
+                        <div class="tip">
+                            <strong>Write:</strong> Get your ideas down first, don't worry about perfection.
+                        </div>
+                        <div class="tip">
+                            <strong>Revise:</strong> Look at the big picture - does your argument make sense?
+                        </div>
+                        <div class="tip">
+                            <strong>Improve:</strong> Make your writing clearer and more convincing.
+                        </div>
+                        <div class="tip">
+                            <strong>Transform:</strong> Strengthen weak arguments and add better evidence.
+                        </div>
+                        <div class="tip">
+                            <strong>Edit:</strong> Fix grammar, spelling, and punctuation errors.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DARE Station Page -->
+        <div class="page" id="darePage">
+            <div class="game-layout">
+                <div class="left-panel">
+                    <div class="mnemonic-display">
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            D
+                            <div class="mnemonic-meaning">Develop topic sentence</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            A
+                            <div class="mnemonic-meaning">Add supporting details</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            R
+                            <div class="mnemonic-meaning">Reject arguments for other side</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            E
+                            <div class="mnemonic-meaning">End with concluding sentence</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="center-panel">
+                    <h2 style="text-align: center; color: #333;">⚖️ DARE to Debate</h2>
+                    <div class="score-display">Score: <span id="dareScore">0</span>/10</div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <h4 style="text-align: center; color: #4caf50;">✅ Strong Arguments</h4>
+                            <div class="drop-zone" data-strength="strong">
+                                <span class="placeholder">Drop strong ideas here</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="text-align: center; color: #f44336;">❌ Weak Arguments</h4>
+                            <div class="drop-zone" data-strength="weak">
+                                <span class="placeholder">Drop weak ideas here</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h3>Available Options:</h3>
+                        <div id="dareItems"></div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="action-button" onclick="game.nextRound('dare')">Next Challenge</button>
+                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <h3>💡 Tips</h3>
+                    <div class="tips-section">
+                        <div class="tip">
+                            <strong>Develop:</strong> Start each paragraph with a clear topic sentence.
+                        </div>
+                        <div class="tip">
+                            <strong>Add:</strong> Include facts, examples, and expert opinions as evidence.
+                        </div>
+                        <div class="tip">
+                            <strong>Reject:</strong> Address counterarguments and explain why they're wrong.
+                        </div>
+                        <div class="tip">
+                            <strong>End:</strong> Conclude each paragraph by connecting back to your main argument.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANSWER Station Page -->
+        <div class="page" id="answerPage">
+            <div class="game-layout">
+                <div class="left-panel">
+                    <div class="mnemonic-display">
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            A
+                            <div class="mnemonic-meaning">Analyze Action Words</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            N
+                            <div class="mnemonic-meaning">Notice Requirements</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            S
+                            <div class="mnemonic-meaning">Set Up Outline</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            W
+                            <div class="mnemonic-meaning">Work in Details</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            E
+                            <div class="mnemonic-meaning">Engineer Answer</div>
+                        </div>
+                        <div class="mnemonic-letter" onclick="game.toggleMeaning(this)">
+                            R
+                            <div class="mnemonic-meaning">Review Answer</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="center-panel">
+                    <h2 style="text-align: center; color: #333;">📝 ANSWER the Prompt</h2>
+                    <div class="score-display">Score: <span id="answerScore">0</span>/10</div>
+                    
+                    <div class="answer-stages">
+                        <div class="stage-container">
+                            <h4>🔍 Analyze Action Words</h4>
+                            <div class="drop-zone" data-stage="analyze">
+                                <span class="placeholder">Find the key action words</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stage-container">
+                            <h4>📋 Notice Requirements</h4>
+                            <div class="drop-zone" data-stage="notice">
+                                <span class="placeholder">Identify what's needed</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stage-container">
+                            <h4>📐 Set Up Outline</h4>
+                            <div class="drop-zone" data-stage="setup">
+                                <span class="placeholder">Create your structure</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stage-container">
+                            <h4>🔧 Work in Details</h4>
+                            <div class="drop-zone" data-stage="work">
+                                <span class="placeholder">Add supporting details</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stage-container">
+                            <h4>🏗️ Engineer Answer</h4>
+                            <div class="drop-zone" data-stage="engineer">
+                                <span class="placeholder">Build your response</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stage-container">
+                            <h4>✅ Review Answer</h4>
+                            <div class="drop-zone" data-stage="review">
+                                <span class="placeholder">Check your work</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h3>Available Options:</h3>
+                        <div id="answerItems"></div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="action-button" onclick="game.nextRound('answer')">Next Challenge</button>
+                        <button class="action-button" onclick="game.goToStation('main')">Back to Menu</button>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <h3>💡 Tips</h3>
+                    <div class="tips-section">
+                        <div class="tip">
+                            <strong>Analyze:</strong> Look for verbs like "compare," "explain," "argue" - they tell you what to do.
+                        </div>
+                        <div class="tip">
+                            <strong>Notice:</strong> Check for requirements like word count, sources needed, or specific format.
+                        </div>
+                        <div class="tip">
+                            <strong>Set Up:</strong> Create a clear outline with introduction, body paragraphs, and conclusion.
+                        </div>
+                        <div class="tip">
+                            <strong>Work in:</strong> Add specific examples, evidence, and details to support each point.
+                        </div>
+                        <div class="tip">
+                            <strong>Engineer:</strong> Write your response following your outline and requirements.
+                        </div>
+                        <div class="tip">
+                            <strong>Review:</strong> Check that you answered all parts and met all requirements.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="celebration" id="celebration"></div>
+
+    <script>
+        class WritingArcade {
+            constructor() {
+                this.currentStation = 'main';
+                this.scores = {
+                    tree: 0,
+                    stop: 0,
+                    plan: 0,
+                    write: 0,
+                    dare: 0,
+                    answer: 0
+                };
+                this.currentRound = {
+                    tree: 0,
+                    stop: 0,
+                    plan: 0,
+                    write: 0,
+                    dare: 0,
+                    answer: 0
+                };
+                this.init();
+                this.loadCurrentRound();
+            }
+
+            init() {
+                this.setupDragAndDrop();
+                this.updateProgress();
+            }
+
+            goToStation(station) {
+                // Hide all pages
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+
+                // Show selected page
+                if (station === 'main') {
+                    document.getElementById('mainMenu').classList.add('active');
+                    this.currentStation = 'main';
+                } else {
+                    document.getElementById(station + 'Page').classList.add('active');
+                    this.currentStation = station;
+                    this.loadCurrentRound();
+                }
+            }
+
+            toggleMeaning(element) {
+                const meaning = element.querySelector('.mnemonic-meaning');
+                meaning.classList.toggle('show');
+                this.playSuccessSound();
+            }
+
+            loadCurrentRound() {
+                if (this.currentStation === 'main') return;
+
+                const items = this.getItemsForStation(this.currentStation);
+                const container = document.getElementById(this.currentStation + 'Items');
+                container.innerHTML = '';
+
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'drag-item';
+                    div.draggable = true;
+                    div.textContent = item.text;
+                    Object.keys(item.data).forEach(key => {
+                        div.dataset[key] = item.data[key];
+                    });
+                    container.appendChild(div);
+                });
+
+                // Reset drop zones
+                document.querySelectorAll(`#${this.currentStation}Page .drop-zone`).forEach(zone => {
+                    const placeholder = zone.querySelector('.placeholder');
+                    if (placeholder) {
+                        zone.innerHTML = '<span class="placeholder">' + placeholder.textContent + '</span>';
+                    } else {
+                        // Restore original placeholder based on zone type
+                        const originalText = this.getOriginalPlaceholder(zone);
+                        zone.innerHTML = '<span class="placeholder">' + originalText + '</span>';
+                    }
+                    zone.classList.remove('correct', 'incorrect');
+                });
+
+                this.setupDragAndDrop();
+            }
+
+            getItemsForStation(station) {
+                const allItems = {
+                    tree: [
+                        // Round 1
+                        [
+                            {text: "School uniforms should be mandatory", data: {type: "topic"}},
+                            {text: "They promote equality among students", data: {type: "reason1"}},
+                            {text: "They reduce morning decision stress", data: {type: "reason2"}},
+                            {text: "Therefore, uniforms benefit everyone", data: {type: "ending"}},
+                            {text: "Homework is unnecessary", data: {type: "wrong"}},
+                            {text: "Some students like fashion", data: {type: "wrong"}},
+                        ],
+                        // Round 2
+                        [
+                            {text: "Video games can improve learning", data: {type: "topic"}},
+                            {text: "They develop problem-solving skills", data: {type: "reason1"}},
+                            {text: "They increase hand-eye coordination", data: {type: "reason2"}},
+                            {text: "Gaming has educational benefits", data: {type: "ending"}},
+                            {text: "Books are better than games", data: {type: "wrong"}},
+                            {text: "Television is entertaining", data: {type: "wrong"}},
+                        ],
+                        // Rounds 3-10 with similar structure
+                        [
+                            {text: "Recycling should be mandatory in schools", data: {type: "topic"}},
+                            {text: "It teaches environmental responsibility", data: {type: "reason1"}},
+                            {text: "It reduces waste in landfills", data: {type: "reason2"}},
+                            {text: "Schools must lead by example", data: {type: "ending"}},
+                            {text: "Plastic bags are convenient", data: {type: "wrong"}},
+                            {text: "Cleaning is someone else's job", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Students need more recess time", data: {type: "topic"}},
+                            {text: "Physical activity improves focus", data: {type: "reason1"}},
+                            {text: "Social skills develop through play", data: {type: "reason2"}},
+                            {text: "Longer recess benefits learning", data: {type: "ending"}},
+                            {text: "Tests are more important", data: {type: "wrong"}},
+                            {text: "Sitting builds character", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Libraries should stay open later", data: {type: "topic"}},
+                            {text: "Students need quiet study spaces", data: {type: "reason1"}},
+                            {text: "Working parents need after-school care", data: {type: "reason2"}},
+                            {text: "Extended hours serve the community", data: {type: "ending"}},
+                            {text: "Librarians need sleep", data: {type: "wrong"}},
+                            {text: "Books can wait until tomorrow", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Art classes are essential in schools", data: {type: "topic"}},
+                            {text: "Creativity enhances problem-solving", data: {type: "reason1"}},
+                            {text: "Art provides emotional expression", data: {type: "reason2"}},
+                            {text: "Creative education builds better citizens", data: {type: "ending"}},
+                            {text: "Math is the only important subject", data: {type: "wrong"}},
+                            {text: "Art supplies cost money", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "School should start later in the day", data: {type: "topic"}},
+                            {text: "Teenagers need more sleep for development", data: {type: "reason1"}},
+                            {text: "Later start times improve academic performance", data: {type: "reason2"}},
+                            {text: "Student health should come first", data: {type: "ending"}},
+                            {text: "Early birds catch worms", data: {type: "wrong"}},
+                            {text: "Buses run on schedule", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Students should learn coding in elementary school", data: {type: "topic"}},
+                            {text: "Technology skills are essential for future jobs", data: {type: "reason1"}},
+                            {text: "Coding develops logical thinking", data: {type: "reason2"}},
+                            {text: "Early tech education prepares students for success", data: {type: "ending"}},
+                            {text: "Pencils and paper are sufficient", data: {type: "wrong"}},
+                            {text: "Computers are too complicated", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Healthy school lunches should be prioritized", data: {type: "topic"}},
+                            {text: "Good nutrition improves concentration", data: {type: "reason1"}},
+                            {text: "Healthy habits start in childhood", data: {type: "reason2"}},
+                            {text: "Schools must invest in student wellness", data: {type: "ending"}},
+                            {text: "Pizza every day sounds great", data: {type: "wrong"}},
+                            {text: "Vegetables are expensive", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Field trips enhance classroom learning", data: {type: "topic"}},
+                            {text: "Real-world experiences make lessons memorable", data: {type: "reason1"}},
+                            {text: "Field trips spark curiosity and interest", data: {type: "reason2"}},
+                            {text: "Experiential learning should be standard", data: {type: "ending"}},
+                            {text: "Classrooms have everything we need", data: {type: "wrong"}},
+                            {text: "Field trips are just fun, not educational", data: {type: "wrong"}},
+                        ]
+                    ],
+                    stop: [
+                        [
+                            {text: "Read the prompt without deciding immediately", data: {type: "suspend"}},
+                            {text: "Choose to support school uniforms", data: {type: "take"}},
+                            {text: "Group reasons by importance", data: {type: "organize"}},
+                            {text: "Create a detailed outline", data: {type: "plan"}},
+                            {text: "Start writing the first sentence", data: {type: "wrong"}},
+                            {text: "Ask friends for their opinions", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Consider all sides of the homework debate", data: {type: "suspend"}},
+                            {text: "Decide homework should be reduced", data: {type: "take"}},
+                            {text: "Sort arguments into categories", data: {type: "organize"}},
+                            {text: "Number points in logical order", data: {type: "plan"}},
+                            {text: "Write whatever comes to mind", data: {type: "wrong"}},
+                            {text: "Copy someone else's ideas", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Think about both sides of technology in schools", data: {type: "suspend"}},
+                            {text: "Support more technology in classrooms", data: {type: "take"}},
+                            {text: "Arrange evidence from strongest to weakest", data: {type: "organize"}},
+                            {text: "Map out introduction, body, conclusion", data: {type: "plan"}},
+                            {text: "Jump straight to conclusions", data: {type: "wrong"}},
+                            {text: "Use only personal opinions", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Examine pros and cons of year-round school", data: {type: "suspend"}},
+                            {text: "Argue against year-round schooling", data: {type: "take"}},
+                            {text: "Group similar supporting details", data: {type: "organize"}},
+                            {text: "Sequence paragraphs logically", data: {type: "plan"}},
+                            {text: "Write the conclusion first", data: {type: "wrong"}},
+                            {text: "Ignore opposing viewpoints", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Weigh benefits and drawbacks of social media", data: {type: "suspend"}},
+                            {text: "Take position that social media needs regulation", data: {type: "take"}},
+                            {text: "Cluster related research findings", data: {type: "organize"}},
+                            {text: "Design paragraph structure", data: {type: "plan"}},
+                            {text: "Start with random facts", data: {type: "wrong"}},
+                            {text: "Only use emotional appeals", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Consider multiple perspectives on climate change", data: {type: "suspend"}},
+                            {text: "Advocate for immediate climate action", data: {type: "take"}},
+                            {text: "Organize evidence by type and strength", data: {type: "organize"}},
+                            {text: "Plan transitions between ideas", data: {type: "plan"}},
+                            {text: "Rely only on personal experience", data: {type: "wrong"}},
+                            {text: "Avoid controversial topics", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Analyze different views on standardized testing", data: {type: "suspend"}},
+                            {text: "Oppose excessive standardized testing", data: {type: "take"}},
+                            {text: "Sort arguments by logical flow", data: {type: "organize"}},
+                            {text: "Outline counterargument responses", data: {type: "plan"}},
+                            {text: "Write stream of consciousness", data: {type: "wrong"}},
+                            {text: "Stick to obvious points only", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Evaluate arguments about school dress codes", data: {type: "suspend"}},
+                            {text: "Support flexible dress code policies", data: {type: "take"}},
+                            {text: "Arrange points in order of importance", data: {type: "organize"}},
+                            {text: "Structure with clear topic sentences", data: {type: "plan"}},
+                            {text: "Mix up all ideas randomly", data: {type: "wrong"}},
+                            {text: "Focus only on personal preferences", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Consider various angles on homework policies", data: {type: "suspend"}},
+                            {text: "Argue for balanced homework approach", data: {type: "take"}},
+                            {text: "Group supporting evidence logically", data: {type: "organize"}},
+                            {text: "Plan strong opening and closing", data: {type: "plan"}},
+                            {text: "Write without any structure", data: {type: "wrong"}},
+                            {text: "Use only weak examples", data: {type: "wrong"}},
+                        ],
+                        [
+                            {text: "Examine all sides of the school lunch debate", data: {type: "suspend"}},
+                            {text: "Champion healthier school meal options", data: {type: "take"}},
+                            {text: "Organize research by credibility", data: {type: "organize"}},
+                            {text: "Plan compelling introduction hook", data: {type: "plan"}},
+                            {text: "Start writing without thinking", data: {type: "wrong"}},
+                            {text: "Ignore factual evidence", data: {type: "wrong"}},
+                        ]
+                    ],
+                    plan: [
+                        [
+                            {text: "Read and understand the writing prompt", data: {order: "1"}},
+                            {text: "Brainstorm and list all possible ideas", data: {order: "2"}},
+                            {text: "Add specific details and examples", data: {order: "3"}},
+                            {text: "Number ideas in logical sequence", data: {order: "4"}},
+                            {text: "Start writing immediately", data: {order: "wrong"}},
+                            {text: "Skip the planning phase", data: {order: "wrong"}},
+                        ],
+                        [
+                            {text: "Analyze what the prompt is asking", data: {order: "1"}},
+                            {text: "Generate multiple supporting points", data: {order: "2"}},
+                            {text: "Develop each point with evidence", data: {order: "3"}},
+                            {text: "Arrange points from strongest to weakest", data: {order: "4"}},
+                            {text: "Write the conclusion first", data: {order: "wrong"}},
+                            {text: "Use only one supporting point", data: {order: "wrong"}},
+                        ],
+                        [
+                            {text: "Identify the key question to answer", data: {order: "1"}},
+                            {text: "List pros and cons of your position", data: {order: "2"}},
+                            {text: "Add research and expert opinions", data: {order: "3"}},
+                            {text: "Organize from introduction to conclusion", data: {order: "4"}},
+                            {text: "Ignore the prompt requirements", data: {order: "wrong"}},
+                            {text: "Write without any examples", data: {order: "wrong"}},
+                        ],
+                        [
+                            {text: "Determine your stance on the issue", data: {order: "1"}},
+                            {text: "Collect all relevant supporting ideas", data: {order: "2"}},
+                            {text: "Expand ideas with specific examples", data: {order: "3"}},
+                            {text: "Sequence ideas for maximum impact", data: {order: "4"}},
+                            {text: "Change your position mid-writing", data: {order: "wrong"}},
+                            {text: "Use vague, general statements", data: {order: "wrong"}},
+                        ],
+                        [
+                            {text: "Understand the audience and purpose", data: {order: "1"}},
+                            {text: "Brainstorm creative and logical points", data: {order: "2"}},
+                            {text: "Support each point with concrete details", data: {order: "3"}},
+                            {text: "Create a roadmap for your essay", data: {order: "4"}},
+                            {text: "Write randomly without direction", data: {order: "wrong"}},
+                            {text: "Rely only on personal opinions", data: {order: "wrong"}},
+                        ],
+                        [
+                            {text: "Break down the prompt into parts", data: {order: "1"}},
+                            {text: "Generate ideas through mind mapping", data: {order: "2"}},
+                            {text: "Add statistics and real-world examples", data: {order: "3"}},
+                            {text: "Plan smooth transitions between ideas", data: {order: "4"}},
+                            {text: "Skip research and evidence", data: {order: "wrong"}},
+                            {text: "Jump between unrelated topics", data: {order: "wrong"}},
+                        ],
+                        [
+                            {text: "Clarify what position to defend", data: {order: "1"}},
+                            {text: "List multiple angles and approaches", data: {order: "2"}},
+                            {text: "Strengthen weak points with more support", data: {order: "3"}},
+                            {text: "Arrange for logical flow and coherence", data: {order: "4"}},
+                            {text: "Contradict yourself throughout", data: {order: "wrong"}},
+                            {text: "Use only emotional appeals", data: {order: "wrong"}},
+                        ],
+                        [
+                            {text: "Identify the central argument needed", data: {order: "1"}},
+                            {text: "Develop multiple supporting reasons", data: {order: "2"}},
+                            {text: "Include counterarguments to address", data: {order: "3"}},
+                            {text: "Structure with clear beginning and end", data: {order: "4"}},
+                            {text: "Avoid planning altogether", data: {order: "wrong"}},
+                            {text: "Use the same example repeatedly", data: {order: "wrong"}},
+                        ],
+                        [
+                            {text: "Decode exactly what's being asked", data: {order: "1"}},
+                            {text: "Gather diverse supporting evidence", data: {order: "2"}},
+                            {text: "Elaborate on each piece of evidence", data: {order: "3"}},
+                            {text: "Organize for persuasive impact", data: {order: "4"}},
+                            {text: "Write without considering the audience", data: {order: "wrong"}},
+                            {text: "Make unsupported claims", data: {order: "wrong"}},
+                        ],
+                        [
+                            {text: "Choose your strongest argumentative position", data: {order: "1"}},
+                            {text: "Compile comprehensive supporting points", data: {order: "2"}},
+                            {text: "Enhance arguments with credible sources", data: {order: "3"}},
+                            {text: "Plan strategic paragraph organization", data: {order: "4"}},
+                            {text: "Present ideas in random order", data: {order: "wrong"}},
+                            {text: "Ignore opposing viewpoints completely", data: {order: "wrong"}},
+                        ]
+                    ],
+                    write: [
+                        [
+                            {text: "Get your first draft down on paper", data: {step: "write"}},
+                            {text: "Check if your argument makes sense", data: {step: "revise"}},
+                            {text: "Make your language clearer and stronger", data: {step: "improve"}},
+                            {text: "Strengthen weak supporting evidence", data: {step: "transform"}},
+                            {text: "Fix spelling and grammar mistakes", data: {step: "edit"}},
+                            {text: "Submit without reading it over", data: {step: "wrong"}},
+                        ],
+                        [
+                            {text: "Write freely without worrying about perfection", data: {step: "write"}},
+                            {text: "Reorganize paragraphs for better flow", data: {step: "revise"}},
+                            {text: "Replace weak words with powerful ones", data: {step: "improve"}},
+                            {text: "Add more convincing examples", data: {step: "transform"}},
+                            {text: "Proofread for punctuation errors", data: {step: "edit"}},
+                            {text: "Keep the first version unchanged", data: {step: "wrong"}},
+                        ],
+                        [
+                            {text: "Focus on getting ideas onto the page", data: {step: "write"}},
+                            {text: "Ensure each paragraph supports your thesis", data: {step: "revise"}},
+                            {text: "Vary sentence length and structure", data: {step: "improve"}},
+                            {text: "Replace opinion with factual evidence", data: {step: "transform"}},
+                            {text: "Check for proper capitalization", data: {step: "edit"}},
+                            {text: "Add random information", data: {step: "wrong"}},
+                        ],
+                        [
+                            {text: "Express your ideas in complete sentences", data: {step: "write"}},
+                            {text: "Remove irrelevant or off-topic content", data: {step: "revise"}},
+                            {text: "Use more precise and specific vocabulary", data: {step: "improve"}},
+                            {text: "Convert weak arguments into strong ones", data: {step: "transform"}},
+                            {text: "Correct subject-verb agreement", data: {step: "edit"}},
+                            {text: "Make the essay longer with filler", data: {step: "wrong"}},
+                        ],
+                        [
+                            {text: "Translate your outline into full paragraphs", data: {step: "write"}},
+                            {text: "Strengthen connections between ideas", data: {step: "revise"}},
+                            {text: "Eliminate wordiness and redundancy", data: {step: "improve"}},
+                            {text: "Upgrade examples to more compelling ones", data: {step: "transform"}},
+                            {text: "Fix run-on and fragment sentences", data: {step: "edit"}},
+                            {text: "Copy text from other sources", data: {step: "wrong"}},
+                        ],
+                        [
+                            {text: "Develop each planned point fully", data: {step: "write"}},
+                            {text: "Verify that evidence supports claims", data: {step: "revise"}},
+                            {text: "Enhance clarity and readability", data: {step: "improve"}},
+                            {text: "Substitute generic examples with specific ones", data: {step: "transform"}},
+                            {text: "Ensure consistent verb tenses", data: {step: "edit"}},
+                            {text: "Rush through without checking", data: {step: "wrong"}},
+                        ],
+                        [
+                            {text: "Create complete thoughts and arguments", data: {step: "write"}},
+                            {text: "Improve logical progression of ideas", data: {step: "revise"}},
+                            {text: "Refine word choice for impact", data: {step: "improve"}},
+                            {text: "Enhance weak reasoning with better logic", data: {step: "transform"}},
+                            {text: "Check for proper comma usage", data: {step: "edit"}},
+                            {text: "Submit the rough draft", data: {step: "wrong"}},
+                        ],
+                        [
+                            {text: "Write with your authentic voice", data: {step: "write"}},
+                            {text: "Ensure smooth transitions between paragraphs", data: {step: "revise"}},
+                            {text: "Strengthen weak or unclear sentences", data: {step: "improve"}},
+                            {text: "Replace assumptions with proven facts", data: {step: "transform"}},
+                            {text: "Verify proper apostrophe placement", data: {step: "edit"}},
+                            {text: "Ignore feedback from others", data: {step: "wrong"}},
+                        ],
+                        [
+                            {text: "Put your planned ideas into essay form", data: {step: "write"}},
+                            {text: "Check that introduction and conclusion align", data: {step: "revise"}},
+                            {text: "Polish language for sophistication", data: {step: "improve"}},
+                            {text: "Upgrade weak sources to credible ones", data: {step: "transform"}},
+                            {text: "Eliminate unnecessary apostrophes", data: {step: "edit"}},
+                            {text: "Change your main argument halfway through", data: {step: "wrong"}},
+                        ],
+                        [
+                            {text: "Transform your outline into flowing prose", data: {step: "write"}},
+                            {text: "Evaluate overall argument effectiveness", data: {step: "revise"}},
+                            {text: "Fine-tune for maximum persuasive impact", data: {step: "improve"}},
+                            {text: "Convert weak points into compelling arguments", data: {step: "transform"}},
+                            {text: "Perfect formatting and presentation", data: {step: "edit"}},
+                            {text: "Add unrelated interesting facts", data: {step: "wrong"}},
+                        ]
+                    ],
+                    dare: [
+                        [
+                            {text: "Supported by scientific research", data: {strength: "strong"}},
+                            {text: "Just my personal opinion", data: {strength: "weak"}},
+                            {text: "Expert testimony from professionals", data: {strength: "strong"}},
+                            {text: "Everyone I know agrees", data: {strength: "weak"}},
+                            {text: "Statistical evidence from studies", data: {strength: "strong"}},
+                            {text: "It's obvious to anyone", data: {strength: "weak"}},
+                        ],
+                        [
+                            {text: "Documented historical examples", data: {strength: "strong"}},
+                            {text: "I heard it from a friend", data: {strength: "weak"}},
+                            {text: "Peer-reviewed academic sources", data: {strength: "strong"}},
+                            {text: "It's common sense", data: {strength: "weak"}},
+                            {text: "Government data and reports", data: {strength: "strong"}},
+                            {text: "Someone on social media said", data: {strength: "weak"}},
+                        ],
+                        [
+                            {text: "Multiple independent studies confirm", data: {strength: "strong"}},
+                            {text: "My teacher once mentioned", data: {strength: "weak"}},
+                            {text: "International organization findings", data: {strength: "strong"}},
+                            {text: "It seems logical to me", data: {strength: "weak"}},
+                            {text: "Controlled experiment results", data: {strength: "strong"}},
+                            {text: "I saw it in a movie", data: {strength: "weak"}},
+                        ],
+                        [
+                            {text: "Verified by fact-checking organizations", data: {strength: "strong"}},
+                            {text: "My family has always believed", data: {strength: "weak"}},
+                            {text: "Published in reputable journals", data: {strength: "strong"}},
+                            {text: "It's what most people think", data: {strength: "weak"}},
+                            {text: "Cross-cultural research supports", data: {strength: "strong"}},
+                            {text: "I read it somewhere online", data: {strength: "weak"}},
+                        ],
+                        [
+                            {text: "Longitudinal study over 10 years", data: {strength: "strong"}},
+                            {text: "Based on a single example", data: {strength: "weak"}},
+                            {text: "Consensus among leading experts", data: {strength: "strong"}},
+                            {text: "It's traditional wisdom", data: {strength: "weak"}},
+                            {text: "Replicated in multiple countries", data: {strength: "strong"}},
+                            {text: "My gut feeling tells me", data: {strength: "weak"}},
+                        ],
+                        [
+                            {text: "Meta-analysis of 50 studies", data: {strength: "strong"}},
+                            {text: "One person's experience", data: {strength: "weak"}},
+                            {text: "Nobel Prize winner's research", data: {strength: "strong"}},
+                            {text: "It's what I was taught", data: {strength: "weak"}},
+                            {text: "Documented case studies", data: {strength: "strong"}},
+                            {text: "Popular opinion polls", data: {strength: "weak"}},
+                        ],
+                        [
+                            {text: "Peer-reviewed medical research", data: {strength: "strong"}},
+                            {text: "Celebrity endorsement", data: {strength: "weak"}},
+                            {text: "University laboratory findings", data: {strength: "strong"}},
+                            {text: "Anecdotal evidence only", data: {strength: "weak"}},
+                            {text: "Professional organization guidelines", data: {strength: "strong"}},
+                            {text: "Unverified internet claims", data: {strength: "weak"}},
+                        ],
+                        [
+                            {text: "Archaeological evidence supports", data: {strength: "strong"}},
+                            {text: "Wishful thinking", data: {strength: "weak"}},
+                            {text: "Economic data analysis", data: {strength: "strong"}},
+                            {text: "Stereotypes and assumptions", data: {strength: "weak"}},
+                            {text: "Independent audit results", data: {strength: "strong"}},
+                            {text: "Outdated information", data: {strength: "weak"}},
+                        ],
+                        [
+                            {text: "Clinical trial evidence", data: {strength: "strong"}},
+                            {text: "Emotional reaction only", data: {strength: "weak"}},
+                            {text: "Systematic review conclusions", data: {strength: "strong"}},
+                            {text: "Unsupported generalizations", data: {strength: "weak"}},
+                            {text: "Primary source documentation", data: {strength: "strong"}},
+                            {text: "Hearsay and rumors", data: {strength: "weak"}},
+                        ],
+                        [
+                            {text: "Validated measurement tools", data: {strength: "strong"}},
+                            {text: "Biased personal perspective", data: {strength: "weak"}},
+                            {text: "Comparative international data", data: {strength: "strong"}},
+                            {text: "Circular reasoning", data: {strength: "weak"}},
+                            {text: "Transparent methodology", data: {strength: "strong"}},
+                            {text: "Cherry-picked examples", data: {strength: "weak"}},
+                        ]
+                    ],
+                    answer: [
+                        [
+                            {text: "Compare the benefits and drawbacks", data: {stage: "analyze"}},
+                            {text: "Write 500 words minimum", data: {stage: "notice"}},
+                            {text: "Introduction → Body → Conclusion", data: {stage: "setup"}},
+                            {text: "Add specific examples from research", data: {stage: "work"}},
+                            {text: "Write clear topic sentences", data: {stage: "engineer"}},
+                            {text: "Check all requirements were met", data: {stage: "review"}},
+                            {text: "Start writing immediately", data: {stage: "wrong"}},
+                            {text: "Ignore the word count", data: {stage: "wrong"}},
+                        ],
+                        [
+                            {text: "Explain the causes and effects", data: {stage: "analyze"}},
+                            {text: "Include three credible sources", data: {stage: "notice"}},
+                            {text: "Plan three body paragraphs", data: {stage: "setup"}},
+                            {text: "Support with statistics and facts", data: {stage: "work"}},
+                            {text: "Connect ideas with transitions", data: {stage: "engineer"}},
+                            {text: "Verify all sources are cited", data: {stage: "review"}},
+                            {text: "Use only personal opinions", data: {stage: "wrong"}},
+                            {text: "Skip the conclusion", data: {stage: "wrong"}},
+                        ],
+                        [
+                            {text: "Argue for or against the position", data: {stage: "analyze"}},
+                            {text: "Format in MLA style", data: {stage: "notice"}},
+                            {text: "Outline counterargument section", data: {stage: "setup"}},
+                            {text: "Include expert testimony", data: {stage: "work"}},
+                            {text: "Refute opposing viewpoints", data: {stage: "engineer"}},
+                            {text: "Proofread for grammar errors", data: {stage: "review"}},
+                            {text: "Avoid taking a clear stance", data: {stage: "wrong"}},
+                            {text: "Use informal language", data: {stage: "wrong"}},
+                        ],
+                        [
+                            {text: "Analyze the author's techniques", data: {stage: "analyze"}},
+                            {text: "Focus on literary devices only", data: {stage: "notice"}},
+                            {text: "Structure by technique type", data: {stage: "setup"}},
+                            {text: "Quote directly from the text", data: {stage: "work"}},
+                            {text: "Explain how techniques create meaning", data: {stage: "engineer"}},
+                            {text: "Ensure quotes are properly integrated", data: {stage: "review"}},
+                            {text: "Summarize the plot instead", data: {stage: "wrong"}},
+                            {text: "Write without textual evidence", data: {stage: "wrong"}},
+                        ],
+                        [
+                            {text: "Evaluate the effectiveness of solutions", data: {stage: "analyze"}},
+                            {text: "Address multiple stakeholder perspectives", data: {stage: "notice"}},
+                            {text: "Organize by solution type", data: {stage: "setup"}},
+                            {text: "Provide real-world case studies", data: {stage: "work"}},
+                            {text: "Assess feasibility and impact", data: {stage: "engineer"}},
+                            {text: "Check logical flow between paragraphs", data: {stage: "review"}},
+                            {text: "Focus on only one solution", data: {stage: "wrong"}},
+                            {text: "Ignore practical constraints", data: {stage: "wrong"}},
+                        ],
+                        [
+                            {text: "Discuss the historical significance", data: {stage: "analyze"}},
+                            {text: "Use primary and secondary sources", data: {stage: "notice"}},
+                            {text: "Chronological or thematic structure", data: {stage: "setup"}},
+                            {text: "Include multiple historical perspectives", data: {stage: "work"}},
+                            {text: "Connect past events to present impact", data: {stage: "engineer"}},
+                            {text: "Verify historical accuracy of claims", data: {stage: "review"}},
+                            {text: "Rely on Wikipedia only", data: {stage: "wrong"}},
+                            {text: "Present only one viewpoint", data: {stage: "wrong"}},
+                        ],
+                        [
+                            {text: "Synthesize information from multiple sources", data: {stage: "analyze"}},
+                            {text: "Demonstrate original thinking", data: {stage: "notice"}},
+                            {text: "Balance summary with analysis", data: {stage: "setup"}},
+                            {text: "Show relationships between sources", data: {stage: "work"}},
+                            {text: "Develop your own informed position", data: {stage: "engineer"}},
+                            {text: "Ensure synthesis, not just summary", data: {stage: "review"}},
+                            {text: "Copy from each source separately", data: {stage: "wrong"}},
+                            {text: "Avoid making connections", data: {stage: "wrong"}},
+                        ],
+                        [
+                            {text: "Interpret the data and trends", data: {stage: "analyze"}},
+                            {text: "Include visual aids if helpful", data: {stage: "notice"}},
+                            {text: "Present findings then implications", data: {stage: "setup"}},
+                            {text: "Explain statistical significance", data: {stage: "work"}},
+                            {text: "Draw evidence-based conclusions", data: {stage: "engineer"}},
+                            {text: "Verify data accuracy and sources", data: {stage: "review"}},
+                            {text: "Present data without interpretation", data: {stage: "wrong"}},
+                            {text: "Make unsupported generalizations", data: {stage: "wrong"}},
+                        ],
+                        [
+                            {text: "Critique the methodology and findings", data: {stage: "analyze"}},
+                            {text: "Maintain objective academic tone", data: {stage: "notice"}},
+                            {text: "Address strengths and weaknesses", data: {stage: "setup"}},
+                            {text: "Reference current research standards", data: {stage: "work"}},
+                            {text: "Provide constructive evaluation", data: {stage: "engineer"}},
+                            {text: "Check for bias in your critique", data: {stage: "review"}},
+                            {text: "Attack the researcher personally", data: {stage: "wrong"}},
+                            {text: "Accept all findings uncritically", data: {stage: "wrong"}},
+                        ],
+                        [
+                            {text: "Propose and defend a solution", data: {stage: "analyze"}},
+                            {text: "Consider ethical implications", data: {stage: "notice"}},
+                            {text: "Present problem, solution, benefits", data: {stage: "setup"}},
+                            {text: "Address potential objections", data: {stage: "work"}},
+                            {text: "Demonstrate solution viability", data: {stage: "engineer"}},
+                            {text: "Ensure proposal is realistic and ethical", data: {stage: "review"}},
+                            {text: "Propose impossible solutions", data: {stage: "wrong"}},
+                            {text: "Ignore ethical considerations", data: {stage: "wrong"}},
+                        ]
+                    ]
+                };
+
+                const currentRoundIndex = this.currentRound[station];
+                return allItems[station][currentRoundIndex] || allItems[station][0];
+            }
+
+            getOriginalPlaceholder(zone) {
+                // Return original placeholder text based on zone attributes
+                if (zone.dataset.type === 'topic') return '🎯 Drop Topic Sentence Here';
+                if (zone.dataset.type === 'reason1') return '💡 Drop First Reason Here';
+                if (zone.dataset.type === 'reason2') return '💡 Drop Second Reason Here';
+                if (zone.dataset.type === 'ending') return '🏁 Drop Ending Here';
+                if (zone.dataset.type === 'suspend') return '⏸️ Suspend Judgment';
+                if (zone.dataset.type === 'take') return '📝 Take a Side';
+                if (zone.dataset.type === 'organize') return '📊 Organize Ideas';
+                if (zone.dataset.type === 'plan') return '🎯 Plan to Write';
+                if (zone.dataset.order === '1') return '1️⃣ First Step';
+                if (zone.dataset.order === '2') return '2️⃣ Second Step';
+                if (zone.dataset.order === '3') return '3️⃣ Third Step';
+                if (zone.dataset.order === '4') return '4️⃣ Fourth Step';
+                if (zone.dataset.step === 'write') return '✍️ Writing Step';
+                if (zone.dataset.step === 'revise') return '🔄 Revising Step';
+                if (zone.dataset.step === 'improve') return '⬆️ Improving Step';
+                if (zone.dataset.step === 'transform') return '🔄 Transforming Step';
+                if (zone.dataset.step === 'edit') return '✏️ Editing Step';
+                if (zone.dataset.strength === 'strong') return 'Drop strong ideas here';
+                if (zone.dataset.strength === 'weak') return 'Drop weak ideas here';
+                if (zone.dataset.stage === 'analyze') return 'Find the key action words';
+                if (zone.dataset.stage === 'notice') return 'Identify what\'s needed';
+                if (zone.dataset.stage === 'setup') return 'Create your structure';
+                if (zone.dataset.stage === 'work') return 'Add supporting details';
+                if (zone.dataset.stage === 'engineer') return 'Build your response';
+                if (zone.dataset.stage === 'review') return 'Check your work';
+                return 'Drop items here';
+            }
+
+            setupDragAndDrop() {
+                const dragItems = document.querySelectorAll('.drag-item');
+                const dropZones = document.querySelectorAll('.drop-zone');
+
+                dragItems.forEach(item => {
+                    item.addEventListener('dragstart', (e) => {
+                        if (item.classList.contains('used')) {
+                            e.preventDefault();
+                            return;
+                        }
+                        
+                        const data = {
+                            text: item.textContent,
+                            element: item.outerHTML
+                        };
+                        
+                        // Add all dataset properties
+                        Object.keys(item.dataset).forEach(key => {
+                            data[key] = item.dataset[key];
+                        });
+                        
+                        e.dataTransfer.setData('text/plain', JSON.stringify(data));
+                        item.style.opacity = '0.5';
+                    });
+
+                    item.addEventListener('dragend', (e) => {
+                        item.style.opacity = '1';
+                    });
+                });
+
+                dropZones.forEach(zone => {
+                    zone.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        zone.classList.add('drag-over');
+                    });
+
+                    zone.addEventListener('dragleave', () => {
+                        zone.classList.remove('drag-over');
+                    });
+
+                    zone.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        zone.classList.remove('drag-over');
+                        
+                        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                        this.handleDrop(zone, data);
+                    });
+                });
+            }
+
+            handleDrop(zone, data) {
+                // Check if zone is already filled
+                if (zone.classList.contains('correct')) {
+                    return;
+                }
+
+                const isCorrect = this.checkCorrectPlacement(zone, data);
+                
+                if (isCorrect) {
+                    zone.innerHTML = data.text;
+                    zone.classList.add('correct');
+                    this.scores[this.currentStation]++;
+                    this.updateScore();
+                    this.playSuccessSound();
+                    this.createSparkles(zone);
+                    
+                    // Mark the dragged item as used
+                    const draggedItem = document.querySelector(`[data-${Object.keys(data)[1]}="${data[Object.keys(data)[1]]}"]`);
+                    if (draggedItem) {
+                        draggedItem.classList.add('used');
+                    }
+                    
+                    this.checkRoundCompletion();
+                } else {
+                    zone.classList.add('incorrect');
+                    setTimeout(() => {
+                        zone.classList.remove('incorrect');
+                    }, 500);
+                }
+            }
+
+            checkCorrectPlacement(zone, data) {
+                // Check each possible data attribute
+                const zoneType = zone.dataset.type;
+                const zoneWedge = zone.dataset.wedge;
+                const zoneOrder = zone.dataset.order;
+                const zoneStep = zone.dataset.step;
+                const zoneStrength = zone.dataset.strength;
+                const zoneStage = zone.dataset.stage;
+
+                return (zoneType && data.type === zoneType) ||
+                       (zoneWedge && data.type === zoneWedge) ||
+                       (zoneOrder && data.order === zoneOrder) ||
+                       (zoneStep && data.step === zoneStep) ||
+                       (zoneStrength && data.strength === zoneStrength) ||
+                       (zoneStage && data.stage === zoneStage);
+            }
+
+            checkRoundCompletion() {
+                const currentPage = document.querySelector('.page.active');
+                const allZones = currentPage.querySelectorAll('.drop-zone');
+                const correctZones = currentPage.querySelectorAll('.drop-zone.correct');
+
+                if (allZones.length === correctZones.length) {
+                    this.createCelebration();
+                    setTimeout(() => {
+                        if (this.currentRound[this.currentStation] < 9) {
+                            this.nextRound(this.currentStation);
+                        }
+                    }, 2000);
+                }
+            }
+
+            nextRound(station) {
+                this.currentRound[station] = (this.currentRound[station] + 1) % 10;
+                this.loadCurrentRound();
+            }
+
+            updateScore() {
+                const scoreElement = document.getElementById(this.currentStation + 'Score');
+                if (scoreElement) {
+                    scoreElement.textContent = this.scores[this.currentStation];
+                }
+            }
+
+            updateProgress() {
+                const totalScore = Object.values(this.scores).reduce((a, b) => a + b, 0);
+                const progressFill = document.getElementById('progressFill');
+                progressFill.style.width = `${(totalScore / 60) * 100}%`;
+            }
+
+            createSparkles(element) {
+                const rect = element.getBoundingClientRect();
+                for (let i = 0; i < 8; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.style.position = 'absolute';
+                    sparkle.style.left = `${rect.left + Math.random() * rect.width}px`;
+                    sparkle.style.top = `${rect.top + Math.random() * rect.height}px`;
+                    sparkle.style.width = '6px';
+                    sparkle.style.height = '6px';
+                    sparkle.style.background = '#ffd700';
+                    sparkle.style.borderRadius = '50%';
+                    sparkle.style.pointerEvents = 'none';
+                    sparkle.style.zIndex = '1000';
+                    sparkle.style.animation = 'sparkle 1.5s ease-out forwards';
+                    
+                    document.body.appendChild(sparkle);
+                    
+                    setTimeout(() => {
+                        sparkle.remove();
+                    }, 1500);
+                }
+            }
+
+            createCelebration() {
+                const celebration = document.getElementById('celebration');
+                for (let i = 0; i < 30; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = `${Math.random() * 100}%`;
+                    confetti.style.background = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                    confetti.style.animationDelay = `${Math.random() * 2}s`;
+                    celebration.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }
+            }
+
+            playSuccessSound() {
+                if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+                    const audioContext = new (AudioContext || webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                }
+            }
+        }
+
+        // Add sparkle animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes sparkle {
+                0% {
+                    transform: scale(0) rotate(0deg);
+                    opacity: 1;
+                }
+                50% {
+                    transform: scale(1.5) rotate(180deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: scale(0) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize the game
+        const game = new WritingArcade();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'988862c8f0d87ad9',t:'MTc1OTQ1MjAwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
