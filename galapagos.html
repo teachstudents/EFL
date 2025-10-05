@@ -10,18 +10,18 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
-        @keyframes slowColorChange {
-            0% { background-color: #0e7490; } /* Cyan */
-            25% { background-color: #155e75; } /* Dark Cyan */
-            50% { background-color: #164e63; } /* Mid Blue */
-            75% { background-color: #155e75; } /* Dark Cyan */
-            100% { background-color: #0e7490; } /* Cyan */
+        @keyframes oceanColors {
+            0% { background-color: #0c4a6e; } /* sky-900 */
+            25% { background-color: #1e293b; } /* slate-800 */
+            50% { background-color: #075985; } /* cyan-800 */
+            75% { background-color: #1e293b; } /* slate-800 */
+            100% { background-color: #0c4a6e; } /* sky-900 */
         }
         body {
             font-family: 'Inter', sans-serif;
             overscroll-behavior: none;
-            animation: slowColorChange 240s linear infinite;
-            padding-top: 70px; /* Add padding to prevent nav overlap */
+            animation: oceanColors 240s linear infinite;
+            padding-top: 85px; /* Adjusted padding for progress bar */
         }
         #background-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
@@ -78,20 +78,13 @@
         /* Certificate Canvas */
         #completion-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
         
-        /* Reward Animation Styles */
-        #nav-header .score-display.hit { transform: scale(1.2); transition: transform 0.1s ease-out; }
-        .coin, .token, .gem, .star { position: absolute; box-shadow: 0 4px 8px rgba(0,0,0,0.4); will-change: transform, opacity; border-radius: 50%; }
-        .coin { width: 30px; height: 30px; background: linear-gradient(45deg, #ffd700, #ffed4e); border: 3px solid #ffb700; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #b8860b; }
-        .token { width: 25px; height: 25px; background: linear-gradient(45deg, #ff6b6b, #ee5a52); border: 2px solid #ff5252; }
-        .gem { width: 22px; height: 22px; background: linear-gradient(45deg, #9c27b0, #e91e63); transform: rotate(45deg); border-radius: 4px; }
-        .star { width: 25px; height: 25px; background: #ffd700; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); border-radius: 0; }
-        .sparkle { position: absolute; width: 8px; height: 8px; background: #ffd700; border-radius: 50%; animation: sparkle 0.8s ease-out forwards; }
-        .fly-straight { animation: flyStraight 1s ease-out forwards; }
-        .fly-arc { animation: flyArc 1.2s ease-out forwards; }
-        @keyframes flyStraight { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--end-x), var(--end-y)) scale(0.3); opacity: 0; } }
-        @keyframes flyArc { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 50% { transform: translate(calc(var(--end-x) * 0.5), calc(var(--end-y) * 0.3 - 50px)) scale(0.8); } 100% { transform: translate(var(--end-x), var(--end-y)) scale(0.3); opacity: 0; } }
-        @keyframes sparkle { 0% { transform: scale(0); opacity: 1; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(0); opacity: 0; } }
+        /* Progress Bar */
+        #progress-container { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 8px; width: 100%; margin-top: 8px; }
+        #progress-bar { height: 100%; width: 0%; background-color: #38bdf8; transition: width 0.5s ease-out; }
         
+        /* Vocab Game Timer */
+        #vocab-game-timer-bar { height: 6px; background-color: #38bdf8; transition: width 0.1s linear; }
+
         /* Print Styles */
         @media print {
             body * { visibility: hidden; }
@@ -105,30 +98,35 @@
     <div id="reward-animation-container" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[60]"></div>
 
     <header id="nav-header" class="fixed top-0 left-0 right-0 z-50 p-2" style="display: none;">
-        <div class="max-w-sm mx-auto p-1.5 flex justify-center items-center gap-2 bg-white/90 backdrop-blur-sm shadow-lg rounded-full">
-            <button onclick="goBack()" class="nav-button bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold p-2 rounded-full">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
-            <div class="font-bold text-base text-cyan-600 px-3">Score: <span id="score-display">0</span></div>
-            <button onclick="navigateTo('main-menu')" class="nav-button bg-gray-800 text-white font-bold p-2 rounded-full hover:bg-gray-900">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-            </button>
-            <button onclick="toggleTTS(this)" class="nav-button p-2 rounded-full hover:bg-gray-200" title="Toggle Sound">
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 5.858a3 3 0 104.243 4.243M9 12l4.243 4.243"></path></svg>
-            </button>
-            <button onclick="goNext()" class="nav-button bg-cyan-600 hover:bg-cyan-700 text-white font-bold p-2 rounded-full">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-            </button>
+        <div class="max-w-md mx-auto bg-white/90 backdrop-blur-sm shadow-lg rounded-full p-2">
+            <div class="flex justify-center items-center gap-2">
+                <button onclick="goBack()" class="nav-button bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold p-2 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <div class="font-bold text-base text-sky-500 px-3 whitespace-nowrap">Points 🧬: <span id="score-display">0</span></div>
+                <button onclick="navigateTo('main-menu')" class="nav-button bg-gray-800 text-white font-bold p-2 rounded-full hover:bg-gray-900">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                </button>
+                <button onclick="toggleTTS(this)" class="nav-button p-2 rounded-full hover:bg-gray-200" title="Toggle Sound">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 5.858a3 3 0 104.243 4.243M9 12l4.243 4.243"></path></svg>
+                </button>
+                <button onclick="goNext()" class="nav-button bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
         </div>
     </header>
 
     <div id="app-container" class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
         <section id="page-title-screen" class="page active text-center bg-white rounded-2xl shadow-lg p-8">
             <div class="h-full flex flex-col justify-center items-center">
-                <h1 id="main-title" class="text-5xl md:text-6xl font-bold text-cyan-800 mb-4"></h1>
+                <h1 id="main-title" class="text-5xl md:text-6xl font-bold text-slate-800 mb-4"></h1>
                 <p id="main-subtitle" class="text-xl md:text-2xl text-gray-600 mb-8"></p>
-                <div id="main-svg-container" class="rounded-lg shadow-md mb-8 w-full max-w-lg mx-auto"></div>
-                <button onclick="startApp()" class="action-button bg-cyan-600 text-white font-bold py-3 px-8 rounded-full text-2xl hover:bg-cyan-700">START LESSON</button>
+                <div id="main-svg-container" class="rounded-lg mb-8 w-full max-w-lg mx-auto"></div>
+                <button onclick="startApp()" class="action-button bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-2xl hover:bg-blue-700">START LESSON</button>
             </div>
         </section>
         <div id="dynamic-pages-container"></div>
@@ -147,6 +145,7 @@
                 { id: 'menu-tps', text: '0. Think-Pair-Share <span aria-hidden="true">🧠</span>', color: 'green', target: 'tps-start' },
                 { id: 'menu-goals', text: '1. Learning Goals <span aria-hidden="true">🎯</span>', color: 'teal', target: 'learning-goals' },
                 { id: 'menu-warmup', text: '2. Warm-Up & Vocab <span aria-hidden="true">📚</span>', color: 'sky', target: 'warm-up' },
+                { id: 'menu-vocab-game', text: 'Vocab Game <span aria-hidden="true">🎮</span>', color: 'sky', target: 'vocab-game'},
                 { id: 'menu-reading', text: '3. Reading & Comprehension <span aria-hidden="true">📖</span>', color: 'blue', target: 'reading-main' },
                 { id: 'menu-convo', text: '4. Conversation Practice <span aria-hidden="true">🗣️</span>', color: 'indigo', target: 'conversation-practice' },
                 { id: 'menu-lecture1', text: '5. Listening: Lecture <span aria-hidden="true">🧑‍🏫</span>', color: 'amber', target: 'lecture-uni' },
@@ -163,8 +162,8 @@
                 { word: 'Adaptation', def: 'A change in a plant or animal that makes it better able to live in a particular place.', sentence: 'A giraffe\'s long neck is an adaptation for reaching leaves high in trees.' },
                 { word: 'Endemic', def: 'A plant or animal that is native to a single location and not found anywhere else.', sentence: 'The giant panda is endemic to China.' },
                 { word: 'Archipelago', def: 'A large group or chain of islands.', sentence: 'Japan is a large archipelago in East Asia.' },
-                { word: 'Marine Iguana', def: 'The world\'s only lizard that swims and feeds in the ocean.', sentence: 'The marine iguana is a famous endemic animal of the Galápagos.' },
-                { word: 'Giant Tortoise', def: 'A very large species of tortoise, famous for its long lifespan.', sentence: 'The giant tortoise can live for over 100 years.' },
+                { word: 'Marine Iguana', def: 'The world\'s only lizard that swims and feeds in the ocean.', sentence: 'The marine iguana <span aria-hidden="true">🦎</span> is a famous endemic animal of the Galápagos.' },
+                { word: 'Giant Tortoise', def: 'A very large species of tortoise, famous for its long lifespan.', sentence: 'The giant tortoise <span aria-hidden="true">🐢</span> can live for over 100 years.' },
                 { word: 'Natural Selection', def: 'The process where organisms with favorable traits are more likely to survive and reproduce.', sentence: 'Through natural selection, animals become better adapted to their environment.' },
                 { word: 'Volcanic', def: 'Relating to or produced by a volcano.', sentence: 'The islands were formed by volcanic activity millions of years ago.' },
                 { word: 'Biodiversity Hotspot', def: 'A region with a very high level of biodiversity that is under threat.', sentence: 'The mountains of Southwest China are a major biodiversity hotspot.' },
@@ -193,12 +192,12 @@
                 // 2. Warm-Up & Vocab
                 { id: 'warm-up', type: 'html-content', content: { title: 'Warm-Up Questions <span aria-hidden="true">📚</span>', html: `
                                 <ol class="list-decimal list-inside space-y-4 text-xl text-left">
-                                    <li>If you were a scientist discovering a new island, what would you be most excited to study? (For example, China's Sichuan Giant Panda Sanctuaries <span aria-hidden="true">🐼</span> are a special, isolated place with unique life.)</li>
+                                    <li>China is the only place in the world you can find giant pandas in the wild. The Galápagos Islands are the only place you can find marine iguanas. Why do you think some animals only live in one specific place on Earth?</li>
                                     <li>The animals on the Galápagos are famous for having no fear of humans. Why do you think this might be?</li>
                                     <li>A visitor's footprint can damage the fragile environment. What rules do you think should be in place for tourists visiting a special place like this?</li>
                                 </ol>` } },
                 { id: 'vocab-start', type: 'simple', content: { title: 'Unit Vocabulary <span aria-hidden="true">📚</span>', text: 'Let\'s learn the key terms for this unit. Click the "Next" arrow to cycle through the words.' } },
-                { id: 'vocab-match', type: 'quiz-mcq', content: { title: 'Vocabulary Practice: Matching', questions: [] } },
+                { id: 'vocab-game', type: 'vocab-game', content: { title: 'Vocabulary Review Game <span aria-hidden="true">🎮</span>'} },
                 
                 // 3. Reading & Comprehension
                 { id: 'reading-main', type: 'html-content', content: { title: 'Reading: The Enchanted Islands <span aria-hidden="true">📖</span>', html: `
@@ -293,6 +292,10 @@
                                     <p><strong class="font-semibold text-violet-700">Product:</strong> A digital campaign toolkit that includes: 1) A slogan and poster, 2) A new visitor pledge to sign, and 3) A sample social media post.</p>
                                     <p><strong class="font-semibold text-violet-700">Standards:</strong> Your campaign will be judged on its clarity, persuasiveness, creativity, and its potential to genuinely change tourist behavior.</p>
                                 </div>
+                                <div class="mt-8">
+                                    <h3 class="text-2xl font-bold text-violet-600 mb-3">My Field Notes <span aria-hidden="true">📓</span></h3>
+                                    <textarea id="field-notes" class="w-full h-48 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Jot down your ideas, key vocabulary, and answers here..."></textarea>
+                                </div>
                                 </div>` } },
                 { id: 'writing-task', type: 'writing-task', content: { 
                     title: 'Project Writing Activity <span aria-hidden="true">✍️</span>', 
@@ -359,12 +362,93 @@
              toggleTTS(forceState) { this.isTtsEnabled = forceState === undefined ? !this.isTtsEnabled : forceState; if (!this.isTtsEnabled) { this.cancel(); } return this.isTtsEnabled; }
          }
 
-        // --- Global App State and Functions (Logic is unchanged) ---
+        // --- Global App State and Functions ---
         const speechService = new SpeechService();
         let score = 0, currentPage = lessonData.startPageId, timerInterval;
         const pageHistory = [lessonData.startPageId];
         let pageSequence = [];
+        let completedSections = new Set();
+        let vocabGameTimer;
 
+        // --- Progress and Completion Logic ---
+        const pageToMenuMap = {};
+        function buildPageToMenuMap() {
+            lessonData.mainMenu.forEach(menuItem => {
+                let queue = [menuItem.target];
+                let visited = new Set(queue);
+                while (queue.length > 0) {
+                    const pageId = queue.shift();
+                    pageToMenuMap[pageId] = menuItem.id;
+                    const pageDef = lessonData.pages.find(p => p.id === pageId);
+                    if (pageDef && pageDef.type.startsWith('quiz')) {
+                        // This logic is simple, for complex branching use a more robust map
+                        const nextQuizPage = getNextQuizPage(pageId);
+                        if (nextQuizPage && !visited.has(nextQuizPage)) {
+                            queue.push(nextQuizPage);
+                            visited.add(nextQuizPage);
+                        }
+                    }
+                }
+            });
+        }
+        function getNextQuizPage(pageId) {
+            const sequence = ['mcq', 'tfng', 'gap-fill'];
+            const [prefix, type] = pageId.split('-quiz-');
+            const currentIndex = sequence.indexOf(type);
+            if (currentIndex > -1 && currentIndex < sequence.length - 1) {
+                return `${prefix}-quiz-${sequence[currentIndex + 1]}`;
+            }
+            return null;
+        }
+
+        function updateProgressBar() {
+            const progress = (completedSections.size / lessonData.mainMenu.length) * 100;
+            const bar = document.getElementById('progress-bar');
+            if (bar) bar.style.width = `${progress}%`;
+        }
+
+        function updateMenuCompletionState() {
+            const menuContainer = document.getElementById('page-main-menu');
+            if (!menuContainer) return;
+            lessonData.mainMenu.forEach(item => {
+                const button = menuContainer.querySelector(`[onclick="navigateTo('${item.target}')"]`);
+                if (button && completedSections.has(item.id)) {
+                    if (!button.innerHTML.includes('✓')) {
+                        button.innerHTML += ' <span class="text-green-300">✓</span>';
+                    }
+                }
+            });
+        }
+
+        function markSectionAsComplete(pageId) {
+            const menuId = pageToMenuMap[pageId];
+            if (menuId && !completedSections.has(menuId)) {
+                completedSections.add(menuId);
+                updateProgressBar();
+            }
+        }
+        
+        function checkQuizPageCompletion(pageId) {
+            const pageElement = document.getElementById(`page-${pageId}`);
+            if (!pageElement) return false;
+            const questions = pageElement.querySelectorAll('.question-group');
+            const answered = pageElement.querySelectorAll('.question-group button:disabled');
+            // Logic to determine if all questions are answered.
+            // For MCQ/TFNG, one disabled button per group is enough.
+            // For Gap-Fill, all gaps must be correct.
+            let allAnswered = true;
+            questions.forEach(q => {
+                if(pageId.includes('gap-fill')) {
+                    if(!q.querySelector('.gap.correct')) allAnswered = false;
+                } else {
+                    if(!q.querySelector('button:disabled')) allAnswered = false;
+                }
+            });
+            return allAnswered;
+        }
+
+
+        // --- App Navigation ---
         window.toggleTTS = (button) => {
             const isNowEnabled = speechService.toggleTTS();
             const iconPath = isNowEnabled 
@@ -402,12 +486,21 @@
         }
 
         window.navigateTo = (pageId) => {
+            const previousPageId = currentPage;
+            const previousPageDef = lessonData.pages.find(p => p.id === previousPageId);
+            
             const targetPage = document.getElementById(`page-${pageId}`);
             if (!targetPage) return console.warn('navigateTo: no page found for id', pageId);
             if (pageId === currentPage) return;
             
             clearInterval(timerInterval);
+            clearTimeout(vocabGameTimer);
             speechService.cancel();
+
+            // Mark completion for non-quiz pages when navigating away
+            if (previousPageDef && !previousPageDef.type.startsWith('quiz')) {
+                 markSectionAsComplete(previousPageId);
+            }
 
             document.getElementById(`page-${currentPage}`)?.classList.remove('active');
             targetPage.classList.add('active');
@@ -419,6 +512,8 @@
                 if (pageData.type === 'timer') {
                     const timerEl = document.getElementById(pageData.content.timerId);
                     if (timerEl) startTimer(pageData.content.duration, timerEl, goNext);
+                } else if (pageData.type === 'vocab-game') {
+                    startVocabGame();
                 }
                 
                 if (pageData.type === 'dialogue') {
@@ -431,6 +526,7 @@
                 }
             } else if (pageId === lessonData.homePageId) {
                 speechService.speak(targetPage.querySelector('h2').innerText);
+                updateMenuCompletionState();
             }
             updateNavButtons();
             window.scrollTo(0, 0);
@@ -466,6 +562,12 @@
 
         function updateScore(points) { score += points; document.getElementById('score-display').textContent = score; }
 
+        function checkCompletionAndMark() {
+            if(checkQuizPageCompletion(currentPage)) {
+                markSectionAsComplete(currentPage);
+            }
+        }
+
         window.checkTfngAnswer = function(clickedButton, chosenAnswer, correctAnswer) {
             const buttonContainer = clickedButton.parentElement;
             Array.from(buttonContainer.children).forEach(btn => btn.disabled = true);
@@ -479,6 +581,7 @@
                 const correctBtn = Array.from(buttonContainer.children).find(btn => btn.textContent === correctAnswer.charAt(0));
                 if (correctBtn) correctBtn.className = correctBtn.className.replace(/bg-\w+-500/, 'bg-green-500');
             }
+            setTimeout(checkCompletionAndMark, 100);
         }
         
         window.checkMcqAnswer = function(button, isCorrect) {
@@ -498,6 +601,7 @@
                     correctButton.classList.add('bg-green-500', 'border-green-600', 'text-white');
                 }
             }
+            setTimeout(checkCompletionAndMark, 100);
         }
 
         function initGapFill(pageId) {
@@ -545,8 +649,95 @@
                 gap.classList.toggle('correct', isCorrect);
                 gap.classList.toggle('incorrect', !isCorrect);
                 if (isCorrect) { updateScore(10); showFeedbackMessage(true); } else { showFeedbackMessage(false); }
+                setTimeout(checkCompletionAndMark, 100);
             }
         }
+
+        // --- Vocab Game Logic ---
+        let vocabGameQuestions = [];
+        let vocabGameCurrentIndex = 0;
+        let vocabGameScore = 0;
+        const ROUND_TIME = 10000; // 10 seconds
+
+        function startVocabGame() {
+            vocabGameQuestions = [...lessonData.vocabulary].sort(() => 0.5 - Math.random());
+            vocabGameCurrentIndex = 0;
+            vocabGameScore = 0;
+            document.getElementById('vocab-game-score').textContent = '0';
+            nextVocabGameRound();
+        }
+
+        function nextVocabGameRound() {
+            if (vocabGameCurrentIndex >= vocabGameQuestions.length) {
+                endVocabGame();
+                return;
+            }
+            
+            const question = vocabGameQuestions[vocabGameCurrentIndex];
+            document.getElementById('vocab-game-definition').textContent = question.def;
+            
+            const options = [question.word];
+            const wrongAnswers = lessonData.vocabulary.filter(v => v.word !== question.word);
+            while (options.length < 4) {
+                const randomWrong = wrongAnswers.splice(Math.floor(Math.random() * wrongAnswers.length), 1)[0];
+                options.push(randomWrong.word);
+            }
+            
+            const optionsContainer = document.getElementById('vocab-game-options');
+            optionsContainer.innerHTML = '';
+            options.sort(() => 0.5 - Math.random()).forEach(opt => {
+                const button = document.createElement('button');
+                button.className = 'quiz-option p-3 rounded-lg text-left bg-gray-100 hover:bg-gray-200 border border-gray-200';
+                button.textContent = opt;
+                button.onclick = () => checkVocabGameAnswer(opt === question.word);
+                optionsContainer.appendChild(button);
+            });
+
+            startRoundTimer();
+        }
+        
+        function startRoundTimer() {
+            clearTimeout(vocabGameTimer);
+            const timerBar = document.getElementById('vocab-game-timer-bar');
+            timerBar.style.transition = 'none';
+            timerBar.style.width = '100%';
+            
+            setTimeout(() => {
+                timerBar.style.transition = `width ${ROUND_TIME / 1000}s linear`;
+                timerBar.style.width = '0%';
+            }, 100);
+
+            vocabGameTimer = setTimeout(() => {
+                showFeedbackMessage(false);
+                vocabGameCurrentIndex++;
+                nextVocabGameRound();
+            }, ROUND_TIME);
+        }
+
+        function checkVocabGameAnswer(isCorrect) {
+            clearTimeout(vocabGameTimer);
+            showFeedbackMessage(isCorrect);
+            if (isCorrect) {
+                vocabGameScore++;
+                updateScore(5);
+                document.getElementById('vocab-game-score').textContent = vocabGameScore;
+            }
+            
+            const optionsContainer = document.getElementById('vocab-game-options');
+            optionsContainer.querySelectorAll('button').forEach(btn => btn.disabled = true);
+
+            setTimeout(() => {
+                vocabGameCurrentIndex++;
+                nextVocabGameRound();
+            }, 1500);
+        }
+
+        function endVocabGame() {
+            document.getElementById('vocab-game-definition').textContent = `Game Over! You scored ${vocabGameScore} out of ${vocabGameQuestions.length}.`;
+            document.getElementById('vocab-game-options').innerHTML = `<button onclick="startVocabGame()" class="action-button bg-blue-500 text-white font-bold p-3 rounded-lg">Play Again</button>`;
+            markSectionAsComplete('vocab-game');
+        }
+
 
         function createPageElement(id, content) {
             const section = document.createElement('section');
@@ -576,47 +767,36 @@
             if(readingMcq) readingMcq.content.questions = [ { question: 'What is the main reason the Galápagos Islands have so many unique animals?', options: ['They have a very warm climate.', 'They are isolated from the mainland.', 'They are protected by the Ecuadorian government.', 'They have many active volcanoes.'], correctAnswer: 'They are isolated from the mainland.' }, { question: 'What did Charles Darwin observe about the finches on the islands?', options: ['They were all identical.', 'They could all swim in the ocean.', 'Their beaks were different depending on the island and its food source.', 'They were afraid of humans.'], correctAnswer: 'Their beaks were different depending on the island and its food source.' }, { question: 'Which of the following is an example of an "endemic" species mentioned in the text?', options: ['Charles Darwin', 'Goats and rats', 'The marine iguana', 'South American finches'], correctAnswer: 'The marine iguana' }, { question: 'What does the term "biodiversity hotspot" imply?', options: ['The area has a high variety of life but is under threat.', 'The area is a popular place for tourists to visit.', 'The area has many active volcanoes.', 'The area is where natural selection happens the fastest.'], correctAnswer: 'The area has a high variety of life but is under threat.' }, { question: 'According to the text, what is a major modern threat to the Galápagos?', options: ['The frequent volcanic eruptions.', 'The process of natural selection.', 'The introduction of non-native species.', 'A lack of interest from scientists.'], correctAnswer: 'The introduction of non-native species.' } ];
 
             // --- ALL LISTENING QUIZZES ---
-            // Lecture
             const lectureMcq = lessonData.pages.find(p => p.id === 'lecture-uni-quiz-mcq');
             if(lectureMcq) lectureMcq.content.questions = [ { question: 'What is "adaptive radiation"?', options: ['The evolution of one species into another single species.', 'The rapid evolution of many species from one common ancestor.', 'The process of animals adapting to radiation.', 'A type of volcanic activity.'], correctAnswer: 'The rapid evolution of many species from one common ancestor.' }, { question: 'What allowed the ancestral finches to diversify so much?', options: ['There was a lot of competition for food.', 'There were many available ecological niches with little competition.', 'The islands were very close to the mainland.', 'The finches could swim between islands.'], correctAnswer: 'There were many available ecological niches with little competition.' }, { question: "What part of the finches' bodies adapted to the different food sources?", options: ['Their feet', 'Their wings', 'Their beaks', 'Their color'], correctAnswer: 'Their beaks' }, { question: "Where did the ancestral finch species likely come from?", options: ['Asia', 'North America', 'South America', 'Africa'], correctAnswer: 'South America' }, { question: "What does the lecture describe as a 'textbook example of adaptation'?", options: ["The islands' volcanic activity", "The isolation of the archipelago", "The variety in the finches' beak shapes", "The arrival of Charles Darwin"], correctAnswer: "The variety in the finches' beak shapes" } ];
             const lectureTfng = lessonData.pages.find(p => p.id === 'lecture-uni-quiz-tfng');
             if(lectureTfng) lectureTfng.content.questions = [ { statement: 'The Galápagos archipelago is very old in geological terms.', correctAnswer: 'False' }, { statement: 'The different beak shapes of the finches are examples of adaptation.', correctAnswer: 'True' }, { statement: 'All 13 species of finches arrived from the mainland at different times.', correctAnswer: 'False' }, { statement: 'The lecture states that the finches on the mainland faced little competition for food.', correctAnswer: 'False' }, { statement: "Darwin's theory was primarily based on his study of marine iguanas.", correctAnswer: 'False' } ];
             const lectureGap = lessonData.pages.find(p => p.id === 'lecture-uni-quiz-gap-fill');
             if(lectureGap) lectureGap.content.sentences = [ { text: ['Adaptive radiation happens when an organism enters a new environment with many available', '.'], answer: 'ecological niches' }, { text: ['All the finch species on the islands came from a single common', '.'], answer: 'ancestor' }, { text: ['Over time, the finch populations became very', 'for their specific food source.'], answer: 'specialized' }, { text: ['The islands are incredibly', ', which is a key reason for their unique evolution.'], answer: 'isolated' }, { text: ['The different food sources on the islands included hard seeds, soft fruits, and small', '.'], answer: 'insects' } ];
-            
-            // Expert Talk
             const expertMcq = lessonData.pages.find(p => p.id === 'lecture-expert-quiz-mcq');
             if(expertMcq) expertMcq.content.questions = [ { question: 'According to Dr. Cruz, what is the most immediate, destructive threat?', options: ['Oil spills', 'Climate change', 'Invasive species', 'Tourism'], correctAnswer: 'Invasive species' }, { question: 'How do black rats harm native birds?', options: ['They compete for the same food.', 'They destroy their nests.', 'They eat their eggs.', 'They carry diseases.'], correctAnswer: 'They eat their eggs.' }, { question: 'Which invasive animal can turn a lush landscape into a barren desert?', options: ['Black rats', 'Goats', 'Blackberries', 'Humans'], correctAnswer: 'Goats' }, { question: "What is the name of Dr. Cruz's organization?", options: ['The Galápagos Foundation', 'The Charles Darwin Foundation', 'The Invasive Species Council', 'The World Wildlife Fund'], correctAnswer: 'The Charles Darwin Foundation' }, { question: "How does the foundation deal with invasive goats?", options: ['They build fences.', 'They relocate them to the mainland.', 'They use GPS tracking to eradicate them.', 'They introduce a natural predator.'], correctAnswer: 'They use GPS tracking to eradicate them.' } ];
             const expertTfng = lessonData.pages.find(p => p.id === 'lecture-expert-quiz-tfng');
             if(expertTfng) expertTfng.content.questions = [ { statement: 'Goats were introduced to the islands by accident.', correctAnswer: 'Not Given' }, { statement: 'The Charles Darwin Foundation uses technology like GPS to fight invasive species.', correctAnswer: 'True' }, { statement: 'Dr. Cruz believes the fight against invasive species is easy and will be over soon.', correctAnswer: 'False' }, { statement: 'Invasive blackberries are mentioned as a threat to native plants.', correctAnswer: 'True' }, { statement: 'Dr. Cruz states that invasive species are a bigger threat than tourism.', correctAnswer: 'Not Given' } ];
             const expertGap = lessonData.pages.find(p => p.id === 'lecture-expert-quiz-gap-fill');
             if(expertGap) expertGap.content.sentences = [ { text: ['The expert describes the threat of invasive species as quiet and', '.'], answer: 'insidious' }, { text: ['The introduction of new species can', 'havoc on the native ecosystem.'], answer: 'wreak' }, { text: ['The Foundation works to', 'goat populations from the islands.'], answer: 'eradicate' }, { text: ['Black rats arrived on the islands by traveling on', '.'], answer: 'ships' }, { text: ['The effort to protect the species is described as painstaking and', '.'], answer: 'never-ending' } ];
-
-            // Podcast Convo
             const convoMcq = lessonData.pages.find(p => p.id === 'podcast-convo-quiz-mcq');
             if(convoMcq) convoMcq.content.questions = [ { question: 'Why does the marine iguana sneeze salt?', options: ['To communicate with other iguanas.', 'To clean its nose.', 'To get rid of excess salt from the ocean.', 'To scare away predators.'], correctAnswer: 'To get rid of excess salt from the ocean.' }, { question: 'What physical adaptation helps the marine iguana swim?', options: ['Webbed feet', 'A flattened tail', 'Fins', 'Gills'], correctAnswer: 'A flattened tail' }, { question: "What do marine iguanas eat?", options: ['Fish', 'Insects', 'Algae', 'Birds'], correctAnswer: 'Algae' }, { question: "What was a key factor that pushed the iguana's ancestors into the water?", options: ['A desire to explore', 'Fleeing from predators', 'Limited food on land', 'A change in climate'], correctAnswer: 'Limited food on land' }, { question: "What do the hosts compare the marine iguana's appearance to?", options: ['A movie monster', 'A cute pet', 'A type of fish', 'A common lizard'], correctAnswer: 'A movie monster' } ];
             const convoTfng = lessonData.pages.find(p => p.id === 'podcast-convo-quiz-tfng');
             if(convoTfng) convoTfng.content.questions = [ { statement: "The marine iguana's ancestors were also marine lizards.", correctAnswer: 'False' }, { statement: 'The podcast hosts think the marine iguana looks cute.', correctAnswer: 'Not Given' }, { statement: 'There was plenty of food for iguanas on the land.', correctAnswer: 'False' }, { statement: 'Marine iguanas have strong claws to grip rocks.', correctAnswer: 'True' }, { statement: 'The podcast concludes that the marine iguana is still evolving.', correctAnswer: 'Not Given' } ];
             const convoGap = lessonData.pages.find(p => p.id === 'podcast-convo-quiz-gap-fill');
             if(convoGap) convoGap.content.sentences = [ { text: ['The marine iguana had a survival', 'by venturing into the water for food.'], answer: 'advantage' }, { text: ['They have strong claws to grip rocks in the', '.'], answer: 'current' }, { text: ['They have special', 'that allow them to sneeze out salt.'], answer: 'glands' }, { text: ['The hosts state that it is the only lizard that has adapted to a', 'lifestyle.'], answer: 'marine' }, { text: ["The iguana's ancestors were", 'iguanas.'], answer: 'land' } ];
-            
-            // Podcast Futures
             const futuresMcq = lessonData.pages.find(p => p.id === 'podcast-futures-quiz-mcq');
             if(futuresMcq) futuresMcq.content.questions = [ { question: 'What is the tourism model used in the Galápagos called?', options: ['Low-cost, high-volume', 'High-value, low-impact', 'All-inclusive', 'Open-access'], correctAnswer: 'High-value, low-impact' }, { question: 'What must all tourists be accompanied by?', options: ['A police officer', 'A licensed naturalist guide', 'A government official', 'A translator'], correctAnswer: 'A licensed naturalist guide' }, { question: "What is the park entrance fee primarily used for?", options: ['Building new hotels', 'Funding conservation and research', 'Paying government salaries', 'Marketing and advertising'], correctAnswer: 'Funding conservation and research' }, { question: "What is a rule for tourists mentioned in the podcast?", options: ['They can touch the animals gently.', 'They must stay on marked trails.', 'They can collect shells as souvenirs.', 'They must travel in large groups.'], correctAnswer: 'They must stay on marked trails.' }, { question: "The narrator says every tourist's footprint should be light, but their ______ should be heavy.", options: ['Luggage', 'Donations to museums', 'Expectations', 'Financial contribution'], correctAnswer: 'Financial contribution' } ];
             const futuresTfng = lessonData.pages.find(p => p.id === 'podcast-futures-quiz-tfng');
             if(futuresTfng) futuresTfng.content.questions = [ { statement: 'The park entrance fee is low to encourage more visitors.', correctAnswer: 'False' }, { statement: 'Money from tourism helps fund conservation efforts.', correctAnswer: 'True' }, { statement: 'Tourists are allowed to visit any island they want without restrictions.', correctAnswer: 'False' }, { statement: "The podcast suggests that the current tourism model is perfect and needs no changes.", correctAnswer: 'False' }, { statement: "The number of visitors to specific islands is limited each day.", correctAnswer: 'True' } ];
             const futuresGap = lessonData.pages.find(p => p.id === 'podcast-futures-quiz-gap-fill');
             if(futuresGap) futuresGap.content.sentences = [ { text: ['Visitor numbers to specific islands are', 'daily.'], answer: 'capped' }, { text: ["The goal is to ensure every tourist's financial", 'to conservation is heavy.'], answer: 'contribution' }, { text: ['The model depends on maintaining a delicate', 'between tourism and preservation.'], answer: 'balance' }, { text: ["The podcast discusses how to experience the natural", "without 'loving it to death.'"], answer: 'marvel' }, { text: ["Tourism in the Galápagos is described as strictly", '.'], answer: 'controlled' } ];
-
-            // Debate
             const debateMcq = lessonData.pages.find(p => p.id === 'debate-planning-quiz-mcq');
             if(debateMcq) debateMcq.content.questions = [ { question: "What is Maria's primary argument FOR reducing tourism?", options: ['It is too expensive for tourists.', 'The risk of introducing non-native species.', 'The local economy is too strong.', 'The animals are becoming too friendly.'], correctAnswer: 'The risk of introducing non-native species.' }, { question: "What is Carlos's primary argument AGAINST reducing tourism?", options: ['It would be unfair to tourists.', 'The animals would miss the people.', 'Tourism funds the conservation work.', 'Ecuador has no other industries.'], correctAnswer: 'Tourism funds the conservation work.' }, { question: "What does Maria believe is more important than short-term economic gain?", options: ['The happiness of tourists', 'The preservation of a global treasure', 'The reputation of Ecuador', 'Building more hotels'], correctAnswer: 'The preservation of a global treasure' }, { question: "What negative outcome does Carlos warn could happen if tourism is drastically reduced?", options: ['The islands might sink.', 'Scientists will stop visiting.', 'Locals might turn to destructive industries like illegal fishing.', 'The government will sell the islands.'], correctAnswer: 'Locals might turn to destructive industries like illegal fishing.' }, { question: "What word does Carlos use to describe Maria's view?", options: ['Realistic', 'Unrealistic', 'Popular', 'Scientific'], correctAnswer: 'Unrealistic' } ];
             const debateTfng = lessonData.pages.find(p => p.id === 'debate-planning-quiz-tfng');
             if(debateTfng) debateTfng.content.questions = [ { statement: 'Maria believes economic gain is more important than preservation.', correctAnswer: 'False' }, { statement: 'Carlos believes that without tourism money, locals might turn to more destructive industries.', correctAnswer: 'True' }, { statement: 'Both speakers agree that tourism currently has no negative impacts.', correctAnswer: 'False' }, { statement: "Maria thinks that every single tourist poses a risk to the ecosystem.", correctAnswer: 'True' }, { statement: "Carlos believes that the current tourism model is perfect and cannot be improved.", correctAnswer: 'False' } ];
             const debateGap = lessonData.pages.find(p => p.id === 'debate-planning-quiz-gap-fill');
             if(debateGap) debateGap.content.sentences = [ { text: ['Maria argues that the', 'of this global treasure is most important.'], answer: 'preservation' }, { text: ['Carlos argues that tourism is the main source of', 'for conservation.'], answer: 'funding' }, { text: ['A drastic reduction in tourism could', 'the local economy.'], answer: 'devastate' }, { text: ['Maria is concerned that tourists can introduce non-native', 'or diseases.'], answer: 'seeds' }, { text: ["Carlos believes the key is to perfect the", 'model of tourism.'], answer: 'sustainable' } ];
-            
-            // Dilemma
             const dilemmaMcq = lessonData.pages.find(p => p.id === 'dilemma-ethics-quiz-mcq');
             if(dilemmaMcq) dilemmaMcq.content.questions = [ { question: 'Why is touching the sea lion pup forbidden?', options: ['The pup might bite the tourist.', 'The mother may reject the pup.', 'It is a sign of disrespect.', 'It can spread diseases to humans.'], correctAnswer: 'The mother may reject the pup.' }, { question: 'What is the main concern of Student 2?', options: ['Getting the guide in trouble.', 'The safety of the pup.', 'Avoiding a public conflict.', 'Getting a refund for the tour.'], correctAnswer: 'Avoiding a public conflict.' }, { question: "What is the main concern of Student 1?", options: ["The animal's immediate safety.", "The guide's professionalism.", "Getting the other tourist in trouble.", "The rules of the tour."], correctAnswer: "The animal's immediate safety." }, { question: "What is the potential negative outcome of Student 2's choice?", options: ['The tour will be cancelled.', 'The guide might not believe them.', 'It might be too late to help the pup.', 'The other tourist will get angry.'], correctAnswer: 'It might be too late to help the pup.' }, { question: "The guide frames the choice as being between protecting the animal and what?", options: ['Following the rules.', 'Maintaining social harmony.', 'Finishing the tour on time.', 'Respecting other tourists.'], correctAnswer: 'Maintaining social harmony.' } ];
             const dilemmaTfng = lessonData.pages.find(p => p.id === 'dilemma-ethics-quiz-tfng');
@@ -628,17 +808,18 @@
         function initializeLesson() {
             document.getElementById('main-title').innerHTML = lessonData.title;
             document.getElementById('main-subtitle').innerHTML = lessonData.subtitle;
-            document.getElementById('main-svg-container').innerHTML = `<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:rgb(8, 145, 178);stop-opacity:1" /><stop offset="100%" style="stop-color:rgb(16, 185, 129);stop-opacity:1" /></linearGradient></defs><rect width="600" height="300" fill="#ecfeff"/><path d="M50,150 C150,50 350,250 550,150" stroke="url(#grad1)" stroke-width="8" fill="none" stroke-linecap="round"/><circle cx="100" cy="120" r="10" fill="#0e7490"/><circle cx="450" cy="180" r="15" fill="#059669"/><text x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="#155e75" font-weight="bold">Living Laboratory</text></svg>`;
+            document.getElementById('main-svg-container').innerHTML = `<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#38bdf8;stop-opacity:1" /><stop offset="100%" style="stop-color:#34d399;stop-opacity:1" /></linearGradient></defs><rect width="600" height="300" fill="#f0f9ff"/><g transform="translate(300, 160) scale(1.2)"><path d="M -100 0 C -120 -80, 120 -80, 100 0 C 120 80, -120 80, -100 0 Z" fill="#475569"/><path d="M -90 5 C -100 -60, 100 -60, 90 5 C 100 60, -100 60, -90 5 Z" fill="#64748b"/><circle cx="0" cy="-20" r="15" fill="#334155"/><circle cx="0" cy="-20" r="8" fill="#1e293b"/></g><text x="50%" y="30%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="#1e293b" font-weight="bold">Living Laboratory</text></svg>`;
 
             populateAllQuizzes();
+            buildPageToMenuMap();
 
             const menuButtons = lessonData.mainMenu.map(item => {
                 const colors = { green: 'bg-green-500 border-green-700', blue: 'bg-blue-500 border-blue-700', sky: 'bg-sky-500 border-sky-700', amber: 'bg-amber-500 border-amber-700', rose: 'bg-rose-500 border-rose-700', violet: 'bg-violet-500 border-violet-700', teal: 'bg-teal-500 border-teal-700', orange: 'bg-orange-500 border-orange-700', indigo: 'bg-indigo-500 border-indigo-700', lime: 'bg-lime-500 border-lime-700', emerald: 'bg-emerald-500 border-emerald-700', red: 'bg-red-500 border-red-700', purple: 'bg-purple-500 border-purple-700' };
-                return `<button onclick="navigateTo('${item.target}')" class="btn-animated-3d ${colors[item.color] || colors['green']} text-white font-bold text-xl p-4 rounded-xl">${item.text}</button>`;
+                return `<button id="menu-btn-${item.id}" onclick="navigateTo('${item.target}')" class="btn-animated-3d ${colors[item.color] || colors['green']} text-white font-bold text-xl p-4 rounded-xl">${item.text}</button>`;
             }).join('');
-            createPageElement(lessonData.homePageId, `<div class="bg-white rounded-2xl shadow-lg p-8"><h2 class="text-4xl font-bold text-center text-cyan-800 mb-8">Main Menu</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-4">${menuButtons}</div></div>`);
+            createPageElement(lessonData.homePageId, `<div class="bg-white rounded-2xl shadow-lg p-8"><h2 class="text-4xl font-bold text-center text-slate-800 mb-8">Main Menu</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-4">${menuButtons}</div></div>`);
             
-            const pageOrderMap = { 'reading-main': ['reading-quiz-gap-fill', 'reading-quiz-tfng', 'reading-quiz-mcq'], 'lecture-uni': ['lecture-uni-quiz-mcq', 'lecture-uni-quiz-tfng', 'lecture-uni-quiz-gap-fill'], 'lecture-expert': ['lecture-expert-quiz-mcq', 'lecture-expert-quiz-tfng', 'lecture-expert-quiz-gap-fill'], 'podcast-convo': ['podcast-convo-quiz-mcq', 'podcast-convo-quiz-tfng', 'podcast-convo-quiz-gap-fill'], 'podcast-futures': ['podcast-futures-quiz-mcq', 'podcast-futures-quiz-tfng', 'podcast-futures-quiz-gap-fill'], 'debate-planning': ['debate-planning-quiz-mcq', 'debate-planning-quiz-tfng', 'debate-planning-quiz-gap-fill'], 'dilemma-ethics': ['dilemma-ethics-quiz-mcq', 'dilemma-ethics-quiz-tfng', 'dilemma-ethics-quiz-gap-fill'], 'final-project-hub': ['writing-task', 'self-assessment', 'certificate'] };
+            const pageOrderMap = { 'warm-up': ['vocab-start'], 'vocab-start': lessonData.vocabulary.map((v, i) => `vocab-${i}`), 'vocab-match':['reading-main'], 'reading-main': ['reading-quiz-gap-fill', 'reading-quiz-tfng', 'reading-quiz-mcq'], 'lecture-uni': ['lecture-uni-quiz-mcq', 'lecture-uni-quiz-tfng', 'lecture-uni-quiz-gap-fill'], 'lecture-expert': ['lecture-expert-quiz-mcq', 'lecture-expert-quiz-tfng', 'lecture-expert-quiz-gap-fill'], 'podcast-convo': ['podcast-convo-quiz-mcq', 'podcast-convo-quiz-tfng', 'podcast-convo-quiz-gap-fill'], 'podcast-futures': ['podcast-futures-quiz-mcq', 'podcast-futures-quiz-tfng', 'podcast-futures-quiz-gap-fill'], 'debate-planning': ['debate-planning-quiz-mcq', 'debate-planning-quiz-tfng', 'debate-planning-quiz-gap-fill'], 'dilemma-ethics': ['dilemma-ethics-quiz-mcq', 'dilemma-ethics-quiz-tfng', 'dilemma-ethics-quiz-gap-fill'], 'final-project-hub': ['writing-task', 'self-assessment', 'certificate'] };
             let flatPageList = [lessonData.startPageId];
             lessonData.mainMenu.forEach(item => {
                 let queue = [item.target];
@@ -663,19 +844,22 @@
                 let pageHTML = '';
                 switch (page.type) {
                     case 'simple': pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-center pt-16"><div class="readable-content"><h2 class="text-4xl font-bold text-gray-800 mb-6">${page.content.title}</h2><p class="text-xl text-gray-600 mb-8">${page.content.text}</p></div></div>`; break;
-                    case 'timer': pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-left pt-16"><div class="w-full flex justify-between items-center mb-4"><h2 class="text-2xl md:text-3xl font-bold text-cyan-700">${page.content.title}</h2><div id="${page.content.timerId}" class="text-3xl md:text-4xl font-bold text-gray-700 ml-4"></div></div><div class="readable-content"><p class="text-lg md:text-xl text-gray-600 mt-8">${page.content.text}</p></div></div>`; break;
+                    case 'timer': pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-left pt-16"><div class="w-full flex justify-between items-center mb-4"><h2 class="text-2xl md:text-3xl font-bold text-blue-700">${page.content.title}</h2><div id="${page.content.timerId}" class="text-3xl md:text-4xl font-bold text-gray-700 ml-4"></div></div><div class="readable-content"><p class="text-lg md:text-xl text-gray-600 mt-8">${page.content.text}</p></div></div>`; break;
                     case 'dialogue':
                     case 'html-content':
-                        const contentHTML = page.type === 'html-content' ? page.content.html : (page.content.dialogue || '').split('\n\n').map(line => `<p>${line.replace(/([^:]+):/, '<strong class="font-semibold text-cyan-700">$1:</strong>')}</p>`).join('');
-                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><h2 class="text-4xl font-bold text-center text-cyan-800 mb-6">${page.content.title}</h2><div class="readable-content text-lg leading-relaxed space-y-4 bg-gray-50 p-6 rounded-lg max-h-[70vh] overflow-y-auto">${contentHTML}</div></div>`;
+                        const contentHTML = page.type === 'html-content' ? page.content.html : (page.content.dialogue || '').split('\n\n').map(line => `<p>${line.replace(/([^:]+):/, '<strong class="font-semibold text-blue-700">$1:</strong>')}</p>`).join('');
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><h2 class="text-4xl font-bold text-center text-slate-800 mb-6">${page.content.title}</h2><div class="readable-content text-lg leading-relaxed space-y-4 bg-gray-50 p-6 rounded-lg max-h-[70vh] overflow-y-auto">${contentHTML}</div></div>`;
+                        break;
+                    case 'vocab-game':
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><h2 class="text-4xl font-bold text-center text-sky-600 mb-4">${page.content.title}</h2><div class="text-center mb-4 text-lg">Score: <span id="vocab-game-score" class="font-bold">0</span></div><div class="w-full bg-gray-200 rounded-full h-2.5 mb-4"><div id="vocab-game-timer-bar" class="bg-blue-600 h-2.5 rounded-full"></div></div><div id="vocab-game-definition" class="text-center text-2xl font-semibold my-6 min-h-[6rem]"></div><div id="vocab-game-options" class="grid grid-cols-2 gap-4"></div></div>`;
                         break;
                     case 'writing-task':
                         const startersHTML = page.content.starters.map(s => `<li class="text-gray-500">${s}</li>`).join('');
                         const wordBankHTML = page.content.wordBank ? `<div class="mt-6"><h4 class="font-bold text-lg text-violet-600">Word Bank:</h4><div class="flex flex-wrap gap-2 mt-2 p-4 bg-gray-100 rounded-lg">${page.content.wordBank.map(w => `<span class="bg-white px-2 py-1 rounded-md shadow-sm text-gray-700">${w}</span>`).join('')}</div></div>` : '';
-                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><div class="readable-content"><h2 class="text-4xl font-bold text-center text-violet-700 mb-6">${page.content.title}</h2><div class="text-lg leading-relaxed space-y-4 bg-gray-50 p-6 rounded-lg"><h3 class="font-bold text-xl text-violet-600">Prompt:</h3><p>${page.content.prompt}</p><h3 class="font-bold text-xl text-violet-600 mt-4">Sentence Starters:</h3><ul class="list-disc list-inside ml-4">${startersHTML}</ul>${wordBankHTML}</div></div><div class="text-center mt-6"><button onclick="goNext()" class="action-button bg-cyan-600 text-white font-bold py-3 px-8 rounded-full text-xl hover:bg-cyan-700">Continue</button></div></div>`;
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><div class="readable-content"><h2 class="text-4xl font-bold text-center text-violet-700 mb-6">${page.content.title}</h2><div class="text-lg leading-relaxed space-y-4 bg-gray-50 p-6 rounded-lg"><h3 class="font-bold text-xl text-violet-600">Prompt:</h3><p>${page.content.prompt}</p><h3 class="font-bold text-xl text-violet-600 mt-4">Sentence Starters:</h3><ul class="list-disc list-inside ml-4">${startersHTML}</ul>${wordBankHTML}</div></div><div class="text-center mt-6"><button onclick="goNext()" class="action-button bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-xl hover:bg-blue-700">Continue</button></div></div>`;
                         break;
                     case 'certificate':
-                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-center pt-16 relative overflow-hidden"><canvas id="completion-canvas"></canvas><div class="relative z-10"><div class="readable-content"><h2 class="text-4xl font-bold text-amber-600 mb-4">${page.content.title}</h2><p class="text-xl text-gray-600 mb-6">${page.content.text}</p></div><div id="certificate-to-print" class="bg-cyan-50 border-4 border-dashed border-cyan-300 rounded-lg p-8 max-w-2xl mx-auto"><div class="flex justify-center mb-4"><span class="text-6xl"><span aria-hidden="true">🐢</span></span></div><h3 class="text-3xl font-bold text-cyan-800">${page.content.certificateTitle}</h3><p class="mt-4 text-lg">This certificate is awarded to</p><p id="certificate-name" class="text-2xl font-bold text-cyan-600 my-2 border-b-2 border-gray-400 pb-2">[Enter Your Name Here]</p><p class="mt-4 text-lg">for successfully completing this lesson.</p><p class="mt-6 text-md"><strong>Final Score:</strong> <span id="certificate-score" class="font-bold"></span> points</p><p class="text-sm mt-1"><strong>Date of Completion:</strong> <span id="certificate-date"></span></p></div><div id="cert-controls" class="mt-6"><div id="cert-initial-controls"><input type="text" id="name-input-cert" placeholder="Enter your name for the certificate" class="text-center p-2 border rounded-lg w-full max-w-md"><button onclick="generateCertificate()" class="action-button mt-4 bg-cyan-600 text-white font-bold py-2 px-6 rounded-full hover:bg-cyan-700">Generate Certificate</button></div><div id="cert-generated-controls" class="hidden mt-4 flex flex-wrap justify-center gap-4"><button onclick="downloadCertificateAsImage()" class="action-button bg-blue-600 text-white font-bold py-2 px-4 rounded-full text-sm">Download Image</button></div></div></div></div>`;
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-center pt-16 relative overflow-hidden"><canvas id="completion-canvas"></canvas><div class="relative z-10"><div class="readable-content"><h2 class="text-4xl font-bold text-amber-600 mb-4">${page.content.title}</h2><p class="text-xl text-gray-600 mb-6">${page.content.text}</p></div><div id="certificate-to-print" class="bg-sky-50 border-4 border-dashed border-sky-300 rounded-lg p-8 max-w-2xl mx-auto"><div class="flex justify-center mb-4"><span class="text-6xl"><span aria-hidden="true">🐢</span></span></div><h3 class="text-3xl font-bold text-slate-800">${page.content.certificateTitle}</h3><p class="mt-4 text-lg">This certificate is awarded to</p><p id="certificate-name" class="text-2xl font-bold text-blue-600 my-2 border-b-2 border-gray-400 pb-2">[Enter Your Name Here]</p><p class="mt-4 text-lg">for successfully completing this lesson.</p><p class="mt-6 text-md"><strong>Final Score:</strong> <span id="certificate-score" class="font-bold"></span> points</p><p class="text-sm mt-1"><strong>Date of Completion:</strong> <span id="certificate-date"></span></p></div><div id="cert-controls" class="mt-6"><div id="cert-initial-controls"><input type="text" id="name-input-cert" placeholder="Enter your name for the certificate" class="text-center p-2 border rounded-lg w-full max-w-md"><button onclick="generateCertificate()" class="action-button mt-4 bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700">Generate Certificate</button></div><div id="cert-generated-controls" class="hidden mt-4 flex flex-wrap justify-center gap-4"><button onclick="downloadCertificateAsImage()" class="action-button bg-sky-600 text-white font-bold py-2 px-4 rounded-full text-sm">Download Image</button></div></div></div></div>`;
                         break;
                     case 'quiz-tfng':
                     case 'quiz-mcq':
@@ -684,7 +868,7 @@
                         if (page.type === 'quiz-tfng' && page.content.questions) {
                             questionsHTML = page.content.questions.map((q, i) => `<div class="question-group flex items-center gap-4 p-4 rounded-lg bg-gray-100"><div class="flex-shrink-0 flex gap-2">${['True', 'False', 'Not Given'].map(l => `<button onclick="checkTfngAnswer(this, '${l}', '${q.correctAnswer}')" class="tfng-button bg-${l==='True'?'blue':l==='False'?'red':'gray'}-500 text-white font-bold w-12 h-10 rounded-full">${l.charAt(0)}</button>`).join('')}</div><p>${i + 1}. ${q.statement}</p></div>`).join('');
                         } else if (page.type === 'quiz-mcq' && page.content.questions) {
-                            questionsHTML = page.content.questions.map((q, i) => `<div class="question-group ${i > 0 ? 'border-t pt-6 mt-6' : ''}"><p class="font-semibold mb-2">${i + 1}. ${q.question}</p><div class="grid grid-cols-1 md:grid-cols-2 gap-2">${q.options.map(o => `<button onclick="checkMcqAnswer(this, '${o}' === '${q.correctAnswer}')" data-correct="${o === q.correctAnswer}" class="quiz-option p-3 rounded-lg text-left bg-gray-100 hover:bg-gray-200 border border-gray-200">${o}</button>`).join('')}</div></div>`).join('');
+                            questionsHTML = page.content.questions.map((q, i) => `<div class="question-group ${i > 0 ? 'border-t pt-6 mt-6' : ''}"><p class="font-semibold mb-2">${i + 1}. ${q.question}</p><div class="grid grid-cols-1 md:grid-cols-2 gap-2">${q.options.map(o => `<button onclick="checkMcqAnswer(this, '${o.replace(/'/g, "\\'")}' === '${q.correctAnswer.replace(/'/g, "\\'")}')" data-correct="${o === q.correctAnswer}" class="quiz-option p-3 rounded-lg text-left bg-gray-100 hover:bg-gray-200 border border-gray-200">${o}</button>`).join('')}</div></div>`).join('');
                         } else if (page.type === 'quiz-gap-fill' && page.content.sentences) {
                             const words = page.content.sentences.map(s => s.answer).sort(() => Math.random() - 0.5);
                             questionsHTML = `<div class="gap-fill-container">${page.content.sentences.map((s, i) => `<p class="text-lg mb-4">${i + 1}. ${s.text[0]} <span class="gap" data-answer="${s.answer}"></span> ${s.text[1]}</p>`).join('')}</div><div class="word-bank-container mt-8 p-4 bg-gray-100 rounded-lg flex flex-wrap gap-4 justify-center">${words.map(w => `<div class="word-bank-word" draggable="true" data-word="${w}">${w}</div>`).join('')}</div>`;
@@ -700,7 +884,36 @@
             updateNavButtons();
         }
 
-        document.addEventListener('DOMContentLoaded', initializeLesson);
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeLesson();
+            const bgCanvas = document.getElementById('background-canvas');
+            const bgCtx = bgCanvas.getContext('2d');
+            bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
+            let particles = [];
+            function animateBackground() {
+                bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+                particles.forEach((p, i) => {
+                    p.y -= p.speed;
+                    if (p.y < -p.radius) particles.splice(i, 1);
+                    bgCtx.beginPath();
+                    bgCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    bgCtx.fillStyle = p.color;
+                    bgCtx.fill();
+                });
+                if (Math.random() > 0.95 && particles.length < 50) {
+                    particles.push({ 
+                        x: Math.random() * bgCanvas.width, 
+                        y: bgCanvas.height + 20, 
+                        radius: Math.random() * 8 + 2, 
+                        speed: Math.random() * 1 + 0.5, 
+                        color: `rgba(255, 255, 255, ${Math.random() * 0.2 + 0.1})`
+                    });
+                }
+                requestAnimationFrame(animateBackground);
+            }
+            window.addEventListener('resize', () => { bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight; });
+            animateBackground();
+        });
     </script>
 </body>
 </html>
