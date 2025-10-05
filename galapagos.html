@@ -84,6 +84,16 @@
         
         /* Vocab Game Timer */
         #vocab-game-timer-bar { height: 6px; background-color: #38bdf8; transition: width 0.1s linear; }
+        
+        /* Shake Animation for incorrect answers */
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .shake { animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both; }
+
 
         /* Print Styles */
         @media print {
@@ -235,7 +245,7 @@
                 { id: 'lecture-expert-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Expert Talk Quiz (Gap Fill)', sentences: [] } },
 
                 // 7. Listening: Podcast
-                { id: 'podcast-convo', type: 'dialogue', content: { title: 'Listening: Podcast <span aria-hidden="true">🎧</span>', dialogue: "Host 1: So, if you go to the Galápagos, you'll see something that looks like it's from a movie: the marine iguana. It's this dark lizard that sneezes salt.\n\nHost 2: (Laughs) It really is! They sneeze salt to get rid of the excess they ingest from the ocean. But what's truly incredible is that it's the only lizard on Earth that has adapted to a marine lifestyle.\n\nHost 1: Right, its ancestors were land iguanas. So how did this evolution happen?\n\nHost 2: Well, the Galápagos are tough volcanic islands with limited food on land. At some point, iguanas that were brave enough to venture into the cold water to eat algae had a survival advantage. Over countless generations of natural selection, they developed key adaptations: flattened tails to help them swim, strong claws to grip rocks, and those special glands to sneeze out salt." } },
+                { id: 'podcast-convo', type: 'dialogue', content: { title: 'Listening: Podcast <span aria-hidden="true">🎧</span>', dialogue: "Host 1: Welcome back to 'Planet Wonders'! Today, we're diving into one of the most unique places on Earth: the Galápagos. And you can't talk about the Galápagos without mentioning the creature that looks like it walked out of a monster movie: the marine iguana.\n\nHost 2: (Laughs) It really is something else! They're famous for sneezing salt, right?\n\nHost 1: Exactly! They have to get rid of the excess salt they ingest from the ocean. But what's truly incredible is that they are the only lizards on Earth that have adapted to a marine lifestyle.\n\nHost 2: Their ancestors were land iguanas. How does a lizard just decide to start swimming for its food?\n\nHost 1: That's the million-dollar question of evolution! We're lucky to have Dr. Elena Cruz with us today, an expert from the Charles Darwin Foundation. Dr. Cruz, can you shed some light on this?\n\nDr. Elena Cruz: Hello, it's a pleasure to be here. You're right, the marine iguana's evolution is fascinating. The Galápagos are tough volcanic islands with limited food on land. At some point, iguanas that were brave enough to venture into the cold water to eat algae had a survival advantage.\n\nHost 2: So it was a matter of 'swim or starve'?\n\nDr. Elena Cruz: In a way, yes. Over countless generations of natural selection, those that were slightly better swimmers or could hold their breath a little longer were more successful. They passed on those traits. This led to key adaptations: flattened tails that act like rudders, strong claws to grip slippery volcanic rocks in the current, and of course, those special glands to expel salt. It’s a perfect snapshot of evolution in progress.\n\nHost 1: It's amazing how a single challenge—lack of food on land—can lead to such a unique creature.\n\nDr. Elena Cruz: It is. But it also highlights the incredible fragility of this ecosystem. These animals are hyper-specialized for this one environment. A small change, like a rise in sea temperature that affects the algae they eat, can be catastrophic for their entire population. Their unique adaptation is both their greatest strength and their greatest vulnerability." } },
                 { id: 'podcast-convo-quiz-mcq', type: 'quiz-mcq', content: { title: 'Podcast Quiz (MCQ)', questions: [] } },
                 { id: 'podcast-convo-quiz-tfng', type: 'quiz-tfng', content: { title: 'Podcast Quiz (TFNG)', questions: [] } },
                 { id: 'podcast-convo-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Podcast Quiz (Gap Fill)', sentences: [] } },
@@ -357,7 +367,7 @@
              async init() { if (this.isInitialized) return; try { const warmUp = new SpeechSynthesisUtterance(' '); warmUp.volume = 0; this.synth.speak(warmUp); this.synth.cancel(); await this._setupVoices(); this.isInitialized = true; } catch (e) { console.error("Speech synthesis setup failed:", e); } }
              _cleanTextForSpeech(text) { const tempDiv = document.createElement('div'); const textWithoutSpans = text.replace(/<span aria-hidden="true">.*?<\/span>/g, ' '); tempDiv.innerHTML = textWithoutSpans; let cleanText = tempDiv.textContent || tempDiv.innerText || ''; cleanText = cleanText.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, ''); return cleanText; }
              async speak(text, { onEndCallback = null } = {}) { if (!this.isInitialized || !this.isTtsEnabled || !text) { if (onEndCallback) onEndCallback(); return; } if (this.synth.speaking) { this.synth.cancel(); await new Promise(resolve => setTimeout(resolve, 100)); } const cleanText = this._cleanTextForSpeech(text); if (!cleanText.trim()) { if (onEndCallback) onEndCallback(); return; } const utter = new SpeechSynthesisUtterance(cleanText); utter.voice = this.voices['default']; utter.rate = this.speechRate; if (onEndCallback) utter.onend = onEndCallback; utter.onerror = (e) => { console.error('SpeechSynthesisUtterance.onerror', e); if (onEndCallback) onEndCallback(); }; try { this.synth.speak(utter); } catch (e) { console.error("Error calling synth.speak:", e); if (onEndCallback) onEndCallback(); } }
-             async speakDialogue(text) { if (!this.isInitialized || !this.isTtsEnabled || !text || this.isDialoguePlaying) return; this.cancel(); this.isDialoguePlaying = true; const lines = text.split('\n').filter(line => line.trim() !== '' && line.includes(':')); const queue = lines.map(line => { const [speaker, ...parts] = line.split(':'); const dialogue = parts.join(':').trim(); const cleanDialogue = this._cleanTextForSpeech(dialogue); const voiceKey = speaker.toLowerCase().replace(/dr\. |professor /g, '').trim(); return { text: cleanDialogue, voiceKey: voiceKey }; }).filter(item => item.text); if (queue.length === 0) { this.isDialoguePlaying = false; return; } const playNext = () => { if (queue.length > 0 && this.isTtsEnabled) { const item = queue.shift(); const utter = new SpeechSynthesisUtterance(item.text); utter.voice = this.voices[item.voiceKey] || this.voices['default']; utter.rate = this.speechRate; utter.onend = playNext; utter.onerror = (e) => { console.error('Speech synthesis error in dialogue:', e); playNext(); }; this.synth.speak(utter); } else { this.isDialoguePlaying = false; } }; playNext(); }
+             async speakDialogue(text) { if (!this.isInitialized || !this.isTtsEnabled || !text || this.isDialoguePlaying) return; this.cancel(); this.isDialoguePlaying = true; const lines = text.split('\n').filter(line => line.trim() !== '' && line.includes(':')); const queue = lines.map(line => { const [speaker, ...parts] = line.split(':'); const dialogue = parts.join(':').trim(); const cleanDialogue = this._cleanTextForSpeech(dialogue); const voiceKey = speaker.toLowerCase().replace(/dr\. |professor /g, '').trim(); return { text: cleanDialogue, voiceKey: voiceKey }; }).filter(item => item.text); if (queue.length === 0) { this.isDialoguePlaying = false; return; } const playNext = () => { if (queue.length > 0 && this.isTtsEnabled) { const item = queue.shift(); const utter = new SpeechSynthesisUtterance(item.text); utter.voice = this.voices[item.voiceKey] || this.voices['default']; utter.rate = this.speechRate; utter.onend = playNext; utter.onerror = (e) => { console.warn('A speech synthesis error occurred, attempting to recover.', e.error); try { this.synth.cancel(); } catch (cancelError) { console.error("Error while cancelling synth:", cancelError); } setTimeout(playNext, 250); }; try { this.synth.speak(utter); } catch(e) { console.error("Error in synth.speak:", e); setTimeout(playNext, 250); } } else { this.isDialoguePlaying = false; } }; playNext(); }
              cancel() { if (this.synth) { this.isDialoguePlaying = false; this.synth.cancel(); } }
              toggleTTS(forceState) { this.isTtsEnabled = forceState === undefined ? !this.isTtsEnabled : forceState; if (!this.isTtsEnabled) { this.cancel(); } return this.isTtsEnabled; }
          }
@@ -381,7 +391,6 @@
                     pageToMenuMap[pageId] = menuItem.id;
                     const pageDef = lessonData.pages.find(p => p.id === pageId);
                     if (pageDef && pageDef.type.startsWith('quiz')) {
-                        // This logic is simple, for complex branching use a more robust map
                         const nextQuizPage = getNextQuizPage(pageId);
                         if (nextQuizPage && !visited.has(nextQuizPage)) {
                             queue.push(nextQuizPage);
@@ -390,10 +399,16 @@
                     }
                 }
             });
+            // Manual mapping for vocab game
+            pageToMenuMap['vocab-game'] = 'menu-vocab-game';
         }
+
         function getNextQuizPage(pageId) {
             const sequence = ['mcq', 'tfng', 'gap-fill'];
-            const [prefix, type] = pageId.split('-quiz-');
+            const parts = pageId.split('-quiz-');
+            if (parts.length < 2) return null;
+            const prefix = parts[0];
+            const type = parts[1];
             const currentIndex = sequence.indexOf(type);
             if (currentIndex > -1 && currentIndex < sequence.length - 1) {
                 return `${prefix}-quiz-${sequence[currentIndex + 1]}`;
@@ -411,7 +426,7 @@
             const menuContainer = document.getElementById('page-main-menu');
             if (!menuContainer) return;
             lessonData.mainMenu.forEach(item => {
-                const button = menuContainer.querySelector(`[onclick="navigateTo('${item.target}')"]`);
+                const button = menuContainer.querySelector(`#menu-btn-${item.id}`);
                 if (button && completedSections.has(item.id)) {
                     if (!button.innerHTML.includes('✓')) {
                         button.innerHTML += ' <span class="text-green-300">✓</span>';
@@ -431,20 +446,14 @@
         function checkQuizPageCompletion(pageId) {
             const pageElement = document.getElementById(`page-${pageId}`);
             if (!pageElement) return false;
-            const questions = pageElement.querySelectorAll('.question-group');
-            const answered = pageElement.querySelectorAll('.question-group button:disabled');
-            // Logic to determine if all questions are answered.
-            // For MCQ/TFNG, one disabled button per group is enough.
-            // For Gap-Fill, all gaps must be correct.
-            let allAnswered = true;
-            questions.forEach(q => {
-                if(pageId.includes('gap-fill')) {
-                    if(!q.querySelector('.gap.correct')) allAnswered = false;
-                } else {
-                    if(!q.querySelector('button:disabled')) allAnswered = false;
-                }
-            });
-            return allAnswered;
+
+            if (pageId.includes('gap-fill')) {
+                const gaps = pageElement.querySelectorAll('.gap');
+                return gaps.length > 0 && Array.from(gaps).every(g => g.classList.contains('correct'));
+            } else {
+                const questions = pageElement.querySelectorAll('.question-group');
+                return questions.length > 0 && Array.from(questions).every(q => q.querySelector('button:disabled'));
+            }
         }
 
 
@@ -487,7 +496,13 @@
 
         window.navigateTo = (pageId) => {
             const previousPageId = currentPage;
-            const previousPageDef = lessonData.pages.find(p => p.id === previousPageId);
+            
+            // Mark completion if leaving a quiz page and it's fully answered
+            if (previousPageId.includes('-quiz-')) {
+                if (checkQuizPageCompletion(previousPageId)) {
+                    markSectionAsComplete(previousPageId);
+                }
+            }
             
             const targetPage = document.getElementById(`page-${pageId}`);
             if (!targetPage) return console.warn('navigateTo: no page found for id', pageId);
@@ -497,8 +512,9 @@
             clearTimeout(vocabGameTimer);
             speechService.cancel();
 
-            // Mark completion for non-quiz pages when navigating away
-            if (previousPageDef && !previousPageDef.type.startsWith('quiz')) {
+            // Mark simple pages as complete on navigation
+            const previousPageDef = lessonData.pages.find(p => p.id === previousPageId);
+            if (previousPageDef && !previousPageDef.type.startsWith('quiz') && previousPageId !== 'vocab-game') {
                  markSectionAsComplete(previousPageId);
             }
 
@@ -594,7 +610,7 @@
                 button.classList.add('bg-green-500', 'border-green-600', 'text-white');
             } else {
                 button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
-                button.classList.add('bg-red-500', 'border-red-600', 'text-white');
+                button.classList.add('bg-red-500', 'border-red-600', 'text-white', 'shake');
                 const correctButton = questionGroup.querySelector(".quiz-option[data-correct='true']");
                 if (correctButton) {
                     correctButton.classList.remove('bg-gray-100', 'hover:bg-gray-200');
@@ -689,7 +705,7 @@
                 const button = document.createElement('button');
                 button.className = 'quiz-option p-3 rounded-lg text-left bg-gray-100 hover:bg-gray-200 border border-gray-200';
                 button.textContent = opt;
-                button.onclick = () => checkVocabGameAnswer(opt === question.word);
+                button.onclick = () => checkVocabGameAnswer(button, opt === question.word);
                 optionsContainer.appendChild(button);
             });
 
@@ -714,13 +730,18 @@
             }, ROUND_TIME);
         }
 
-        function checkVocabGameAnswer(isCorrect) {
+        function checkVocabGameAnswer(button, isCorrect) {
             clearTimeout(vocabGameTimer);
             showFeedbackMessage(isCorrect);
             if (isCorrect) {
                 vocabGameScore++;
                 updateScore(5);
                 document.getElementById('vocab-game-score').textContent = vocabGameScore;
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                button.classList.add('bg-green-500', 'text-white');
+            } else {
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                button.classList.add('bg-red-500', 'text-white', 'shake');
             }
             
             const optionsContainer = document.getElementById('vocab-game-options');
