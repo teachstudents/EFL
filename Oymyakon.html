@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life in the Coldest Town – Exploring Oymyakon, Russia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        @keyframes arcticSky {
+            0% { background-color: #0c4a6e; } /* sky-900 */
+            25% { background-color: #1e293b; } /* slate-800 */
+            50% { background-color: #075985; } /* cyan-800 */
+            75% { background-color: #1e293b; } /* slate-800 */
+            100% { background-color: #0c4a6e; } /* sky-900 */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior: none;
+            animation: arcticSky 240s linear infinite;
+            padding-top: 85px; /* Adjusted padding for progress bar */
+        }
+        #background-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+        }
+        .page { display: none; position: relative; }
+        .page.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .action-button, .nav-button, .quiz-option, .tfng-button, .word-bank-word, .btn-animated-3d {
+            transition: all 0.15s ease-out;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2), 0 2px 4px -2px rgba(0,0,0,0.1), inset 0 -4px 0 0 rgba(0,0,0,0.2);
+            border: none;
+        }
+        .action-button:hover, .nav-button:hover, .quiz-option:hover:not(:disabled), .tfng-button:hover:not(:disabled), .word-bank-word:hover, .btn-animated-3d:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px -3px rgba(0,0,0,0.2), 0 4px 6px -4px rgba(0,0,0,0.1), inset 0 -4px 0 0 rgba(0,0,0,0.2);
+        }
+        .action-button:active, .nav-button:active, .quiz-option:active, .tfng-button:active, .btn-animated-3d:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 2px -1px rgba(0,0,0,0.2), 0 1px 2px -2px rgba(0,0,0,0.1), inset 0 -2px 0 0 rgba(0,0,0,0.2);
+        }
+        
+        /* Gap Fill Styles */
+        .gap-fill-container .gap {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 120px; height: 44px; padding: 0 4px;
+            border: 2px dashed #9ca3af; border-radius: 8px; margin: 0 4px;
+            vertical-align: middle; background-color: #f3f4f6;
+        }
+        .word-bank-word {
+            cursor: grab; padding: 8px 16px; border-radius: 8px;
+            background-color: white; user-select: none;
+        }
+        .word-bank-word.selected { outline: 2px solid #6366f1; transform: scale(1.05); }
+        .gap .word-bank-word { cursor: pointer; }
+        .gap.correct .word-bank-word { background-color: #dcfce7; border-color: #22c55e; color: #15803d; }
+        .gap.incorrect .word-bank-word { background-color: #fee2e2; border-color: #ef4444; color: #b91c1c; }
+
+        /* Feedback Message & Badge Notification */
+        .feedback-toast, .badge-toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            padding: 12px 24px; border-radius: 9999px; color: white;
+            font-weight: bold; z-index: 200;
+            animation: slideUpFadeIn 0.5s ease-out, slideDownFadeOut 0.5s ease-in 3.5s forwards;
+        }
+        .feedback-toast.correct { background-color: #22c55e; }
+        .feedback-toast.encouraging { background-color: #f59e0b; }
+        .badge-toast { background: linear-gradient(45deg, #fde047, #f97316); }
+        @keyframes slideUpFadeIn { from { opacity: 0; bottom: 0; } to { opacity: 1; bottom: 20px; } }
+        @keyframes slideDownFadeOut { from { opacity: 1; bottom: 20px; } to { opacity: 0; bottom: 0; } }
+
+        /* Certificate Canvas */
+        #completion-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        
+        /* Progress Bar */
+        #progress-container { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 8px; width: 100%; margin-top: 8px; }
+        #progress-bar { height: 100%; width: 0%; background-color: #38bdf8; transition: width 0.5s ease-out; }
+        
+        /* Vocab Game Timer */
+        #vocab-game-timer-bar { height: 6px; background-color: #38bdf8; transition: width 0.1s linear; }
+        
+        /* Shake Animation for incorrect answers */
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .shake { animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both; }
+
+        .explanation-text {
+            margin-top: 12px;
+            padding: 10px;
+            background-color: #f3f4f6;
+            border-left: 4px solid #f59e0b;
+            font-size: 0.9em;
+            color: #4b5563;
+            border-radius: 4px;
+        }
+
+        /* Print Styles */
+        @media print {
+            body * { visibility: hidden; }
+            #certificate-to-print, #certificate-to-print * { visibility: visible; }
+            #certificate-to-print { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800 text-lg">
+    <canvas id="background-canvas"></canvas>
+    <div id="reward-animation-container" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[60]"></div>
+
+    <header id="nav-header" class="fixed top-0 left-0 right-0 z-50 p-2" style="display: none;">
+        <div class="max-w-md mx-auto bg-white/90 backdrop-blur-sm shadow-lg rounded-full p-2">
+            <div class="flex justify-center items-center gap-2">
+                <button onclick="goBack()" class="nav-button bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold p-2 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <div class="font-bold text-base text-blue-500 px-3 whitespace-nowrap">Points ✨: <span id="score-display">0</span></div>
+                <button onclick="navigateTo('main-menu')" class="nav-button bg-gray-800 text-white font-bold p-2 rounded-full hover:bg-gray-900">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                </button>
+                <button onclick="toggleTTS(this)" class="nav-button p-2 rounded-full hover:bg-gray-200" title="Toggle Sound">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 5.858a3 3 0 104.243 4.243M9 12l4.243 4.243"></path></svg>
+                </button>
+                <button onclick="goNext()" class="nav-button bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+        </div>
+    </header>
+
+    <div id="app-container" class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+        <section id="page-title-screen" class="page active text-center bg-white rounded-2xl shadow-lg p-8">
+            <div class="h-full flex flex-col justify-center items-center">
+                <h1 id="main-title" class="text-5xl md:text-6xl font-bold text-slate-800 mb-4"></h1>
+                <p id="main-subtitle" class="text-xl md:text-2xl text-gray-600 mb-8"></p>
+                <div id="main-svg-container" class="rounded-lg mb-8 w-full max-w-lg mx-auto"></div>
+                <button onclick="startApp()" class="action-button bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-2xl hover:bg-blue-700">START LESSON</button>
+            </div>
+        </section>
+        <div id="dynamic-pages-container"></div>
+    </div>
+    
+    <script>
+        // ===================================================================================
+        // --- LESSON CONTENT CONFIGURATION (OYMYAKON, RUSSIA) ---
+        // ===================================================================================
+        const lessonData = {
+            title: "Life in the Coldest Town",
+            subtitle: "Exploring Oymyakon, Russia <span aria-hidden='true'>🇷🇺</span>",
+            startPageId: 'title-screen',
+            homePageId: 'main-menu',
+            mainMenu: [
+                { id: 'menu-tps', text: '0. Think-Pair-Share <span aria-hidden="true">🧠</span>', color: 'green', target: 'tps-start' },
+                { id: 'menu-goals', text: '1. Learning Goals <span aria-hidden="true">🎯</span>', color: 'teal', target: 'learning-goals' },
+                { id: 'menu-warmup', text: '2. Warm-Up & Vocab <span aria-hidden="true">📚</span>', color: 'sky', target: 'warm-up' },
+                { id: 'menu-vocab-game', text: 'Vocab Game <span aria-hidden="true">🎮</span>', color: 'sky', target: 'vocab-game'},
+                { id: 'menu-reading', text: '3. Reading & Comprehension <span aria-hidden="true">📖</span>', color: 'blue', target: 'reading-main' },
+                { id: 'menu-convo', text: '4. Conversation Practice <span aria-hidden="true">🗣️</span>', color: 'indigo', target: 'conversation-practice' },
+                { id: 'menu-lecture-challenges', text: '5. Listening: Challenges & Culture <span aria-hidden="true">❄️</span>', color: 'orange', target: 'lecture-challenges-pre' },
+                { id: 'menu-lecture-geography', text: '6. Listening: Geography & Adaptation <span aria-hidden="true">🌍</span>', color: 'rose', target: 'lecture-geography-pre' },
+                { id: 'menu-thinking', text: '7. Thinking & Exam Prep <span aria-hidden="true">📝</span>', color: 'purple', target: 'thinking-prompts' },
+                { id: 'menu-final', text: '8. Final Project <span aria-hidden="true">✍️</span>', color: 'violet', target: 'final-project-hub' },
+            ],
+            vocabulary: [
+                { word: 'Permafrost', def: 'Ground that remains frozen year-round.', sentence: 'Buildings in Oymyakon are built on stilts due to the permafrost.' },
+                { word: 'Yakut', def: 'Indigenous people of Siberia.', sentence: 'The Yakut people have a culture deeply connected to the Siberian landscape.' },
+                { word: 'Adaptation', def: 'The process of changing to suit different conditions.', sentence: 'Human adaptation to the cold in Oymyakon is remarkable.' },
+                { word: 'Celsius', def: 'A temperature scale where water freezes at 0° and boils at 100°.', sentence: 'The record low temperature was minus 67.7 degrees Celsius.' },
+                { word: 'Resilience', def: 'The ability to recover from or adjust easily to difficulties.', sentence: 'The community shows incredible resilience in the face of extreme weather.' },
+                { word: 'Siberia', def: 'A vast region of Russia extending from the Ural Mountains to the Pacific Ocean.', sentence: 'Oymyakon is located deep within Siberia.' },
+                { word: 'Indigenous', def: 'Originating or occurring naturally in a particular place; native.', sentence: 'The Yakut are an indigenous people of the region.' }
+            ],
+            pages: [
+                // 0. Think Pair Share
+                { id: 'tps-start', type: 'simple', content: { title: 'Activity: Think-Pair-Share <span aria-hidden="true">🧠</span>', text: 'Let\'s think about daily challenges in the extreme cold.' } },
+                { id: 'tps-think', type: 'timer', content: { title: '1. Think <span aria-hidden="true">🤔</span>', text: 'Think about one specific daily challenge a person in Oymyakon might face (e.g., going to the grocery store, fixing a car).', duration: 120, timerId: 'timer-think' } },
+                { id: 'tps-pair', type: 'timer', content: { title: '2. Pair <span aria-hidden="true">👥</span>', text: 'With a partner, discuss how you would solve that specific challenge. What special tools or knowledge would you need?', duration: 180, timerId: 'timer-pair' } },
+                { id: 'tps-share', type: 'timer', content: { title: '3. Share <span aria-hidden="true">🗣️</span>', text: 'Let\'s share our ideas. What does this tell us about the importance of planning and preparation in extreme environments?', duration: 300, timerId: 'timer-share' } },
+                
+                // 1. Learning Goals
+                { id: 'learning-goals', type: 'html-content', content: { title: 'Learning Goals <span aria-hidden="true">🎯</span>', html: `
+                                        <div class="text-left space-y-4">
+                                            <p><strong class="text-teal-600">Learning Intention:</strong> We are learning about Oymyakon to understand how people live in extreme cold and how environment influences culture and education.</p>
+                                            <hr class="my-4">
+                                            <h3 class="text-2xl font-bold text-teal-600 mb-3">Success Criteria</h3>
+                                            <ul class="list-disc list-inside space-y-2 text-xl">
+                                                <li>I can describe Oymyakon’s location, climate, and lifestyle.</li>
+                                                <li>I can compare life in Oymyakon with life in my hometown using specific examples.</li>
+                                                <li>I can analyze how extreme environments shape human adaptation.</li>
+                                            </ul>
+                                        </div>` } },
+                
+                // 2. Warm-Up & Vocab
+                { id: 'warm-up', type: 'html-content', content: { title: 'Background-Building Questions <span aria-hidden="true">📚</span>', html: `
+                                        <ol class="list-decimal list-inside space-y-4 text-xl text-left">
+                                            <li>What is the coldest temperature you’ve ever experienced?</li>
+                                            <li>How do you prepare for winter in your hometown?</li>
+                                            <li>What challenges do you think people face in extremely cold climates?</li>
+                                            <li>Why do people choose to live in such harsh environments?</li>
+                                        </ol>` } },
+                { id: 'vocab-start', type: 'simple', content: { title: 'Unit Vocabulary <span aria-hidden="true">📚</span>', text: 'Let\'s learn the key terms for this unit. Click the "Next" arrow to cycle through the words.' } },
+                { id: 'vocab-game', type: 'vocab-game', content: { title: 'Vocabulary Review Game <span aria-hidden="true">🎮</span>'} },
+                
+                // 3. Reading & Comprehension
+                { id: 'reading-main', type: 'html-content', content: { title: 'Reading: Oymyakon – The Coldest Inhabited Place on Earth <span aria-hidden="true">📖</span>', html: `
+                                        <div class="space-y-6 text-left">
+                                            <div class="bg-blue-50 p-4 rounded-lg">
+                                                <h4 class="font-bold text-xl text-blue-800">Location and Climate</h4>
+                                                <p>Oymyakon is a village in northeastern Siberia, Russia. It holds the record for the lowest temperature ever recorded in a populated area: −67.7°C. Winters are long and harsh, with little daylight.</p>
+                                            </div>
+                                            <div class="bg-sky-50 p-4 rounded-lg">
+                                                <h4 class="font-bold text-xl text-sky-800">People and Culture</h4>
+                                                <p>The population is small, and many residents are Yakut. They speak Russian and Yakut, and traditional practices like reindeer herding and ice fishing are common.</p>
+                                            </div>
+                                            <div class="bg-green-50 p-4 rounded-lg">
+                                                <h4 class="font-bold text-xl text-green-800">Daily Life</h4>
+                                                <p>Homes are built to withstand extreme cold. Water pipes freeze, so people use outhouses. Cars must be kept running or stored in heated garages. Schools close only when temperatures drop below −52°C.</p>
+                                            </div>
+                                             <div class="bg-yellow-50 p-4 rounded-lg">
+                                                <h4 class="font-bold text-xl text-yellow-800">Education and Community</h4>
+                                                <p>Children attend local schools and learn about their culture and environment. Despite the cold, community life is strong, with festivals and shared traditions.</p>
+                                            </div>
+                                        </div>` } },
+                { id: 'reading-quiz-tfng', type: 'quiz-tfng', content: { title: 'Comprehension: True/False', questions: [] } },
+                { id: 'reading-quiz-mcq', type: 'quiz-mcq', content: { title: 'Comprehension: Multiple Choice', questions: [] } },
+                
+                // 4. Conversation Practice
+                { id: 'conversation-practice', type: 'dialogue', content: { title: 'Conversation Practice <span aria-hidden="true">🗣️</span>', dialogue: "A: Have you heard of Oymyakon in Russia?\n\nB: Yes! It’s the coldest place people live, right?\n\nA: Exactly. It can get colder than −60°C!\n\nB: That’s freezing! How do people survive?\n\nA: They wear special clothes and keep their cars running.\n\nB: Do kids go to school there?\n\nA: Yes, unless it’s colder than −52°C.\n\nB: Wow! I’d love to learn more about their culture." } },
+                 
+                // 5. Listening: Oymyakon Challenges & Culture
+                { id: 'lecture-challenges-pre', type: 'html-content', content: { title: 'Pre-Listening: Challenges & Culture <span aria-hidden="true">❄️</span>', html: `<div class="text-left space-y-4 text-xl"><p>Before listening to this lecture, consider:</p><ol class="list-decimal list-inside pl-4 space-y-2"><li>What do you think is the most difficult part about living in a very cold and remote place?</li><li>How can a community keep its traditions alive when it becomes more modern?</li></ol></div>`}},
+                { id: 'lecture-challenges-main', type: 'dialogue', content: { title: 'Listening: Oymyakon Challenges & Culture', dialogue: "Professor: Alright class, let's venture into one of the coldest inhabited places on Earth, um, Oymyakon, Russia. Today, we'll explore the unique challenges of living in Oymyakon, how its extreme climate impacts daily life, education, and transportation, and what we can learn from communities in such harsh environments. We'll also delve into some higher-order thinking questions, analyzing how the climate shapes daily life, evaluating the sustainability of living there, creating elements for a survival guide, and synthesizing lessons from their resilience. Let's start with the basic challenges. Aisha, in your research, what are some of the main difficulties people face living in Oymyakon?\n\nAisha: Well, professor, the most obvious challenge is the extreme cold. It's known as the Pole of Cold in the Northern Hemisphere, with incredibly low temperatures, especially in winter. I've read that frostbite is a constant danger, and even simple things like keeping vehicles running or plumbing from freezing are huge issues.\n\nProfessor: You're absolutely right, Aisha. The intense cold presents numerous logistical and survival challenges. Ben, how does this climate specifically affect education and transportation in Oymyakon?\n\nBen: Yeah, I guess, uh, for schools, they sometimes have to close on the coldest days, right? Because it's too dangerous for the kids to be outside. And transportation, I saw that cars have to be left running all the time or they won't start again. And, um, flying in and out can be really difficult with the visibility and everything.\n\nProfessor: Precisely, Ben. The cold significantly disrupts daily life, leading to school closures and demanding extreme measures for transportation, including continuously running engines and facing risks with air travel due to weather conditions. Despite these immense challenges, communities like Oymyakon persevere. What can we learn from people living in such extreme environments? Aisha?\n\nAisha: I think it shows incredible resilience and adaptability, professor. Like how they've developed ways to live in that cold, with special clothing and building techniques. And, um, the importance of community, relying on each other when things are so difficult.\n\nProfessor: Excellent points, Aisha. Resilience, ingenuity in adaptation, and strong community bonds are indeed crucial lessons we can glean from their experience. Ben, any thoughts on this?\n\nBen: I guess it depends on, like, support from outside too, right? Like if they can get supplies and maintain infrastructure. It seems like they really depend on, uh, being connected.\n\nProfessor: A valid point, Ben. Connectivity and external support for resources and infrastructure are indeed crucial factors influencing sustainability in such remote and extreme locations. Now, let's move to our higher-order thinking questions. First, analyze: How does the climate shape daily life in Oymyakon? Ben, what are your thoughts on this?\n\nBen: Well, the cold pretty much dictates everything, doesn't it? Like, what time of year you can do certain things outside, what kind of clothes you have to wear, how you build your house. Even, uh, things like burying people. I read they have to use fires to thaw the ground.\n\nProfessor: A very insightful analysis, Ben. The climate permeates every aspect of daily life, influencing everything from seasonal activities and clothing to infrastructure, building practices, and even burial customs, requiring unique adaptations to the permafrost. Next, evaluate: is it sustainable to live in such extreme conditions? Aisha, what's your evaluation?\n\nAisha: That's a tough one, professor. On the one hand, people have lived there for a long time, so in a way, it is. But with climate change, and maybe young people moving away, is it sustainable in the long term? It feels, um, very fragile.\n\nProfessor: You highlight the complexity, Aisha. Historically, it has been sustained by traditional practices and resourcefulness. However, contemporary challenges like economic shifts, potential impacts of climate change on infrastructure and environment, and out-migration raise questions about its future sustainability. It's a balancing act between tradition and modernity in a changing world. Moving to create: design a survival guide for students visiting Oymyakon. If you were putting together a guide, Aisha, what would be some essential tips?\n\nAisha: Okay, definitely layer clothing, like, way more layers than you think you need. And good quality thermal stuff. And cover all exposed skin to prevent frostbite. Maybe, um, tips on how to breathe in the really cold air, and how to keep your phone battery from dying instantly.\n\nProfessor: Excellent, Aisha. Layering clothing, protecting exposed skin, techniques for breathing in cold air, and strategies for preserving electronics would be essential. Ben, what would you include in a survival guide?\n\nBen: I'd add stuff about, like, not going outside alone for long periods, especially if you're not used to it. And maybe tips on like what to do if your car breaks down or you get lost. And, um, definitely mention the importance of listening to the locals.\n\nProfessor: Very practical advice, Ben. Emphasizing safety in numbers, preparing for vehicle issues, navigating potential disorientation, and, crucially, respecting and learning from local knowledge and experience would be vital components of a survival guide. Finally, let's synthesize: how can the resilience of Oymyakon's people inspire solutions for living in other extreme environments? Ben, what can we learn from them?\n\nBen: I think their, uh, ability to just deal with it, you know? Like, they don't complain, they just find ways to make it work. That kind of, uh, mental toughness and practical problem-solving.\n\nProfessor: That's a powerful takeaway, Ben. The sheer mental fortitude and practical problem-solving skills developed by the people of Oymyakon in facing such extreme conditions offer valuable inspiration for building resilience in other challenging environments. Aisha?\n\nAisha: And maybe how they've built such a strong community, like, they really rely on each other. In extreme places, you can't really be, um, completely independent. That sense of mutual support is inspiring.\n\nProfessor: An insightful synthesis, Aisha. The strong emphasis on community and mutual support in Oymyakon underscores the importance of social cohesion in navigating extreme environments, a lesson applicable to many challenging contexts globally. Excellent discussion, everyone. We've explored the unique challenges and remarkable resilience in Oymyakon, examined how the climate shapes various aspects of life, evaluated sustainability, brainstormed survival strategies, and synthesized valuable lessons from their experience. Thank you, Aisha and Ben, for your thoughtful contributions.\n\nAisha: Thank you, professor. It was fascinating and a bit terrifying.\n\nBen: Yeah, thanks. Makes you appreciate central heating.\n\nProfessor: Indeed. My pleasure." }},
+                { id: 'lecture-challenges-quiz-mcq', type: 'quiz-mcq', content: { title: 'Challenges & Culture Quiz (MCQ)', questions: [] } },
+                { id: 'lecture-challenges-quiz-tfng', type: 'quiz-tfng', content: { title: 'Challenges & Culture Quiz (TFNG)', questions: [] } },
+                { id: 'lecture-challenges-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Challenges & Culture Quiz (Gap Fill)', sentences: [] } },
+
+                // 6. Listening: Geography & Adaptation
+                { id: 'lecture-geography-pre', type: 'html-content', content: { title: 'Pre-Listening: Geography & Adaptation <span aria-hidden="true">🌍</span>', html: `<div class="text-left space-y-4 text-xl"><p>Before listening to this lecture, consider:</p><ol class="list-decimal list-inside pl-4 space-y-2"><li>How can a place's geography (like being in a valley) affect its weather?</li><li>What does the word "irony" mean? Can you think of an example?</li></ol></div>`}},
+                { id: 'lecture-geography-main', type: 'dialogue', content: { title: 'Listening: Geography & Adaptation', dialogue: "Professor: Good day. Today, we journey to the coldest permanently inhabited place on Earth, the village of Oymyakon. Our essential question is, how do extreme environments shape human culture, technology, and resilience? To answer this, my lecture will be in three parts. First, I will establish Oymyakon's location and its climate data. Second, we will analyze the specific geographical reasons for its extreme cold. And finally, we will review the technical adaptations required for modern life to function there. Let's begin with geography. Oymyakon, I'll spell that O-Y-M-Y-A-K-O-N, is a village in the Sakha Republic of Russia, also known as Yakutia, located on the continent of Asia, deep within Siberia. It holds the official record for the Northern Hemisphere's coldest temperature, but the iconic figure comes from 1924, when a nearby weather station recorded minus 71.2 degrees Celsius or minus 96.2 degrees Fahrenheit. Let me repeat that data point: minus 71.2 degrees Celsius. So, why is it so cold? The primary reason is its geography. Oymyakon sits in a valley between two mountain ranges. During the winter, cold, dense air sinks and becomes trapped in this valley. This phenomenon is known as a temperature inversion, and it prevents the air from mixing and warming up. The ground itself is in a state of continuous permafrost. This extreme environment necessitates incredible technical adaptations. For example, all buildings must be constructed on deep piles or stilts, so the heat from the building doesn't melt the permafrost below and destabilize the foundation. Cars cannot simply be turned off outside. They are either left running for hours or kept in heated garages to prevent the oil, tires, and metal from freezing solid. Even the social infrastructure must adapt. Schools in Oymyakon only close if the temperature drops below minus 55 degrees Celsius. To review, Oymyakon's extreme climate is a product of its valley geography, which creates a temperature inversion. Survival there requires significant technological solutions for everything from construction to transportation. These facts illustrate a clear case of an environment dictating the terms of human existence.\n\nGuide: Hello. I want you to try and imagine a cold so severe it takes your breath away, where your eyelashes freeze solid the moment you step outside. This is daily life in Oymyakon, Russia, a village of about 500 people. Today, we'll explore our essential question: how do extreme environments shape human culture, technology, and resilience? My talk will outline this human side of the story. First, we'll look at the people and their daily lives. Second, we will discuss the irony of the town's name. And finally, we'll review what this community teaches us about human endurance. The people of Oymyakon are mostly indigenous Yakuts, I'll spell that Y-A-K-U-T-S, and ethnic Russians. Their entire culture is a masterclass in adaptation. Growing crops is impossible, so the traditional diet is almost entirely carnivorous: reindeer meat, horse meat, and a local delicacy of frozen, raw fish called stroganina. The cold is the central fact of life, dictating everything. People wear clothes made of layers of fur. They spend as little time outdoors as possible. It's a life built around a deep, practical respect for the power of nature. Now, here is a fascinating detail. The name Oymyakon, in the local Sakha language, ironically means 'non-freezing water'. This is because the village was originally a seasonal stop for reindeer herders who would water their flocks at a nearby thermal spring that doesn't freeze. So, the coldest town on Earth is named after a patch of warm water. Let's review what this tells us about the people. To live in a place where the average winter temperature is minus 50 Celsius requires more than just technology. It requires immense community resilience and a deep well of traditional knowledge. The key takeaway is not just that people can survive here, but that they have built a unique and enduring culture in spite of and because of the extreme challenge. They show us the absolute limit of human adaptation on our planet." }},
+                { id: 'lecture-geography-quiz-mcq', type: 'quiz-mcq', content: { title: 'Geography & Adaptation Quiz (MCQ)', questions: [] } },
+                { id: 'lecture-geography-quiz-tfng', type: 'quiz-tfng', content: { title: 'Geography & Adaptation Quiz (TFNG)', questions: [] } },
+                { id: 'lecture-geography-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Geography & Adaptation Quiz (Gap Fill)', sentences: [] } },
+                
+                // 7. Thinking & Exam Prep
+                { id: 'thinking-prompts', type: 'html-content', content: { title: 'Thinking & Exam Prep <span aria-hidden="true">📝</span>', html: `
+                                        <div class="text-left space-y-8">
+                                            <div>
+                                                <h3 class="text-2xl font-bold text-purple-600 mb-3">Higher-Order Thinking Questions</h3>
+                                                <ul class="list-disc list-inside space-y-2 text-lg">
+                                                    <li><b>Analyze:</b> How does the climate shape daily life in Oymyakon?</li>
+                                                    <li><b>Evaluate:</b> Is it sustainable to live in such extreme conditions?</li>
+                                                    <li><b>Create:</b> Design a survival guide for students visiting Oymyakon.</li>
+                                                    <li><b>Synthesis:</b> How can the resilience of Oymyakon’s people inspire solutions for living in other extreme environments?</li>
+                                                </ul>
+                                            </div>
+                                             <div>
+                                                <h3 class="text-2xl font-bold text-purple-600 mb-3">IELTS & TOEFL Practice</h3>
+                                                <p class="mb-2"><strong>IELTS Part 2:</strong> Describe a place with extreme weather that you know about.</p>
+                                                <p><strong>TOEFL Speaking:</strong> Discuss how climate affects education and daily lifestyle choices.</p>
+                                            </div>
+                                        </div>` } },
+
+                // 8. Final Project
+                { id: 'final-project-hub', type: 'html-content', content: { title: 'Final Project Hub <span aria-hidden="true">✍️</span>', html: `
+                                        <div class="bg-white rounded-2xl shadow-xl p-8 text-left">
+                                        <h2 class="text-3xl font-bold text-violet-600 mb-4">GRASPS Task: A Tale of Two Climates</h2>
+                                        <div class="space-y-3 text-lg">
+                                            <p><strong class="font-semibold text-violet-700">Goal:</strong> To create a comparative report between Oymyakon and your hometown, focusing on climate, culture, and education.</p>
+                                            <p><strong class="font-semibold text-violet-700">Role:</strong> You are a cultural researcher and climate analyst preparing a report for an international student exchange program.</p>
+                                            <p><strong class="font-semibold text-violet-700">Audience:</strong> Students from your school and students from Oymyakon.</p>
+                                            <p><strong class="font-semibold text-violet-700">Situation:</strong> You need to create a report that clearly explains the profound differences in daily life caused by living in two very different climates.</p>
+                                            <p><strong class="font-semibold text-violet-700">Product:</strong> A multimedia presentation or a written report that compares Oymyakon and your hometown across three categories: Daily Routine, School Life, and Community Traditions.</p>
+                                            <p><strong class="font-semibold text-violet-700">Standards:</strong> Your report will be evaluated on its use of specific examples, clear comparisons, and insightful analysis of how the environment shapes human life.</p>
+                                        </div>
+                                        </div>` } },
+                { id: 'writing-task', type: 'writing-task', content: { 
+                    title: 'Project Writing Activity <span aria-hidden="true">✍️</span>', 
+                    prompt: 'Write a paragraph (200-250 words) for your report, comparing life in Oymyakon with life in your hometown. Focus on how climate influences daily routines and challenges.', 
+                    starters: [
+                        "Oymyakon, located in Siberia, is defined by its...",
+                        "In my hometown, the climate is completely different, which means...",
+                        "A daily challenge in Oymyakon is..., whereas in my town, we worry more about...",
+                        "This comparison shows how adaptable people can be..."
+                    ],
+                    wordBank: ['Adaptation', 'Celsius', 'climate', 'community', 'culture', 'extreme', 'frozen', 'harsh', 'Oymyakon', 'permafrost', 'resilience', 'Siberia', 'survival', 'tradition', 'Yakut']
+                } },
+                { id: 'self-assessment', type: 'html-content', content: { title: 'Self-Assessment <span aria-hidden="true">🧑‍🏫</span>', html: `
+                                        <div class="text-left">
+                                            <h3 class="text-2xl font-bold text-purple-600 mb-3">Metacognitive Self-Assessments</h3>
+                                            <ol class="list-decimal list-inside space-y-4 text-xl">
+                                                <li>What strategy helped me most to understand what life is like in Oymyakon?</li>
+                                                <li>How did learning about Oymyakon's resilience change my perspective on challenges in my own life?</li>
+                                            </ol>
+                                        </div>` } },
+                { id: 'certificate', type: 'certificate', content: { title: 'Module Complete! <span aria-hidden="true">🎉</span>', text: 'You have successfully completed the "Life in the Coldest Town" module.', certificateTitle: 'Certificate of Resilience Studies' } }
+            ]
+        };
+        // --- END OF LESSON CONTENT CONFIGURATION ---
+        // ===================================================================================
+
+        class SpeechService {
+             constructor() {
+                 this.synth = window.speechSynthesis;
+                 this.isInitialized = false;
+                 this.isTtsEnabled = true;
+                 this.voices = {};
+                 this.speechRate = 0.85;
+                 this.isDialoguePlaying = false;
+                 this.keepAliveInterval = null;
+             }
+
+             _startKeepAlive() {
+                if (this.keepAliveInterval) {
+                    clearInterval(this.keepAliveInterval);
+                }
+                this.keepAliveInterval = setInterval(() => {
+                    if (this.synth.speaking) {
+                        // Don't interrupt if it's currently speaking.
+                    } else {
+                        // A silent pause/resume can keep the service active on some browsers.
+                        this.synth.pause();
+                        this.synth.resume();
+                    }
+                }, 10000); // every 10 seconds
+            }
+    
+            _stopKeepAlive() {
+                if (this.keepAliveInterval) {
+                    clearInterval(this.keepAliveInterval);
+                    this.keepAliveInterval = null;
+                }
+            }
+             
+             async _setupVoices() {
+                 const voicesPromise = new Promise(resolve => { if (this.synth.getVoices().length) return resolve(this.synth.getVoices()); this.synth.onvoiceschanged = () => resolve(this.synth.getVoices()); });
+                 const availableVoices = await voicesPromise;
+                 if (!availableVoices.length) { console.warn("No speech synthesis voices available."); return; }
+                 const speakerToVoiceMap = {
+                    // General conversation practice speakers
+                    'a': ['Microsoft Emma Online (Natural) - English (United States)', 'Microsoft Ava Online (Natural) - English (United States)'],
+                    'b': ['Microsoft Brian Online (Natural) - English (United States)', 'Microsoft Andrew Online (Natural) - English (United States)'],
+                    
+                    // Speakers for the lectures
+                    'narrator': ['Microsoft Andrew Online (Natural) - English (United States)', 'Google US English'],
+                    'professor': ['Microsoft Brian Online (Natural) - English (United States)', 'Google US English'],
+                    'emily': ['Microsoft Emma Online (Natural) - English (United States)', 'Google US English'],
+                    'oliver': ['Microsoft Andrew Online (Natural) - English (United States)', 'Google US English'],
+                    'aisha': ['Microsoft Ava Online (Natural) - English (United States)', 'Google US English'],
+                    'ben': ['Microsoft Brian Online (Natural) - English (United States)', 'Google US English'],
+                    'guide': ['Microsoft Ava Online (Natural) - English (United States)', 'Google US English']
+                 };
+                 for (const speaker in speakerToVoiceMap) {
+                     const voicePriorityList = speakerToVoiceMap[speaker];
+                     let chosenVoice = null;
+                     for (const voiceName of voicePriorityList) {
+                         const foundVoice = availableVoices.find(v => v.name === voiceName);
+                         if (foundVoice) { chosenVoice = foundVoice; break; }
+                     }
+                     if (chosenVoice) { this.voices[speaker] = chosenVoice; } else { console.warn(`Could not find specified voices for speaker: "${speaker}"`); }
+                 }
+                 this.voices['default'] = availableVoices.find(v => v.name === 'Microsoft Ava Online (Natural) - English (United States)') || availableVoices.find(v => v.lang === 'en-US');
+             }
+
+             async init() {
+                 if (this.isInitialized) return;
+                 try {
+                     // Initial speaking event to "wake up" the synthesis engine
+                     const warmUp = new SpeechSynthesisUtterance(' ');
+                     warmUp.volume = 0;
+                     this.synth.speak(warmUp);
+                     this.synth.cancel(); // Clear the empty utterance
+                     await this._setupVoices();
+                     this.isInitialized = true;
+                     this._startKeepAlive(); // Start the keep-alive timer
+                 } catch (e) {
+                     console.error("Speech synthesis setup failed:", e);
+                 }
+             }
+             
+             _cleanTextForSpeech(text) { const tempDiv = document.createElement('div'); const textWithoutSpans = text.replace(/<span aria-hidden="true">.*?<\/span>/g, ' '); tempDiv.innerHTML = textWithoutSpans; let cleanText = tempDiv.textContent || tempDiv.innerText || ''; cleanText = cleanText.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, ''); return cleanText; }
+             
+             async speak(text, { onEndCallback = null, voiceKey = 'default' } = {}) { 
+                if (!this.isInitialized || !this.isTtsEnabled || !text) { 
+                    if (onEndCallback) onEndCallback(); 
+                    return; 
+                } 
+                if (this.synth.speaking) { 
+                    this.synth.cancel(); 
+                    await new Promise(resolve => setTimeout(resolve, 100)); 
+                } 
+                const cleanText = this._cleanTextForSpeech(text); 
+                if (!cleanText.trim()) { 
+                    if (onEndCallback) onEndCallback(); 
+                    return; 
+                } 
+                const utter = new SpeechSynthesisUtterance(cleanText); 
+                utter.voice = this.voices[voiceKey] || this.voices['default']; 
+                utter.rate = 0.85; 
+                if (onEndCallback) utter.onend = onEndCallback; 
+                utter.onerror = (e) => { 
+                    console.error('SpeechSynthesisUtterance.onerror', e); 
+                    if (onEndCallback) onEndCallback(); 
+                }; 
+                try { 
+                    this.synth.speak(utter); 
+                } catch (e) { 
+                    console.error("Error calling synth.speak:", e); 
+                    if (onEndCallback) onEndCallback(); 
+                } 
+            }
+            
+             async speakDialogue(text) { if (!this.isInitialized || !this.isTtsEnabled || !text || this.isDialoguePlaying) return; this.cancel(); this.isDialoguePlaying = true; const lines = text.split('\n').filter(line => line.trim() !== '' && line.includes(':')); const queue = lines.map(line => { const [speaker, ...parts] = line.split(':'); const dialogue = parts.join(':').trim(); const cleanDialogue = this._cleanTextForSpeech(dialogue); const voiceKey = speaker.toLowerCase().replace(/dr\. |professor /g, '').trim(); return { text: cleanDialogue, voiceKey: voiceKey }; }).filter(item => item.text); if (queue.length === 0) { this.isDialoguePlaying = false; return; } const playNext = () => { if (queue.length > 0 && this.isTtsEnabled) { const item = queue.shift(); const utter = new SpeechSynthesisUtterance(item.text); utter.voice = this.voices[item.voiceKey] || this.voices['default']; utter.rate = 0.85; utter.onend = playNext; utter.onerror = (e) => { console.warn('A speech synthesis error occurred, attempting to recover.', e.error); try { this.synth.cancel(); } catch (cancelError) { console.error("Error while cancelling synth:", cancelError); } setTimeout(playNext, 250); }; try { this.synth.speak(utter); } catch(e) { console.error("Error in synth.speak:", e); setTimeout(playNext, 250); } } else { this.isDialoguePlaying = false; } }; playNext(); }
+             
+             cancel() { if (this.synth) { this.isDialoguePlaying = false; this.synth.cancel(); } }
+             
+             toggleTTS(forceState) { this.isTtsEnabled = forceState === undefined ? !this.isTtsEnabled : forceState; if (!this.isTtsEnabled) { this.cancel(); } return this.isTtsEnabled; }
+        }
+
+        // --- Global App State and Functions ---
+        const speechService = new SpeechService();
+        let score = 0, currentPage = lessonData.startPageId, timerInterval;
+        const pageHistory = [lessonData.startPageId];
+        let pageSequence = [];
+        let completedSections = new Set();
+        let vocabGameTimer;
+        let selectedWord = { element: null, text: '' };
+
+        // --- Sound and Reward Effects ---
+        const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        const noiseSynth = new Tone.NoiseSynth().toDestination();
+        
+        function playCorrectSound() {
+            if (!speechService.isTtsEnabled) return;
+            try {
+                const now = Tone.now();
+                synth.triggerAttackRelease(["C5", "E5", "G5"], "8n", now);
+            } catch(e) {
+                console.warn("Tone.js sound failed to play:", e);
+            }
+        }
+        
+        function playIncorrectSound() {
+            if (!speechService.isTtsEnabled) return;
+            try {
+                noiseSynth.triggerAttackRelease("4n");
+            } catch(e) {
+                console.warn("Tone.js sound failed to play:", e);
+            }
+        }
+
+        function triggerRewardAnimation() {
+            const container = document.getElementById('reward-animation-container');
+            if (!container) return;
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                const colors = ['#ffffff', '#dbeafe', '#bfdbfe', '#93c5fd', '#60a5fa'];
+                confetti.style.position = 'absolute';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.top = `${Math.random() * -50 - 50}px`;
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = confetti.style.width;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.opacity = '1';
+                confetti.style.borderRadius = '50%';
+                
+                container.appendChild(confetti);
+
+                const animation = confetti.animate([
+                    { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translate(${Math.random() * 100 - 50}px, 120vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 3000 + 4000,
+                    easing: 'ease-out',
+                    iterations: 1
+                });
+
+                animation.onfinish = () => {
+                    confetti.remove();
+                };
+            }
+        }
+
+        // --- Progress and Completion Logic ---
+        const pageToMenuMap = {};
+        function buildPageToMenuMap() {
+            lessonData.mainMenu.forEach(menuItem => {
+                let queue = [menuItem.target];
+                let visited = new Set(queue);
+                while (queue.length > 0) {
+                    const pageId = queue.shift();
+                    pageToMenuMap[pageId] = menuItem.id;
+                    const pageDef = lessonData.pages.find(p => p.id === pageId);
+                    if (pageDef && pageDef.type.startsWith('quiz')) {
+                        const nextQuizPage = getNextQuizPage(pageId);
+                        if (nextQuizPage && !visited.has(nextQuizPage) && lessonData.pages.some(p => p.id === nextQuizPage)) {
+                            queue.push(nextQuizPage);
+                            visited.add(nextQuizPage);
+                        }
+                    }
+                }
+            });
+            // Manual mapping for vocab game
+            pageToMenuMap['vocab-game'] = 'menu-vocab-game';
+        }
+
+        function getNextQuizPage(pageId) {
+            const sequence = ['mcq','tfng', 'gap-fill'];
+            const parts = pageId.split('-quiz-');
+            if (parts.length < 2) return null;
+            const prefix = parts[0];
+            const type = parts[1];
+            const currentIndex = sequence.indexOf(type);
+            if (currentIndex > -1 && currentIndex < sequence.length - 1) {
+                return `${prefix}-quiz-${sequence[currentIndex + 1]}`;
+            }
+            return null;
+        }
+
+        function updateProgressBar() {
+            const progress = (completedSections.size / lessonData.mainMenu.length) * 100;
+            const bar = document.getElementById('progress-bar');
+            if (bar) bar.style.width = `${progress}%`;
+        }
+
+        function updateMenuCompletionState() {
+            const menuContainer = document.getElementById('page-main-menu');
+            if (!menuContainer) return;
+            lessonData.mainMenu.forEach(item => {
+                const button = menuContainer.querySelector(`#menu-btn-${item.id}`);
+                if (button && completedSections.has(item.id)) {
+                    if (!button.innerHTML.includes('✓')) {
+                        button.innerHTML += ' <span class="text-green-300">✓</span>';
+                    }
+                }
+            });
+        }
+
+        function markSectionAsComplete(pageId) {
+            const menuId = pageToMenuMap[pageId];
+            if (menuId && !completedSections.has(menuId)) {
+                completedSections.add(menuId);
+                updateProgressBar();
+            }
+        }
+        
+        function checkQuizPageCompletion(pageId) {
+            const pageElement = document.getElementById(`page-${pageId}`);
+            if (!pageElement) return false;
+
+            if (pageId.includes('gap-fill')) {
+                const gaps = pageElement.querySelectorAll('.gap');
+                return gaps.length > 0 && Array.from(gaps).every(g => g.classList.contains('correct'));
+            } else {
+                const questions = pageElement.querySelectorAll('.question-group');
+                return questions.length > 0 && Array.from(questions).every(q => q.querySelector('button:disabled'));
+            }
+        }
+
+
+        // --- App Navigation ---
+        window.toggleTTS = (button) => {
+            const isNowEnabled = speechService.toggleTTS();
+            const iconPath = isNowEnabled 
+                ? "M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 5.858a3 3 0 104.243 4.243M9 12l4.243 4.243"
+                : "M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707a1 1 0 011.414 0v14a1 1 0 01-1.414 0L5.586 15z M17 14l-4-4m0 4l4-4";
+            button.querySelector('svg').classList.toggle('text-gray-600', isNowEnabled);
+            button.querySelector('svg').classList.toggle('text-gray-400', !isNowEnabled);
+            button.querySelector('path').setAttribute('d', iconPath);
+
+            if (isNowEnabled) {
+                const pageData = lessonData.pages.find(p => p.id === currentPage);
+                const targetPage = document.getElementById(`page-${currentPage}`);
+                if (pageData && pageData.type === 'dialogue') {
+                    speechService.speakDialogue(pageData.content.dialogue);
+                } else if (targetPage) {
+                    const readableContent = targetPage.querySelector('.readable-content');
+                    const titleElement = targetPage.querySelector('h2, h3');
+                    if (readableContent) speechService.speak(readableContent.innerText);
+                    else if (titleElement) speechService.speak(titleElement.innerText);
+                }
+            }
+        };
+
+        window.startApp = async function() {
+            await speechService.init(); 
+            try { await Tone.start(); } catch (e) { console.error(e); }
+            navigateTo(lessonData.homePageId);
+        }
+        
+        function startTimer(duration, display, onComplete) {
+            let timer = duration;
+            const update = () => { display.textContent = `${String(Math.floor(timer/60)).padStart(2,'0')}:${String(timer%60).padStart(2,'0')}`; };
+            update();
+            timerInterval = setInterval(() => { timer--; update(); if (timer < 0) { clearInterval(timerInterval); if (onComplete) onComplete(); } }, 1000);
+        }
+
+        window.navigateTo = (pageId) => {
+            const previousPageId = currentPage;
+            
+            // Mark completion if leaving a quiz page and it's fully answered
+            if (previousPageId.includes('-quiz-')) {
+                if (checkQuizPageCompletion(previousPageId)) {
+                    markSectionAsComplete(previousPageId);
+                }
+            }
+            
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (!targetPage) return console.warn('navigateTo: no page found for id', pageId);
+            if (pageId === currentPage) return;
+            
+            clearInterval(timerInterval);
+            clearTimeout(vocabGameTimer);
+            speechService.cancel();
+
+            // Mark simple pages as complete on navigation
+            const previousPageDef = lessonData.pages.find(p => p.id === previousPageId);
+            if (previousPageDef && !previousPageDef.type.startsWith('quiz') && previousPageId !== 'vocab-game') {
+                 markSectionAsComplete(previousPageId);
+            }
+
+            document.getElementById(`page-${currentPage}`)?.classList.remove('active');
+            targetPage.classList.add('active');
+            currentPage = pageId;
+            if (pageHistory[pageHistory.length - 1] !== currentPage) pageHistory.push(currentPage);
+            
+            const pageData = lessonData.pages.find(p => p.id === pageId);
+            if (pageData) {
+                if (pageData.type === 'timer') {
+                    const timerEl = document.getElementById(pageData.content.timerId);
+                    if (timerEl) startTimer(pageData.content.duration, timerEl, goNext);
+                } else if (pageData.type === 'vocab-game') {
+                    startVocabGame();
+                }
+                
+                if (pageData.type === 'dialogue') {
+                    speechService.speakDialogue(pageData.content.dialogue);
+                } else {
+                    const readableContent = targetPage.querySelector('.readable-content');
+                    const titleElement = targetPage.querySelector('h2, h3');
+                    let contentToSpeak = readableContent ? readableContent.innerText : (titleElement ? titleElement.innerText : '');
+                    let voice = 'default';
+                    if (pageId.startsWith('vocab-') || pageId === 'reading-main') {
+                       voice = 'oliver'; // Andrew voice
+                       if (pageId === 'reading-main') {
+                           contentToSpeak = Array.from(targetPage.querySelectorAll('h4, p')).map(el => el.innerText).join(' ');
+                       }
+                    }
+                    speechService.speak(contentToSpeak, { voiceKey: voice });
+                }
+            } else if (pageId === lessonData.homePageId) {
+                speechService.speak(targetPage.querySelector('h2').innerText);
+                updateMenuCompletionState();
+            }
+            updateNavButtons();
+            window.scrollTo(0, 0);
+        }
+
+        window.goNext = () => { const currentIndex = pageSequence.indexOf(currentPage); if (currentIndex > -1 && currentIndex < pageSequence.length - 1) navigateTo(pageSequence[currentIndex + 1]); }
+        window.goBack = () => { if (pageHistory.length > 1) { pageHistory.pop(); navigateTo(pageHistory.pop()); } }
+
+        function updateNavButtons() {
+            const nav = document.getElementById('nav-header');
+            if (!nav) return;
+            nav.style.display = (currentPage === lessonData.startPageId) ? 'none' : 'block';
+            const backBtn = nav.querySelector('button:first-child');
+            backBtn.disabled = pageHistory.length <= 1;
+            backBtn.classList.toggle('opacity-50', backBtn.disabled);
+            const nextBtn = nav.querySelector('button:last-child');
+            const currentIndex = pageSequence.indexOf(currentPage);
+            const isLast = currentIndex >= pageSequence.length - 1;
+            nextBtn.disabled = isLast || currentPage === lessonData.homePageId;
+            nextBtn.classList.toggle('opacity-50', nextBtn.disabled);
+        }
+        
+        function showFeedbackMessage(isCorrect) {
+            const correctFeedback = ["That's right!", "Excellent!", "Perfect!", "Great job!"];
+            const incorrectFeedback = ["Not quite.", "Keep trying!", "Almost there."];
+            const message = isCorrect ? correctFeedback[Math.floor(Math.random() * correctFeedback.length)] : incorrectFeedback[Math.floor(Math.random() * incorrectFeedback.length)];
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.className = `feedback-toast ${isCorrect ? 'correct' : 'encouraging'}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function updateScore(points) { score += points; document.getElementById('score-display').textContent = score; }
+
+        function checkCompletionAndMark() {
+            if(checkQuizPageCompletion(currentPage)) {
+                markSectionAsComplete(currentPage);
+            }
+        }
+
+        window.checkTfngAnswer = function(clickedButton, chosenAnswer, correctAnswer) {
+            const buttonContainer = clickedButton.parentElement;
+            Array.from(buttonContainer.children).forEach(btn => btn.disabled = true);
+            const isCorrect = chosenAnswer === correctAnswer;
+            showFeedbackMessage(isCorrect);
+            if (isCorrect) {
+                updateScore(10);
+                playCorrectSound();
+                triggerRewardAnimation();
+                clickedButton.className = clickedButton.className.replace(/bg-\w+-500/, 'bg-green-500');
+            } else {
+                playIncorrectSound();
+                clickedButton.className = clickedButton.className.replace(/bg-\w+-500/, 'bg-red-600');
+                const correctBtn = Array.from(buttonContainer.children).find(btn => btn.textContent === correctAnswer.charAt(0));
+                if (correctBtn) correctBtn.className = correctBtn.className.replace(/bg-\w+-500/, 'bg-green-500');
+            }
+            setTimeout(checkCompletionAndMark, 100);
+        }
+        
+        window.checkMcqAnswer = function(button, isCorrect) {
+            const questionGroup = button.closest('.question-group');
+            questionGroup.querySelectorAll('.quiz-option').forEach(opt => opt.disabled = true);
+            showFeedbackMessage(isCorrect);
+            if (isCorrect) {
+                updateScore(10);
+                playCorrectSound();
+                triggerRewardAnimation();
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                button.classList.add('bg-green-500', 'border-green-600', 'text-white');
+            } else {
+                playIncorrectSound();
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                button.classList.add('bg-red-500', 'border-red-600', 'text-white', 'shake');
+                const correctButton = questionGroup.querySelector(".quiz-option[data-correct='true']");
+                if (correctButton) {
+                    correctButton.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                    correctButton.classList.add('bg-green-500', 'border-green-600', 'text-white');
+                }
+            }
+            setTimeout(checkCompletionAndMark, 100);
+        }
+
+        function initGapFill(pageId) {
+            const page = document.getElementById(pageId);
+            if (!page) return;
+            const gaps = page.querySelectorAll('.gap');
+            const words = page.querySelectorAll('.word-bank-word');
+            const wordBank = page.querySelector('.word-bank-container');
+
+            words.forEach(word => {
+                word.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', word.dataset.word); });
+                word.addEventListener('click', handleWordClick);
+            });
+            gaps.forEach(gap => {
+                gap.addEventListener('dragover', e => e.preventDefault());
+                gap.addEventListener('drop', e => handleDrop(e, gap));
+                gap.addEventListener('click', handleGapClick);
+            });
+
+            function handleWordClick(e) {
+                const clickedWord = e.currentTarget;
+                if (clickedWord.parentElement.classList.contains('gap')) { 
+                    wordBank.appendChild(clickedWord); 
+                    clickedWord.parentElement.classList.remove('correct', 'incorrect');
+                    return; 
+                }
+                if (selectedWord.element) selectedWord.element.classList.remove('selected');
+                if (selectedWord.element === clickedWord) { selectedWord = { element: null, text: '' }; } 
+                else { selectedWord = { element: clickedWord, text: clickedWord.dataset.word }; clickedWord.classList.add('selected'); }
+            }
+            function handleGapClick(e) {
+                const clickedGap = e.currentTarget;
+                if(clickedGap.children.length > 0) {
+                     wordBank.appendChild(clickedGap.children[0]);
+                     clickedGap.classList.remove('correct', 'incorrect');
+                }
+                if (!selectedWord.element) return;
+                clickedGap.appendChild(selectedWord.element);
+                checkGap(clickedGap);
+                selectedWord.element.classList.remove('selected');
+                selectedWord = { element: null, text: '' };
+            }
+            function handleDrop(e, gap) {
+                e.preventDefault();
+                if (gap.children.length > 0) return;
+                const wordText = e.dataTransfer.getData('text/plain');
+                const wordElement = page.querySelector(`.word-bank-word[data-word="${wordText}"]`);
+                if (wordElement) { gap.appendChild(wordElement); checkGap(gap); }
+            }
+            function checkGap(gap) {
+                const word = gap.querySelector('.word-bank-word');
+                const isCorrect = word && word.dataset.word.toLowerCase() === gap.dataset.answer.toLowerCase();
+                gap.classList.toggle('correct', isCorrect);
+                gap.classList.toggle('incorrect', !isCorrect);
+                if (isCorrect) { 
+                    updateScore(10); 
+                    playCorrectSound();
+                    triggerRewardAnimation();
+                    showFeedbackMessage(true); 
+                } else { 
+                    playIncorrectSound();
+                    showFeedbackMessage(false); 
+                }
+                setTimeout(checkCompletionAndMark, 100);
+            }
+        }
+
+        // --- Vocab Game Logic ---
+        let vocabGameQuestions = [];
+        let vocabGameCurrentIndex = 0;
+        let vocabGameScore = 0;
+        const ROUND_TIME = 10000; // 10 seconds
+
+        function startVocabGame() {
+            vocabGameQuestions = [...lessonData.vocabulary].sort(() => 0.5 - Math.random());
+            vocabGameCurrentIndex = 0;
+            vocabGameScore = 0;
+            document.getElementById('vocab-game-score').textContent = '0';
+            nextVocabGameRound();
+        }
+
+        function nextVocabGameRound() {
+            if (vocabGameCurrentIndex >= vocabGameQuestions.length) {
+                endVocabGame();
+                return;
+            }
+            
+            const question = vocabGameQuestions[vocabGameCurrentIndex];
+            document.getElementById('vocab-game-definition').textContent = question.def;
+            
+            const options = [question.word];
+            const wrongAnswers = lessonData.vocabulary.filter(v => v.word !== question.word);
+            while (options.length < 4 && wrongAnswers.length > 0) {
+                const randomWrong = wrongAnswers.splice(Math.floor(Math.random() * wrongAnswers.length), 1)[0];
+                options.push(randomWrong.word);
+            }
+            
+            const optionsContainer = document.getElementById('vocab-game-options');
+            optionsContainer.innerHTML = '';
+            options.sort(() => 0.5 - Math.random()).forEach(opt => {
+                const button = document.createElement('button');
+                button.className = 'quiz-option p-3 rounded-lg text-left bg-gray-100 hover:bg-gray-200 border border-gray-200';
+                button.textContent = opt;
+                button.onclick = () => checkVocabGameAnswer(button, opt === question.word);
+                optionsContainer.appendChild(button);
+            });
+
+            startRoundTimer();
+        }
+        
+        function startRoundTimer() {
+            clearTimeout(vocabGameTimer);
+            const timerBar = document.getElementById('vocab-game-timer-bar');
+            timerBar.style.transition = 'none';
+            timerBar.style.width = '100%';
+            
+            setTimeout(() => {
+                timerBar.style.transition = `width ${ROUND_TIME / 1000}s linear`;
+                timerBar.style.width = '0%';
+            }, 100);
+
+            vocabGameTimer = setTimeout(() => {
+                showFeedbackMessage(false);
+                playIncorrectSound();
+                vocabGameCurrentIndex++;
+                nextVocabGameRound();
+            }, ROUND_TIME);
+        }
+
+        function checkVocabGameAnswer(button, isCorrect) {
+            clearTimeout(vocabGameTimer);
+            showFeedbackMessage(isCorrect);
+            if (isCorrect) {
+                vocabGameScore++;
+                updateScore(5);
+                playCorrectSound();
+                triggerRewardAnimation();
+                document.getElementById('vocab-game-score').textContent = vocabGameScore;
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                button.classList.add('bg-green-500', 'text-white');
+            } else {
+                playIncorrectSound();
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                button.classList.add('bg-red-500', 'text-white', 'shake');
+            }
+            
+            const optionsContainer = document.getElementById('vocab-game-options');
+            optionsContainer.querySelectorAll('button').forEach(btn => btn.disabled = true);
+
+            setTimeout(() => {
+                vocabGameCurrentIndex++;
+                nextVocabGameRound();
+            }, 1500);
+        }
+
+        function endVocabGame() {
+            document.getElementById('vocab-game-definition').textContent = `Game Over! You scored ${vocabGameScore} out of ${vocabGameQuestions.length}.`;
+            document.getElementById('vocab-game-options').innerHTML = `<button onclick="startVocabGame()" class="action-button bg-blue-500 text-white font-bold p-3 rounded-lg">Play Again</button>`;
+            markSectionAsComplete('vocab-game');
+        }
+
+
+        function createPageElement(id, content) {
+            const section = document.createElement('section');
+            section.id = `page-${id}`;
+            section.className = 'page';
+            section.innerHTML = content;
+            document.getElementById('dynamic-pages-container').appendChild(section);
+        }
+        
+        function populateAllQuizzes() {
+             // Reading Quizzes
+            const readingTfng = lessonData.pages.find(p => p.id === 'reading-quiz-tfng');
+            if(readingTfng) readingTfng.content.questions = [ 
+                { statement: 'Oymyakon is in southern Russia.', correctAnswer: 'False' },
+                { statement: 'People in Oymyakon speak only Russian.', correctAnswer: 'False' },
+                { statement: 'Cars must be kept running in winter.', correctAnswer: 'True' },
+                { statement: 'Schools close when it’s −30°C.', correctAnswer: 'False' },
+                { statement: 'Reindeer herding is a traditional activity.', correctAnswer: 'True' }
+            ];
+            const readingMcq = lessonData.pages.find(p => p.id === 'reading-quiz-mcq');
+            if(readingMcq) readingMcq.content.questions = [ 
+                { question: 'What is Oymyakon known for?', options: ['Beaches', 'Warm weather', 'Extreme cold', 'Rainforests'], correctAnswer: 'Extreme cold' },
+                { question: 'What is permafrost?', options: ['Frozen food', 'Ground that stays frozen', 'A type of clothing', 'A snowstorm'], correctAnswer: 'Ground that stays frozen' },
+                { question: 'What language do people speak in Oymyakon?', options: ['Chinese', 'English', 'Russian and Yakut', 'French'], correctAnswer: 'Russian and Yakut' },
+                { question: 'What traditional activity is common in Oymyakon?', options: ['Surfing', 'Reindeer herding', 'Farming', 'Sailing'], correctAnswer: 'Reindeer herding' },
+                { question: 'When do schools close in Oymyakon?', options: ['−30°C', '−40°C', '−52°C', '−60°C'], correctAnswer: '−52°C' }
+            ];
+
+            // Oymyakon Challenges & Culture Lecture Quizzes
+            const lectureChallengesMcq = lessonData.pages.find(p => p.id === 'lecture-challenges-quiz-mcq');
+            if(lectureChallengesMcq) lectureChallengesMcq.content.questions = [
+                { question: "What is the most obvious challenge of living in Oymyakon, according to Aisha?", options: ["Isolation from other towns", "Lack of internet access", "The extreme cold", "Difficulty finding jobs"], correctAnswer: "The extreme cold" },
+                { question: "What is a specific transportation challenge mentioned by Ben?", options: ["The roads are always closed", "There are no airports nearby", "Cars must be left running or they won't start", "Fuel is not available in winter"], correctAnswer: "Cars must be left running or they won't start" },
+                { question: "What does Aisha believe is a key lesson from Oymyakon's community?", options: ["The importance of modern technology", "How to be completely self-sufficient", "Incredible resilience and adaptability", "The benefits of a nomadic lifestyle"], correctAnswer: "Incredible resilience and adaptability" },
+                { question: "When designing a school program, what does Aisha suggest connecting students with?", options: ["Students in other countries", "University researchers", "Community elders", "Online tutors"], correctAnswer: "Community elders" },
+                { question: "What does the professor say is a crucial factor influencing sustainability in Oymyakon?", options: ["The number of tourists", "The local government's policies", "Connectivity and external support", "The amount of snowfall each year"], correctAnswer: "Connectivity and external support" }
+            ];
+            const lectureChallengesTfng = lessonData.pages.find(p => p.id === 'lecture-challenges-quiz-tfng');
+            if(lectureChallengesTfng) lectureChallengesTfng.content.questions = [
+                { statement: "Aisha believes that getting supplies in Oymyakon is easy and cheap.", correctAnswer: "False" },
+                { statement: "Ben suggests that the isolation of Oymyakon could be psychologically tough for people.", correctAnswer: "True" },
+                { statement: "The professor states that the cold climate has very little impact on daily routines.", correctAnswer: "False" },
+                { statement: "Ben proposes that a school curriculum in Oymyakon should include science relevant to the Arctic.", correctAnswer: "True" },
+                { statement: "The discussion concludes that community bonds are not very important for survival in Oymyakon.", correctAnswer: "False" }
+            ];
+            const lectureChallengesGapFill = lessonData.pages.find(p => p.id === 'lecture-challenges-quiz-gap-fill');
+            if(lectureChallengesGapFill) lectureChallengesGapFill.content.sentences = [
+                { text: ["The intense cold presents numerous logistical and", "challenges."], answer: "survival" },
+                { text: ["The professor mentions that the climate influences everything down to burial", "."], answer: "customs" },
+                { text: ["Aisha describes the long-term sustainability of the village as feeling very", "."], answer: "fragile" },
+                { text: ["Ben emphasizes the importance of listening to the", "for survival tips."], answer: "locals" },
+                { text: ["Aisha notes that a sense of mutual", "is inspiring about the community."], answer: "support" }
+            ];
+            
+            // Geography & Adaptation Lecture Quizzes
+            const lectureGeopoliticsMcq = lessonData.pages.find(p => p.id === 'lecture-geography-quiz-mcq');
+            if(lectureGeopoliticsMcq) lectureGeopoliticsMcq.content.questions = [
+                { question: "What is the primary geographical reason for Oymyakon's extreme cold?", options: ["It is at a very high altitude.", "It is located on a large, open plain.", "It sits in a valley that traps cold air.", "It is surrounded by large bodies of water."], correctAnswer: "It sits in a valley that traps cold air." },
+                { question: "What technical adaptation is necessary for buildings in Oymyakon?", options: ["They must be painted white to reflect the sun.", "They are built underground to stay warm.", "They are constructed on deep piles or stilts.", "They have extremely thick glass windows."], correctAnswer: "They are constructed on deep piles or stilts." },
+                { question: "What is the ironic meaning of the name 'Oymyakon' in the local language?", options: ["'Coldest place'", "'Land of the sun'", "'Non-freezing water'", "'Valley of shadows'"], correctAnswer: "'Non-freezing water'" },
+                { question: "What is the traditional diet in Oymyakon almost entirely based on?", options: ["Grains and vegetables", "Imported fruits", "Carnivorous (meat and fish)", "Dairy products"], correctAnswer: "Carnivorous (meat and fish)" },
+                { question: "According to the guide, what does living in Oymyakon require more than just technology?", options: ["Government support", "A large population", "Immense community resilience", "A modern economy"], correctAnswer: "Immense community resilience" }
+            ];
+            const lectureGeopoliticsTfng = lessonData.pages.find(p => p.id === 'lecture-geography-quiz-tfng');
+            if(lectureGeopoliticsTfng) lectureGeopoliticsTfng.content.questions = [
+                { statement: "Oymyakon is located on the continent of North America.", correctAnswer: "False" },
+                { statement: "A 'temperature inversion' helps to warm the air in the valley.", correctAnswer: "False" },
+                { statement: "The name Oymyakon comes from a nearby thermal spring that doesn't freeze.", correctAnswer: "True" },
+                { statement: "The guide states that growing crops is a major part of the traditional diet.", correctAnswer: "False" },
+                { statement: "The lectures suggest that human existence in Oymyakon is largely dictated by the environment.", correctAnswer: "True" }
+            ];
+            const lectureGeopoliticsGapFill = lessonData.pages.find(p => p.id === 'lecture-geography-quiz-gap-fill');
+            if(lectureGeopoliticsGapFill) lectureGeopoliticsGapFill.content.sentences = [
+                { text: ["The ground in Oymyakon is in a state of continuous", "."], answer: "permafrost" },
+                { text: ["Schools only close if the temperature drops below minus 55 degrees", "."], answer: "Celsius" },
+                { text: ["The guide describes the culture as a masterclass in", "."], answer: "adaptation" },
+                { text: ["A local delicacy of frozen, raw fish is called", "."], answer: "stroganina" },
+                { text: ["The community teaches us about the absolute limit of human", "on our planet."], answer: "endurance" }
+            ];
+        }
+
+        function initializeLesson() {
+            document.getElementById('main-title').innerHTML = lessonData.title;
+            document.getElementById('main-subtitle').innerHTML = lessonData.subtitle;
+            document.getElementById('main-svg-container').innerHTML = `<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="grad-cold" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#a7f3d0;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#bfdbfe;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <rect width="600" height="300" fill="url(#grad-cold)"/>
+                <path d="M 0 300 L 0 250 Q 150 200 300 250 T 600 200 L 600 300 Z" fill="#ffffff"/>
+                <path d="M 50 220 L 70 200 L 90 220 L 70 240 Z" fill="#60a5fa" />
+                <path d="M 150 180 L 170 160 L 190 180 L 170 200 Z" fill="#93c5fd" />
+                <path d="M 500 150 L 520 130 L 540 150 L 520 170 Z" fill="#60a5fa" />
+                <rect x="250" y="220" width="80" height="80" fill="#7f1d1d" />
+                <polygon points="240,220 340,220 290,190" style="fill:#451a03;" />
+                <text x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="#1e3a8a" font-weight="bold">The Coldest Town</text>
+            </svg>`;
+
+            populateAllQuizzes();
+            buildPageToMenuMap();
+
+            const menuButtons = lessonData.mainMenu.map(item => {
+                const colors = { green: 'bg-green-500 border-green-700', blue: 'bg-blue-500 border-blue-700', sky: 'bg-sky-500 border-sky-700', amber: 'bg-amber-500 border-amber-700', rose: 'bg-rose-500 border-rose-700', violet: 'bg-violet-500 border-violet-700', teal: 'bg-teal-500 border-teal-700', orange: 'bg-orange-500 border-orange-700', indigo: 'bg-indigo-500 border-indigo-700', lime: 'bg-lime-500 border-lime-700', emerald: 'bg-emerald-500 border-emerald-700', red: 'bg-red-500 border-red-700', purple: 'bg-purple-500 border-purple-700' };
+                return `<button id="menu-btn-${item.id}" onclick="navigateTo('${item.target}')" class="btn-animated-3d ${colors[item.color] || colors['green']} text-white font-bold text-xl p-4 rounded-xl">${item.text}</button>`;
+            }).join('');
+            createPageElement(lessonData.homePageId, `<div class="bg-white rounded-2xl shadow-lg p-8"><h2 class="text-4xl font-bold text-center text-slate-800 mb-8">Main Menu</h2><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${menuButtons}</div></div>`);
+            
+            const pageOrderMap = { 
+                'warm-up': ['vocab-start'], 
+                'vocab-start': lessonData.vocabulary.map((v, i) => `vocab-${i}`), 
+                'reading-main': ['reading-quiz-tfng', 'reading-quiz-mcq'], 
+                'lecture-challenges-pre': ['lecture-challenges-main', 'lecture-challenges-quiz-mcq', 'lecture-challenges-quiz-tfng', 'lecture-challenges-quiz-gap-fill'],
+                'lecture-geography-pre': ['lecture-geography-main', 'lecture-geography-quiz-mcq', 'lecture-geography-quiz-tfng', 'lecture-geography-quiz-gap-fill'],
+                'final-project-hub': ['writing-task', 'self-assessment', 'certificate'] 
+            };
+            let flatPageList = [lessonData.startPageId];
+            lessonData.mainMenu.forEach(item => {
+                let queue = [item.target];
+                let visited = new Set();
+                while(queue.length > 0) {
+                    let current = queue.shift();
+                    if (visited.has(current)) continue;
+                    visited.add(current);
+                    flatPageList.push(current);
+                    if (pageOrderMap[current]) {
+                        queue.push(...pageOrderMap[current]);
+                    }
+                }
+            });
+            pageSequence = [...new Set(flatPageList)];
+
+            lessonData.vocabulary.forEach((v, i) => {
+                createPageElement(`vocab-${i}`, `<div class="bg-white rounded-2xl shadow-lg p-8 text-center pt-16"><div class="readable-content"><h3 class="text-2xl font-bold text-sky-600 mb-2">Vocabulary ${i + 1} / ${lessonData.vocabulary.length}</h3><div class="my-8"><h2 class="text-5xl font-bold text-gray-800 mb-4">${v.word}</h2><p class="text-2xl text-gray-600 mb-4">${v.def}</p><p class="text-xl text-gray-500 italic">"${v.sentence}"</p></div></div></div>`);
+            });
+
+            lessonData.pages.forEach(page => {
+                let pageHTML = '';
+                switch (page.type) {
+                    case 'simple': pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-center pt-16"><div class="readable-content"><h2 class="text-4xl font-bold text-gray-800 mb-6">${page.content.title}</h2><p class="text-xl text-gray-600 mb-8">${page.content.text}</p></div></div>`; break;
+                    case 'timer': pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-left pt-16"><div class="w-full flex justify-between items-center mb-4"><h2 class="text-2xl md:text-3xl font-bold text-blue-700">${page.content.title}</h2><div id="${page.content.timerId}" class="text-3xl md:text-4xl font-bold text-gray-700 ml-4"></div></div><div class="readable-content"><p class="text-lg md:text-xl text-gray-600 mt-8">${page.content.text}</p></div></div>`; break;
+                    case 'dialogue':
+                    case 'html-content':
+                        const contentHTML = page.type === 'html-content' ? page.content.html : (page.content.dialogue || '').split('\n').map(line => `<p class="mb-2">${line.replace(/([^:]+):/, '<strong class="font-semibold text-blue-700">$1:</strong>')}</p>`).join('');
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><h2 class="text-4xl font-bold text-center text-slate-800 mb-6">${page.content.title}</h2><div class="readable-content text-lg leading-relaxed space-y-4 bg-gray-50 p-6 rounded-lg max-h-[70vh] overflow-y-auto">${contentHTML}</div></div>`;
+                        break;
+                    case 'vocab-game':
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><h2 class="text-4xl font-bold text-center text-sky-600 mb-4">${page.content.title}</h2><div class="text-center mb-4 text-lg">Score: <span id="vocab-game-score" class="font-bold">0</span></div><div class="w-full bg-gray-200 rounded-full h-2.5 mb-4"><div id="vocab-game-timer-bar" class="bg-blue-600 h-2.5 rounded-full"></div></div><div id="vocab-game-definition" class="text-center text-2xl font-semibold my-6 min-h-[6rem]"></div><div id="vocab-game-options" class="grid grid-cols-2 gap-4"></div></div>`;
+                        break;
+                    case 'writing-task':
+                        const startersHTML = page.content.starters.map(s => `<li class="text-gray-500">${s}</li>`).join('');
+                        const wordBankHTML = page.content.wordBank ? `<div class="mt-6"><h4 class="font-bold text-lg text-violet-600">Word Bank:</h4><div class="flex flex-wrap gap-2 mt-2 p-4 bg-gray-100 rounded-lg">${page.content.wordBank.map(w => `<span class="bg-white px-2 py-1 rounded-md shadow-sm text-gray-700">${w}</span>`).join('')}</div></div>` : '';
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><div class="readable-content"><h2 class="text-4xl font-bold text-center text-violet-700 mb-6">${page.content.title}</h2><div class="text-lg leading-relaxed space-y-4 bg-gray-50 p-6 rounded-lg"><h3 class="font-bold text-xl text-violet-600">Prompt:</h3><p>${page.content.prompt}</p><h3 class="font-bold text-xl text-violet-600 mt-4">Sentence Starters:</h3><ul class="list-disc list-inside ml-4">${startersHTML}</ul>${wordBankHTML}</div></div><div class="text-center mt-6"><button onclick="goNext()" class="action-button bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-xl hover:bg-blue-700">Continue</button></div></div>`;
+                        break;
+                    case 'certificate':
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-center pt-16 relative overflow-hidden"><canvas id="completion-canvas"></canvas><div class="relative z-10"><div class="readable-content"><h2 class="text-4xl font-bold text-amber-600 mb-4">${page.content.title}</h2><p class="text-xl text-gray-600 mb-6">${page.content.text}</p></div><div id="certificate-to-print" class="bg-blue-50 border-4 border-dashed border-blue-300 rounded-lg p-8 max-w-2xl mx-auto"><div class="flex justify-center mb-4"><span class="text-6xl"><span aria-hidden="true">🇷🇺</span></span></div><h3 class="text-3xl font-bold text-slate-800">${page.content.certificateTitle}</h3><p class="mt-4 text-lg">This certificate is awarded to</p><p id="certificate-name" class="text-2xl font-bold text-blue-600 my-2 border-b-2 border-gray-400 pb-2">[Enter Your Name Here]</p><p class="mt-4 text-lg">for successfully completing this lesson.</p><p class="mt-6 text-md"><strong>Final Score:</strong> <span id="certificate-score" class="font-bold"></span> points</p><p class="text-sm mt-1"><strong>Date of Completion:</strong> <span id="certificate-date"></span></p></div><div id="cert-controls" class="mt-6"><div id="cert-initial-controls"><input type="text" id="name-input-cert" placeholder="Enter your name for the certificate" class="text-center p-2 border rounded-lg w-full max-w-md"><button onclick="generateCertificate()" class="action-button mt-4 bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700">Generate Certificate</button></div><div id="cert-generated-controls" class="hidden mt-4 flex flex-wrap justify-center gap-4"><button onclick="downloadCertificateAsImage()" class="action-button bg-sky-600 text-white font-bold py-2 px-4 rounded-full text-sm">Download Image</button></div></div></div></div>`;
+                        break;
+                    case 'quiz-tfng':
+                    case 'quiz-mcq':
+                    case 'quiz-gap-fill':
+                        let questionsHTML = '';
+                        if (page.type === 'quiz-tfng' && page.content.questions) {
+                            questionsHTML = page.content.questions.map((q, i) => `<div class="question-group flex items-center gap-4 p-4 rounded-lg bg-gray-100"><div class="flex-shrink-0 flex gap-2">${['True', 'False', 'Not Given'].map(l => `<button onclick="checkTfngAnswer(this, '${l}', '${q.correctAnswer}')" class="tfng-button bg-${l==='True'?'blue':l==='False'?'red':'gray'}-500 text-white font-bold w-12 h-10 rounded-full">${l.charAt(0)}</button>`).join('')}</div><p>${i + 1}. ${q.statement}</p></div>`).join('');
+                        } else if (page.type === 'quiz-mcq' && page.content.questions) {
+                            questionsHTML = page.content.questions.map((q, i) => `<div class="question-group ${i > 0 ? 'border-t pt-6 mt-6' : ''}"><p class="font-semibold mb-2">${i + 1}. ${q.question}</p><div class="grid grid-cols-1 md:grid-cols-2 gap-2">${q.options.map(o => `<button onclick="checkMcqAnswer(this, '${o.replace(/'/g, "\\'")}' === '${q.correctAnswer.replace(/'/g, "\\'")}')" data-correct="${o === q.correctAnswer}" class="quiz-option p-3 rounded-lg text-left bg-gray-100 hover:bg-gray-200 border border-gray-200">${o}</button>`).join('')}</div></div>`).join('');
+                        } else if (page.type === 'quiz-gap-fill' && page.content.sentences) {
+                            const words = page.content.sentences.map(s => s.answer).sort(() => Math.random() - 0.5);
+                            questionsHTML = `<div class="gap-fill-container">${page.content.sentences.map((s, i) => `<p class="text-lg mb-4">${i + 1}. ${s.text[0]} <span class="gap" data-answer="${s.answer}"></span> ${s.text[1]}</p>`).join('')}</div><div class="word-bank-container mt-8 p-4 bg-gray-100 rounded-lg flex flex-wrap gap-4 justify-center">${words.map(w => `<div class="word-bank-word" draggable="true" data-word="${w}">${w}</div>`).join('')}</div>`;
+                        }
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><h3 class="text-3xl font-bold text-rose-600 mb-6 text-center">${page.content.title}</h3><div class="space-y-6">${questionsHTML}</div></div>`;
+                        break;
+                }
+                if (pageHTML) {
+                    createPageElement(page.id, pageHTML);
+                    if (page.type === 'quiz-gap-fill') initGapFill(`page-${page.id}`);
+                }
+            });
+            updateNavButtons();
+        }
+
+        function generateCertificate() {
+            const name = document.getElementById('name-input-cert').value || 'Dedicated Student';
+            document.getElementById('certificate-name').textContent = name;
+            document.getElementById('certificate-score').textContent = score;
+            document.getElementById('certificate-date').textContent = new Date().toLocaleDateString();
+            document.getElementById('cert-initial-controls').classList.add('hidden');
+            document.getElementById('cert-generated-controls').classList.remove('hidden');
+
+            const canvas = document.getElementById('completion-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            let particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 5 + 2,
+                    color: ['#fde047', '#f97316', '#fb923c', '#fed7aa'][Math.floor(Math.random() * 4)],
+                    speed: Math.random() * 2 + 1
+                });
+            }
+
+            function drawConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speed;
+                    if (p.y > canvas.height) {
+                        p.y = -p.radius;
+                        p.x = Math.random() * canvas.width;
+                    }
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                });
+                requestAnimationFrame(drawConfetti);
+            }
+            drawConfetti();
+        }
+
+        function downloadCertificateAsImage() {
+            html2canvas(document.querySelector("#certificate-to-print")).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'Oymyakon_Certificate.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeLesson();
+            const bgCanvas = document.getElementById('background-canvas');
+            const bgCtx = bgCanvas.getContext('2d');
+            bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
+            let particles = [];
+            function animateBackground() {
+                bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+                particles.forEach((p, i) => {
+                    p.y += p.speed;
+                    if (p.y > bgCanvas.height) {
+                        particles.splice(i, 1);
+                    }
+                    bgCtx.beginPath();
+                    bgCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    bgCtx.fillStyle = p.color;
+                    bgCtx.fill();
+                });
+                if (Math.random() > 0.95) {
+                    particles.push({ 
+                        x: Math.random() * bgCanvas.width, 
+                        y: -20, 
+                        radius: Math.random() * 3 + 1, 
+                        speed: Math.random() * 1 + 0.5, 
+                        color: `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.2})`
+                    });
+                }
+                requestAnimationFrame(animateBackground);
+            }
+            window.addEventListener('resize', () => { bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight; });
+            animateBackground();
+        });
+    </script>
+</body>
+</html>
+
