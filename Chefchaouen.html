@@ -170,8 +170,9 @@
                 { id: 'menu-lecture', text: '5. Listening: Class Lecture <span aria-hidden="true">🧑‍🏫</span>', color: 'amber', target: 'lecture-pre' },
                 { id: 'menu-lecture2', text: '6. Listening: History & Economy <span aria-hidden="true">📈</span>', color: 'orange', target: 'lecture-history-pre' },
                 { id: 'menu-lecture3', text: '7. Listening: Tourism Paradox <span aria-hidden="true">🤔</span>', color: 'rose', target: 'lecture-tourism-pre' },
-                { id: 'menu-thinking', text: '8. Thinking & Exam Prep <span aria-hidden="true">📝</span>', color: 'purple', target: 'thinking-prompts' },
-                { id: 'menu-final', text: '9. Final Project <span aria-hidden="true">✍️</span>', color: 'violet', target: 'final-project-hub' },
+                { id: 'menu-discussion', text: '8. Listening: Classroom Discussion <span aria-hidden="true">💬</span>', color: 'lime', target: 'discussion-pre' },
+                { id: 'menu-thinking', text: '9. Thinking & Exam Prep <span aria-hidden="true">📝</span>', color: 'purple', target: 'thinking-prompts' },
+                { id: 'menu-final', text: '10. Final Project <span aria-hidden="true">✍️</span>', color: 'violet', target: 'final-project-hub' },
             ],
             vocabulary: [
                 { word: 'Amazigh', def: 'The indigenous Berber people of North Africa and their language.', sentence: 'Efforts are being made to revitalize the Amazigh language in Morocco.' },
@@ -266,7 +267,14 @@
                 { id: 'lecture-tourism-quiz-tfng', type: 'quiz-tfng', content: { title: 'Tourism Paradox Quiz (TFNG)', questions: [] } },
                 { id: 'lecture-tourism-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Tourism Paradox Quiz (Gap Fill)', sentences: [] } },
 
-                // 8. Thinking & Exam Prep
+                // 8. Listening: Classroom Discussion
+                { id: 'discussion-pre', type: 'html-content', content: { title: 'Pre-Listening: Classroom Discussion <span aria-hidden="true">💬</span>', html: `<div class="text-left space-y-4 text-xl"><p>Before listening, consider:</p><ol class="list-decimal list-inside pl-4 space-y-2"><li>What makes a place feel "authentic"?</li><li>What are the pros and cons of a city becoming a major tourist destination?</li></ol></div>`}},
+                { id: 'discussion-main', type: 'dialogue', content: { title: 'Listening: Classroom Discussion', dialogue: "Professor: All right, class. Let's shift our focus today to a truly unique and visually stunning city: Chefchaouen in Morocco, often called the 'Blue Pearl.' Its distinctive blue-washed buildings are quite famous. Has anyone here, perhaps, seen photos or read anything about Chefchaouen before? Emily, maybe you?\n\nEmily: Yes, professor. I've seen so many photos online. It looks absolutely beautiful, almost like a dream or something. All that blue is just incredible.\n\nProfessor: That's a great way to put it, Emily, 'like a dream.' It really does have that ethereal quality. Oliver, what about you? Any prior knowledge or impressions of Chefchaouen?\n\nOliver: Hello, professor. Yes, I've seen the pictures as well. It looks quite striking. The blue is definitely the main thing you notice straight away.\n\nProfessor: It does look incredible, Oliver. The blue is certainly its most striking feature. The exact reason for painting the city blue is debated, but theories range from keeping cool to warding off mosquitoes or even religious significance. Beyond the color, what other aspects of Chefchaouen make it such a fascinating place? Emily, what did you find interesting?\n\nEmily: Well, besides the blue, I think the atmosphere seems really relaxed and peaceful, compared to, say, Marrakesh or Fes. And I read that it's in the mountains, so the scenery around it looks amazing, too.\n\nProfessor: Absolutely, Emily. The relaxed atmosphere is a big draw for many visitors. It feels less hectic than some of the larger Moroccan cities. And the surrounding Rif Mountains offer incredible opportunities for hiking and exploring nature. Oliver, did you come across any information about the culture or daily life in Chefchaouen?\n\nOliver: I didn't read too much about the culture specifically, but I imagine it's quite different from the bigger cities. I suppose with tourism being a big part of its economy now, there's always that balance between catering to visitors and maintaining local traditions.\n\nProfessor: That's a good point, Oliver. While tourism is important, it's crucial to understand and respect the local culture and traditions. Chefchaouen has a rich history, influenced by Andalusian refugees who settled there. The local markets, or souks, are vibrant and a central part of daily life. What about the challenges Chefchaouen might face, perhaps related to its popularity or location? Emily, any thoughts?\n\nEmily: Hmm, challenges? I guess managing the tourism, like keeping it authentic while still having lots of visitors. And maybe infrastructure, like, can the city handle all the people?\n\nProfessor: You've hit on key challenges, Emily. Managing the influx of tourists while preserving the city's unique character and infrastructure is a delicate balancing act. Providing adequate facilities and ensuring sustainable tourism practices are essential. Oliver, are there any environmental considerations, given its mountain location?\n\nOliver: Environmentally, I suppose water could be an issue, being in the mountains, and maybe waste management. With more tourists, that would become more of a challenge, I'd think.\n\nProfessor: Excellent point, Oliver. Water management and waste disposal are particularly important in a place like Chefchaouen, nestled in the mountains. Protecting the natural beauty of the Rif Mountains is also vital for the city's appeal and the local ecosystem. So, in conclusion, Chefchaouen's captivating blue architecture, relaxed atmosphere, and stunning natural surroundings make it a remarkable destination. However, its growing popularity brings challenges related to sustainable tourism, infrastructure, and environmental protection. It's a city striving to balance its unique charm with the demands of the modern world. Thank you both for your insights into this beautiful Blue Pearl of Morocco." }},
+                { id: 'discussion-quiz-mcq', type: 'quiz-mcq', content: { title: 'Discussion Quiz (MCQ)', questions: [] } },
+                { id: 'discussion-quiz-tfng', type: 'quiz-tfng', content: { title: 'Discussion Quiz (TFNG)', questions: [] } },
+                { id: 'discussion-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Discussion Quiz (Gap Fill)', sentences: [] } },
+
+                // 9. Thinking & Exam Prep
                 { id: 'thinking-prompts', type: 'html-content', content: { title: 'Thinking & Exam Prep <span aria-hidden="true">📝</span>', html: `
                                         <div class="text-left space-y-8">
                                             <div>
@@ -284,7 +292,7 @@
                                             </div>
                                         </div>` } },
 
-                // 9. Final Project
+                // 10. Final Project
                 { id: 'final-project-hub', type: 'html-content', content: { title: 'Final Project Hub <span aria-hidden="true">✍️</span>', html: `
                                         <div class="bg-white rounded-2xl shadow-xl p-8 text-left">
                                         <h2 class="text-3xl font-bold text-violet-600 mb-4">GRASPS Task: Cultural Showcase Presentation</h2>
@@ -329,12 +337,17 @@
                  const availableVoices = await voicesPromise;
                  if (!availableVoices.length) { console.warn("No speech synthesis voices available."); return; }
                  const speakerToVoiceMap = {
+                    // General conversation practice speakers
                     'a': ['Microsoft Emma Online (Natural) - English (United States)', 'Microsoft Ava Online (Natural) - English (United States)'],
                     'b': ['Microsoft Brian Online (Natural) - English (United States)', 'Microsoft Andrew Online (Natural) - English (United States)'],
-                    'professor': ['Microsoft Andrew Online (Natural) - English (United States)', 'Google US English'],
-                    'aisha': ['Microsoft Ava Online (Natural) - English (United States)', 'Google US English'],
-                    'ben': ['Microsoft Brian Online (Natural) - English (United States)', 'Google US English'],
-                    'guide': ['Microsoft Ava Online (Natural) - English (United States)', 'Google US English']
+                    
+                    // Speakers for the lectures
+                    'professor': ['Microsoft Brian Online (Natural) - English (United States)', 'Microsoft Andrew Online (Natural) - English (United States)', 'Google US English'],
+                    'aisha': ['Microsoft Emma Online (Natural) - English (United States)', 'Google US English'],
+                    'ben': ['Microsoft Andrew Online (Natural) - English (United States)', 'Google US English'],
+                    'guide': ['Microsoft Ava Online (Natural) - English (United States)', 'Google US English'],
+                    'emily': ['Microsoft Emma Online (Natural) - English (United States)', 'Google US English'],
+                    'oliver': ['Microsoft Andrew Online (Natural) - English (United States)', 'Google US English']
                  };
                  for (const speaker in speakerToVoiceMap) {
                      const voicePriorityList = speakerToVoiceMap[speaker];
@@ -349,7 +362,35 @@
              }
              async init() { if (this.isInitialized) return; try { const warmUp = new SpeechSynthesisUtterance(' '); warmUp.volume = 0; this.synth.speak(warmUp); this.synth.cancel(); await this._setupVoices(); this.isInitialized = true; } catch (e) { console.error("Speech synthesis setup failed:", e); } }
              _cleanTextForSpeech(text) { const tempDiv = document.createElement('div'); const textWithoutSpans = text.replace(/<span aria-hidden="true">.*?<\/span>/g, ' '); tempDiv.innerHTML = textWithoutSpans; let cleanText = tempDiv.textContent || tempDiv.innerText || ''; cleanText = cleanText.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, ''); return cleanText; }
-             async speak(text, { onEndCallback = null } = {}) { if (!this.isInitialized || !this.isTtsEnabled || !text) { if (onEndCallback) onEndCallback(); return; } if (this.synth.speaking) { this.synth.cancel(); await new Promise(resolve => setTimeout(resolve, 100)); } const cleanText = this._cleanTextForSpeech(text); if (!cleanText.trim()) { if (onEndCallback) onEndCallback(); return; } const utter = new SpeechSynthesisUtterance(cleanText); utter.voice = this.voices['default']; utter.rate = this.speechRate; if (onEndCallback) utter.onend = onEndCallback; utter.onerror = (e) => { console.error('SpeechSynthesisUtterance.onerror', e); if (onEndCallback) onEndCallback(); }; try { this.synth.speak(utter); } catch (e) { console.error("Error calling synth.speak:", e); if (onEndCallback) onEndCallback(); } }
+             async speak(text, { onEndCallback = null, voiceKey = 'default' } = {}) { 
+                if (!this.isInitialized || !this.isTtsEnabled || !text) { 
+                    if (onEndCallback) onEndCallback(); 
+                    return; 
+                } 
+                if (this.synth.speaking) { 
+                    this.synth.cancel(); 
+                    await new Promise(resolve => setTimeout(resolve, 100)); 
+                } 
+                const cleanText = this._cleanTextForSpeech(text); 
+                if (!cleanText.trim()) { 
+                    if (onEndCallback) onEndCallback(); 
+                    return; 
+                } 
+                const utter = new SpeechSynthesisUtterance(cleanText); 
+                utter.voice = this.voices[voiceKey] || this.voices['default']; 
+                utter.rate = this.speechRate; 
+                if (onEndCallback) utter.onend = onEndCallback; 
+                utter.onerror = (e) => { 
+                    console.error('SpeechSynthesisUtterance.onerror', e); 
+                    if (onEndCallback) onEndCallback(); 
+                }; 
+                try { 
+                    this.synth.speak(utter); 
+                } catch (e) { 
+                    console.error("Error calling synth.speak:", e); 
+                    if (onEndCallback) onEndCallback(); 
+                } 
+            }
              async speakDialogue(text) { if (!this.isInitialized || !this.isTtsEnabled || !text || this.isDialoguePlaying) return; this.cancel(); this.isDialoguePlaying = true; const lines = text.split('\n').filter(line => line.trim() !== '' && line.includes(':')); const queue = lines.map(line => { const [speaker, ...parts] = line.split(':'); const dialogue = parts.join(':').trim(); const cleanDialogue = this._cleanTextForSpeech(dialogue); const voiceKey = speaker.toLowerCase().replace(/dr\. |professor /g, '').trim(); return { text: cleanDialogue, voiceKey: voiceKey }; }).filter(item => item.text); if (queue.length === 0) { this.isDialoguePlaying = false; return; } const playNext = () => { if (queue.length > 0 && this.isTtsEnabled) { const item = queue.shift(); const utter = new SpeechSynthesisUtterance(item.text); utter.voice = this.voices[item.voiceKey] || this.voices['default']; utter.rate = this.speechRate; utter.onend = playNext; utter.onerror = (e) => { console.warn('A speech synthesis error occurred, attempting to recover.', e.error); try { this.synth.cancel(); } catch (cancelError) { console.error("Error while cancelling synth:", cancelError); } setTimeout(playNext, 250); }; try { this.synth.speak(utter); } catch(e) { console.error("Error in synth.speak:", e); setTimeout(playNext, 250); } } else { this.isDialoguePlaying = false; } }; playNext(); }
              cancel() { if (this.synth) { this.isDialoguePlaying = false; this.synth.cancel(); } }
              toggleTTS(forceState) { this.isTtsEnabled = forceState === undefined ? !this.isTtsEnabled : forceState; if (!this.isTtsEnabled) { this.cancel(); } return this.isTtsEnabled; }
@@ -564,8 +605,15 @@
                 } else {
                     const readableContent = targetPage.querySelector('.readable-content');
                     const titleElement = targetPage.querySelector('h2, h3');
-                    const contentToSpeak = readableContent ? readableContent.innerText : (titleElement ? titleElement.innerText : '');
-                    speechService.speak(contentToSpeak);
+                    let contentToSpeak = readableContent ? readableContent.innerText : (titleElement ? titleElement.innerText : '');
+                    let voice = 'default';
+                    if (pageId.startsWith('vocab-') || pageId === 'reading-main') {
+                       voice = 'oliver'; // Andrew voice
+                       if (pageId === 'reading-main') {
+                           contentToSpeak = Array.from(targetPage.querySelectorAll('h4, p')).map(el => el.innerText).join(' ');
+                       }
+                    }
+                    speechService.speak(contentToSpeak, { voiceKey: voice });
                 }
             } else if (pageId === lessonData.homePageId) {
                 speechService.speak(targetPage.querySelector('h2').innerText);
@@ -902,6 +950,32 @@
                 { text: ["Tourism provides vital", "for many local families."], answer: "income" },
                 { text: ["The goal is to support the community without", "it."], answer: "overwhelming" }
             ];
+            
+            // Classroom Discussion Quizzes
+            const discussionMcq = lessonData.pages.find(p => p.id === 'discussion-quiz-mcq');
+            if(discussionMcq) discussionMcq.content.questions = [
+                { question: "How does Emily describe her impression of Chefchaouen from online photos?", options: ["Busy and chaotic", "Like a dream", "Old and decaying", "Similar to other Moroccan cities"], correctAnswer: "Like a dream" },
+                { question: "Besides the blue color, what aspect of Chefchaouen does Emily find appealing?", options: ["Its famous cuisine", "Its modern infrastructure", "Its relaxed and peaceful atmosphere", "Its bustling nightlife"], correctAnswer: "Its relaxed and peaceful atmosphere" },
+                { question: "What concern does Oliver raise about the impact of tourism on Chefchaouen?", options: ["It makes the city too crowded.", "It causes prices to increase.", "The challenge of balancing tourism with local traditions.", "It leads to environmental pollution."], correctAnswer: "The challenge of balancing tourism with local traditions." },
+                { question: "According to the professor, what historical group influenced Chefchaouen's culture?", options: ["French colonists", "Roman traders", "Ottoman governors", "Andalusian refugees"], correctAnswer: "Andalusian refugees" },
+                { question: "What potential environmental challenge does Oliver mention for a mountain city like Chefchaouen?", options: ["Air pollution from factories", "Soil erosion from farming", "Water management and waste disposal", "Noise pollution from airports"], correctAnswer: "Water management and waste disposal" }
+            ];
+            const discussionTfng = lessonData.pages.find(p => p.id === 'discussion-quiz-tfng');
+            if(discussionTfng) discussionTfng.content.questions = [
+                { statement: "Oliver had never heard of or seen pictures of Chefchaouen before the class.", correctAnswer: "False" },
+                { statement: "The professor states that the exact reason for the blue color is known and not debated.", correctAnswer: "False" },
+                { statement: "Emily mentions that the mountain scenery around the city looks amazing.", correctAnswer: "True" },
+                { statement: "The professor says that the local markets (souks) are a quiet part of the city.", correctAnswer: "False" },
+                { statement: "The discussion concludes that tourism has had no negative challenges for Chefchaouen.", correctAnswer: "False" }
+            ];
+            const discussionGap = lessonData.pages.find(p => p.id === 'discussion-quiz-gap-fill');
+            if(discussionGap) discussionGap.content.sentences = [
+                { text: ["Emily describes the city's visual appearance as having an", "quality."], answer: "ethereal" },
+                { text: ["The city's relaxed atmosphere feels less", "than larger Moroccan cities."], answer: "hectic" },
+                { text: ["Managing the influx of tourists while preserving the city's unique character is a delicate", "act."], answer: "balancing" },
+                { text: ["Oliver suggests that", "management could be a challenge with more tourists."], answer: "waste" },
+                { text: ["The city is striving to balance its unique charm with the", "of the modern world."], answer: "demands" }
+            ];
         }
 
         function initializeLesson() {
@@ -937,6 +1011,7 @@
                 'lecture-pre': ['lecture-main', 'lecture-quiz-mcq', 'lecture-quiz-tfng', 'lecture-quiz-gap-fill'],
                 'lecture-history-pre': ['lecture-history-main', 'lecture-history-quiz-mcq', 'lecture-history-quiz-tfng', 'lecture-history-quiz-gap-fill'],
                 'lecture-tourism-pre': ['lecture-tourism-main', 'lecture-tourism-quiz-mcq', 'lecture-tourism-quiz-tfng', 'lecture-tourism-quiz-gap-fill'],
+                'discussion-pre': ['discussion-main', 'discussion-quiz-mcq', 'discussion-quiz-tfng', 'discussion-quiz-gap-fill'],
                 'final-project-hub': ['writing-task', 'self-assessment', 'certificate'] 
             };
             let flatPageList = [lessonData.startPageId];
