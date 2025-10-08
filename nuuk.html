@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discovering Nuuk – Life in Greenland’s Arctic Capital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        @keyframes arcticSky {
+            0% { background-color: #0c4a6e; } /* sky-900 */
+            25% { background-color: #1e293b; } /* slate-800 */
+            50% { background-color: #075985; } /* cyan-800 */
+            75% { background-color: #1e293b; } /* slate-800 */
+            100% { background-color: #0c4a6e; } /* sky-900 */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior: none;
+            animation: arcticSky 240s linear infinite;
+            padding-top: 85px; /* Adjusted padding for progress bar */
+        }
+        #background-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+        }
+        .page { display: none; position: relative; }
+        .page.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .action-button, .nav-button, .quiz-option, .tfng-button, .word-bank-word, .btn-animated-3d {
+            transition: all 0.15s ease-out;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2), 0 2px 4px -2px rgba(0,0,0,0.1), inset 0 -4px 0 0 rgba(0,0,0,0.2);
+            border: none;
+        }
+        .action-button:hover, .nav-button:hover, .quiz-option:hover:not(:disabled), .tfng-button:hover:not(:disabled), .word-bank-word:hover, .btn-animated-3d:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px -3px rgba(0,0,0,0.2), 0 4px 6px -4px rgba(0,0,0,0.1), inset 0 -4px 0 0 rgba(0,0,0,0.2);
+        }
+        .action-button:active, .nav-button:active, .quiz-option:active, .tfng-button:active, .btn-animated-3d:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 2px -1px rgba(0,0,0,0.2), 0 1px 2px -2px rgba(0,0,0,0.1), inset 0 -2px 0 0 rgba(0,0,0,0.2);
+        }
+        
+        /* Gap Fill Styles */
+        .gap-fill-container .gap {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 120px; height: 44px; padding: 0 4px;
+            border: 2px dashed #9ca3af; border-radius: 8px; margin: 0 4px;
+            vertical-align: middle; background-color: #f3f4f6;
+        }
+        .word-bank-word {
+            cursor: grab; padding: 8px 16px; border-radius: 8px;
+            background-color: white; user-select: none;
+        }
+        .word-bank-word.selected { outline: 2px solid #6366f1; transform: scale(1.05); }
+        .gap .word-bank-word { cursor: pointer; }
+        .gap.correct .word-bank-word { background-color: #dcfce7; border-color: #22c55e; color: #15803d; }
+        .gap.incorrect .word-bank-word { background-color: #fee2e2; border-color: #ef4444; color: #b91c1c; }
+
+        /* Feedback Message & Badge Notification */
+        .feedback-toast, .badge-toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            padding: 12px 24px; border-radius: 9999px; color: white;
+            font-weight: bold; z-index: 200;
+            animation: slideUpFadeIn 0.5s ease-out, slideDownFadeOut 0.5s ease-in 3.5s forwards;
+        }
+        .feedback-toast.correct { background-color: #22c55e; }
+        .feedback-toast.encouraging { background-color: #f59e0b; }
+        .badge-toast { background: linear-gradient(45deg, #fde047, #f97316); }
+        @keyframes slideUpFadeIn { from { opacity: 0; bottom: 0; } to { opacity: 1; bottom: 20px; } }
+        @keyframes slideDownFadeOut { from { opacity: 1; bottom: 20px; } to { opacity: 0; bottom: 0; } }
+
+        /* Certificate Canvas */
+        #completion-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        
+        /* Progress Bar */
+        #progress-container { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 8px; width: 100%; margin-top: 8px; }
+        #progress-bar { height: 100%; width: 0%; background-color: #38bdf8; transition: width 0.5s ease-out; }
+        
+        /* Vocab Game Timer */
+        #vocab-game-timer-bar { height: 6px; background-color: #38bdf8; transition: width 0.1s linear; }
+        
+        /* Shake Animation for incorrect answers */
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .shake { animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both; }
+
+        .explanation-text {
+            margin-top: 12px;
+            padding: 10px;
+            background-color: #f3f4f6;
+            border-left: 4px solid #f59e0b;
+            font-size: 0.9em;
+            color: #4b5563;
+            border-radius: 4px;
+        }
+
+        /* Print Styles */
+        @media print {
+            body * { visibility: hidden; }
+            #certificate-to-print, #certificate-to-print * { visibility: visible; }
+            #certificate-to-print { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800 text-lg">
+    <canvas id="background-canvas"></canvas>
+    <div id="reward-animation-container" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[60]"></div>
+
+    <header id="nav-header" class="fixed top-0 left-0 right-0 z-50 p-2" style="display: none;">
+        <div class="max-w-md mx-auto bg-white/90 backdrop-blur-sm shadow-lg rounded-full p-2">
+            <div class="flex justify-center items-center gap-2">
+                <button onclick="goBack()" class="nav-button bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold p-2 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <div class="font-bold text-base text-blue-500 px-3 whitespace-nowrap">Points ✨: <span id="score-display">0</span></div>
+                <button onclick="navigateTo('main-menu')" class="nav-button bg-gray-800 text-white font-bold p-2 rounded-full hover:bg-gray-900">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                </button>
+                <button onclick="toggleTTS(this)" class="nav-button p-2 rounded-full hover:bg-gray-200" title="Toggle Sound">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 5.858a3 3 0 104.243 4.243M9 12l4.243 4.243"></path></svg>
+                </button>
+                <button onclick="goNext()" class="nav-button bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+        </div>
+    </header>
+
+    <div id="app-container" class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+        <section id="page-title-screen" class="page active text-center bg-white rounded-2xl shadow-lg p-8">
+            <div class="h-full flex flex-col justify-center items-center">
+                <h1 id="main-title" class="text-5xl md:text-6xl font-bold text-slate-800 mb-4"></h1>
+                <p id="main-subtitle" class="text-xl md:text-2xl text-gray-600 mb-8"></p>
+                <div id="main-svg-container" class="rounded-lg mb-8 w-full max-w-lg mx-auto"></div>
+                <button onclick="startApp()" class="action-button bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-2xl hover:bg-blue-700">START LESSON</button>
+            </div>
+        </section>
+        <div id="dynamic-pages-container"></div>
+    </div>
+    
+    <script>
+        // ===================================================================================
+        // --- LESSON CONTENT CONFIGURATION (NUUK, GREENLAND) ---
+        // ===================================================================================
+        const lessonData = {
+            title: "Discovering Nuuk",
+            subtitle: "Life in Greenland’s Arctic Capital <span aria-hidden='true'>🇬🇱</span>",
+            startPageId: 'title-screen',
+            homePageId: 'main-menu',
+            mainMenu: [
+                { id: 'menu-tps', text: '0. Think-Pair-Share <span aria-hidden="true">🧠</span>', color: 'green', target: 'tps-start' },
+                { id: 'menu-goals', text: '1. Learning Goals <span aria-hidden="true">🎯</span>', color: 'teal', target: 'learning-goals' },
+                { id: 'menu-warmup', text: '2. Warm-Up & Vocab <span aria-hidden="true">📚</span>', color: 'sky', target: 'warm-up' },
+                { id: 'menu-vocab-game', text: 'Vocab Game <span aria-hidden="true">🎮</span>', color: 'sky', target: 'vocab-game'},
+                { id: 'menu-reading', text: '3. Reading & Comprehension <span aria-hidden="true">📖</span>', color: 'blue', target: 'reading-main' },
+                { id: 'menu-convo', text: '4. Conversation Practice <span aria-hidden="true">🗣️</span>', color: 'indigo', target: 'conversation-practice' },
+                { id: 'menu-lecture', text: '5. Listening: Nuuk Overview <span aria-hidden="true">🇬🇱</span>', color: 'amber', target: 'lecture-nuuk-pre' },
+                { id: 'menu-challenges', text: '6. Listening: Nuuk Challenges & Culture <span aria-hidden="true">❄️</span>', color: 'orange', target: 'lecture-challenges-pre' },
+                { id: 'menu-discussion', text: '7. Listening: Classroom Discussion <span aria-hidden="true">💬</span>', color: 'lime', target: 'discussion-pre' },
+                { id: 'menu-thinking', text: '8. Thinking & Exam Prep <span aria-hidden="true">📝</span>', color: 'purple', target: 'thinking-prompts' },
+                { id: 'menu-final', text: '9. Final Project <span aria-hidden="true">✍️</span>', color: 'violet', target: 'final-project-hub' },
+            ],
+            vocabulary: [
+                { word: 'Inuit', def: 'Indigenous people of Greenland and the Arctic regions.', sentence: 'The Inuit people have a rich culture adapted to the Arctic environment.' },
+                { word: 'Fjord', def: 'A long, deep, narrow body of water between high cliffs.', sentence: 'Nuuk is surrounded by a vast system of beautiful fjords.' },
+                { word: 'Isolation', def: 'Being far away from other places or people.', sentence: 'Despite its isolation, Nuuk is a connected and modern city.' },
+                { word: 'Adaptation', def: 'Changes made to survive in a particular environment.', sentence: 'Adaptation is key to life in the extreme Arctic climate.' },
+                { word: 'Bilingual', def: 'Speaking two languages fluently.', sentence: 'Being bilingual in Greenlandic and Danish is common in Nuuk.' },
+                { word: 'Subarctic', def: 'Relating to the region immediately south of the Arctic Circle.', sentence: 'Nuuk has a subarctic climate with very cold winters.' },
+                { word: 'Greenlandic', def: 'The Inuit language spoken in Greenland.', sentence: 'Schools in Nuuk teach in both Greenlandic and Danish.' }
+            ],
+            pages: [
+                // 0. Think Pair Share
+                { id: 'tps-start', type: 'simple', content: { title: 'Activity: Think-Pair-Share <span aria-hidden="true">🧠</span>', text: 'Let\'s think about adapting to challenges.' } },
+                { id: 'tps-think', type: 'timer', content: { title: '1. Think <span aria-hidden="true">🤔</span>', text: 'Think about a challenge people in Nuuk might face due to the cold climate and isolation. How might they solve it?', duration: 120, timerId: 'timer-think' } },
+                { id: 'tps-pair', type: 'timer', content: { title: '2. Pair <span aria-hidden="true">👥</span>', text: 'With a partner, discuss the solutions you came up with. How does technology or community help overcome these challenges?', duration: 180, timerId: 'timer-pair' } },
+                { id: 'tps-share', type: 'timer', content: { title: '3. Share <span aria-hidden="true">🗣️</span>', text: 'As a class, let\'s discuss the meaning of "adaptation." How do people in Nuuk adapt, and what can we learn from them?', duration: 300, timerId: 'timer-share' } },
+                
+                // 1. Learning Goals
+                { id: 'learning-goals', type: 'html-content', content: { title: 'Learning Goals <span aria-hidden="true">🎯</span>', html: `
+                                        <div class="text-left space-y-4">
+                                            <p><strong class="text-teal-600">Learning Intention:</strong> We are learning about Nuuk to understand how people adapt to life in extreme environments and preserve their culture.</p>
+                                            <hr class="my-4">
+                                            <h3 class="text-2xl font-bold text-teal-600 mb-3">Success Criteria</h3>
+                                            <ul class="list-disc list-inside space-y-2 text-xl">
+                                                <li>I can describe Nuuk’s location, climate, and culture.</li>
+                                                <li>I can compare life in Nuuk with life in my hometown using specific examples.</li>
+                                                <li>I can analyze how climate and isolation influence community life.</li>
+                                            </ul>
+                                        </div>` } },
+                
+                // 2. Warm-Up & Vocab
+                { id: 'warm-up', type: 'html-content', content: { title: 'Background-Building Questions <span aria-hidden="true">📚</span>', html: `
+                                        <ol class="list-decimal list-inside space-y-4 text-xl text-left">
+                                            <li>What do you know about the Arctic?</li>
+                                            <li>Have you ever lived in a very cold climate? What was it like?</li>
+                                            <li>What challenges do people who live in remote areas face?</li>
+                                            <li>Where is Greenland located on a map?</li>
+                                        </ol>` } },
+                { id: 'vocab-start', type: 'simple', content: { title: 'Unit Vocabulary <span aria-hidden="true">📚</span>', text: 'Let\'s learn the key terms for this unit. Click the "Next" arrow to cycle through the words.' } },
+                { id: 'vocab-game', type: 'vocab-game', content: { title: 'Vocabulary Review Game <span aria-hidden="true">🎮</span>'} },
+                
+                // 3. Reading & Comprehension
+                { id: 'reading-main', type: 'html-content', content: { title: 'Reading: Life in Nuuk – Greenland’s Arctic Capital <span aria-hidden="true">📖</span>', html: `
+                                        <div class="space-y-6 text-left">
+                                            <div class="bg-blue-50 p-4 rounded-lg">
+                                                <h4 class="font-bold text-xl text-blue-800">Introduction</h4>
+                                                <p>Nuuk is the capital of Greenland, located on the southwest coast. It is home to around 19,000 people and is surrounded by fjords and mountains.</p>
+                                            </div>
+                                             <div class="bg-sky-50 p-4 rounded-lg">
+                                                <h4 class="font-bold text-xl text-sky-800">Climate and Environment</h4>
+                                                <p>Nuuk has a subarctic climate with long, cold winters and short, cool summers. Snow and ice are common, and the sea is often frozen.</p>
+                                            </div>
+                                            <div class="bg-green-50 p-4 rounded-lg">
+                                                <h4 class="font-bold text-xl text-green-800">Culture and People</h4>
+                                                <p>Most people in Nuuk are Inuit. They speak Greenlandic and Danish. Traditional activities like fishing and kayaking are still important, but modern life includes schools, hospitals, and internet access.</p>
+                                            </div>
+                                             <div class="bg-yellow-50 p-4 rounded-lg">
+                                                <h4 class="font-bold text-xl text-yellow-800">Education</h4>
+                                                <p>Students in Nuuk learn in both Greenlandic and Danish. Schools focus on preserving Inuit culture while preparing students for global opportunities.</p>
+                                            </div>
+                                            <div class="bg-red-50 p-4 rounded-lg">
+                                                <h4 class="font-bold text-xl text-red-800">Arts and Community</h4>
+                                                <p>Nuuk has museums, music festivals, and art galleries. Despite its isolation, it has a strong sense of community and creativity.</p>
+                                            </div>
+                                        </div>` } },
+                { id: 'reading-quiz-tfng', type: 'quiz-tfng', content: { title: 'Comprehension: True/False', questions: [] } },
+                { id: 'reading-quiz-mcq', type: 'quiz-mcq', content: { title: 'Comprehension: Multiple Choice', questions: [] } },
+                
+                // 4. Conversation Practice
+                { id: 'conversation-practice', type: 'dialogue', content: { title: 'Conversation Practice <span aria-hidden="true">🗣️</span>', dialogue: "A: Have you heard of Nuuk in Greenland?\n\nB: Yes, it’s the capital city, right?\n\nA: That’s right. It’s really cold there!\n\nB: I wonder how people live in such a cold place.\n\nA: They adapt with warm clothes and special houses.\n\nB: Do they go to school like us?\n\nA: Yes, and they learn in two languages!\n\nB: That’s cool. I’d love to visit someday." } },
+                 
+                // 5. Listening: Nuuk Overview
+                { id: 'lecture-nuuk-pre', type: 'html-content', content: { title: 'Pre-Listening: Nuuk Overview <span aria-hidden="true">🇬🇱</span>', html: `<div class="text-left space-y-4 text-xl"><p>Before listening to the short lecture, think about these questions:</p><ol class="list-decimal list-inside pl-4 space-y-2"><li>What three words come to mind when you think of an "Arctic capital"?</li><li>What do you think is the most important tradition for the Inuit people?</li></ol></div>`}},
+                { id: 'lecture-nuuk-main', type: 'dialogue', content: { title: 'Listening: Nuuk Overview', dialogue: "Narrator: Nuuk is the capital of Greenland, located on the southwest coast. It is home to around 19,000 people and is surrounded by fjords and mountains. Nuuk has a subarctic climate with long, cold winters and short, cool summers. Snow and ice are common, and the sea is often frozen. Most people in Nuuk are Inuit. They speak Greenlandic and Danish. Traditional activities like fishing and kayaking are still important, but modern life includes schools, hospitals, and internet access. Students in Nuuk learn in both Greenlandic and Danish. Schools focus on preserving Inuit culture while preparing students for global opportunities. Nuuk has museums, music festivals, and art galleries. Despite its isolation, it has a strong sense of community and creativity." }},
+                { id: 'lecture-nuuk-quiz-mcq', type: 'quiz-mcq', content: { title: 'Nuuk Overview Quiz (MCQ)', questions: [] } },
+                { id: 'lecture-nuuk-quiz-tfng', type: 'quiz-tfng', content: { title: 'Nuuk Overview Quiz (TFNG)', questions: [] } },
+                { id: 'lecture-nuuk-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Nuuk Overview Quiz (Gap Fill)', sentences: [] } },
+
+                // 6. Listening: Nuuk Challenges & Culture
+                { id: 'lecture-challenges-pre', type: 'html-content', content: { title: 'Pre-Listening: Challenges & Culture <span aria-hidden="true">❄️</span>', html: `<div class="text-left space-y-4 text-xl"><p>Before listening to this lecture, consider:</p><ol class="list-decimal list-inside pl-4 space-y-2"><li>What do you think is the most difficult part about living in a very cold and remote place?</li><li>How can a community keep its traditions alive when it becomes more modern?</li></ol></div>`}},
+                { id: 'lecture-challenges-main', type: 'dialogue', content: { title: 'Listening: Nuuk Challenges & Culture', dialogue: "Professor: Alright class, let's shift our focus to a very different environment. We're going to explore life in the Arctic, specifically in Nuuk, the capital of Greenland. Today, we'll be addressing some important questions about Nuuk. We'll look at the challenges people face living there, how bilingual education impacts students, and the role of culture in this remote community. Then, we'll dive into some higher-order thinking questions. How does Nuuk's climate influence its culture? Is bilingual education effective? How can we design a school program for Nuuk students? And finally, what can Nuuk's lifestyle teach us about living in extreme environments elsewhere? By the end of our discussion, you should have a deeper understanding of these aspects. Let's start with the basic challenges. Aisha, what are some difficulties people living in Nuuk might face?\n\nAisha: Well, professor, I imagine the climate is a big one. It must be really cold and dark for long parts of the year. Access to resources too, probably? Like, is it hard to get supplies there?\n\nProfessor: Those are certainly key challenges, Aisha. The harsh Arctic climate, with its long, dark winters and limited daylight, is a significant factor. And access to goods and services can be more limited and expensive compared to larger urban centers elsewhere. Ben, anything to add about challenges?\n\nBen: Yeah, I guess, uh, the isolation? It's a small community pretty far from other places. That could be tough for some people, right?\n\nProfessor: Absolutely, Ben. Isolation and the psychological impacts of living in a remote, small community can be challenging for some individuals. Moving on to education. Greenland has two official languages: Greenlandic and Danish. How does bilingual education play a role for students in Nuuk? Aisha?\n\nAisha: I think it's really important for preserving their culture, professor. Like, keeping their native language strong. And also, learning Danish probably helps them connect with, um, Denmark and the wider world.\n\nProfessor: Precisely, Aisha. Bilingual education in Nuuk is vital for maintaining the Greenlandic language and cultural identity, while also providing access to opportunities through Danish, you know, as Greenland is part of the Kingdom of Denmark. Ben, from your perspective, how might this bilingual approach benefit students?\n\nBen: It probably gives them more options for, like, higher education or jobs later on, right? Knowing both languages. And maybe helps bridge cultural gaps?\n\nProfessor: Indeed. It opens doors and helps navigate between different cultural spheres. Let's consider the broader role of culture in remote communities like Nuuk. Ben, what are your thoughts on that?\n\nBen: I guess culture is, uh, super important for keeping people connected, isn't it? Especially when you're, like, isolated. Traditions, community events, helps people feel like they belong.\n\nProfessor: That's a key insight, Ben. Culture provides a sense of belonging, continuity, and shared identity in remote communities. It helps reinforce social bonds and provides a framework for navigating life, especially in challenging environments. Aisha?\n\nAisha: And maybe it helps them, um, cope with the challenges? Like, traditional knowledge about living in the Arctic, or cultural practices that bring joy during the long winters.\n\nProfessor: An excellent point, Aisha. Traditional knowledge and cultural practices are essential for adaptation and resilience in the Arctic climate. They offer practical skills and emotional support. Now, let's move to our higher-order thinking questions. First, analyze: How does Nuuk's climate influence its culture? Ben, what are your initial thoughts?\n\nBen: Well, the climate, it's harsh, right? So maybe the culture is like really focused on, uh, community and helping each other out to survive. And, um, maybe traditions around like hunting or fishing are important.\n\nProfessor: You're on the right track, Ben. The harsh climate has deeply influenced Greenlandic culture, fostering strong community ties, resilience, and traditions centered around activities like hunting, fishing, and indoor social gatherings during the long winters. It shapes everything from architecture to daily routines and celebrations. Aisha, anything to add?\n\nAisha: And maybe the art and stories, like reflecting the landscape and the, uh, challenges of living there?\n\nProfessor: Absolutely, Aisha. The climate and landscape are powerful inspirations for Greenlandic art, storytelling, and traditional crafts. Next, evaluate: Is bilingual education effective in Nuuk? Aisha, what's your evaluation?\n\nAisha: I think, yes, mostly. It helps preserve the language like we said. But maybe it's challenging for some students to learn in two languages? And, um, are there enough resources for both?\n\nProfessor: Those are valid points, Aisha. While bilingual education is crucial for cultural preservation and providing opportunities, challenges can include ensuring sufficient resources for instruction in both languages and supporting students who may face difficulties navigating between them. It's a complex balance. Ben, your thoughts on its effectiveness?\n\nBen: I guess it depends on, like, the individual student, right? Some might thrive on it, others might struggle. But overall, for the community and keeping the language alive, it seems pretty important.\n\nProfessor: A nuanced perspective, Ben. Its effectiveness is multifaceted and can vary, but its role in linguistic and cultural survival is undeniable. Moving to create. Design a school program for students in Nuuk. If you were to design one, Ben, what would be some key elements?\n\nBen: Hmm, I'd definitely include a strong focus on Greenlandic language and culture. And maybe integrate traditional skills like hunting or fishing into the curriculum. And maybe, like, science that's relevant to the Arctic environment.\n\nProfessor: Excellent ideas, Ben. A strong school program in Nuuk would likely emphasize Greenlandic language and culture, integrate traditional knowledge and skills relevant to the Arctic environment, and offer science and other subjects with a local context. Aisha, what would you include?\n\nAisha: I'd want to make sure it supports both languages really well. And maybe include, um, programs that connect students with their community elders to learn about traditions and history directly. And maybe focus on, like, resilience and coping skills for living in a remote place.\n\nProfessor: Wonderful additions, Aisha. Strong support for both languages, intergenerational learning opportunities, and incorporating resilience-building skills would be valuable components of such a program. Finally, let's synthesize: How can the lifestyle in Nuuk inspire solutions for living in extreme environments elsewhere? Aisha, what can we learn from Nuuk?\n\nAisha: I think their, um, strong sense of community is a big one. Like, relying on each other when things are tough. And their ability to adapt to the cold and the dark.\n\nProfessor: Absolutely, Aisha. The strong community bonds and remarkable adaptability to extreme conditions in Nuuk offer valuable lessons for other communities facing similar challenges. Their ingenuity in developing technologies and strategies for cold climates is also inspiring. Ben?\n\nBen: And maybe, uh, the way they use local resources, like sustainably, and how their culture is so connected to the environment.\n\nProfessor: Precisely, Ben. The integration of culture and environmental stewardship and the sustainable use of local resources are crucial takeaways from Nuuk's lifestyle that can inform approaches in other extreme environments. Excellent discussion, everyone. We've touched upon the challenges and cultural resilience in Nuuk, the importance and complexities of bilingual education, key elements for designing a relevant school program, and valuable lessons from Nuuk's lifestyle for living in extreme environments globally. Thank you, Aisha and Ben, for your thoughtful contributions to our discussion on Nuuk.\n\nAisha: Thank you, professor. It was really interesting.\n\nBen: Yeah, thanks. Lots to think about.\n\nProfessor: My pleasure." }},
+                { id: 'lecture-challenges-quiz-mcq', type: 'quiz-mcq', content: { title: 'Challenges & Culture Quiz (MCQ)', questions: [] } },
+                { id: 'lecture-challenges-quiz-tfng', type: 'quiz-tfng', content: { title: 'Challenges & Culture Quiz (TFNG)', questions: [] } },
+                { id: 'lecture-challenges-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Challenges & Culture Quiz (Gap Fill)', sentences: [] } },
+
+                // 7. Listening: Classroom Discussion
+                { id: 'discussion-pre', type: 'html-content', content: { title: 'Pre-Listening: Classroom Discussion <span aria-hidden="true">💬</span>', html: `<div class="text-left space-y-4 text-xl"><p>Before listening, consider:</p><ol class="list-decimal list-inside pl-4 space-y-2"><li>What makes a place feel "authentic"?</li><li>What are the pros and cons of a city becoming a major tourist destination?</li></ol></div>`}},
+                { id: 'discussion-main', type: 'dialogue', content: { title: 'Listening: Classroom Discussion', dialogue: "Professor: Alright class, welcome back. Today, we're shifting our focus to a rather unique capital city: Nuuk, the capital of Greenland. It's a place where infrastructure meets incredible nature, and life is shaped by the Arctic environment. To get us started, Emily, as our student from Australia, what were your initial thoughts or any surprising facts you learned about Nuuk?\n\nEmily: Thanks, professor. I was really surprised by how modern it is in parts, alongside the incredible natural surroundings. I guess I pictured something a bit more isolated, but it seems to have a mix of everything, you know? And the fact that it's the capital of the largest island in the world is pretty cool.\n\nProfessor: That's a great starting point, Emily. A blend of modern and natural. It really does have that quality. Oliver, coming from the UK, a very different climate and landscape, what aspects of Nuuk's environment or geography stood out to you?\n\nOliver: Hello, professor. I was really interested in the geography, particularly the massive fjord system. It looks absolutely stunning in photos. And the idea of seeing the Northern Lights from a capital city is just incredible. It's so different from the urban environments we have here in the UK.\n\nProfessor: Absolutely, Oliver. The fjord system is a defining feature, and the Arctic environment itself presents both beauty and challenges. Emily, what did you find interesting about Nuuk's culture or society based on our readings? What did you learn about life in an Arctic capital?\n\nEmily: I found it interesting how important fishing is to their economy. It makes sense given the location, but it also feels a bit vulnerable, you know, relying so much on one industry. And the blend of cultures, the Inuit and Danish influences, that sounds fascinating. I'd love to learn more about how those two distinct cultures coexist and shape the city's identity and daily life.\n\nProfessor: Those are all fascinating points, Emily. The mix of Inuit and Danish culture is central to Nuuk's identity, and the scale of the population compared to the vastness of Greenland is striking. Oliver, what about the challenges Nuuk might face, perhaps related to its location or environment?\n\nOliver: Building and infrastructure in that climate seems incredibly challenging, doesn't it? I was reading about the limited road network outside the city and how much relies on boats and helicopters. And trying to grow the economy beyond fishing, it must be difficult to attract diverse industries to such a remote location.\n\nProfessor: You've hit on key challenges, Oliver. Building and maintaining infrastructure in an Arctic climate is incredibly difficult and expensive, and the economic reliance on fishing also presents vulnerabilities. Emily, are there any specific environmental concerns you noted about Nuuk or Greenland?\n\nEmily: Climate change is a major concern. Seeing how rising sea levels and melting ice can directly affect a city's infrastructure and way of life, it makes it feel very real. I remember reading about how they have to adjust building foundations because of the thawing ground. It's intense. Also, I guess its unique environment could be a big draw for tourism, if it's managed sustainably.\n\nProfessor: You're absolutely right, Emily. Climate change isn't abstract in the Arctic; it's a daily reality with tangible impacts on sea levels and infrastructure. It's a critical issue for Nuuk's future. Oliver, are there any unique opportunities for Nuuk that stand out to you, perhaps related to its environment or the growing global interest in the Arctic?\n\nOliver: I agree with Emily about tourism. It feels like there's a real opportunity there, but it would need careful planning to avoid, you know, overwhelming the local community and environment. Maybe also renewable energy. Harnessing the natural resources like hydropower seems like a logical step for sustainability. I was also thinking about the sheer scale of Greenland itself. Nuuk is the capital, but it's such a small part of the overall landmass. It makes you wonder about the connection between the capital and the smaller, more remote settlements. How do people and resources move around the country?\n\nProfessor: That's a really insightful point, Oliver. Responsible tourism and leveraging its unique environment could be significant. So, to summarize our discussion on Nuuk, we've explored its blend of nature and modernity, its unique environmental and cultural landscape, and the significant challenges and potential opportunities it faces. It's a compelling case study of life in the Arctic in the 21st century. Thank you both for your insights into this remarkable capital." }},
+                { id: 'discussion-quiz-mcq', type: 'quiz-mcq', content: { title: 'Discussion Quiz (MCQ)', questions: [] } },
+                { id: 'discussion-quiz-tfng', type: 'quiz-tfng', content: { title: 'Discussion Quiz (TFNG)', questions: [] } },
+                { id: 'discussion-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Discussion Quiz (Gap Fill)', sentences: [] } },
+
+                // 8. Thinking & Exam Prep
+                { id: 'thinking-prompts', type: 'html-content', content: { title: 'Thinking & Exam Prep <span aria-hidden="true">📝</span>', html: `
+                                        <div class="text-left space-y-8">
+                                            <div>
+                                                <h3 class="text-2xl font-bold text-purple-600 mb-3">Higher-Order Thinking Questions</h3>
+                                                <ul class="list-disc list-inside space-y-2 text-lg">
+                                                    <li><b>Analyze:</b> How does Nuuk’s climate influence its culture and community life?</li>
+                                                    <li><b>Evaluate:</b> What are the potential benefits and drawbacks of bilingual education in Nuuk?</li>
+                                                    <li><b>Create:</b> Design a welcome program for a new student moving to a school in Nuuk. What would you include?</li>
+                                                     <li><b>Synthesis:</b> How can the lifestyle in Nuuk inspire solutions for living sustainably in other extreme environments?</li>
+                                                </ul>
+                                            </div>
+                                             <div>
+                                                <h3 class="text-2xl font-bold text-purple-600 mb-3">IELTS & TOEFL Practice</h3>
+                                                <p class="mb-2"><strong>IELTS Part 2:</strong> Talk about a city in a cold climate you would like to visit.</p>
+                                                <p><strong>TOEFL Speaking:</strong> Discuss how climate affects people's daily lifestyles.</p>
+                                            </div>
+                                        </div>` } },
+
+                // 9. Final Project
+                { id: 'final-project-hub', type: 'html-content', content: { title: 'Final Project Hub <span aria-hidden="true">✍️</span>', html: `
+                                        <div class="bg-white rounded-2xl shadow-xl p-8 text-left">
+                                        <h2 class="text-3xl font-bold text-violet-600 mb-4">GRASPS Task: A Tale of Two Towns</h2>
+                                        <div class="space-y-3 text-lg">
+                                            <p><strong class="font-semibold text-violet-700">Goal:</strong> To create a multimedia presentation comparing life in Nuuk with life in your own hometown.</p>
+                                            <p><strong class="font-semibold text-violet-700">Role:</strong> You are a student ambassador creating a presentation for a cultural exchange program.</p>
+                                            <p><strong class="font-semibold text-violet-700">Audience:</strong> Students in Nuuk who might visit your hometown.</p>
+                                            <p><strong class="font-semibold text-violet-700">Situation:</strong> Your task is to highlight the similarities and differences in daily life, culture, and education between your community and Nuuk to foster cross-cultural understanding.</p>
+                                            <p><strong class="font-semibold text-violet-700">Product:</strong> A 5-slide multimedia presentation (e.g., Google Slides, PowerPoint) that includes images and text comparing at least three aspects of life (e.g., climate, school, transportation, hobbies).</p>
+                                            <p><strong class="font-semibold text-violet-700">Standards:</strong> Your presentation will be evaluated on its clarity, use of specific examples, visual appeal, and thoughtful comparison of the two locations.</p>
+                                        </div>
+                                        </div>` } },
+                { id: 'writing-task', type: 'writing-task', content: { 
+                    title: 'Project Writing Activity <span aria-hidden="true">✍️</span>', 
+                    prompt: 'Write a paragraph (200-250 words) for your presentation script, comparing and contrasting daily life in Nuuk with life in your hometown. Focus on how the environment shapes activities.', 
+                    starters: [
+                        "Nuuk, located in the Arctic, has a lifestyle shaped by its...",
+                        "In contrast, my hometown experiences...",
+                        "For example, a typical weekend for a teenager in Nuuk might involve..., whereas I usually...",
+                        "Despite these differences, I think both places value..."
+                    ],
+                    wordBank: ['Adaptation', 'Arctic', 'bilingual', 'climate', 'community', 'culture', 'environment', 'fjord', 'Greenlandic', 'Inuit', 'isolation', 'kayaking', 'lifestyle', 'remote', 'snow', 'tradition']
+                } },
+                { id: 'self-assessment', type: 'html-content', content: { title: 'Self-Assessment <span aria-hidden="true">🧑‍🏫</span>', html: `
+                                        <div class="text-left">
+                                            <h3 class="text-2xl font-bold text-purple-600 mb-3">Metacognitive Self-Assessments</h3>
+                                            <ol class="list-decimal list-inside space-y-4 text-xl">
+                                                <li>What was the most surprising thing I learned about life in Nuuk?</li>
+                                                <li>How did comparing my life with life in Nuuk help me better understand my own culture and environment?</li>
+                                            </ol>
+                                        </div>` } },
+                { id: 'certificate', type: 'certificate', content: { title: 'Module Complete! <span aria-hidden="true">🎉</span>', text: 'You have successfully completed the "Discovering Nuuk" module.', certificateTitle: 'Certificate of Arctic Exploration' } }
+            ]
+        };
+        // --- END OF LESSON CONTENT CONFIGURATION ---
+        // ===================================================================================
+
+        class SpeechService {
+             constructor() {
+                 this.synth = window.speechSynthesis;
+                 this.isInitialized = false;
+                 this.isTtsEnabled = true;
+                 this.voices = {};
+                 this.speechRate = 0.85;
+                 this.isDialoguePlaying = false;
+                 this.keepAliveInterval = null;
+             }
+
+             _startKeepAlive() {
+                if (this.keepAliveInterval) {
+                    clearInterval(this.keepAliveInterval);
+                }
+                this.keepAliveInterval = setInterval(() => {
+                    if (this.synth.speaking) {
+                        // Don't interrupt if it's currently speaking.
+                    } else {
+                        // A silent pause/resume can keep the service active on some browsers.
+                        this.synth.pause();
+                        this.synth.resume();
+                    }
+                }, 10000); // every 10 seconds
+            }
+    
+            _stopKeepAlive() {
+                if (this.keepAliveInterval) {
+                    clearInterval(this.keepAliveInterval);
+                    this.keepAliveInterval = null;
+                }
+            }
+             
+             async _setupVoices() {
+                 const voicesPromise = new Promise(resolve => { if (this.synth.getVoices().length) return resolve(this.synth.getVoices()); this.synth.onvoiceschanged = () => resolve(this.synth.getVoices()); });
+                 const availableVoices = await voicesPromise;
+                 if (!availableVoices.length) { console.warn("No speech synthesis voices available."); return; }
+                 const speakerToVoiceMap = {
+                    // General conversation practice speakers
+                    'a': ['Microsoft Emma Online (Natural) - English (United States)', 'Microsoft Ava Online (Natural) - English (United States)'],
+                    'b': ['Microsoft Brian Online (Natural) - English (United States)', 'Microsoft Andrew Online (Natural) - English (United States)'],
+                    
+                    // Speakers for the lectures
+                    'narrator': ['Microsoft Andrew Online (Natural) - English (United States)', 'Google US English'],
+                    'professor': ['Microsoft Brian Online (Natural) - English (United States)', 'Google US English'],
+                    'emily': ['Microsoft Emma Online (Natural) - English (United States)', 'Google US English'],
+                    'oliver': ['Microsoft Andrew Online (Natural) - English (United States)', 'Google US English'],
+                    'aisha': ['Microsoft Ava Online (Natural) - English (United States)', 'Google US English'],
+                    'ben': ['Microsoft Brian Online (Natural) - English (United States)', 'Google US English'],
+                 };
+                 for (const speaker in speakerToVoiceMap) {
+                     const voicePriorityList = speakerToVoiceMap[speaker];
+                     let chosenVoice = null;
+                     for (const voiceName of voicePriorityList) {
+                         const foundVoice = availableVoices.find(v => v.name === voiceName);
+                         if (foundVoice) { chosenVoice = foundVoice; break; }
+                     }
+                     if (chosenVoice) { this.voices[speaker] = chosenVoice; } else { console.warn(`Could not find specified voices for speaker: "${speaker}"`); }
+                 }
+                 this.voices['default'] = availableVoices.find(v => v.name === 'Microsoft Ava Online (Natural) - English (United States)') || availableVoices.find(v => v.lang === 'en-US');
+             }
+
+             async init() {
+                 if (this.isInitialized) return;
+                 try {
+                     // Initial speaking event to "wake up" the synthesis engine
+                     const warmUp = new SpeechSynthesisUtterance(' ');
+                     warmUp.volume = 0;
+                     this.synth.speak(warmUp);
+                     this.synth.cancel(); // Clear the empty utterance
+                     await this._setupVoices();
+                     this.isInitialized = true;
+                     this._startKeepAlive(); // Start the keep-alive timer
+                 } catch (e) {
+                     console.error("Speech synthesis setup failed:", e);
+                 }
+             }
+             
+             _cleanTextForSpeech(text) { const tempDiv = document.createElement('div'); const textWithoutSpans = text.replace(/<span aria-hidden="true">.*?<\/span>/g, ' '); tempDiv.innerHTML = textWithoutSpans; let cleanText = tempDiv.textContent || tempDiv.innerText || ''; cleanText = cleanText.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, ''); return cleanText; }
+             
+             async speak(text, { onEndCallback = null, voiceKey = 'default' } = {}) { 
+                if (!this.isInitialized || !this.isTtsEnabled || !text) { 
+                    if (onEndCallback) onEndCallback(); 
+                    return; 
+                } 
+                if (this.synth.speaking) { 
+                    this.synth.cancel(); 
+                    await new Promise(resolve => setTimeout(resolve, 100)); 
+                } 
+                const cleanText = this._cleanTextForSpeech(text); 
+                if (!cleanText.trim()) { 
+                    if (onEndCallback) onEndCallback(); 
+                    return; 
+                } 
+                const utter = new SpeechSynthesisUtterance(cleanText); 
+                utter.voice = this.voices[voiceKey] || this.voices['default']; 
+                utter.rate = this.speechRate; 
+                if (onEndCallback) utter.onend = onEndCallback; 
+                utter.onerror = (e) => { 
+                    console.error('SpeechSynthesisUtterance.onerror', e); 
+                    if (onEndCallback) onEndCallback(); 
+                }; 
+                try { 
+                    this.synth.speak(utter); 
+                } catch (e) { 
+                    console.error("Error calling synth.speak:", e); 
+                    if (onEndCallback) onEndCallback(); 
+                } 
+            }
+            
+             async speakDialogue(text) { if (!this.isInitialized || !this.isTtsEnabled || !text || this.isDialoguePlaying) return; this.cancel(); this.isDialoguePlaying = true; const lines = text.split('\n').filter(line => line.trim() !== '' && line.includes(':')); const queue = lines.map(line => { const [speaker, ...parts] = line.split(':'); const dialogue = parts.join(':').trim(); const cleanDialogue = this._cleanTextForSpeech(dialogue); const voiceKey = speaker.toLowerCase().replace(/dr\. |professor /g, '').trim(); return { text: cleanDialogue, voiceKey: voiceKey }; }).filter(item => item.text); if (queue.length === 0) { this.isDialoguePlaying = false; return; } const playNext = () => { if (queue.length > 0 && this.isTtsEnabled) { const item = queue.shift(); const utter = new SpeechSynthesisUtterance(item.text); utter.voice = this.voices[item.voiceKey] || this.voices['default']; utter.rate = this.speechRate; utter.onend = playNext; utter.onerror = (e) => { console.warn('A speech synthesis error occurred, attempting to recover.', e.error); try { this.synth.cancel(); } catch (cancelError) { console.error("Error while cancelling synth:", cancelError); } setTimeout(playNext, 250); }; try { this.synth.speak(utter); } catch(e) { console.error("Error in synth.speak:", e); setTimeout(playNext, 250); } } else { this.isDialoguePlaying = false; } }; playNext(); }
+             
+             cancel() { if (this.synth) { this.isDialoguePlaying = false; this.synth.cancel(); } }
+             
+             toggleTTS(forceState) { this.isTtsEnabled = forceState === undefined ? !this.isTtsEnabled : forceState; if (!this.isTtsEnabled) { this.cancel(); } return this.isTtsEnabled; }
+        }
+
+        // --- Global App State and Functions ---
+        const speechService = new SpeechService();
+        let score = 0, currentPage = lessonData.startPageId, timerInterval;
+        const pageHistory = [lessonData.startPageId];
+        let pageSequence = [];
+        let completedSections = new Set();
+        let vocabGameTimer;
+        let selectedWord = { element: null, text: '' };
+
+        // --- Sound and Reward Effects ---
+        const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        function playCorrectSound() {
+            if (!speechService.isTtsEnabled) return; // Respect the mute button
+            try {
+                const now = Tone.now();
+                synth.triggerAttackRelease(["C5", "E5", "G5"], "8n", now);
+            } catch(e) {
+                console.warn("Tone.js sound failed to play:", e);
+            }
+        }
+
+        function triggerRewardAnimation() {
+            const container = document.getElementById('reward-animation-container');
+            if (!container) return;
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+                confetti.style.position = 'absolute';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.top = `${Math.random() * -50 - 50}px`; /* Start above screen */
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = confetti.style.width;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.opacity = '1';
+                
+                container.appendChild(confetti);
+
+                const animation = confetti.animate([
+                    { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translateY(120vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 2000 + 3000,
+                    easing: 'ease-out',
+                    iterations: 1
+                });
+
+                animation.onfinish = () => {
+                    confetti.remove();
+                };
+            }
+        }
+
+        // --- Progress and Completion Logic ---
+        const pageToMenuMap = {};
+        function buildPageToMenuMap() {
+            lessonData.mainMenu.forEach(menuItem => {
+                let queue = [menuItem.target];
+                let visited = new Set(queue);
+                while (queue.length > 0) {
+                    const pageId = queue.shift();
+                    pageToMenuMap[pageId] = menuItem.id;
+                    const pageDef = lessonData.pages.find(p => p.id === pageId);
+                    if (pageDef && pageDef.type.startsWith('quiz')) {
+                        const nextQuizPage = getNextQuizPage(pageId);
+                        if (nextQuizPage && !visited.has(nextQuizPage) && lessonData.pages.some(p => p.id === nextQuizPage)) {
+                            queue.push(nextQuizPage);
+                            visited.add(nextQuizPage);
+                        }
+                    }
+                }
+            });
+            // Manual mapping for vocab game
+            pageToMenuMap['vocab-game'] = 'menu-vocab-game';
+        }
+
+        function getNextQuizPage(pageId) {
+            const sequence = ['mcq','tfng', 'gap-fill'];
+            const parts = pageId.split('-quiz-');
+            if (parts.length < 2) return null;
+            const prefix = parts[0];
+            const type = parts[1];
+            const currentIndex = sequence.indexOf(type);
+            if (currentIndex > -1 && currentIndex < sequence.length - 1) {
+                return `${prefix}-quiz-${sequence[currentIndex + 1]}`;
+            }
+            return null;
+        }
+
+        function updateProgressBar() {
+            const progress = (completedSections.size / lessonData.mainMenu.length) * 100;
+            const bar = document.getElementById('progress-bar');
+            if (bar) bar.style.width = `${progress}%`;
+        }
+
+        function updateMenuCompletionState() {
+            const menuContainer = document.getElementById('page-main-menu');
+            if (!menuContainer) return;
+            lessonData.mainMenu.forEach(item => {
+                const button = menuContainer.querySelector(`#menu-btn-${item.id}`);
+                if (button && completedSections.has(item.id)) {
+                    if (!button.innerHTML.includes('✓')) {
+                        button.innerHTML += ' <span class="text-green-300">✓</span>';
+                    }
+                }
+            });
+        }
+
+        function markSectionAsComplete(pageId) {
+            const menuId = pageToMenuMap[pageId];
+            if (menuId && !completedSections.has(menuId)) {
+                completedSections.add(menuId);
+                updateProgressBar();
+            }
+        }
+        
+        function checkQuizPageCompletion(pageId) {
+            const pageElement = document.getElementById(`page-${pageId}`);
+            if (!pageElement) return false;
+
+            if (pageId.includes('gap-fill')) {
+                const gaps = pageElement.querySelectorAll('.gap');
+                return gaps.length > 0 && Array.from(gaps).every(g => g.classList.contains('correct'));
+            } else {
+                const questions = pageElement.querySelectorAll('.question-group');
+                return questions.length > 0 && Array.from(questions).every(q => q.querySelector('button:disabled'));
+            }
+        }
+
+
+        // --- App Navigation ---
+        window.toggleTTS = (button) => {
+            const isNowEnabled = speechService.toggleTTS();
+            const iconPath = isNowEnabled 
+                ? "M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 5.858a3 3 0 104.243 4.243M9 12l4.243 4.243"
+                : "M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707a1 1 0 011.414 0v14a1 1 0 01-1.414 0L5.586 15z M17 14l-4-4m0 4l4-4";
+            button.querySelector('svg').classList.toggle('text-gray-600', isNowEnabled);
+            button.querySelector('svg').classList.toggle('text-gray-400', !isNowEnabled);
+            button.querySelector('path').setAttribute('d', iconPath);
+
+            if (isNowEnabled) {
+                const pageData = lessonData.pages.find(p => p.id === currentPage);
+                const targetPage = document.getElementById(`page-${currentPage}`);
+                if (pageData && pageData.type === 'dialogue') {
+                    speechService.speakDialogue(pageData.content.dialogue);
+                } else if (targetPage) {
+                    const readableContent = targetPage.querySelector('.readable-content');
+                    const titleElement = targetPage.querySelector('h2, h3');
+                    if (readableContent) speechService.speak(readableContent.innerText);
+                    else if (titleElement) speechService.speak(titleElement.innerText);
+                }
+            }
+        };
+
+        window.startApp = async function() {
+            await speechService.init(); 
+            try { await Tone.start(); } catch (e) { console.error(e); }
+            navigateTo(lessonData.homePageId);
+        }
+        
+        function startTimer(duration, display, onComplete) {
+            let timer = duration;
+            const update = () => { display.textContent = `${String(Math.floor(timer/60)).padStart(2,'0')}:${String(timer%60).padStart(2,'0')}`; };
+            update();
+            timerInterval = setInterval(() => { timer--; update(); if (timer < 0) { clearInterval(timerInterval); if (onComplete) onComplete(); } }, 1000);
+        }
+
+        window.navigateTo = (pageId) => {
+            const previousPageId = currentPage;
+            
+            // Mark completion if leaving a quiz page and it's fully answered
+            if (previousPageId.includes('-quiz-')) {
+                if (checkQuizPageCompletion(previousPageId)) {
+                    markSectionAsComplete(previousPageId);
+                }
+            }
+            
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (!targetPage) return console.warn('navigateTo: no page found for id', pageId);
+            if (pageId === currentPage) return;
+            
+            clearInterval(timerInterval);
+            clearTimeout(vocabGameTimer);
+            speechService.cancel();
+
+            // Mark simple pages as complete on navigation
+            const previousPageDef = lessonData.pages.find(p => p.id === previousPageId);
+            if (previousPageDef && !previousPageDef.type.startsWith('quiz') && previousPageId !== 'vocab-game') {
+                 markSectionAsComplete(previousPageId);
+            }
+
+            document.getElementById(`page-${currentPage}`)?.classList.remove('active');
+            targetPage.classList.add('active');
+            currentPage = pageId;
+            if (pageHistory[pageHistory.length - 1] !== currentPage) pageHistory.push(currentPage);
+            
+            const pageData = lessonData.pages.find(p => p.id === pageId);
+            if (pageData) {
+                if (pageData.type === 'timer') {
+                    const timerEl = document.getElementById(pageData.content.timerId);
+                    if (timerEl) startTimer(pageData.content.duration, timerEl, goNext);
+                } else if (pageData.type === 'vocab-game') {
+                    startVocabGame();
+                }
+                
+                if (pageData.type === 'dialogue') {
+                    speechService.speakDialogue(pageData.content.dialogue);
+                } else {
+                    const readableContent = targetPage.querySelector('.readable-content');
+                    const titleElement = targetPage.querySelector('h2, h3');
+                    let contentToSpeak = readableContent ? readableContent.innerText : (titleElement ? titleElement.innerText : '');
+                    let voice = 'default';
+                    if (pageId.startsWith('vocab-') || pageId === 'reading-main') {
+                       voice = 'oliver'; // Andrew voice
+                       if (pageId === 'reading-main') {
+                           contentToSpeak = Array.from(targetPage.querySelectorAll('h4, p')).map(el => el.innerText).join(' ');
+                       }
+                    }
+                    speechService.speak(contentToSpeak, { voiceKey: voice });
+                }
+            } else if (pageId === lessonData.homePageId) {
+                speechService.speak(targetPage.querySelector('h2').innerText);
+                updateMenuCompletionState();
+            }
+            updateNavButtons();
+            window.scrollTo(0, 0);
+        }
+
+        window.goNext = () => { const currentIndex = pageSequence.indexOf(currentPage); if (currentIndex > -1 && currentIndex < pageSequence.length - 1) navigateTo(pageSequence[currentIndex + 1]); }
+        window.goBack = () => { if (pageHistory.length > 1) { pageHistory.pop(); navigateTo(pageHistory.pop()); } }
+
+        function updateNavButtons() {
+            const nav = document.getElementById('nav-header');
+            if (!nav) return;
+            nav.style.display = (currentPage === lessonData.startPageId) ? 'none' : 'block';
+            const backBtn = nav.querySelector('button:first-child');
+            backBtn.disabled = pageHistory.length <= 1;
+            backBtn.classList.toggle('opacity-50', backBtn.disabled);
+            const nextBtn = nav.querySelector('button:last-child');
+            const currentIndex = pageSequence.indexOf(currentPage);
+            const isLast = currentIndex >= pageSequence.length - 1;
+            nextBtn.disabled = isLast || currentPage === lessonData.homePageId;
+            nextBtn.classList.toggle('opacity-50', nextBtn.disabled);
+        }
+        
+        function showFeedbackMessage(isCorrect) {
+            const correctFeedback = ["That's right!", "Excellent!", "Perfect!", "Great job!"];
+            const incorrectFeedback = ["Not quite.", "Keep trying!", "Almost there."];
+            const message = isCorrect ? correctFeedback[Math.floor(Math.random() * correctFeedback.length)] : incorrectFeedback[Math.floor(Math.random() * incorrectFeedback.length)];
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.className = `feedback-toast ${isCorrect ? 'correct' : 'encouraging'}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function updateScore(points) { score += points; document.getElementById('score-display').textContent = score; }
+
+        function checkCompletionAndMark() {
+            if(checkQuizPageCompletion(currentPage)) {
+                markSectionAsComplete(currentPage);
+            }
+        }
+
+        window.checkTfngAnswer = function(clickedButton, chosenAnswer, correctAnswer) {
+            const buttonContainer = clickedButton.parentElement;
+            Array.from(buttonContainer.children).forEach(btn => btn.disabled = true);
+            const isCorrect = chosenAnswer === correctAnswer;
+            showFeedbackMessage(isCorrect);
+            if (isCorrect) {
+                updateScore(10);
+                playCorrectSound();
+                triggerRewardAnimation();
+                clickedButton.className = clickedButton.className.replace(/bg-\w+-500/, 'bg-green-500');
+            } else {
+                clickedButton.className = clickedButton.className.replace(/bg-\w+-500/, 'bg-red-600');
+                const correctBtn = Array.from(buttonContainer.children).find(btn => btn.textContent === correctAnswer.charAt(0));
+                if (correctBtn) correctBtn.className = correctBtn.className.replace(/bg-\w+-500/, 'bg-green-500');
+            }
+            setTimeout(checkCompletionAndMark, 100);
+        }
+        
+        window.checkMcqAnswer = function(button, isCorrect) {
+            const questionGroup = button.closest('.question-group');
+            questionGroup.querySelectorAll('.quiz-option').forEach(opt => opt.disabled = true);
+            showFeedbackMessage(isCorrect);
+            if (isCorrect) {
+                updateScore(10);
+                playCorrectSound();
+                triggerRewardAnimation();
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                button.classList.add('bg-green-500', 'border-green-600', 'text-white');
+            } else {
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                button.classList.add('bg-red-500', 'border-red-600', 'text-white', 'shake');
+                const correctButton = questionGroup.querySelector(".quiz-option[data-correct='true']");
+                if (correctButton) {
+                    correctButton.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                    correctButton.classList.add('bg-green-500', 'border-green-600', 'text-white');
+                }
+            }
+            setTimeout(checkCompletionAndMark, 100);
+        }
+
+        function initGapFill(pageId) {
+            const page = document.getElementById(pageId);
+            if (!page) return;
+            const gaps = page.querySelectorAll('.gap');
+            const words = page.querySelectorAll('.word-bank-word');
+            const wordBank = page.querySelector('.word-bank-container');
+
+            words.forEach(word => {
+                word.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', word.dataset.word); });
+                word.addEventListener('click', handleWordClick);
+            });
+            gaps.forEach(gap => {
+                gap.addEventListener('dragover', e => e.preventDefault());
+                gap.addEventListener('drop', e => handleDrop(e, gap));
+                gap.addEventListener('click', handleGapClick);
+            });
+
+            function handleWordClick(e) {
+                const clickedWord = e.currentTarget;
+                if (clickedWord.parentElement.classList.contains('gap')) { 
+                    wordBank.appendChild(clickedWord); 
+                    clickedWord.parentElement.classList.remove('correct', 'incorrect');
+                    return; 
+                }
+                if (selectedWord.element) selectedWord.element.classList.remove('selected');
+                if (selectedWord.element === clickedWord) { selectedWord = { element: null, text: '' }; } 
+                else { selectedWord = { element: clickedWord, text: clickedWord.dataset.word }; clickedWord.classList.add('selected'); }
+            }
+            function handleGapClick(e) {
+                const clickedGap = e.currentTarget;
+                if(clickedGap.children.length > 0) {
+                     wordBank.appendChild(clickedGap.children[0]);
+                     clickedGap.classList.remove('correct', 'incorrect');
+                }
+                if (!selectedWord.element) return;
+                clickedGap.appendChild(selectedWord.element);
+                checkGap(clickedGap);
+                selectedWord.element.classList.remove('selected');
+                selectedWord = { element: null, text: '' };
+            }
+            function handleDrop(e, gap) {
+                e.preventDefault();
+                if (gap.children.length > 0) return;
+                const wordText = e.dataTransfer.getData('text/plain');
+                const wordElement = page.querySelector(`.word-bank-word[data-word="${wordText}"]`);
+                if (wordElement) { gap.appendChild(wordElement); checkGap(gap); }
+            }
+            function checkGap(gap) {
+                const word = gap.querySelector('.word-bank-word');
+                const isCorrect = word && word.dataset.word.toLowerCase() === gap.dataset.answer.toLowerCase();
+                gap.classList.toggle('correct', isCorrect);
+                gap.classList.toggle('incorrect', !isCorrect);
+                if (isCorrect) { 
+                    updateScore(10); 
+                    playCorrectSound();
+                    triggerRewardAnimation();
+                    showFeedbackMessage(true); 
+                } else { 
+                    showFeedbackMessage(false); 
+                }
+                setTimeout(checkCompletionAndMark, 100);
+            }
+        }
+
+        // --- Vocab Game Logic ---
+        let vocabGameQuestions = [];
+        let vocabGameCurrentIndex = 0;
+        let vocabGameScore = 0;
+        const ROUND_TIME = 10000; // 10 seconds
+
+        function startVocabGame() {
+            vocabGameQuestions = [...lessonData.vocabulary].sort(() => 0.5 - Math.random());
+            vocabGameCurrentIndex = 0;
+            vocabGameScore = 0;
+            document.getElementById('vocab-game-score').textContent = '0';
+            nextVocabGameRound();
+        }
+
+        function nextVocabGameRound() {
+            if (vocabGameCurrentIndex >= vocabGameQuestions.length) {
+                endVocabGame();
+                return;
+            }
+            
+            const question = vocabGameQuestions[vocabGameCurrentIndex];
+            document.getElementById('vocab-game-definition').textContent = question.def;
+            
+            const options = [question.word];
+            const wrongAnswers = lessonData.vocabulary.filter(v => v.word !== question.word);
+            while (options.length < 4 && wrongAnswers.length > 0) {
+                const randomWrong = wrongAnswers.splice(Math.floor(Math.random() * wrongAnswers.length), 1)[0];
+                options.push(randomWrong.word);
+            }
+            
+            const optionsContainer = document.getElementById('vocab-game-options');
+            optionsContainer.innerHTML = '';
+            options.sort(() => 0.5 - Math.random()).forEach(opt => {
+                const button = document.createElement('button');
+                button.className = 'quiz-option p-3 rounded-lg text-left bg-gray-100 hover:bg-gray-200 border border-gray-200';
+                button.textContent = opt;
+                button.onclick = () => checkVocabGameAnswer(button, opt === question.word);
+                optionsContainer.appendChild(button);
+            });
+
+            startRoundTimer();
+        }
+        
+        function startRoundTimer() {
+            clearTimeout(vocabGameTimer);
+            const timerBar = document.getElementById('vocab-game-timer-bar');
+            timerBar.style.transition = 'none';
+            timerBar.style.width = '100%';
+            
+            setTimeout(() => {
+                timerBar.style.transition = `width ${ROUND_TIME / 1000}s linear`;
+                timerBar.style.width = '0%';
+            }, 100);
+
+            vocabGameTimer = setTimeout(() => {
+                showFeedbackMessage(false);
+                vocabGameCurrentIndex++;
+                nextVocabGameRound();
+            }, ROUND_TIME);
+        }
+
+        function checkVocabGameAnswer(button, isCorrect) {
+            clearTimeout(vocabGameTimer);
+            showFeedbackMessage(isCorrect);
+            if (isCorrect) {
+                vocabGameScore++;
+                updateScore(5);
+                playCorrectSound();
+                triggerRewardAnimation();
+                document.getElementById('vocab-game-score').textContent = vocabGameScore;
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                button.classList.add('bg-green-500', 'text-white');
+            } else {
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                button.classList.add('bg-red-500', 'text-white', 'shake');
+            }
+            
+            const optionsContainer = document.getElementById('vocab-game-options');
+            optionsContainer.querySelectorAll('button').forEach(btn => btn.disabled = true);
+
+            setTimeout(() => {
+                vocabGameCurrentIndex++;
+                nextVocabGameRound();
+            }, 1500);
+        }
+
+        function endVocabGame() {
+            document.getElementById('vocab-game-definition').textContent = `Game Over! You scored ${vocabGameScore} out of ${vocabGameQuestions.length}.`;
+            document.getElementById('vocab-game-options').innerHTML = `<button onclick="startVocabGame()" class="action-button bg-blue-500 text-white font-bold p-3 rounded-lg">Play Again</button>`;
+            markSectionAsComplete('vocab-game');
+        }
+
+
+        function createPageElement(id, content) {
+            const section = document.createElement('section');
+            section.id = `page-${id}`;
+            section.className = 'page';
+            section.innerHTML = content;
+            document.getElementById('dynamic-pages-container').appendChild(section);
+        }
+        
+        function populateAllQuizzes() {
+            // Reading Quizzes
+            const readingTfng = lessonData.pages.find(p => p.id === 'reading-quiz-tfng');
+            if(readingTfng) readingTfng.content.questions = [ 
+                { statement: 'Nuuk is located in southern Greenland.', correctAnswer: 'False' },
+                { statement: 'People in Nuuk speak only Greenlandic.', correctAnswer: 'False' },
+                { statement: 'The sea near Nuuk is often frozen.', correctAnswer: 'True' },
+                { statement: 'Inuit traditions are part of daily life in Nuuk.', correctAnswer: 'True' },
+                { statement: 'Nuuk has no schools or hospitals.', correctAnswer: 'False' }
+            ];
+            const readingMcq = lessonData.pages.find(p => p.id === 'reading-quiz-mcq');
+            if(readingMcq) readingMcq.content.questions = [ 
+                { question: 'What is Nuuk known for?', options: ['Tropical beaches', 'Desert landscapes', 'Arctic fjords', 'Rainforests'], correctAnswer: 'Arctic fjords' },
+                { question: 'What languages are spoken in Nuuk?', options: ['English and French', 'Greenlandic and Danish', 'Spanish and Portuguese', 'Russian and Chinese'], correctAnswer: 'Greenlandic and Danish' },
+                { question: 'What is a fjord?', options: ['A type of food', 'A frozen lake', 'A narrow sea between cliffs', 'A mountain range'], correctAnswer: 'A narrow sea between cliffs' },
+                { question: 'What is a traditional activity in Nuuk?', options: ['Surfing', 'Kayaking', 'Farming', 'Skiing'], correctAnswer: 'Kayaking' },
+                { question: 'What is the approximate population of Nuuk?', options: ['5,000', '19,000', '50,000', '100,000'], correctAnswer: '19,000' }
+            ];
+
+            // Nuuk Overview Lecture Quizzes
+            const lectureNuukMcq = lessonData.pages.find(p => p.id === 'lecture-nuuk-quiz-mcq');
+            if(lectureNuukMcq) lectureNuukMcq.content.questions = [
+                { question: "What is the population of Nuuk?", options: ["About 1,900", "About 19,000", "About 90,000", "About 190,000"], correctAnswer: "About 19,000" },
+                { question: "Which two languages are commonly spoken and taught in Nuuk?", options: ["English and Greenlandic", "Danish and English", "Greenlandic and Danish", "Inuit and English"], correctAnswer: "Greenlandic and Danish" },
+                { question: "What kind of climate does Nuuk have?", options: ["Temperate", "Tropical", "Desert", "Subarctic"], correctAnswer: "Subarctic" },
+                { question: "Besides schools and hospitals, what modern amenity is mentioned?", options: ["Shopping malls", "Internet access", "Subway systems", "Theme parks"], correctAnswer: "Internet access" },
+                { question: "What is the main focus of schools in Nuuk?", options: ["Only teaching Danish culture", "Preparing students only for local jobs", "Preserving Inuit culture and preparing for global opportunities", "Focusing entirely on modern technology"], correctAnswer: "Preserving Inuit culture and preparing for global opportunities" }
+            ];
+             const lectureNuukTfng = lessonData.pages.find(p => p.id === 'lecture-nuuk-quiz-tfng');
+            if(lectureNuukTfng) lectureNuukTfng.content.questions = [
+                { statement: "Nuuk is located on the northeast coast of Greenland.", correctAnswer: "False" },
+                { statement: "The sea near Nuuk is rarely frozen.", correctAnswer: "False" },
+                { statement: "Traditional activities like fishing are still important in Nuuk.", correctAnswer: "True" },
+                { statement: "Nuuk lacks any cultural venues like museums or art galleries.", correctAnswer: "False" },
+                { statement: "The lecture suggests Nuuk has a weak sense of community due to its isolation.", correctAnswer: "False" }
+            ];
+            const lectureNuukGapFill = lessonData.pages.find(p => p.id === 'lecture-nuuk-quiz-gap-fill');
+            if(lectureNuukGapFill) lectureNuukGapFill.content.sentences = [
+                { text: ["Nuuk is surrounded by", "and mountains."], answer: "fjords" },
+                { text: ["Most people in Nuuk are of", "descent."], answer: "Inuit" },
+                { text: ["Students in Nuuk learn in both Greenlandic and", "."], answer: "Danish" },
+                { text: ["Despite its", ", it has a strong sense of community."], answer: "isolation" },
+                { text: ["Nuuk has a vibrant cultural scene with museums and music", "."], answer: "festivals" }
+            ];
+
+            // Classroom Discussion Quizzes
+            const discussionMcq = lessonData.pages.find(p => p.id === 'discussion-quiz-mcq');
+            if(discussionMcq) discussionMcq.content.questions = [
+                { question: "How does Emily describe her initial impression of Nuuk from online photos?", options: ["Completely isolated and traditional", "A blend of modern and natural", "Smaller than she expected", "Very similar to Australian cities"], correctAnswer: "A blend of modern and natural" },
+                { question: "What geographical feature of Nuuk did Oliver find particularly stunning?", options: ["The vast ice sheet", "The volcanic mountains", "The massive fjord system", "The colorful tundra"], correctAnswer: "The massive fjord system" },
+                { question: "What is a major concern Emily has about Nuuk's economy?", options: ["It is growing too quickly.", "It relies too heavily on the fishing industry.", "It is not modern enough.", "There are not enough jobs for young people."], correctAnswer: "It relies too heavily on the fishing industry." },
+                { question: "What is a key challenge related to infrastructure that Oliver mentions?", options: ["The buildings are too old.", "There is too much traffic.", "The limited road network outside the city.", "The airport is too small."], correctAnswer: "The limited road network outside the city." },
+                { question: "What daily reality of climate change in Nuuk does Emily mention?", options: ["It is getting much warmer in the summers.", "There is more rain than snow.", "Building foundations must be adjusted for thawing ground.", "The Northern Lights are disappearing."], correctAnswer: "Building foundations must be adjusted for thawing ground." }
+            ];
+            const discussionTfng = lessonData.pages.find(p => p.id === 'discussion-quiz-tfng');
+            if(discussionTfng) discussionTfng.content.questions = [
+                { statement: "Oliver is from Australia and Emily is from the UK.", correctAnswer: "False" },
+                { statement: "The professor states that the Arctic environment presents both beauty and challenges.", correctAnswer: "True" },
+                { statement: "Oliver believes it would be easy to attract diverse industries to Nuuk.", correctAnswer: "False" },
+                { statement: "Emily suggests that Nuuk's unique environment could be a draw for sustainable tourism.", correctAnswer: "True" },
+                { statement: "The discussion concludes that Nuuk has no significant challenges to overcome.", correctAnswer: "False" }
+            ];
+            const discussionGap = lessonData.pages.find(p => p.id === 'discussion-quiz-gap-fill');
+            if(discussionGap) discussionGap.content.sentences = [
+                { text: ["Emily describes Nuuk as having an almost", "quality, like a dream."], answer: "ethereal" },
+                { text: ["The discussion highlights the blend of Inuit and", "influences in Nuuk's culture."], answer: "Danish" },
+                { text: ["Maintaining infrastructure in an Arctic climate is described as a", "balancing act."], answer: "delicate" },
+                { text: ["Oliver mentions", "energy, like hydropower, as a potential opportunity."], answer: "renewable" },
+                { text: ["The professor calls Nuuk a compelling", "of life in the Arctic."], answer: "case study" }
+            ];
+            
+            // Nuuk Challenges & Culture Lecture Quizzes
+            const lectureChallengesMcq = lessonData.pages.find(p => p.id === 'lecture-challenges-quiz-mcq');
+            if(lectureChallengesMcq) lectureChallengesMcq.content.questions = [
+                { question: "What does Aisha identify as a primary challenge for people in Nuuk?", options: ["Too much tourism", "The harsh climate and dark winters", "Lack of modern technology", "Conflicts with neighboring countries"], correctAnswer: "The harsh climate and dark winters" },
+                { question: "According to the professor, what is a key benefit of bilingual education in Nuuk?", options: ["It makes it easier to travel", "It provides access to opportunities through Danish", "It is cheaper than single-language education", "All students prefer learning in Danish"], correctAnswer: "It provides access to opportunities through Danish" },
+                { question: "What role does Ben suggest culture plays in a remote community like Nuuk?", options: ["It is mainly for tourists.", "It helps people feel connected and like they belong.", "It is less important than the economy.", "It prevents the community from modernizing."], correctAnswer: "It helps people feel connected and like they belong." },
+                { question: "When designing a school program for Nuuk, what does Ben suggest integrating into the curriculum?", options: ["Advanced computer programming", "Traditional skills like hunting and fishing", "International business studies", "Classical music and art"], correctAnswer: "Traditional skills like hunting and fishing" },
+                { question: "What is one solution the lifestyle in Nuuk can inspire, according to the discussion?", options: ["Building larger cities in the Arctic", "The sustainable use of local resources", "Moving all communities to warmer climates", "Depending solely on imported goods"], correctAnswer: "The sustainable use of local resources" }
+            ];
+            const lectureChallengesTfng = lessonData.pages.find(p => p.id === 'lecture-challenges-quiz-tfng');
+            if(lectureChallengesTfng) lectureChallengesTfng.content.questions = [
+                { statement: "The professor says access to goods in Nuuk is cheaper than in other places.", correctAnswer: "False" },
+                { statement: "Bilingual education in Nuuk is only for preserving the Greenlandic language.", correctAnswer: "False" },
+                { statement: "Aisha suggests that cultural practices can help people cope with long winters.", correctAnswer: "True" },
+                { statement: "The professor disagrees with Ben's idea that culture is important for community connection.", correctAnswer: "False" },
+                { statement: "Aisha proposes a school program that connects students with community elders.", correctAnswer: "True" }
+            ];
+            const lectureChallengesGapFill = lessonData.pages.find(p => p.id === 'lecture-challenges-quiz-gap-fill');
+            if(lectureChallengesGapFill) lectureChallengesGapFill.content.sentences = [
+                { text: ["One of the main challenges discussed for people in Nuuk is", "."], answer: "isolation" },
+                { text: ["Bilingual education is vital for maintaining cultural", "."], answer: "identity" },
+                { text: ["The professor states that culture helps reinforce social", "in remote communities."], answer: "bonds" },
+                { text: ["Aisha suggests a school program should include skills for building", "."], answer: "resilience" },
+                { text: ["The lifestyle in Nuuk demonstrates a strong connection between culture and environmental", "."], answer: "stewardship" }
+            ];
+        }
+
+        function initializeLesson() {
+            document.getElementById('main-title').innerHTML = lessonData.title;
+            document.getElementById('main-subtitle').innerHTML = lessonData.subtitle;
+            document.getElementById('main-svg-container').innerHTML = `<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="grad-sky" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#374151;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#111827;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <rect width="600" height="300" fill="url(#grad-sky)"/>
+                <path d="M 0 300 Q 150 200 300 250 T 600 220 L 600 300 Z" fill="#f9fafb"/>
+                <path d="M 100 300 L 150 220 L 200 300 Z" fill="#d1d5db"/>
+                <path d="M 400 300 L 450 200 L 500 300 Z" fill="#e5e7eb"/>
+                <rect x="250" y="230" width="20" height="70" fill="#ef4444" />
+                <rect x="280" y="250" width="20" height="50" fill="#3b82f6" />
+                <rect x="310" y="240" width="20" height="60" fill="#f59e0b" />
+                <text x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="#e5e7eb" font-weight="bold">Arctic Capital</text>
+            </svg>`;
+
+            populateAllQuizzes();
+            buildPageToMenuMap();
+
+            const menuButtons = lessonData.mainMenu.map(item => {
+                const colors = { green: 'bg-green-500 border-green-700', blue: 'bg-blue-500 border-blue-700', sky: 'bg-sky-500 border-sky-700', amber: 'bg-amber-500 border-amber-700', rose: 'bg-rose-500 border-rose-700', violet: 'bg-violet-500 border-violet-700', teal: 'bg-teal-500 border-teal-700', orange: 'bg-orange-500 border-orange-700', indigo: 'bg-indigo-500 border-indigo-700', lime: 'bg-lime-500 border-lime-700', emerald: 'bg-emerald-500 border-emerald-700', red: 'bg-red-500 border-red-700', purple: 'bg-purple-500 border-purple-700' };
+                return `<button id="menu-btn-${item.id}" onclick="navigateTo('${item.target}')" class="btn-animated-3d ${colors[item.color] || colors['green']} text-white font-bold text-xl p-4 rounded-xl">${item.text}</button>`;
+            }).join('');
+            createPageElement(lessonData.homePageId, `<div class="bg-white rounded-2xl shadow-lg p-8"><h2 class="text-4xl font-bold text-center text-slate-800 mb-8">Main Menu</h2><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${menuButtons}</div></div>`);
+            
+            const pageOrderMap = { 
+                'warm-up': ['vocab-start'], 
+                'vocab-start': lessonData.vocabulary.map((v, i) => `vocab-${i}`), 
+                'reading-main': ['reading-quiz-tfng', 'reading-quiz-mcq'], 
+                'lecture-nuuk-pre': ['lecture-nuuk-main', 'lecture-nuuk-quiz-mcq', 'lecture-nuuk-quiz-tfng', 'lecture-nuuk-quiz-gap-fill'],
+                'lecture-challenges-pre': ['lecture-challenges-main', 'lecture-challenges-quiz-mcq', 'lecture-challenges-quiz-tfng', 'lecture-challenges-quiz-gap-fill'],
+                'discussion-pre': ['discussion-main', 'discussion-quiz-mcq', 'discussion-quiz-tfng', 'discussion-quiz-gap-fill'],
+                'final-project-hub': ['writing-task', 'self-assessment', 'certificate'] 
+            };
+            let flatPageList = [lessonData.startPageId];
+            lessonData.mainMenu.forEach(item => {
+                let queue = [item.target];
+                let visited = new Set();
+                while(queue.length > 0) {
+                    let current = queue.shift();
+                    if (visited.has(current)) continue;
+                    visited.add(current);
+                    flatPageList.push(current);
+                    if (pageOrderMap[current]) {
+                        queue.push(...pageOrderMap[current]);
+                    }
+                }
+            });
+            pageSequence = [...new Set(flatPageList)];
+
+            lessonData.vocabulary.forEach((v, i) => {
+                createPageElement(`vocab-${i}`, `<div class="bg-white rounded-2xl shadow-lg p-8 text-center pt-16"><div class="readable-content"><h3 class="text-2xl font-bold text-sky-600 mb-2">Vocabulary ${i + 1} / ${lessonData.vocabulary.length}</h3><div class="my-8"><h2 class="text-5xl font-bold text-gray-800 mb-4">${v.word}</h2><p class="text-2xl text-gray-600 mb-4">${v.def}</p><p class="text-xl text-gray-500 italic">"${v.sentence}"</p></div></div></div>`);
+            });
+
+            lessonData.pages.forEach(page => {
+                let pageHTML = '';
+                switch (page.type) {
+                    case 'simple': pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-center pt-16"><div class="readable-content"><h2 class="text-4xl font-bold text-gray-800 mb-6">${page.content.title}</h2><p class="text-xl text-gray-600 mb-8">${page.content.text}</p></div></div>`; break;
+                    case 'timer': pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-left pt-16"><div class="w-full flex justify-between items-center mb-4"><h2 class="text-2xl md:text-3xl font-bold text-blue-700">${page.content.title}</h2><div id="${page.content.timerId}" class="text-3xl md:text-4xl font-bold text-gray-700 ml-4"></div></div><div class="readable-content"><p class="text-lg md:text-xl text-gray-600 mt-8">${page.content.text}</p></div></div>`; break;
+                    case 'dialogue':
+                    case 'html-content':
+                        const contentHTML = page.type === 'html-content' ? page.content.html : (page.content.dialogue || '').split('\n').map(line => `<p class="mb-2">${line.replace(/([^:]+):/, '<strong class="font-semibold text-blue-700">$1:</strong>')}</p>`).join('');
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><h2 class="text-4xl font-bold text-center text-slate-800 mb-6">${page.content.title}</h2><div class="readable-content text-lg leading-relaxed space-y-4 bg-gray-50 p-6 rounded-lg max-h-[70vh] overflow-y-auto">${contentHTML}</div></div>`;
+                        break;
+                    case 'vocab-game':
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><h2 class="text-4xl font-bold text-center text-sky-600 mb-4">${page.content.title}</h2><div class="text-center mb-4 text-lg">Score: <span id="vocab-game-score" class="font-bold">0</span></div><div class="w-full bg-gray-200 rounded-full h-2.5 mb-4"><div id="vocab-game-timer-bar" class="bg-blue-600 h-2.5 rounded-full"></div></div><div id="vocab-game-definition" class="text-center text-2xl font-semibold my-6 min-h-[6rem]"></div><div id="vocab-game-options" class="grid grid-cols-2 gap-4"></div></div>`;
+                        break;
+                    case 'writing-task':
+                        const startersHTML = page.content.starters.map(s => `<li class="text-gray-500">${s}</li>`).join('');
+                        const wordBankHTML = page.content.wordBank ? `<div class="mt-6"><h4 class="font-bold text-lg text-violet-600">Word Bank:</h4><div class="flex flex-wrap gap-2 mt-2 p-4 bg-gray-100 rounded-lg">${page.content.wordBank.map(w => `<span class="bg-white px-2 py-1 rounded-md shadow-sm text-gray-700">${w}</span>`).join('')}</div></div>` : '';
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><div class="readable-content"><h2 class="text-4xl font-bold text-center text-violet-700 mb-6">${page.content.title}</h2><div class="text-lg leading-relaxed space-y-4 bg-gray-50 p-6 rounded-lg"><h3 class="font-bold text-xl text-violet-600">Prompt:</h3><p>${page.content.prompt}</p><h3 class="font-bold text-xl text-violet-600 mt-4">Sentence Starters:</h3><ul class="list-disc list-inside ml-4">${startersHTML}</ul>${wordBankHTML}</div></div><div class="text-center mt-6"><button onclick="goNext()" class="action-button bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-xl hover:bg-blue-700">Continue</button></div></div>`;
+                        break;
+                    case 'certificate':
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-center pt-16 relative overflow-hidden"><canvas id="completion-canvas"></canvas><div class="relative z-10"><div class="readable-content"><h2 class="text-4xl font-bold text-amber-600 mb-4">${page.content.title}</h2><p class="text-xl text-gray-600 mb-6">${page.content.text}</p></div><div id="certificate-to-print" class="bg-blue-50 border-4 border-dashed border-blue-300 rounded-lg p-8 max-w-2xl mx-auto"><div class="flex justify-center mb-4"><span class="text-6xl"><span aria-hidden="true">🇬🇱</span></span></div><h3 class="text-3xl font-bold text-slate-800">${page.content.certificateTitle}</h3><p class="mt-4 text-lg">This certificate is awarded to</p><p id="certificate-name" class="text-2xl font-bold text-blue-600 my-2 border-b-2 border-gray-400 pb-2">[Enter Your Name Here]</p><p class="mt-4 text-lg">for successfully completing this lesson.</p><p class="mt-6 text-md"><strong>Final Score:</strong> <span id="certificate-score" class="font-bold"></span> points</p><p class="text-sm mt-1"><strong>Date of Completion:</strong> <span id="certificate-date"></span></p></div><div id="cert-controls" class="mt-6"><div id="cert-initial-controls"><input type="text" id="name-input-cert" placeholder="Enter your name for the certificate" class="text-center p-2 border rounded-lg w-full max-w-md"><button onclick="generateCertificate()" class="action-button mt-4 bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700">Generate Certificate</button></div><div id="cert-generated-controls" class="hidden mt-4 flex flex-wrap justify-center gap-4"><button onclick="downloadCertificateAsImage()" class="action-button bg-sky-600 text-white font-bold py-2 px-4 rounded-full text-sm">Download Image</button></div></div></div></div>`;
+                        break;
+                    case 'quiz-tfng':
+                    case 'quiz-mcq':
+                    case 'quiz-gap-fill':
+                        let questionsHTML = '';
+                        if (page.type === 'quiz-tfng' && page.content.questions) {
+                            questionsHTML = page.content.questions.map((q, i) => `<div class="question-group flex items-center gap-4 p-4 rounded-lg bg-gray-100"><div class="flex-shrink-0 flex gap-2">${['True', 'False', 'Not Given'].map(l => `<button onclick="checkTfngAnswer(this, '${l}', '${q.correctAnswer}')" class="tfng-button bg-${l==='True'?'blue':l==='False'?'red':'gray'}-500 text-white font-bold w-12 h-10 rounded-full">${l.charAt(0)}</button>`).join('')}</div><p>${i + 1}. ${q.statement}</p></div>`).join('');
+                        } else if (page.type === 'quiz-mcq' && page.content.questions) {
+                            questionsHTML = page.content.questions.map((q, i) => `<div class="question-group ${i > 0 ? 'border-t pt-6 mt-6' : ''}"><p class="font-semibold mb-2">${i + 1}. ${q.question}</p><div class="grid grid-cols-1 md:grid-cols-2 gap-2">${q.options.map(o => `<button onclick="checkMcqAnswer(this, '${o.replace(/'/g, "\\'")}' === '${q.correctAnswer.replace(/'/g, "\\'")}')" data-correct="${o === q.correctAnswer}" class="quiz-option p-3 rounded-lg text-left bg-gray-100 hover:bg-gray-200 border border-gray-200">${o}</button>`).join('')}</div></div>`).join('');
+                        } else if (page.type === 'quiz-gap-fill' && page.content.sentences) {
+                            const words = page.content.sentences.map(s => s.answer).sort(() => Math.random() - 0.5);
+                            questionsHTML = `<div class="gap-fill-container">${page.content.sentences.map((s, i) => `<p class="text-lg mb-4">${i + 1}. ${s.text[0]} <span class="gap" data-answer="${s.answer}"></span> ${s.text[1]}</p>`).join('')}</div><div class="word-bank-container mt-8 p-4 bg-gray-100 rounded-lg flex flex-wrap gap-4 justify-center">${words.map(w => `<div class="word-bank-word" draggable="true" data-word="${w}">${w}</div>`).join('')}</div>`;
+                        }
+                        pageHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><h3 class="text-3xl font-bold text-rose-600 mb-6 text-center">${page.content.title}</h3><div class="space-y-6">${questionsHTML}</div></div>`;
+                        break;
+                }
+                if (pageHTML) {
+                    createPageElement(page.id, pageHTML);
+                    if (page.type === 'quiz-gap-fill') initGapFill(`page-${page.id}`);
+                }
+            });
+            updateNavButtons();
+        }
+
+        function generateCertificate() {
+            const name = document.getElementById('name-input-cert').value || 'Dedicated Student';
+            document.getElementById('certificate-name').textContent = name;
+            document.getElementById('certificate-score').textContent = score;
+            document.getElementById('certificate-date').textContent = new Date().toLocaleDateString();
+            document.getElementById('cert-initial-controls').classList.add('hidden');
+            document.getElementById('cert-generated-controls').classList.remove('hidden');
+
+            const canvas = document.getElementById('completion-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            let particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 5 + 2,
+                    color: ['#fde047', '#f97316', '#fb923c', '#fed7aa'][Math.floor(Math.random() * 4)],
+                    speed: Math.random() * 2 + 1
+                });
+            }
+
+            function drawConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speed;
+                    if (p.y > canvas.height) {
+                        p.y = -p.radius;
+                        p.x = Math.random() * canvas.width;
+                    }
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                });
+                requestAnimationFrame(drawConfetti);
+            }
+            drawConfetti();
+        }
+
+        function downloadCertificateAsImage() {
+            html2canvas(document.querySelector("#certificate-to-print")).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'Nuuk_Certificate.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeLesson();
+            const bgCanvas = document.getElementById('background-canvas');
+            const bgCtx = bgCanvas.getContext('2d');
+            bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
+            let particles = [];
+            function animateBackground() {
+                bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+                particles.forEach((p, i) => {
+                    p.y -= p.speed;
+                    if (p.y < -p.radius) particles.splice(i, 1);
+                    bgCtx.beginPath();
+                    bgCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    bgCtx.fillStyle = p.color;
+                    bgCtx.fill();
+                });
+                if (Math.random() > 0.98) {
+                    particles.push({ 
+                        x: Math.random() * bgCanvas.width, 
+                        y: bgCanvas.height + 20, 
+                        radius: Math.random() * 2 + 1, 
+                        speed: Math.random() * 0.5 + 0.2, 
+                        color: `rgba(255, 255, 255, ${Math.random() * 0.3 + 0.1})`
+                    });
+                }
+                requestAnimationFrame(animateBackground);
+            }
+            window.addEventListener('resize', () => { bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight; });
+            animateBackground();
+        });
+    </script>
+</body>
+</html>
+
