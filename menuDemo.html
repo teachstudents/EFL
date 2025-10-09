@@ -309,8 +309,7 @@
 
         .round-info { font-size: 1.3rem; font-weight: bold; text-shadow: 0 0 10px #ffde7d; }
         .card-counter { font-size: 1.2rem; color: #ffb703; text-shadow: 0 0 10px #ffb703; }
-
-        .game-area { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .game-area { display: flex; justify-content: space-between; align-items: stretch; gap: 1rem; }
 
         .versus-indicator {
             font-size: 3rem;
@@ -318,6 +317,7 @@
             color: #ffb703;
             text-shadow: 0 0 15px #ff8c00;
             animation: bonusPulse 1.5s ease-in-out infinite;
+            align-self: center;
         }
 
         .team-game-area { flex: 1; display: flex; flex-direction: column; gap: 1rem; position: relative; }
@@ -340,19 +340,23 @@
             padding: 1.5rem;
             border: 2px solid #ffde7d;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative; /* This is the key fix */
         }
 
         .player-name { 
             font-size: 1.4rem; 
             font-weight: bold; 
-            margin-bottom: 1rem; 
+            margin-top: 1rem; 
             text-shadow: 0 0 10px #ffde7d;
             min-height: 40px; 
         }
-        .emoji-display { font-size: 5rem; margin: 1rem 0; animation: emojiFloat 3s ease-in-out infinite; }
+        .emoji-display { font-size: 5rem; margin-bottom: 1rem; animation: emojiFloat 3s ease-in-out infinite; }
         @keyframes emojiFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
 
-        .answer-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1rem; }
+        .answer-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
         .answer-btn {
             padding: 0.8rem; font-size: 1rem; font-weight: bold;
             background: linear-gradient(45deg, rgba(255, 183, 3, 0.3), rgba(251, 133, 0, 0.3));
@@ -407,11 +411,16 @@
             border: 5px solid #ff8c00; box-shadow: 0 0 50px rgba(255,215,0,0.8);
             z-index: 2000; max-width: 600px;
         }
-        .certificate h2 { font-size: 2.5rem; margin-bottom: 1rem; }
-        .certificate-content { font-size: 1.3rem; line-height: 1.6; margin: 2rem 0; }
-        .winning-team { font-size: 2rem; font-weight: bold; color: #ff0040; margin: 1rem 0; }
-        .final-score { font-size: 1.8rem; font-weight: bold; color: #0066cc; margin: 1rem 0; }
-        .certificate-date { font-size: 1.1rem; margin-top: 2rem; font-style: italic; }
+
+        .player-area.correct-answer-glow {
+            animation: glow 1.5s ease-out;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px #ffde7d, 0 0 10px #ffb703; }
+            50% { box-shadow: 0 0 20px #ffde7d, 0 0 40px #ffb703, 0 0 60px #ff8c00; }
+            100% { box-shadow: 0 0 5px #ffde7d, 0 0 10px #ffb703; }
+        }
 
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -517,19 +526,33 @@
 
             <!-- Game Play -->
             <div class="game-play" id="gamePlay">
-                <div class="game-status"><div class="round-info" id="roundInfo"></div></div>
-                <div class="timer-container"><div class="timer-display" id="timerDisplay">7</div><div class="timer-bar"><div class="timer-progress" id="timerProgress"></div></div></div>
                 <div class="game-area">
                     <div class="team-game-area" id="team1GameArea">
-                        <div class="team-score-display"><div class="team-name" id="gameTeam1Name"></div><div class="score-number" id="team1Score">0</div></div>
-                        <div class="player-area"><div class="player-name" id="player1Name"></div><div class="emoji-display" id="player1Emoji"></div><div class="answer-buttons" id="player1Buttons"></div></div>
+                        <div class="player-area">
+                            <div class="emoji-display" id="player1Emoji"></div>
+                            <div class="answer-buttons" id="player1Buttons"></div>
+                            <div class="player-name" id="player1Name"></div>
+                            <div class="team-score-display" style="margin-top: 1rem;">
+                                <div class="team-name" id="gameTeam1Name"></div>
+                                <div class="score-number" id="team1Score">0</div>
+                            </div>
+                        </div>
                     </div>
                     <div class="versus-indicator">VS</div>
                     <div class="team-game-area" id="team2GameArea">
-                        <div class="team-score-display"><div class="team-name" id="gameTeam2Name"></div><div class="score-number" id="team2Score">0</div></div>
-                        <div class="player-area"><div class="player-name" id="player2Name"></div><div class="emoji-display" id="player2Emoji"></div><div class="answer-buttons" id="player2Buttons"></div></div>
+                        <div class="player-area">
+                            <div class="emoji-display" id="player2Emoji"></div>
+                            <div class="answer-buttons" id="player2Buttons"></div>
+                            <div class="player-name" id="player2Name"></div>
+                            <div class="team-score-display" style="margin-top: 1rem;">
+                                <div class="team-name" id="gameTeam2Name"></div>
+                                <div class="score-number" id="team2Score">0</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <div class="game-status"><div class="round-info" id="roundInfo"></div></div>
+                <div class="timer-container"><div class="timer-display" id="timerDisplay">7</div><div class="timer-bar"><div class="timer-progress" id="timerProgress"></div></div></div>
             </div>
         </div>
     </div>
@@ -629,27 +652,20 @@
             ]}
         ];
         
-        const correctGermanPhrases = [
-            "This food is delicious.",
-            "That tastes excellent.",
-            "It’s unbelievably tasty.",
-            "The flavor is simply perfect.",
-            "That’s a treat for the taste buds.",
-            "I haven’t eaten something this good in a long time.",
-            "That’s heavenly.",
-            "The flavors are wonderfully balanced.",
-            "The meat is tender and juicy.",
-            "The soup is very flavorful.",
-            "The vegetables are crisp and fresh.",
-            "The texture is perfect.",
-            "It tastes freshly prepared.",
-            "I’m thrilled with this dish.",
-            "This exceeds my expectations.",
-            "I’ve never tried anything like this before.",
-            "This is a masterpiece of cooking.",
-            "Every bite is a pleasure.",
-            "That’s love at first bite.",
-            "I could get used to this."
+        const praisePhrases = [
+            "The cake is golden-brown on top.",
+            "Her salad looks vibrant with red tomatoes and green cucumbers.",
+            "The soup smells aromatic with fresh herbs.",
+            "The cheese is pungent, but tasty.",
+            "This lemonade is tangy and sweet.",
+            "The curry is rich with spices.",
+            "Dark chocolate tastes bitter but smooth.",
+            "The chips are crunchy and salty.",
+            "The ice cream is creamy and cold.",
+            "The bread is flaky and soft inside.",
+            "The soda is fizzy and fun.",
+            "The tea feels soothing on my throat.",
+            "The apple juice is crisp and fresh."
         ];
 
         const incorrectPhrases = ["Great attempt! Let's try another.", "Not this time, but you're getting warmer!", "Every try is a step forward. Keep going!", "Mistakes are proof that you are trying. Don't stop!", "That's not the answer, but I believe in you!", "So close! What's your next idea?", "Don't worry, the best discoveries come after a few tries.", "That's a learning opportunity! Try again.", "Your persistence is inspiring. Let's go again.", "Even experts get it wrong sometimes. You've got this!"];
@@ -973,7 +989,9 @@
             container.innerHTML = '';
             let answers = [correctAns.name];
             const incorrect = allItems.map(i => i.name).filter(n => n !== correctAns.name);
-            while (answers.length < 4 && incorrect.length > 0) answers.push(incorrect.splice(Math.floor(Math.random() * incorrect.length), 1)[0]);
+            while (answers.length < 4 && incorrect.length > 0) {
+                answers.push(incorrect.splice(Math.floor(Math.random() * incorrect.length), 1)[0]);
+            }
             answers.sort(() => .5 - Math.random()).forEach((ans, i) => {
                 const btn = document.createElement('button');
                 btn.className = 'answer-btn';
@@ -982,23 +1000,34 @@
                 container.appendChild(btn);
             });
         }
-        
+
         function showPraise(playerNum) {
-            const phrase = correctGermanPhrases[Math.floor(Math.random() * correctGermanPhrases.length)];
+            const phrase = praisePhrases[Math.floor(Math.random() * praisePhrases.length)];
             const el = document.createElement('div');
             el.className = 'praise-word';
-            el.textContent = phrase;
+            el.textContent = "Excellent!";
             el.style.color = '#39FF14';
-            playAudio(phrase, 0, 'en-US');
+            // Voice for praise is Emma (index 3 in requested voices array)
+            playAudio(phrase, 3, 'en-US');
 
             const badge = document.createElement('div');
             badge.className = 'point-badge';
             badge.textContent = "+1";
 
-            const container = document.getElementById(`team${playerNum}GameArea`);
-            container.appendChild(el);
-            container.appendChild(badge);
-            createSparkleTrail(container);
+            const playerArea = document.getElementById(`team${playerNum}GameArea`).querySelector('.player-area');
+            
+            playerArea.appendChild(el);
+            playerArea.appendChild(badge);
+            
+            const scoreDisplay = playerArea.querySelector('.team-score-display');
+            createSparkleTrail(scoreDisplay);
+
+            // Add glow effect to player area
+            playerArea.classList.add('correct-answer-glow');
+            setTimeout(() => {
+                playerArea.classList.remove('correct-answer-glow');
+            }, 1500);
+
 
             setTimeout(() => {
                 el.remove();
@@ -1006,12 +1035,10 @@
             }, 2500);
         }
         
-        function createSparkleTrail(container) {
-            const scoreArea = container.querySelector('.team-score-display');
-            if (!scoreArea) return;
-
-            const rect = scoreArea.getBoundingClientRect();
-            const containerRect = document.querySelector('.game-container').getBoundingClientRect();
+        function createSparkleTrail(element) {
+            const container = element.offsetParent || document.body;
+            const rect = element.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
 
             for (let i = 0; i < 20; i++) {
                 const sparkle = document.createElement('div');
@@ -1036,7 +1063,8 @@
             const phrase = incorrectPhrases[Math.floor(Math.random() * incorrectPhrases.length)];
             const el = document.createElement('div');
             el.className = 'encouragement-phrase'; el.textContent = phrase;
-            document.getElementById(`team${playerNum}GameArea`).appendChild(el);
+            const playerArea = document.getElementById(`team${playerNum}GameArea`).querySelector('.player-area');
+            playerArea.appendChild(el);
             setTimeout(() => el.remove(), 2000);
         }
 
