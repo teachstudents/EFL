@@ -519,7 +519,7 @@
                     </div>
                 </div>
                 <div style="text-align: center; margin-top: 1rem; font-size: 1.2rem; color: #ffb703;">
-                    <div id="selectionCountdown">Game starts in <span id="countdownTimer">5</span>s...</div>
+                    <div id="selectionCountdown">Game starts in <span id="countdownTimer">10</span>s...</div>
                 </div>
             </div>
 
@@ -738,15 +738,56 @@
         
         speechSynthesis.onvoiceschanged = loadVoices;
 
-        function playAudio(text, voiceIndex = 0, lang = 'en-US') {
-            if ('speechSynthesis' in window) {
-                speechSynthesis.cancel(); 
-                const utterance = new SpeechSynthesisUtterance(text);
+        function playAudio(text, voiceIndex = 0, lang = 'en-US', onEndCallback) {
+            if (!('speechSynthesis' in window) || !text) {
+                if (onEndCallback) setTimeout(onEndCallback, 500);
+                return;
+            }
+
+            const allVoices = speechSynthesis.getVoices();
+            if (allVoices.length === 0) {
+                console.warn("Speech synthesis voices not ready, skipping TTS for:", text);
+                if (onEndCallback) setTimeout(onEndCallback, 500);
+                return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(text);
+
+            let voiceToUse = null;
+            if (lang.startsWith('zh')) {
+                voiceToUse = allVoices.find(v => v.lang.startsWith('zh-CN') && v.name.includes('Huihui')) || allVoices.find(v => v.lang.startsWith('zh'));
+            } else {
                 if (preferredVoices.length > 0 && preferredVoices[voiceIndex % preferredVoices.length]) {
-                    utterance.voice = preferredVoices[voiceIndex % preferredVoices.length];
+                    voiceToUse = preferredVoices[voiceIndex % preferredVoices.length];
                 }
-                utterance.lang = lang;
-                utterance.rate = 0.85; 
+            }
+
+            if (voiceToUse) {
+                utterance.voice = voiceToUse;
+            } else {
+                console.warn(`Could not find a suitable voice for lang=${lang}`);
+            }
+
+            utterance.lang = lang;
+            utterance.rate = 0.85;
+
+            utterance.onend = () => {
+                if (onEndCallback) onEndCallback();
+            };
+            utterance.onerror = (e) => {
+                // Log a more detailed error message
+                console.error(`Speech synthesis error: "${e.error}" for text: "${text}"`);
+                if (onEndCallback) onEndCallback(); // Continue game flow even on error
+            };
+
+            // This robust handling of cancel/speak helps prevent errors
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+                // A tiny delay allows the cancel command to process before speaking again
+                setTimeout(() => {
+                    speechSynthesis.speak(utterance);
+                }, 100);
+            } else {
                 speechSynthesis.speak(utterance);
             }
         }
@@ -831,7 +872,7 @@
             const words = item.name.split(/\s+/).length;
             const baseTime = 2500; // minimum time
             const extraPerWord = 400; // add 0.4s per word
-            const displayTime = baseTime + (words * extraPerWord);
+            const displayTime = baseTime + (words * extraPerWord) + 3000; // Added 3 seconds
 
             setTimeout(() => {
                 gameState.learningIndex++;
@@ -885,12 +926,19 @@
             setTimeout(() => {
                 document.getElementById('slot1Window').textContent = gameState.currentPlayer1;
                 document.getElementById('slot2Window').textContent = gameState.currentPlayer2;
+                
+                // Announce players in Chinese
+                const player1Chinese = gameState.currentPlayer1.split('/')[0].trim();
+                const player2Chinese = gameState.currentPlayer2.split('/')[0].trim();
+                const announcement = `${player1Chinese}, 和 ${player2Chinese}, 请准备比赛。`;
+                playAudio(announcement, 0, 'zh-CN');
+
                 startGameCountdown();
             }, 3000);
         }
 
         function startGameCountdown() {
-            let count = 5;
+            let count = 10; // Changed from 5 to 10
             const timerEl = document.getElementById('countdownTimer');
             timerEl.textContent = count;
             const interval = setInterval(() => {
@@ -982,6 +1030,11 @@
             setupAnswerButtons(2, gameState.currentQuestions.player2, items);
 
             gameState.currentAnswers = { player1: null, player2: null };
+
+            // Play a descriptive phrase for the card
+            const phrase = praisePhrases[Math.floor(Math.random() * praisePhrases.length)];
+            // Using voice 3 (Emma) as before, with a small delay
+            setTimeout(() => playAudio(phrase, 3, 'en-US'), 500);
         }
         
         function setupAnswerButtons(playerNum, correctAns, allItems) {
@@ -1002,13 +1055,10 @@
         }
 
         function showPraise(playerNum) {
-            const phrase = praisePhrases[Math.floor(Math.random() * praisePhrases.length)];
             const el = document.createElement('div');
             el.className = 'praise-word';
             el.textContent = "Excellent!";
             el.style.color = '#39FF14';
-            // Voice for praise is Emma (index 3 in requested voices array)
-            playAudio(phrase, 3, 'en-US');
 
             const badge = document.createElement('div');
             badge.className = 'point-badge';
@@ -1194,7 +1244,6 @@
             clearInterval(gameState.roundTimer);
             resetGameState();
             document.getElementById('game-content').style.display = 'none';
-            document.getElementById('gameProgress').style.display = 'none';
             document.getElementById('certificate').style.display = 'none';
             document.getElementById('phaseTransition').style.display = 'none';
             document.getElementById('gameModes').style.display = 'flex';
