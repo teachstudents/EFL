@@ -74,9 +74,9 @@
             <div id="topic-selection-container" class="hidden">
                  <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">Hello, <span id="user-name-display"></span>!</h1>
                  <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                         <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
-                         <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
-                         <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
+                          <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
+                          <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
+                          <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
                  </div>
                 <div id="topic-selection" class="grid grid-cols-3 gap-4">
                     <!-- Topic buttons will be injected here -->
@@ -90,18 +90,19 @@
                 <div class="flex justify-between items-center mb-2">
                     <div class="w-1/3 text-left">
                          <button id="back-to-topics-btn" class="text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-1 px-3 rounded-lg shadow-sm">
-                            <i class="fas fa-arrow-left mr-2"></i>Topics
-                        </button>
+                             <i class="fas fa-arrow-left mr-2"></i>Topics
+                         </button>
                     </div>
                     <div class="w-1/3 text-center">
                          <button id="samples-btn" class="hidden text-sm bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg shadow-md">
-                             <i class="fas fa-comment-dots mr-1"></i>Sample Answers
+                              <i class="fas fa-comment-dots mr-1"></i>Sample Answers
                          </button>
                     </div>
                     <div class="w-1/3 text-right">
                          <button id="next-btn" class="hidden text-sm bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 rounded-lg shadow-sm disabled:bg-indigo-400 dark:disabled:bg-indigo-800 disabled:cursor-not-allowed">
-                            Next<i class="fas fa-arrow-right ml-2"></i>
-                        </button>
+                             Next<i class="fas fa-arrow-right ml-2"></i>
+                         </button>
+                        <p id="pause-instruction" class="hidden text-xs text-gray-500 dark:text-gray-400 mt-1">按暂停键可暂停计时</p>
                     </div>
                 </div>
                 <!-- Timer Display -->
@@ -111,6 +112,9 @@
                         <circle id="timer-progress" class="timer-circle text-indigo-500" stroke-width="10" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
                     </svg>
                     <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-2xl font-bold"></div>
+                    <button id="pause-resume-btn" class="hidden absolute bottom-0 right-0 w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm shadow-md z-20 hover:bg-gray-300 dark:hover:bg-gray-500">
+                        <i class="fas fa-pause"></i>
+                    </button>
                 </div>
                 <p id="phase-indicator" class="font-semibold text-indigo-500 dark:text-indigo-400 mb-2 text-base flex-shrink-0"></p>
 
@@ -138,7 +142,7 @@
                             <!-- Smart Download button -->
                             <button id="download-btn"
                                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
-                                <i class="fas fa-download mr-1"></i>Download Recording
+                                 <i class="fas fa-download mr-1"></i>Download Recording
                             </button>
                             
                             <!-- Upload button -->
@@ -147,14 +151,14 @@
                                target="_blank"
                                rel="noopener noreferrer"
                                class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-green-500/50 focus:ring-2 focus:ring-green-400 focus:outline-none active:scale-95 flex items-center justify-center">
-                                <i class="fas fa-upload mr-1"></i>Upload to Folder
+                                 <i class="fas fa-upload mr-1"></i>Upload to Folder
                             </a>
                         </div>
                     </div>
                 </div>
                  <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold mb-1">
-                     <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
-                     Recording...
+                      <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
+                      Recording...
                  </div>
             </header>
             
@@ -456,7 +460,9 @@
             modalTitle: document.getElementById('modal-title'),
             modalMessage: document.getElementById('modal-message'),
             modalConfirmBtn: document.getElementById('modal-confirm-btn'),
-            modalCancelBtn: document.getElementById('modal-cancel-btn')
+            modalCancelBtn: document.getElementById('modal-cancel-btn'),
+            pauseResumeBtn: document.getElementById('pause-resume-btn'),
+            pauseInstruction: document.getElementById('pause-instruction')
         };
 
 
@@ -466,6 +472,7 @@
         let masterQuestionList = [];
         let currentQuestions = []; 
         let timerInterval;
+        let isTimerPaused = false;
         let mediaRecorder;
         let audioChunks = [];
         let recordedBlob = null;
@@ -615,6 +622,7 @@
             ui.practiceScreen.classList.remove('hidden');
             ui.certificateScreen.classList.add('hidden');
             ui.nextBtn.classList.remove('hidden');
+            ui.pauseInstruction.classList.remove('hidden');
             ui.samplesBtn.classList.remove('hidden');
             showQuestion();
         }
@@ -643,7 +651,9 @@
                 ui.questionText.textContent = "You've finished everything. Fantastic work!";
                 speak("You've finished everything. Fantastic work!");
                 ui.nextBtn.classList.add('hidden');
+                ui.pauseInstruction.classList.add('hidden');
                 ui.samplesBtn.classList.add('hidden');
+                ui.pauseResumeBtn.classList.add('hidden');
                 showCertificate();
                 return;
             }
@@ -692,6 +702,7 @@
                 ui.phaseIndicator.textContent = "Time's up! Click Next to continue.";
                 ui.recordBtn.disabled = true;
                 ui.recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                ui.pauseResumeBtn.classList.add('hidden');
                 ui.nextBtn.disabled = false;
             });
         }
@@ -791,13 +802,24 @@
             updateTimerDisplay(timeLeft, duration);
 
             timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay(timeLeft, duration);
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    if(onEndCallback) onEndCallback();
+                if (!isTimerPaused) {
+                    timeLeft--;
+                    updateTimerDisplay(timeLeft, duration);
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        if(onEndCallback) onEndCallback();
+                    }
                 }
             }, 1000);
+        }
+
+        function togglePauseTimer() {
+            isTimerPaused = !isTimerPaused;
+            if (isTimerPaused) {
+                ui.pauseResumeBtn.innerHTML = '<i class="fas fa-play"></i>';
+            } else {
+                ui.pauseResumeBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            }
         }
 
         function updateTimerDisplay(timeLeft, totalDuration) {
@@ -820,6 +842,10 @@
             ui.recordBtn.disabled = false;
             ui.recordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             resetRecordingUI();
+            
+            isTimerPaused = false;
+            ui.pauseResumeBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            ui.pauseResumeBtn.classList.remove('hidden');
         }
 
         function resetRecordingUI() {
@@ -851,6 +877,7 @@
 
         ui.recordBtn.addEventListener('click', startRecording);
         ui.stopRecordBtn.addEventListener('click', stopRecording);
+        ui.pauseResumeBtn.addEventListener('click', togglePauseTimer);
         
         ui.downloadCertificateBtn.addEventListener('click', () => {
           const certificateNode = document.getElementById('certificate-to-download');
@@ -989,3 +1016,4 @@
     </script>
 </body>
 </html>
+
