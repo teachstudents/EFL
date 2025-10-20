@@ -225,7 +225,7 @@
         // --- Praise Words ---
         const praiseWords = ["Awesome!", "Brilliant!", "You're a star!", "Geography Genius!", "Superb!", "Excellent!", "Fantastic!", "Incredible!", "Well Done!", "Perfect!", "Amazing!", "Outstanding!", "That's it!", "You got it!", "Top Marks!", "Way to go!"];
 
-        // --- Question Data (75 Questions) ---
+        // --- Question Data (100 Questions) ---
         const allQuestions = [
             // --- China ---
             { q: "What is the capital city of China?", o: ["Shanghai", "Beijing", "Hong Kong", "Tianjin"], a: "Beijing" },
@@ -240,20 +240,28 @@
             { q: "What is the currency used in Japan?", o: ["Yuan", "Yen", "Baht", "Won"], a: "Yen" },
             { q: "To fly from Tokyo, Japan to Moscow, Russia, what is your general direction of travel?", o: ["Southeast", "Southwest", "Northwest", "Northeast"], a: "Northwest" },
             { q: "If you travel by train from East to West across Asia, you would likely cross which country?", o: ["India", "Japan", "Russia", "Indonesia"], a: "Russia" },
-            
+            { q: "The city of Seoul is the bustling capital of which Asian country?", o: ["Japan", "China", "South Korea", "Thailand"], a: "South Korea" },
+            { q: "Dubai, known for its futuristic skyscrapers, is a major city in which Asian country?", o: ["Saudi Arabia", "Qatar", "United Arab Emirates", "Oman"], a: "United Arab Emirates" },
+            { q: "The nation of Indonesia, made up of thousands of islands, is part of which continent?", o: ["Australia", "Africa", "Asia", "South America"], a: "Asia" },
+
             // --- Australia ---
             { q: "What is the capital city of Australia?", o: ["Sydney", "Melbourne", "Perth", "Canberra"], a: "Canberra" },
             { q: "What is the primary currency used in Australia?", o: ["Pound", "Euro", "Dollar", "Franc"], a: "Dollar" },
             { q: "In which direction is New Zealand from Australia?", o: ["Northwest", "Southeast", "Southwest", "Northeast"], a: "Southeast" },
             { q: "The Sydney Opera House is an iconic building on which continent?", o: ["Asia", "Europe", "North America", "Australia"], a: "Australia" },
             { q: "A person from Australia is known by what nationality?", o: ["Austrian", "Australian", "Kiwi", "Aussie"], a: "Australian" },
-            
+            { q: "On which continent is the country of New Zealand located?", o: ["Asia", "Australia", "North America", "South America"], a: "Australia" },
+
             // --- Europe ---
             { q: "The Colosseum is an ancient amphitheater located in which European city?", o: ["Athens", "Paris", "Rome", "London"], a: "Rome" },
             { q: "Many countries in Europe, like Germany and France, use what common currency?", o: ["Pound", "Franc", "Mark", "Euro"], a: "Euro" },
             { q: "If you take a boat from England to France, you travel in which direction?", o: ["North", "West", "South", "East"], a: "South" },
             { q: "The Eiffel Tower is a well-known landmark on which continent?", o: ["Asia", "South America", "Europe", "Africa"], a: "Europe" },
             { q: "What is the best mode of transport for travelling quickly between London and Paris?", o: ["Car", "Boat", "Bus", "Train"], a: "Train" },
+            { q: "In which country would you find the city of Barcelona, famous for its unique architecture?", o: ["Portugal", "Italy", "Spain", "France"], a: "Spain" },
+            { q: "The historic city of Athens is the capital of which European country?", o: ["Italy", "Turkey", "Egypt", "Greece"], a: "Greece" },
+            { q: "The country of Poland is located on which continent?", o: ["Asia", "Africa", "Europe", "South America"], a: "Europe" },
+            { q: "On which continent would you find the country of Sweden?", o: ["Asia", "North America", "Europe", "Australia"], a: "Europe" },
             
             // --- North America ---
             { q: "What is the capital of Canada?", o: ["Toronto", "Vancouver", "Montreal", "Ottawa"], a: "Ottawa" },
@@ -261,13 +269,17 @@
             { q: "The Statue of Liberty is a famous monument located on which continent?", o: ["Europe", "North America", "South America", "Asia"], a: "North America" },
             { q: "Besides English, what is the other official language of Canada?", o: ["Spanish", "German", "Mandarin", "French"], a: "French" },
             { q: "If you are in New York, USA, and fly Northeast across the Atlantic, where might you land?", o: ["Brazil", "United Kingdom", "Australia", "Mexico"], a: "United Kingdom" },
-            
+            { q: "Vancouver is a major city on the west coast of which North American country?", o: ["USA", "Mexico", "Canada", "Greenland"], a: "Canada" },
+            { q: "The country of Cuba is an island nation on which continent?", o: ["South America", "North America", "Africa", "Europe"], a: "North America" },
+
             // --- South America ---
             { q: "The Christ the Redeemer statue overlooks which Brazilian city?", o: ["São Paulo", "Brasília", "Salvador", "Rio de Janeiro"], a: "Rio de Janeiro" },
             { q: "Machu Picchu is a famous Incan citadel located on which continent?", o: ["Africa", "Asia", "South America", "Europe"], a: "South America" },
             { q: "Which continent is located directly Southeast of North America?", o: ["Asia", "Africa", "Australia", "South America"], a: "South America" },
             { q: "What is the currency of Brazil?", o: ["Peso", "Real", "Sol", "Guaraní"], a: "Real" },
             { q: "The Andes Mountains run along the western coast of which continent?", o: ["North America", "Asia", "Africa", "South America"], a: "South America" },
+            { q: "In which South American country is the city of Buenos Aires located?", o: ["Brazil", "Chile", "Argentina", "Colombia"], a: "Argentina" },
+            { q: "The country of Chile, known for its long coastline, is on which continent?", o: ["North America", "South America", "Africa", "Antarctica"], a: "South America" },
             
             // --- Africa ---
             { q: "The Great Pyramids of Giza are located in which African country?", o: ["Nigeria", "Egypt", "South Africa", "Morocco"], a: "Egypt" },
@@ -275,10 +287,12 @@
             { q: "Africa is located in which primary direction from Europe?", o: ["North", "East", "West", "South"], a: "South" },
             { q: "The Sahara Desert, the world's largest hot desert, has what typical weather?", o: ["Cold and wet", "Hot and dry", "Mild and humid", "Cold and dry"], a: "Hot and dry" },
             { q: "On which continent would you find Victoria Falls?", o: ["South America", "Africa", "Asia", "Australia"], a: "Africa" },
+            { q: "Cairo is the capital city of which African nation?", o: ["Nigeria", "Kenya", "South Africa", "Egypt"], a: "Egypt" },
+            { q: "On which continent is the country of Kenya located?", o: ["South America", "Asia", "Australia", "Africa"], a: "Africa" },
+            { q: "The country of Morocco is on the northwestern tip of which continent?", o: ["Europe", "South America", "Africa", "Asia"], a: "Africa" },
 
             // --- Mixed / Complex Questions ---
             { q: "To travel from Europe to North America, which direction do you primarily go?", o: ["East", "West", "South", "North"], a: "West" },
-            { q: "Which of these travel routes between continents is impossible by train alone?", o: ["France to Germany", "China to Russia", "USA to Japan", "Spain to Portugal"], a: "USA to Japan" },
             { q: "What mode of transport is essential to get from South America to Antarctica?", o: ["Bus", "Train", "Car", "Boat"], a: "Boat" },
             { q: "Which continent lies in all four hemispheres?", o: ["South America", "Asia", "Europe", "Africa"], a: "Africa" },
             { q: "To fly from Australia to South America, you would fly across which ocean in an easterly direction?", o: ["Indian", "Atlantic", "Arctic", "Pacific"], a: "Pacific" },
@@ -292,7 +306,6 @@
             { q: "If you sail west from Europe, which continent do you reach first?", o: ["Asia", "Africa", "North America", "South America"], a: "North America" },
             { q: "Traveling South from North America across the narrowest point of land leads you to which continent?", o: ["Australia", "Antarctica", "Africa", "South America"], a: "South America" },
             { q: "Australia is located to the Southeast of which continent?", o: ["Africa", "Europe", "South America", "Asia"], a: "Asia" },
-
 
             // --- Nationalities and Populations ---
             { q: "Which country has the largest population in the world?", o: ["USA", "India", "Indonesia", "Pakistan"], a: "India" },
@@ -309,7 +322,29 @@
             { q: "What is the nationality of a person from Egypt?", o: ["Egyptese", "Nilean", "Egyptian", "Coptic"], a: "Egyptian" },
             { q: "If you are from Peru, you are...", o: ["Peruvian", "Peruan", "Perunese", "Incan"], a: "Peruvian" },
             { q: "A person from Nigeria has what nationality?", o: ["Ghanian", "Nigerian", "Kenyan", "Naija"], a: "Nigerian" },
-            { q: "What do you call someone from Finland?", o: ["Fin", "Finnish", "Finlandian", "Finner"], a: "Finnish" }
+            { q: "What do you call someone from Finland?", o: ["Fin", "Finnish", "Finlandian", "Finner"], a: "Finnish" },
+            
+            // --- Oceans, Islands, Environment, Weather ---
+            { q: "Which is the largest ocean in the world by area?", o: ["Atlantic", "Indian", "Arctic", "Pacific"], a: "Pacific" },
+            { q: "What is the world's largest island?", o: ["Greenland", "New Guinea", "Borneo", "Madagascar"], a: "Greenland" },
+            { q: "The Amazon Rainforest is primarily located on which continent?", o: ["Africa", "Asia", "South America", "Australia"], a: "South America" },
+            { q: "What type of climate is typically found along the Earth's equator?", o: ["Polar", "Temperate", "Tropical", "Desert"], a: "Tropical" },
+            { q: "The Great Barrier Reef is located off the coast of which continent?", o: ["Asia", "Australia", "Africa", "South America"], a: "Australia" },
+            { q: "Which is the smallest and shallowest of the world's five oceans?", o: ["Southern", "Indian", "Atlantic", "Arctic"], a: "Arctic" },
+            { q: "The island of Honshu, home to Tokyo, is the main island of which country?", o: ["Philippines", "Indonesia", "Japan", "Malaysia"], a: "Japan" },
+            { q: "Monsoons are seasonal winds that bring heavy rainfall, most famously to which continent?", o: ["Europe", "Asia", "North America", "Africa"], a: "Asia" },
+            { q: "The Atlantic Ocean separates the Americas from which two continents?", o: ["Asia and Australia", "Africa and Europe", "Asia and Africa", "Europe and Asia"], a: "Africa and Europe" },
+            { q: "The 'Ring of Fire' is an area of high volcanic activity surrounding which ocean?", o: ["Atlantic", "Indian", "Pacific", "Arctic"], a: "Pacific" },
+            { q: "What name is given to the ocean surrounding Antarctica?", o: ["Antarctic Ocean", "South Pacific", "Southern Ocean", "South Atlantic"], a: "Southern Ocean" },
+            { q: "The island of Great Britain is part of which continent?", o: ["North America", "Asia", "Africa", "Europe"], a: "Europe" },
+            { q: "Hawaii is a famous archipelago (island chain) in which ocean?", o: ["Atlantic", "Pacific", "Indian", "Arctic"], a: "Pacific" },
+            { q: "The Atacama, one of the driest deserts in the world, is found on which continent?", o: ["Australia", "Africa", "North America", "South America"], a: "South America" },
+            { q: "The climate of Siberia in Russia is best described as which of the following?", o: ["Tropical", "Mediterranean", "Subarctic", "Desert"], a: "Subarctic" },
+            { q: "Tsunamis, or giant harbor waves, are most often caused by underwater...?", o: ["Volcanoes", "Landslides", "Earthquakes", "Storms"], a: "Earthquakes" },
+            { q: "Madagascar is a large island nation located in which ocean?", o: ["Pacific", "Atlantic", "Indian", "Arctic"], a: "Indian" },
+            { q: "The Aurora Borealis (Northern Lights) is a natural light display seen near the...?", o: ["Equator", "Tropic of Cancer", "Arctic Circle", "Prime Meridian"], a: "Arctic Circle" },
+            { q: "The vast, treeless plains of the central United States are known as what?", o: ["Steppes", "Savannas", "Prairies", "Pampas"], a: "Prairies" },
+            { q: "Which of these is a large island in the Mediterranean Sea?", o: ["Iceland", "Sri Lanka", "Sicily", "Cuba"], a: "Sicily" }
         ];
 
         // --- Audio Context for Sound Effects ---
