@@ -16,7 +16,7 @@
     .screen { 
       display: none; 
       height: calc(100vh - 72px); /* Full viewport height minus new header height */
-      overflow-y: auto; 
+      overflow-y: hidden; /* Force no scrolling */
     }
     .screen.active { 
       display: flex; 
@@ -27,17 +27,18 @@
       font-weight: 700;
       text-align: center;
       color: #312e81;
-      padding: 1rem 0;
+      padding: 0.5rem 0; /* Reduced padding */
     }
     .practice-card {
       background-color: white;
       border-radius: 1rem;
-      padding: 1rem;
-      margin: 0.5rem;
+      padding: 0.5rem; /* Tighter card padding */
+      margin: 0.25rem 0.5rem; /* Tighter card margin */
       box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
       flex-grow: 1;
       display: flex;
       flex-direction: column;
+      justify-content: center; /* Center content vertically */
     }
     .qa-list {
       list-style-position: inside;
@@ -45,17 +46,34 @@
     }
     .qa-list li {
       background-color: #f4f4f5;
-      padding: 0.5rem;
+      padding: 0.25rem 0.5rem; /* Tighter item padding */
       border-radius: 0.5rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem; /* Tighter item margin */
       cursor: pointer;
       transition: background-color 0.2s, transform 0.2s;
-      font-size: 1.75rem; /* Further increased font size */
+      font-size: 2.1rem; /* Much larger font */
+      line-height: 1.1; /* Tighter line height */
     }
     .qa-list li:hover {
       background-color: #e0e7ff;
       transform: translateX(5px);
     }
+    
+    /* Titles on practice card */
+    .practice-card-title {
+        font-size: 1.125rem; /* text-lg */
+        margin-bottom: 0.25rem; /* mb-1 */
+    }
+    /* Emoji on practice card */
+    .practice-emoji-container {
+        font-size: 3rem; /* text-5xl */
+        line-height: 1;
+    }
+    /* Name on practice card */
+    .practice-name-container {
+        font-size: 1.25rem; /* text-xl */
+    }
+
     #confetti-canvas {
       position: fixed;
       top: 0;
@@ -100,6 +118,29 @@
         40% { transform: translate(-50%, -50%) scale(1); }
         100% { transform: translate(-50%, -100%) scale(1); opacity: 0; }
     }
+    
+    /* --- ANIMATIONS --- */
+    .emoji-move {
+      display: inline-block;
+      animation: floaty 2s ease-in-out infinite;
+    }
+    @keyframes floaty {
+      0%   { transform: translateY(0); }
+      50%  { transform: translateY(-6px); }
+      100% { transform: translateY(0); }
+    }
+    .emoji-move:hover {
+      animation: wiggle 0.4s ease-in-out;
+    }
+    @keyframes wiggle {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-10deg); }
+      50% { transform: rotate(10deg); }
+      75% { transform: rotate(-10deg); }
+      100% { transform: rotate(0deg); }
+    }
+    /* --- END ANIMATIONS --- */
+
   </style>
 </head>
 <body class="antialiased">
@@ -147,7 +188,7 @@
         bear: { emoji: "🐻", plural: { text: "bears", emoji: "🐻🐻" }, habitat: "the forest", questions: ["What sound does a bear make?", "Where does a bear live?", "What is a baby bear called?", "What do bears do in winter?"], answers: ["A bear growls.", "A bear lives in the forest.", "A baby bear is a cub.", "Bears hibernate in the winter."] },
         panda: { emoji: "🐼", plural: { text: "pandas", emoji: "🐼🐼" }, habitat: "bamboo forests in China", questions: ["What sound does a panda make?", "Where does a panda live?", "What is a baby panda called?", "What does a panda eat?"], answers: ["A panda bleats, which sounds like a goat.", "A panda lives in bamboo forests in China.", "A baby panda is a cub.", "A panda almost only eats bamboo."] },
         lion: { emoji: "🦁", plural: { text: "lions", emoji: "🦁🦁" }, habitat: "the grasslands of Africa", questions: ["What sound does a lion make?", "Where does a lion live?", "What is a baby lion called?", "What is a group of lions called?"], answers: ["A lion roars.", "A lion lives on the grasslands of Africa.", "A baby lion is a cub.", "A group of lions is called a pride."] },
-        tiger: { emoji: "🐯", plural: { text: "tigers", emoji: "🐯🐯" }, habitat: "the jungle", questions: ["What sound does a tiger make?", "Where does a tiger live?", "What is a baby tiger called?", "What is a fun fact about tigers?"], answers: ["A tiger roars and chuffs.", "A tiger lives in the jungle.", "A baby tiger is a cub.", "Every tiger has a unique pattern of stripes."] },
+        tiger: { emoji: "🐯", plural: { text: "tigers", emoji: "🐯🐯" }, habitat: "the jungle", questions: ["What sound does a tiger make?", "Where does a tiger live?", "What is a baby tiger called?", "What is a fun fact about tigers?"], answers: ["A tiger roars and chuffs.", "A tiger lives in thejungle.", "A baby tiger is a cub.", "Every tiger has a unique pattern of stripes."] },
         cow: { emoji: "🐮", plural: { text: "cows", emoji: "🐮🐮" }, habitat: "a farm", questions: ["What sound does a cow make?", "Where does a cow live?", "What is a baby cow called?", "What does a cow eat?"], answers: ["A cow moos.", "A cow lives on a farm.", "A baby cow is a calf.", "A cow eats grass."] },
         pig: { emoji: "🐷", plural: { text: "pigs", emoji: "🐷🐷" }, habitat: "a farm", questions: ["What sound does a pig make?", "Where does a pig live?", "What is a baby pig called?", "What is a fun fact about pigs?"], answers: ["A pig oinks.", "A pig lives on a farm.", "A baby pig is a piglet.", "Pigs are very intelligent animals."] },
         monkey: { emoji: "🐵", plural: { text: "monkeys", emoji: "🐵🐵" }, habitat: "the jungle", questions: ["What sound does a monkey make?", "Where does a monkey live?", "What is a baby monkey called?", "What do monkeys use their tails for?"], answers: ["A monkey chatters.", "A monkey lives in the jungle.", "A baby monkey is an infant.", "Monkeys use their tails for balance."] },
@@ -174,7 +215,7 @@
         chicken: { emoji: "🐔", plural: { text: "chickens", emoji: "🐔🐔" }, habitat: "a farm", questions: ["What sound does a chicken make?", "Where does a chicken live?", "What is a baby chicken called?", "What can a chicken lay?"], answers: ["A chicken clucks.", "A chicken lives on a farm.", "A baby chicken is a chick.", "A chicken can lay eggs."] },
         duck: { emoji: "🦆", plural: { text: "ducks", emoji: "🦆🦆" }, habitat: "a pond or river", questions: ["What sound does a duck make?", "Where does a duck live?", "What is a baby duck called?", "What is a fun fact about a duck's feathers?"], answers: ["A duck quacks.", "A duck lives near a pond or river.", "A baby duck is a duckling.", "A duck's feathers are waterproof."] },
         flamingo: { emoji: "🦩", plural: { text: "flamingos", emoji: "🦩🦩" }, habitat: "lakes and lagoons", questions: ["What sound does a flamingo make?", "Where does a flamingo live?", "What is a baby flamingo called?", "Why are flamingos pink?"], answers: ["A flamingo makes a honking sound.", "A flamingo lives near lakes and lagoons.", "A baby flamingo is a chick.", "They are pink because of the food they eat."] },
-        swan: { emoji: "🦢", plural: { text: "swans", emoji: "🦢🦢" }, habitat: "a lake or pond", questions: ["What sound does a swan make?", "Where does a swan live?", "What is a baby swan called?", "What is special about a swan's neck?"], answers: ["A swan hisses or makes a trumpet-like sound.", "A swan lives on a lake or pond.", "A baby swan is a cygnet.", "A swan has a long, graceful neck."] },
+        swan: { emoji: "🦢", plural: { text: "swans", emoji: "🦢🦢" }, habitat:"a lake or pond", questions: ["What sound does a swan make?", "Where does a swan live?", "What is a baby swan called?", "What is special about a swan's neck?"], answers: ["A swan hisses or makes a trumpet-like sound.", "A swan lives on a lake or pond.", "A baby swan is a cygnet.", "A swan has a long, graceful neck."] },
         bird: { emoji: "🐦", plural: { text: "birds", emoji: "🐦🐦" }, habitat: "trees", questions: ["What sound does a bird make?", "Where does a bird live?", "What is a baby bird called?", "What do most birds eat?"], answers: ["A bird chirps or sings.", "A bird lives in a nest in trees.", "A baby bird is a chick.", "Most birds eat seeds or insects."] },
         chick: { emoji: "🐤", plural: { text: "chicks", emoji: "🐤🐤" }, habitat: "a farm", questions: ["What sound does a chick make?", "Where does a chick live?", "What is a baby chicken called?", "What does a chick grow into?"], answers: ["A chick peeps.", "A chick lives on a farm.", "A baby chicken is called a chick.", "A chick grows into a chicken."] },
         lizard: { emoji: "🦎", plural: { text: "lizards", emoji: "🦎🦎" }, habitat: "the desert or forest", questions: ["What sound does a lizard make?", "Where does a lizard live?", "What is a baby lizard called?", "What kind of skin does a lizard have?"], answers: ["A lizard is mostly quiet but can hiss.", "A lizard lives in the desert or forest.", "A baby lizard is a hatchling.", "A lizard has scaly skin."] },
@@ -226,11 +267,12 @@
       function findVoices(voices) {
         const maleVoiceNames = ['Brian', 'Andrew'];
         maleVoice = voices.find(voice => maleVoiceNames.some(name => voice.name.includes(name) && voice.lang.startsWith('en')));
-
-        // Prioritize Emma, then look for Ava as a fallback
-        const emmaVoice = voices.find(voice => voice.name.includes('Emma') && voice.lang.startsWith('en'));
-        const avaVoice = voices.find(voice => voice.name.includes('Ava') && voice.lang.startsWith('en'));
-        femaleVoice = emmaVoice || avaVoice;
+        
+        // Prioritize Emma, then Ava
+        femaleVoice = voices.find(voice => voice.name.includes('Emma') && voice.lang.startsWith('en'));
+        if (!femaleVoice) {
+            femaleVoice = voices.find(voice => voice.name.includes('Ava') && voice.lang.startsWith('en'));
+        }
       }
 
       document.body.addEventListener('click', initAudio, { once: true });
@@ -258,6 +300,10 @@
 
           // Add bold effect and set timer to remove it
           if (element) {
+            // Remove bold from all other items in the same list
+            const listItems = element.parentElement.querySelectorAll('li');
+            listItems.forEach(li => li.classList.remove('font-bold'));
+            
             element.classList.add('font-bold');
             setTimeout(() => {
               element.classList.remove('font-bold');
@@ -297,30 +343,40 @@
 
         currentAnimalIndex = animalsList.indexOf(animalName);
         
-        const pluralHTML = `
-            <div class="flex items-center justify-center gap-2 mt-1 text-xl font-bold text-gray-600">
-                <span>${data.plural.emoji}</span> <span>${data.plural.text}</span>
-            </div>`;
-
         practiceScreen.innerHTML = `
-          <div class="grid grid-cols-12 gap-2 h-full p-2">
-            <div class="practice-card col-span-5">
-              <h2 class="text-xl font-bold mb-2 text-rose-600 text-center">Questions</h2>
-              <ol class="qa-list space-y-1">
-                ${data.questions.map(q => `<li onclick="speak('${q.replace(/'/g, "\\'")}', 'question', this)">${q}</li>`).join('')}
-              </ol>
+          <div class="flex flex-col h-full p-2">
+            
+            <!-- Top section: Q&A and Emoji -->
+            <div class="grid grid-cols-12 gap-2 flex-grow min-h-0">
+              
+              <!-- Questions -->
+              <div class="practice-card col-span-5">
+                <h2 class="text-lg font-bold mb-1 text-rose-600 text-center practice-card-title">Questions</h2>
+                <ol class="qa-list">
+                  ${data.questions.map(q => `<li onclick="speak('${q.replace(/'/g, "\\'")}', 'question', this)">${q}</li>`).join('')}
+                </ol>
+              </div>
+              
+              <!-- Emoji -->
+              <div class="flex flex-col items-center justify-center col-span-2">
+                <div class="text-5xl emoji-move practice-emoji-container">${data.emoji}</div>
+                <h1 class="text-xl font-bold mt-1 text-indigo-800 practice-name-container">${animalName}</h1>
+              </div>
+
+              <!-- Answers -->
+              <div class="practice-card col-span-5">
+                <h2 class="text-lg font-bold mb-1 text-green-600 text-center practice-card-title">Answers</h2>
+                <ol class="qa-list">
+                  ${data.answers.map(a => `<li onclick="speak('${a.replace(/'/g, "\\'")}', 'answer', this)">${a}</li>`).join('')}
+                </ol>
+              </div>
             </div>
-            <div class="flex flex-col items-center justify-center col-span-2">
-              <div class="text-6xl">${data.emoji}</div>
-              <h1 class="text-2xl font-bold mt-1 text-indigo-800">${animalName}</h1>
-              ${pluralHTML}
+
+            <!-- Bottom section: Spacer -->
+            <div class="flex-shrink-0 h-1/4">
+               <!-- This area is intentionally blank -->
             </div>
-            <div class="practice-card col-span-5">
-              <h2 class="text-xl font-bold mb-2 text-green-600 text-center">Answers</h2>
-              <ol class="qa-list space-y-1">
-                ${data.answers.map(a => `<li onclick="speak('${a.replace(/'/g, "\\'")}', 'answer', this)">${a}</li>`).join('')}
-              </ol>
-            </div>
+
           </div>
         `;
         showScreen(2);
@@ -359,7 +415,7 @@
           const word = document.createElement('div');
           word.className = 'praise-word';
           word.textContent = praiseWords[Math.floor(Math.random() * praiseWords.length)];
-          word.style.setProperty('--color', praiseColors[Math.floor(Math.random() * praiseColors.length)]);
+          word.style.setProperty('--color', praiseColors[Math.floor(Math.random()* praiseColors.length)]);
           document.body.appendChild(word);
           setTimeout(() => word.remove(), 1500);
       }
@@ -370,7 +426,7 @@
         const btn = document.createElement('button');
         btn.className = "bg-white rounded-lg shadow p-2 text-center transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-indigo-500";
         btn.innerHTML = `
-          <div class="text-4xl">${data.emoji}</div>
+          <div class="text-4xl emoji-move">${data.emoji}</div>
           <div class="font-bold text-sm">${animalName}</div>
         `;
         btn.onclick = () => createPracticePage(animalName);
@@ -432,7 +488,7 @@
               p.x += Math.sin(p.angle);
               
               ctx.save();
-              ctx.translate(p.x, p.y);
+              ctx.translate(p.x, p.Y);
               ctx.rotate(p.angle);
               ctx.fillStyle = p.color;
               ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
