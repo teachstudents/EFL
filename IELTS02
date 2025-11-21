@@ -1,0 +1,735 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Play, ArrowRight, Coins, CheckCircle, XCircle, Trophy, StopCircle, Eye, Home, Lightbulb, User, SkipForward } from 'lucide-react';
+
+// --- Audio FX Helper ---
+const playSoundFx = (type) => {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+  
+  const ctx = new AudioContext();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  if (type === 'correct') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(523.25, ctx.currentTime); 
+    osc.frequency.exponentialRampToValueAtTime(1046.5, ctx.currentTime + 0.1); 
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.5);
+  } else {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, ctx.currentTime);
+    osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.3);
+  }
+};
+
+// --- Feedback Phrases ---
+const PRAISE_PHRASES = ["Spot on!", "Brilliant!", "Exactly right!", "Well done!", "Perfect!", "Good job!"];
+const ENCOURAGE_PHRASES = ["Not quite.", "That was a tricky one.", "Watch out for the trap.", "Almost.", "Keep listening closely."];
+
+// --- Logic Helpers ---
+
+const formatSpokenText = (text, type) => {
+  if (!text) return "";
+  let spoken = text;
+
+  if (type === 'spelling') {
+    spoken = spoken.replace(/([A-Z])\1\1/g, "Triple $1 ");
+    spoken = spoken.replace(/([A-Z])\1/g, "Double $1 ");
+    spoken = spoken.split('').join('. ');
+  }
+  
+  if (type === 'number') {
+    spoken = spoken.replace(/(\d)\1\1/g, "Triple $1 ");
+    spoken = spoken.replace(/(\d)\1/g, "Double $1 ");
+    spoken = spoken.replace(/\d/g, '$& '); 
+  }
+  
+  return spoken;
+};
+
+const generateUniqueOptions = (correct, type) => {
+  const options = new Set([correct]);
+  let safeCounter = 0;
+  
+  while (options.size < 4 && safeCounter < 50) {
+    safeCounter++;
+    let fake = correct;
+    
+    if (type === 'spelling') {
+      const rand = Math.random();
+      if (rand < 0.3) fake = correct.replace(/(.)\1/, '$1'); // Remove double
+      else if (rand < 0.6) fake = correct + "S"; 
+      else fake = correct.replace(/[AEIOU]/, (m) => m === 'E' ? 'A' : 'E');
+    } else if (type === 'number') {
+      const arr = correct.split('');
+      // Pick a random digit to change (skipping the '07' prefix)
+      const idx = Math.floor(Math.random() * (arr.length - 2)) + 2;
+      if (!isNaN(parseInt(arr[idx]))) {
+        arr[idx] = (parseInt(arr[idx]) + Math.floor(Math.random() * 8) + 1) % 10;
+        fake = arr.join('');
+      }
+    } else if (type === 'price') {
+       const val = parseFloat(correct.replace('£', ''));
+       // Ensure we generate a clean looking price
+       const modifier = Math.floor(Math.random() * 4 + 1) * 5; // 5, 10, 15, 20
+       const sign = Math.random() > 0.5 ? 1 : -1;
+       fake = `£${(val + (modifier * sign)).toFixed(2)}`;
+    } else if (type === 'time') {
+       const [h, m] = correct.split(':').map(Number);
+       // Random minute shift
+       let newM = (m + (Math.random() > 0.5 ? 15 : -15) + 60) % 60;
+       if (newM === m) newM = (m + 30) % 60;
+       // Occasionally change hour
+       let newH = h;
+       if (Math.random() > 0.7) newH = (h % 12) + 1;
+       
+       fake = `${newH}:${newM < 10 ? '0'+newM : newM}`;
+    } else if (type === 'date') {
+       const parts = correct.split(' '); // "12th May"
+       const day = parseInt(parts[0]);
+       const month = parts[1];
+       // Random day shift +/- 1 to 7
+       let shift = Math.floor(Math.random() * 7) + 1;
+       if (Math.random() > 0.5) shift = -shift;
+       let newDay = day + shift;
+       if (newDay < 1) newDay = 1;
+       if (newDay > 30) newDay = 28; // Safe cap
+       
+       fake = `${newDay}th ${month}`;
+    }
+    
+    // Only add if truly unique
+    if (fake !== correct && fake.length > 1 && !fake.includes('NaN')) {
+      options.add(fake);
+    }
+  }
+  
+  // Emergency fallback
+  const fallbackOpts = Array.from(options);
+  while (fallbackOpts.length < 4) {
+    if (type === 'number') fallbackOpts.push(correct.substring(0, correct.length-1) + (fallbackOpts.length + 1));
+    else fallbackOpts.push(correct + " " + (fallbackOpts.length));
+  }
+  
+  return fallbackOpts.sort(() => Math.random() - 0.5);
+};
+
+// --- Topic-Specific Dialogue Generator ---
+const createDialogue = (q, char1, char2) => {
+  const distractors = q.options.filter(o => o !== q.correctAnswer);
+  const d1 = distractors[0] || "Error";
+  const d2 = distractors[1] || "Error";
+
+  const spokenCorrect = formatSpokenText(q.correctAnswer, q.type);
+  const spokenD1 = formatSpokenText(d1, q.type);
+  const spokenD2 = formatSpokenText(d2, q.type);
+
+  const pattern = Math.floor(Math.random() * 3); 
+
+  // 1. SPELLING: Forms, Lists, Registers
+  if (q.type === 'spelling') {
+    if (pattern === 0) { // Correction
+      return [
+        { speaker: char1, text: `I'm struggling to read this handwriting. Is it ${spokenD1}?` },
+        { speaker: char2, text: `No, sorry for the scribble. It's ${spokenCorrect}.` },
+        { speaker: char1, text: `Ah, ${spokenCorrect}. I see it now.` }
+      ];
+    } else if (pattern === 1) { // Confirmation
+      return [
+        { speaker: char1, text: `Surname is ${spokenCorrect}.` },
+        { speaker: char2, text: `Just to check, is that spelled like ${spokenD1}?` },
+        { speaker: char1, text: `No, ${spokenCorrect}.` }
+      ];
+    } else { // Self-Correction
+      return [
+        { speaker: char2, text: `My last name is ${spokenD1}... oh wait, I spelled that wrong.` },
+        { speaker: char1, text: `Oh? How should it be?` },
+        { speaker: char2, text: `It is actually ${spokenCorrect}.` }
+      ];
+    }
+  } 
+  
+  // 2. NUMBERS: Mobiles, Sims, Errors
+  else if (q.type === 'number') {
+    if (pattern === 0) { // Old vs New
+      return [
+        { speaker: char1, text: `Do you still use ${spokenD1}?` },
+        { speaker: char2, text: `That's my old sim. My new number is ${spokenCorrect}.` },
+        { speaker: char1, text: `Right, I'll update the system.` }
+      ];
+    } else if (pattern === 1) { // Mishearing
+      return [
+        { speaker: char2, text: `My number is ${spokenCorrect}.` },
+        { speaker: char1, text: `Sorry, did you say ${spokenD1}? The line is bad.` },
+        { speaker: char2, text: `No, ${spokenCorrect}.` }
+      ];
+    } else { // Writing down
+      return [
+        { speaker: char1, text: `Can I take a contact number?` },
+        { speaker: char2, text: `Sure, it's ${spokenCorrect}.` },
+        { speaker: char1, text: `Okay, ${spokenCorrect}. Got it.` }
+      ];
+    }
+  }
+
+  // 3. PRICES: Student Discounts, Deposits, Totals
+  else if (q.type === 'price') {
+    if (pattern === 0) { // Discount
+      return [
+        { speaker: char1, text: `The standard adult price is ${spokenD1}.` },
+        { speaker: char2, text: `I'm actually a student.` },
+        { speaker: char1, text: `In that case, it's discounted to ${spokenCorrect}.` }
+      ];
+    } else if (pattern === 1) { // Correction
+      return [
+        { speaker: char1, text: `That will be ${spokenD1}, please.` },
+        { speaker: char1, text: `Oh, my apologies, that's last year's price.` },
+        { speaker: char1, text: `It's actually ${spokenCorrect} now.` },
+        { speaker: char2, text: `That's fine.` }
+      ];
+    } else { // Deposit vs Total
+      return [
+        { speaker: char1, text: `You need to pay a deposit of ${spokenD1} now.` },
+        { speaker: char2, text: `And what is the total cost?` },
+        { speaker: char1, text: `The total is ${spokenCorrect}.` }
+      ];
+    }
+  }
+
+  // 4. DATES: Appointments, Fully Booked
+  else if (q.type === 'date') {
+    if (pattern === 0) { // Unavailability
+      return [
+        { speaker: char1, text: `Can you come in on the ${spokenD1}?` },
+        { speaker: char2, text: `I'm afraid I'm working then. Is the ${spokenCorrect} free?` },
+        { speaker: char1, text: `Yes, let me book you in for the ${spokenCorrect}.` }
+      ];
+    } else if (pattern === 1) { // Change of plan
+      return [
+        { speaker: char2, text: `We originally scheduled the ${spokenD1}.` },
+        { speaker: char1, text: `Yes, but the doctor is away then.` },
+        { speaker: char1, text: `We've moved it to the ${spokenCorrect}.` }
+      ];
+    } else { // Option Selection
+      return [
+        { speaker: char1, text: `We have the ${spokenD1} or the ${spokenCorrect} available.` },
+        { speaker: char2, text: `The ${spokenD1} is too soon for me.` },
+        { speaker: char2, text: `I'll take the ${spokenCorrect}.` }
+      ];
+    }
+  }
+
+  // 5. TIME: Bus/Train, Arrival/Departure
+  else { // Time
+    if (pattern === 0) { // Arrival vs Departure
+      return [
+        { speaker: char1, text: `What time does the train leave? ${spokenD1}?` },
+        { speaker: char2, text: `No, that's when it arrives in London.` },
+        { speaker: char2, text: `It departs at ${spokenCorrect}.` }
+      ];
+    } else if (pattern === 1) { // Express vs Normal
+      return [
+        { speaker: char1, text: `There is a slow bus at ${spokenD1}.` },
+        { speaker: char2, text: `Is there anything faster?` },
+        { speaker: char1, text: `Yes, the express leaves at ${spokenCorrect}.` }
+      ];
+    } else { // Misreading
+      return [
+        { speaker: char1, text: `Let's meet at ${spokenD1}.` },
+        { speaker: char2, text: `Wait, the library doesn't open until ${spokenCorrect}.` },
+        { speaker: char1, text: `Okay, let's make it ${spokenCorrect} then.` }
+      ];
+    }
+  }
+};
+
+const SCENARIOS = [
+  { type: 'spelling', context: 'Spelling Names', icon: '🔤', strategy: "Listen for 'Double' or 'Triple' letters. The answer is often corrected after a mistake." },
+  { type: 'number', context: 'Phone Numbers', icon: '#️⃣', strategy: "Listen for 'Double' digits. The first number they say is often an old or incorrect one." },
+  { type: 'date', context: 'Dates & Schedules', icon: '📅', strategy: "Listen for rejection words like 'busy' or 'full'. The first date mentioned is rarely the answer." },
+  { type: 'price', context: 'Prices & Money', icon: '💰', strategy: "Distinguish between 'Deposit', 'Standard Rate', and the final 'Discounted' price." },
+  { type: 'time', context: 'Time & Travel', icon: '⌚', strategy: "Be careful with 'Quarter to' (2:45) vs 'Quarter past' (2:15). Wait for the final agreement." },
+];
+
+const generateQuestions = () => {
+  const lastNames = ['WINTERBOTTOM', 'KINGSLEY', 'CHARLESTON', 'WESTINGHOUSE', 'BLACKWOOD', 'HAWTHORNE', 'RICHARDSON', 'SUTHERLAND', 'MCCARTHY', 'FITZGERALD', 'COLLINGWOOD', 'BEAUMONT', 'HARRINGTON', 'PENNINGTON', 'DONCASTER', 'LIVINGSTONE', 'MONTGOMERY', 'STANISLAV', 'RODRIGUEZ', 'VANBUREN'];
+  const questions = [];
+
+  // 100 Questions Total (20 per category)
+  for (let i = 0; i < 100; i++) {
+    const scenarioIndex = Math.floor(i / 20); 
+    const scenario = SCENARIOS[scenarioIndex];
+    const difficulty = (i % 20) + 1; 
+    
+    let q = { 
+      id: i + 1, 
+      difficulty, 
+      context: scenario.context, 
+      icon: scenario.icon, 
+      type: scenario.type,
+      strategy: scenario.strategy 
+    };
+    
+    const pairIndex = i % 2; 
+    q.char1 = pairIndex === 0 ? 'Ava' : 'Emma'; 
+    q.char2 = pairIndex === 0 ? 'Brian' : 'Andrew';
+
+    // Generate Content
+    if (scenario.type === 'spelling') {
+      const surname = lastNames[i % lastNames.length];
+      q.questionText = "Surname:";
+      q.correctAnswer = surname;
+      q.options = generateUniqueOptions(surname, 'spelling');
+    } 
+    else if (scenario.type === 'number') {
+      const numBase = 455900 + (i * 17); 
+      const correctNum = `07${numBase}`;
+      q.questionText = "Phone number:";
+      q.correctAnswer = correctNum;
+      q.options = generateUniqueOptions(correctNum, 'number');
+    }
+    else if (scenario.type === 'price') {
+      const price = (120 + (i % 20) * 4.50).toFixed(2);
+      q.questionText = "Cost:";
+      q.correctAnswer = `£${price}`;
+      q.options = generateUniqueOptions(`£${price}`, 'price');
+    }
+    else if (scenario.type === 'date') {
+       const day = 10 + (i % 18);
+       const month = ['May', 'June', 'July', 'August'][i % 4];
+       q.questionText = "Date:";
+       q.correctAnswer = `${day}th ${month}`;
+       q.options = generateUniqueOptions(`${day}th ${month}`, 'date');
+    }
+    else {
+      const h = 2 + (i % 10);
+      const m = [15, 30, 45, 10, 20, 40, 50][i % 7];
+      const correctTime = `${h}:${m < 10 ? '0'+m : m}`;
+      q.questionText = "Time:";
+      q.correctAnswer = correctTime;
+      q.options = generateUniqueOptions(correctTime, 'time');
+    }
+
+    // Create dialogue using options
+    q.dialogue = createDialogue(q, q.char1, q.char2);
+    questions.push(q);
+  }
+  return questions;
+};
+
+const ALL_QUESTIONS = generateQuestions();
+
+// --- Main Component ---
+export default function IELTSGame() {
+  const [gameState, setGameState] = useState('menu'); 
+  const [activeQuestions, setActiveQuestions] = useState([]);
+  const [currentQIndex, setCurrentQIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [tokens, setTokens] = useState(0);
+  const [showTranscript, setShowTranscript] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [isCorrect, setIsCorrect] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [areOptionsVisible, setAreOptionsVisible] = useState(false);
+  const [showStrategy, setShowStrategy] = useState(false);
+  const [playerName, setPlayerName] = useState("");
+  
+  const isCancelledRef = useRef(false);
+
+  const currentQ = activeQuestions[currentQIndex];
+
+  useEffect(() => {
+    const loadVoices = () => {
+      window.speechSynthesis.getVoices();
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }, []);
+
+  const getVoiceForCharacter = useCallback((name) => {
+    const allVoices = window.speechSynthesis.getVoices();
+    let voice = allVoices.find(v => v.name.includes(name) && v.name.includes('Microsoft') && v.name.includes('Online'));
+    if (!voice) voice = allVoices.find(v => v.name.includes(name));
+    if (!voice) {
+      const isFemale = ['Ava', 'Emma'].includes(name);
+      if (isFemale) {
+        voice = allVoices.find(v => v.name.includes('Female') || v.name.includes('Zira') || v.name.includes('Google UK English Female'));
+      } else {
+        voice = allVoices.find(v => v.name.includes('Male') || v.name.includes('David') || v.name.includes('Google UK English Male'));
+      }
+    }
+    return voice || allVoices[0];
+  }, []);
+
+  const playDialogue = async () => {
+    window.speechSynthesis.cancel();
+    isCancelledRef.current = false;
+    setIsPlaying(true);
+
+    const dialogueLines = currentQ.dialogue;
+
+    const speakLine = (line) => {
+      return new Promise((resolve) => {
+        if (isCancelledRef.current) {
+          resolve();
+          return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(line.text);
+        utterance.voice = getVoiceForCharacter(line.speaker);
+        utterance.rate = 0.85; 
+        utterance.pitch = 1;
+        utterance.lang = 'en-GB';
+
+        utterance.onend = () => {
+          setTimeout(resolve, 300);
+        };
+        utterance.onerror = () => resolve(); 
+        window.speechSynthesis.speak(utterance);
+      });
+    };
+
+    for (const line of dialogueLines) {
+      if (isCancelledRef.current) break;
+      await speakLine(line);
+    }
+
+    setIsPlaying(false);
+  };
+
+  const speakFeedback = (correct) => {
+    const phrases = correct ? PRAISE_PHRASES : ENCOURAGE_PHRASES;
+    let text = phrases[Math.floor(Math.random() * phrases.length)];
+    
+    const speakers = ['Ava', 'Brian', 'Emma', 'Andrew'];
+    const feedbackSpeaker = speakers[Math.floor(Math.random() * speakers.length)];
+    const voice = getVoiceForCharacter(feedbackSpeaker);
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.voice = voice;
+    utterance.rate = 1.0; 
+    utterance.pitch = correct ? 1.1 : 0.9;
+    utterance.lang = 'en-GB';
+
+    utterance.onend = () => {
+      if (correct && currentQ.type === 'spelling') {
+        const spellText = formatSpokenText(currentQ.correctAnswer, 'spelling');
+        const spellUtterance = new SpeechSynthesisUtterance(`That is ${currentQ.correctAnswer}. ${spellText}`);
+        spellUtterance.voice = voice;
+        spellUtterance.rate = 0.7; 
+        spellUtterance.lang = 'en-GB';
+        window.speechSynthesis.speak(spellUtterance);
+      }
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopAudio = () => {
+    isCancelledRef.current = true;
+    window.speechSynthesis.cancel();
+    setIsPlaying(false);
+  };
+
+  const startGame = (mode) => {
+    stopAudio();
+    if (!playerName.trim()) {
+      alert("Please enter your name first!");
+      return;
+    }
+
+    let questionsToPlay = ALL_QUESTIONS.filter(q => q.type === mode);
+    
+    setActiveQuestions(questionsToPlay);
+    setCurrentQIndex(0);
+    setScore(0);
+    setTokens(0);
+    setSelectedOption(null);
+    setShowTranscript(false);
+    setIsCorrect(null);
+    setAreOptionsVisible(false);
+    setShowStrategy(false);
+    setGameState('playing');
+  };
+
+  const handleAnswer = (option) => {
+    if (selectedOption) return; 
+    
+    stopAudio(); 
+    setSelectedOption(option);
+    const correct = option === currentQ.correctAnswer;
+    setIsCorrect(correct);
+    setShowTranscript(true);
+
+    playSoundFx(correct ? 'correct' : 'incorrect');
+    setTimeout(() => speakFeedback(correct), 300);
+
+    if (correct) {
+      setScore(prev => prev + 1);
+      setTokens(prev => prev + 5);
+    }
+  };
+
+  const nextQuestion = () => {
+    stopAudio();
+    if (currentQIndex < activeQuestions.length - 1) {
+      setCurrentQIndex(prev => prev + 1);
+      setSelectedOption(null);
+      setShowTranscript(false);
+      setIsCorrect(null);
+      setAreOptionsVisible(false);
+      setShowStrategy(false);
+    } else {
+      setGameState('completed');
+    }
+  };
+
+  const returnToMenu = () => {
+    stopAudio();
+    setGameState('menu');
+  };
+
+  if (gameState === 'menu') {
+    return (
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center font-sans p-4">
+        <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-[0_10px_0_rgb(0,0,0)] border-4 border-black">
+          
+          <h1 className="text-4xl font-black text-slate-800 mb-6 uppercase tracking-tighter">IELTS Drills</h1>
+          
+          <div className="mb-6 text-left">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Player Name</label>
+            <div className="relative">
+              <User className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+              <input 
+                type="text" 
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                placeholder="Enter name..."
+                className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-slate-200 font-bold text-slate-700 focus:outline-none focus:border-blue-500 bg-slate-50"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+             {SCENARIOS.map((s, idx) => (
+               <button 
+                 key={idx}
+                 onClick={() => startGame(s.type)}
+                 className="w-full bg-slate-50 hover:bg-blue-50 text-slate-700 font-bold py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-blue-400 transition-all text-left flex items-center gap-3 group"
+               >
+                 <span className="text-xl group-hover:scale-110 transition-transform">{s.icon}</span>
+                 <span className="flex-1 text-sm">20 {s.context}</span>
+                 <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500" />
+               </button>
+             ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (gameState === 'completed') {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-[0_10px_0_rgb(0,0,0)] border-4 border-black animate-bounce-in relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-50 to-transparent -z-0" />
+          <Trophy className="w-24 h-24 text-yellow-400 mx-auto mb-4 drop-shadow-lg relative z-10" />
+          <h1 className="text-3xl font-black text-slate-800 mb-1 relative z-10">Great Job, {playerName}!</h1>
+          <p className="text-slate-400 font-bold text-sm mb-6">Drill Complete</p>
+
+          <div className="flex justify-center gap-6 mb-8">
+             <div className="text-center">
+                <p className="text-xs font-bold text-slate-400 uppercase">Score</p>
+                <p className="text-4xl font-black text-blue-600">{score}/{activeQuestions.length}</p>
+             </div>
+             <div className="text-center">
+                <p className="text-xs font-bold text-slate-400 uppercase">Tokens</p>
+                <p className="text-4xl font-black text-yellow-500 flex items-center justify-center gap-1">
+                  <Coins className="w-6 h-6" />{tokens}
+                </p>
+             </div>
+          </div>
+
+          <button 
+            onClick={returnToMenu}
+            className="w-full bg-blue-500 text-white font-black text-xl py-4 rounded-2xl border-b-8 border-blue-700 active:border-b-0 active:translate-y-2 transition-all"
+          >
+            Back to Menu
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen bg-slate-100 flex flex-col font-sans overflow-hidden">
+      
+      {/* Header */}
+      <header className="bg-slate-800 text-white p-2 px-4 shadow-md z-10 flex justify-between items-center border-b-4 border-slate-900 shrink-0">
+        <div className="flex items-center gap-2 w-1/4">
+          <button 
+            onClick={returnToMenu}
+            className="flex items-center justify-center w-10 h-10 bg-slate-600 hover:bg-slate-500 text-white rounded-full font-bold transition-all shadow-[0_3px_0_rgb(71,85,105)] active:shadow-none active:translate-y-1 border-2 border-slate-700"
+            title="Home"
+          >
+            <Home className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="flex justify-center items-center gap-3 w-2/4">
+             {!isPlaying ? (
+               <button 
+                 onClick={playDialogue}
+                 className="flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white px-5 py-2 rounded-full font-bold text-sm transition-all shadow-[0_3px_0_rgb(29,78,216)] active:shadow-none active:translate-y-1 border-2 border-blue-600 whitespace-nowrap"
+               >
+                 <Play className="w-4 h-4 fill-current" /> Play
+               </button>
+             ) : (
+               <button 
+                 onClick={stopAudio}
+                 className="flex items-center gap-2 bg-red-500 hover:bg-red-400 text-white px-5 py-2 rounded-full font-bold text-sm animate-pulse shadow-[0_3px_0_rgb(185,28,28)] border-2 border-red-600 whitespace-nowrap"
+               >
+                 <StopCircle className="w-4 h-4" /> Stop
+               </button>
+             )}
+
+             <button
+                onClick={nextQuestion}
+                className="flex items-center justify-center w-10 h-10 bg-green-500 hover:bg-green-400 text-white rounded-full font-bold transition-all shadow-[0_3px_0_rgb(22,163,74)] active:shadow-none active:translate-y-1 border-2 border-green-600"
+                title="Skip / Next"
+             >
+               <SkipForward className="w-5 h-5 fill-current" />
+             </button>
+        </div>
+
+        <div className="flex items-center justify-end gap-2 w-1/4">
+           <div className="hidden sm:flex items-center gap-1 bg-slate-900 px-2 py-1 rounded-full border-2 border-slate-700">
+              <Coins className="w-3 h-3 text-yellow-400" />
+              <span className="font-bold font-mono text-xs">{tokens}</span>
+           </div>
+           <div className="flex items-center gap-1 bg-blue-900 px-2 py-1 rounded-full border-2 border-blue-700">
+              <span className="font-bold font-mono text-xs text-white">{currentQIndex + 1}/{activeQuestions.length}</span>
+           </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col w-full max-w-2xl mx-auto p-2 overflow-hidden relative">
+        
+        <div className="bg-white rounded-2xl p-4 shadow-[0_4px_0_rgb(203,213,225)] border-2 border-slate-300 flex flex-col h-full relative">
+           <div className="absolute top-0 left-0 right-0 bg-slate-50 px-4 py-2 rounded-t-xl border-b border-slate-100 flex justify-between items-center">
+              <span className="font-bold text-slate-500 text-xs uppercase tracking-wider flex items-center gap-2">
+                {currentQ.icon} {currentQ.context}
+              </span>
+              <div className="flex items-center gap-2">
+                 <button 
+                   onClick={() => setShowStrategy(!showStrategy)}
+                   className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors ${showStrategy ? 'bg-yellow-100 text-yellow-700' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}`}
+                 >
+                   <Lightbulb className="w-3 h-3" /> {showStrategy ? 'Hide' : 'Tip'}
+                 </button>
+              </div>
+           </div>
+
+           {showStrategy && (
+             <div className="mt-10 -mb-2 bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded-r shadow-sm animate-fade-in">
+               <p className="text-xs text-yellow-800 font-medium italic">
+                 <span className="font-bold not-italic">Strategy: </span>{currentQ.strategy}
+               </p>
+             </div>
+           )}
+
+           <div className={`${showStrategy ? 'mt-4' : 'mt-10'} mb-2 transition-all`}>
+             <h3 className="text-xl font-black text-slate-800 leading-tight text-center">{currentQ.questionText}</h3>
+           </div>
+
+           <div className="flex-1 overflow-y-auto min-h-0 pr-2 custom-scrollbar bg-slate-50 rounded-xl border-2 border-slate-100 p-2 mb-2">
+             {showTranscript ? (
+               <div className="animate-fade-in">
+                  <div className="flex justify-between items-center mb-2 border-b border-slate-200 pb-1">
+                    <h4 className="font-bold text-slate-400 text-[10px] uppercase">Audio Transcript</h4>
+                  </div>
+                  <div className="space-y-3">
+                    {currentQ.dialogue.map((line, idx) => (
+                      <div key={idx} className={`flex gap-2 ${line.text.includes(currentQ.correctAnswer) ? 'bg-yellow-100 -mx-1 px-1 py-1 rounded' : ''}`}>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 border-2 ${['Ava','Emma'].includes(line.speaker) ? 'bg-pink-100 border-pink-300 text-pink-600' : 'bg-blue-100 border-blue-300 text-blue-600'}`}>
+                          {line.speaker.charAt(0)}
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-bold text-slate-400 block">{line.speaker}</span>
+                          <p className="text-slate-700 text-sm font-medium leading-snug">{line.text}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+               </div>
+             ) : (
+               <div className="h-full flex flex-col items-center justify-center text-slate-300 text-center p-4">
+                 <p className="text-xs font-bold italic text-slate-400">Press Play to listen.<br/>Transcript hidden until answered.</p>
+               </div>
+             )}
+           </div>
+        </div>
+      </main>
+
+      <div className="bg-slate-800 border-t-4 border-slate-900 p-3 pb-6 z-20 shadow-2xl shrink-0">
+        <div className="max-w-2xl mx-auto relative">
+          {selectedOption && (
+             <div className={`absolute -top-16 left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-full font-black text-sm shadow-xl flex items-center gap-2 animate-bounce-up z-30 ${isCorrect ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
+               {isCorrect ? <><CheckCircle className="w-4 h-4" /> Correct!</> : <><XCircle className="w-4 h-4" /> Incorrect</>}
+             </div>
+          )}
+
+          {!selectedOption ? (
+             !areOptionsVisible ? (
+               <button 
+                 onClick={() => setAreOptionsVisible(true)}
+                 className="w-full bg-indigo-500 hover:bg-indigo-400 text-white font-black text-xl py-4 rounded-2xl border-b-8 border-indigo-700 active:border-b-0 active:translate-y-2 transition-all uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl"
+               >
+                 <Eye className="w-6 h-6" /> Reveal Options
+               </button>
+             ) : (
+                <div className="grid grid-cols-2 gap-2 animate-fade-in">
+                  {currentQ.options.map((opt, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleAnswer(opt)}
+                      className={`bg-white hover:bg-blue-50 text-slate-700 font-bold py-3 px-2 rounded-xl border-b-4 border-slate-300 active:border-b-0 active:translate-y-1 transition-all text-base shadow-lg text-center truncate ${selectedOption ? 'cursor-not-allowed opacity-50' : ''}`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+             )
+          ) : (
+            <div className="grid grid-cols-2 gap-2 animate-fade-in">
+              {currentQ.options.map((opt, idx) => {
+                let btnClass = "bg-white text-slate-300 border-slate-100 opacity-50"; 
+                if (opt === currentQ.correctAnswer) {
+                   btnClass = "bg-green-500 text-white border-green-700 shadow-[0_0_15px_rgba(34,197,94,0.6)] scale-105 animate-pop"; 
+                } else if (opt === selectedOption && opt !== currentQ.correctAnswer) {
+                   btnClass = "bg-red-500 text-white border-red-700 animate-shake"; 
+                }
+                return (
+                  <button key={idx} disabled className={`font-bold py-3 px-2 rounded-xl border-b-4 transition-all text-base shadow-lg text-center truncate ${btnClass}`}>
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
