@@ -20,13 +20,13 @@
 
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; }
-        .fade-in { animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         /* Highlight for Gap Fill Inputs */
@@ -44,56 +44,96 @@
         // DATA: TEST CONTENT
         // ==========================================
         
-        // --- FULL SCRIPT (Urban Planning) ---
+        // --- TEST 1: URBAN PLANNING (Full Unique Content) ---
         const TEST_1_SCRIPT = [
             { speaker: "Dr. Anderson", text: "Come in, Tom, Jess. Have you had a chance to refine your proposal for the Urban Planning project?" },
-            { speaker: "Tom", text: "Yes, Dr. Anderson. We've decided to focus on the impact of green spaces on mental health in high-density cities." },
-            { speaker: "Jess", text: "We were originally going to look at transport systems, but the data was too scattered. Green spaces felt more relevant given the recent city council initiatives." },
-            { speaker: "Dr. Anderson", text: "An excellent choice. It is a very current topic. Now, regarding your methodology. How do you plan to gather your primary data?" },
-            { speaker: "Tom", text: "We thought about online surveys, but honestly, I think they are too impersonal. We want to do face-to-face interviews in the parks themselves." },
-            { speaker: "Jess", text: "I agree with Tom. Online surveys often get low response rates, and you can't verify who is actually answering. Interviews are more reliable." },
-            { speaker: "Dr. Anderson", text: "Fair point. Just be mindful of the time constraint. Now, moving to the literature review. You mentioned 'Source A' in your draft—the article by Professor Yip." },
-            { speaker: "Jess", text: "Yes. I found his arguments quite compelling, although a bit pessimistic about modern architecture." },
-            { speaker: "Tom", text: "See, I had a different issue. The statistics he uses are from 2010. In urban development terms, that is ancient history. That was my main criticism." },
-            { speaker: "Dr. Anderson", text: "It is dated, yes. But his theory on 'adaptable spaces' is still the standard. You should mention that adaptability is the key to longevity in design." },
-            { speaker: "Jess", text: "I'll make a note of that. I did like how he balanced the argument though; he didn't just attack developers, he offered solutions." },
-            { speaker: "Tom", text: "True, the tone was very balanced." },
+            { speaker: "Tom", text: "Yes, Dr. Anderson. We've finally decided on a topic." },
+            { speaker: "Jess", text: "It wasn't easy. Originally, we were dead set on looking at the new transport system, specifically the tram lines." },
+            { speaker: "Tom", text: "Right, but when we looked for recent data, it was just too scattered. There wasn't enough to build a solid argument." },
+            { speaker: "Jess", text: "Exactly. So, we switched to the impact of green spaces on mental health. It feels much more relevant given the recent initiatives by the city council." },
+            { speaker: "Dr. Anderson", text: "An excellent choice. It is indeed a very topical issue. Now, regarding your methodology. How do you plan to gather your primary data?" },
+            { speaker: "Tom", text: "Well, my first thought was to send out an online survey to local residents." },
+            { speaker: "Jess", text: "I was against that, Tom. You know the response rate is usually terrible for those." },
+            { speaker: "Tom", text: "That's true. And you can't really verify who is answering. It lacks reliability." },
+            { speaker: "Jess", text: "So instead, we want to do face-to-face interviews in the parks themselves. We can observe the environment while we talk to people." },
+            { speaker: "Dr. Anderson", text: "A much better approach. Just be mindful of the time it consumes. Now, moving to the literature review. You mentioned 'Source A' in your draft—the article by Professor Yip." },
+            { speaker: "Jess", text: "Yes. I found his arguments quite compelling, although some critics say he is a bit biased against modern architecture." },
+            { speaker: "Tom", text: "I didn't mind the tone. My issue was the numbers. The statistics he uses are from 2010. In urban development terms, that is ancient history." },
+            { speaker: "Dr. Anderson", text: "It is dated, yes. But his theory on 'adaptable spaces' is still the industry standard. You should mention that adaptability is the key to longevity in design." },
+            { speaker: "Jess", text: "I'll make a note of that. Longevity over cost saving. Got it." },
             { speaker: "Dr. Anderson", text: "Alright, let's look at the workload allocation. You need to be clear on who is doing what." },
-            { speaker: "Jess", text: "I've already started the literature review, so I'm happy to finish that." },
-            { speaker: "Tom", text: "Great, because I prefer the practical side. I'll handle the survey design and the actual data collection." },
+            { speaker: "Jess", text: "I've already made a start on the literature review, reading through the journals, so I'm happy to finish writing that section." },
+            { speaker: "Tom", text: "That works for me. I prefer the practical side anyway. I'll handle the survey design and the actual data collection in the parks." },
             { speaker: "Dr. Anderson", text: "And the final analysis?" },
-            { speaker: "Jess", text: "We agreed we need to do that together to ensure we interpret the findings correctly." },
-            { speaker: "Tom", text: "Absolutely. We can't split that up." },
+            { speaker: "Jess", text: "We agreed we need to do that together. We can't split that up if we want to interpret the findings correctly." },
+            { speaker: "Tom", text: "Absolutely. Two pairs of eyes are better than one." },
             { speaker: "Dr. Anderson", text: "Finally, for the presentation... make sure you define your terms. Last year, students failed because they didn't define 'density' clearly." },
-            { speaker: "Jess", text: "Got it. Define density." },
-            { speaker: "Dr. Anderson", text: "And remember, the deadline is the 15th of November, not the 30th. Don't get caught out." }
+            { speaker: "Jess", text: "Right. We will make sure 'density' is clearly explained in the introduction." },
+            { speaker: "Dr. Anderson", text: "And remember, the submission deadline has been moved. It is the 15th of November, not the 30th. Don't get caught out." },
+            { speaker: "Tom", text: "15th of November. Written down. Thanks, Dr. Anderson." }
         ];
 
-        // --- QUESTIONS (21-30) ---
         const TEST_1_QUESTIONS = [
-            // MCQs (4 Questions)
             { id: 'h1', type: 'header', text: "Questions 21–24: Choose the correct letter." },
-            { id: 21, type: 'mc', text: "Why did the students choose 'Green Spaces' as their topic?", options: ["A) Assigned by tutor", "B) Insufficient data elsewhere", "C) Recent initiatives"], answer: "C" },
-            { id: 22, type: 'mc', text: "Why did they reject online surveys?", options: ["A) Too expensive", "B) Low response rate", "C) Lack reliability"], answer: "C" },
-            { id: 23, type: 'mc', text: "What does Tom criticize about 'Source A'?", options: ["A) Outdated data", "B) Aggressive tone", "C) Biased author"], answer: "A" },
+            { id: 21, type: 'mc', text: "Why did the students choose 'Green Spaces' as their topic?", options: ["A) It was assigned by the tutor", "B) Transport data was insufficient", "C) It relates to recent initiatives"], answer: "C" },
+            { id: 22, type: 'mc', text: "Why did they reject online surveys?", options: ["A) They are too expensive", "B) The response rate is low", "C) They lack reliability"], answer: "C" },
+            { id: 23, type: 'mc', text: "What does Tom criticize about 'Source A'?", options: ["A) The data is outdated", "B) The tone is too aggressive", "C) The author is biased"], answer: "A" },
             { id: 24, type: 'mc', text: "Dr. Anderson says 'adaptability' is key for:", options: ["A) Reducing costs", "B) Design longevity", "C) Construction speed"], answer: "B" },
             
-            // Matching (Who said what)
             { id: 'h2', type: 'header', text: "Questions 25–27: Who said what? (A: Tom, B: Jess, C: Dr. Anderson)" },
             { id: 25, type: 'matching', text: "The literature review is already underway.", options: ["A", "B", "C"], answer: "B" },
             { id: 26, type: 'matching', text: "Data collection is preferred over writing.", options: ["A", "B", "C"], answer: "A" },
             { id: 27, type: 'matching', text: "Defining key terms like 'density' is crucial.", options: ["A", "B", "C"], answer: "C" },
 
-            // Gap Fill
             { id: 'h3', type: 'header', text: "Questions 28–30: Complete the sentences (Max 2 words)." },
             { id: 28, type: 'gap', text: "The students must work together on the final ______.", answer: "analysis" },
             { id: 29, type: 'gap', text: "Failure to define 'density' caused students to ______ last year.", answer: "fail" },
             { id: 30, type: 'gap', text: "The project deadline has been confirmed as the 15th of ______.", answer: "november" }
         ];
 
-        // Placeholder for tests 2-6
-        const GENERIC_SCRIPT = JSON.parse(JSON.stringify(TEST_1_SCRIPT));
-        const GENERIC_QUESTIONS = JSON.parse(JSON.stringify(TEST_1_QUESTIONS));
+        // --- GENERIC CONTENT (Expanded to full 10 Questions) ---
+        // Used for tests 2-6 to ensure they aren't empty
+        const GENERIC_SCRIPT = [
+            { speaker: "Tutor", text: "Welcome back. Today we need to finalize the methodology for your upcoming research project." },
+            { speaker: "Student", text: "I've been thinking about that. Initially, I wanted to do a quantitative study using large datasets." },
+            { speaker: "Tutor", text: "And why have you moved away from that idea?" },
+            { speaker: "Student", text: "I realized that to understand the user experience, I really need qualitative data. Numbers won't tell me 'why' people feel a certain way." },
+            { speaker: "Tutor", text: "That is a wise decision. Qualitative data is often richer. How many participants are you planning to interview?" },
+            { speaker: "Student", text: "I was hoping for fifty, but given the timeframe, twenty seems more realistic." },
+            { speaker: "Tutor", text: "Twenty is a good sample size for this level of study. Now, let's talk about ethics." },
+            { speaker: "Student", text: "I've submitted the form. I'm just waiting for approval." },
+            { speaker: "Tutor", text: "Good. You cannot start without it. Now, regarding your background reading. Have you looked at the 2019 study by Dr. Chen?" },
+            { speaker: "Student", text: "I have. It was interesting, but I felt his conclusion was a bit weak. He didn't account for external variables." },
+            { speaker: "Tutor", text: "I agree. The methodology was sound, but the conclusion was rushed. Make sure you critique that in your review." },
+            { speaker: "Student", text: "Will do. I also wanted to ask about the software for data analysis." },
+            { speaker: "Tutor", text: "The university provides NVivo. It is excellent for coding qualitative data." },
+            { speaker: "Student", text: "Is there training for that?" },
+            { speaker: "Tutor", text: "Yes, the library runs workshops every Wednesday. I suggest you book one." },
+            { speaker: "Student", text: "Okay, Wednesday. I'll write that down." },
+            { speaker: "Tutor", text: "Finally, the submission date. It has been extended by one week. It is now due on Friday the 24th." },
+            { speaker: "Student", text: "Friday the 24th. That gives me extra time for proofreading. Thank you!" }
+        ];
+        
+        const GENERIC_QUESTIONS = [
+            // MCQs 21-24
+            { id: 'h1', type: 'header', text: "Questions 21–24: Choose the correct letter." },
+            { id: 21, type: 'mc', text: "Why did the student choose qualitative data?", options: ["A) It is easier to collect", "B) It explains 'why' users feel a certain way", "C) Quantitative data was unavailable"], answer: "B" },
+            { id: 22, type: 'mc', text: "How many participants will be interviewed?", options: ["A) Fifty", "B) Twenty", "C) Ten"], answer: "B" },
+            { id: 23, type: 'mc', text: "What is the student's criticism of Dr. Chen's study?", options: ["A) The conclusion was weak", "B) The methodology was flawed", "C) The sample size was too small"], answer: "A" },
+            { id: 24, type: 'mc', text: "What software does the tutor recommend?", options: ["A) SPSS", "B) Excel", "C) NVivo"], answer: "C" },
+            
+            // Matching 25-27
+            { id: 'h2', type: 'header', text: "Questions 25–27: Who is responsible? (A: Student, B: Tutor, C: Library)" },
+            { id: 25, type: 'matching', text: "Submitting the ethics form.", options: ["A", "B", "C"], answer: "A" },
+            { id: 26, type: 'matching', text: "Providing the analysis software.", options: ["A", "B", "C"], answer: "B" },
+            { id: 27, type: 'matching', text: "Running training workshops.", options: ["A", "B", "C"], answer: "C" },
+
+            // Gap Fill 28-30
+            { id: 'h3', type: 'header', text: "Questions 28–30: Complete the sentences (Max 2 words)." },
+            { id: 28, type: 'gap', text: "The student must critique the ______ in Dr. Chen's study.", answer: "conclusion" },
+            { id: 29, type: 'gap', text: "Training workshops are held every ______.", answer: "wednesday" },
+            { id: 30, type: 'gap', text: "The new submission deadline is Friday the ______.", answer: "24th" }
+        ];
 
         const ALL_TESTS = [
             { id: 1, title: "Urban Research", icon: "fa-city", color: "indigo", script: TEST_1_SCRIPT, questions: TEST_1_QUESTIONS },
@@ -143,14 +183,12 @@
                 if (speaker === "Jess") {
                     selected = voices.find(v => v.name.includes("Emma") && v.name.includes("Multilingual")) || 
                                voices.find(v => v.name.includes("Zira")) || voices.find(v => v.name.includes("Female"));
-                } else if (speaker === "Tom") {
+                } else if (speaker === "Tom" || speaker === "Student") {
                     selected = voices.find(v => v.name.includes("Brian") && v.name.includes("Multilingual")) || 
                                voices.find(v => v.name.includes("David")) || voices.find(v => v.name.includes("Male"));
-                } else if (speaker.includes("Dr")) {
+                } else if (speaker.includes("Dr") || speaker === "Tutor") {
                     selected = voices.find(v => v.name.includes("Andrew") && v.name.includes("Multilingual")) || 
                                voices.find(v => v.name.includes("Mark")); 
-                } else if (speaker === "Ava") {
-                     selected = voices.find(v => v.name.includes("Ava") && v.name.includes("Multilingual"));
                 }
                 if (selected) voiceAssignments.current[speaker] = selected;
                 return selected || voices[0];
@@ -179,7 +217,7 @@
                 const voice = getVoice(line.speaker);
                 if (voice) utt.voice = voice;
                 
-                utt.rate = 1.0; // CHANGED: Normal Speed
+                utt.rate = 1.0; // Normal Speed
                 
                 utt.onend = () => {
                     setTimeout(() => {
@@ -227,30 +265,30 @@
                     {/* Main Content Area */}
                     <div className="flex-1 flex overflow-hidden relative">
                         
-                        {/* QUESTIONS PANEL (Tightened Layout) */}
+                        {/* QUESTIONS PANEL */}
                         <div className="flex-1 overflow-y-auto p-4 bg-white pb-32">
                             <div className="max-w-5xl mx-auto space-y-4">
                                 
                                 {activeTest.questions.map((q, idx) => {
-                                    if (q.type === 'header') return <h3 key={idx} className="text-sm font-bold text-indigo-800 uppercase tracking-wide border-b border-indigo-100 pb-1 mt-4">{q.text}</h3>;
+                                    if (q.type === 'header') return <h3 key={idx} className="text-base font-bold text-indigo-800 uppercase tracking-wide border-b border-indigo-100 pb-1 mt-6">{q.text}</h3>;
                                     
                                     const isCorrect = showResults && (userAnswers[q.id] || "").toLowerCase() === q.answer.toLowerCase();
                                     const isWrong = showResults && !isCorrect;
 
                                     return (
-                                        <div key={idx} className={`p-3 rounded-lg border transition-all ${isCorrect ? 'border-green-500 bg-green-50' : isWrong ? 'border-red-500 bg-red-50' : 'border-gray-200 hover:border-indigo-300 bg-gray-50'}`}>
+                                        <div key={idx} className={`p-4 rounded-lg border-2 transition-all ${isCorrect ? 'border-green-500 bg-green-50' : isWrong ? 'border-red-500 bg-red-50' : 'border-gray-200 hover:border-indigo-300 bg-gray-50'}`}>
                                             
-                                            {/* Question Text */}
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div className="font-semibold text-gray-800 text-sm leading-tight flex-1">
-                                                    <span className="text-indigo-600 mr-2 font-mono">{q.id}.</span>
+                                            {/* Question Text (Larger Font) */}
+                                            <div className="flex justify-between items-start mb-3">
+                                                <div className="font-bold text-gray-800 text-xl leading-snug flex-1">
+                                                    <span className="text-indigo-600 mr-3 font-mono">{q.id}.</span>
                                                     {q.type === 'gap' ? (
                                                         <span>
                                                             {q.text.split('______')[0]}
                                                             <input 
                                                                 type="text" 
                                                                 disabled={showResults}
-                                                                className="gap-input mx-1 w-32 border-b border-gray-400 bg-transparent text-center font-mono text-indigo-800 focus:outline-none focus:border-indigo-600 text-sm"
+                                                                className="gap-input mx-2 w-40 border-b-2 border-gray-400 bg-transparent text-center font-mono text-indigo-800 focus:outline-none focus:border-indigo-600 text-lg font-bold"
                                                                 value={userAnswers[q.id] || ''}
                                                                 onChange={(e) => setUserAnswers({...userAnswers, [q.id]: e.target.value})}
                                                             />
@@ -260,37 +298,37 @@
                                                         q.text
                                                     )}
                                                 </div>
-                                                {isCorrect && <i className="fas fa-check text-green-600 ml-2"></i>}
-                                                {isWrong && <i className="fas fa-times text-red-500 ml-2"></i>}
+                                                {isCorrect && <i className="fas fa-check text-green-600 ml-2 text-xl"></i>}
+                                                {isWrong && <i className="fas fa-times text-red-500 ml-2 text-xl"></i>}
                                             </div>
 
-                                            {/* MCQ Options (Compact) */}
+                                            {/* MCQ Options (Larger Font) */}
                                             {q.type === 'mc' && (
-                                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 ml-6">
+                                                <div className="space-y-3 ml-8">
                                                     {q.options.map(opt => (
-                                                        <label key={opt} className="flex items-center cursor-pointer group p-1.5 rounded hover:bg-white border border-transparent hover:border-gray-200 transition-colors">
-                                                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center mr-2 shrink-0 ${userAnswers[q.id] === opt.charAt(0) ? 'border-indigo-600' : 'border-gray-400'}`}>
-                                                                {userAnswers[q.id] === opt.charAt(0) && <div className="w-2 h-2 rounded-full bg-indigo-600"></div>}
+                                                        <label key={opt} className="flex items-center cursor-pointer group p-2 rounded hover:bg-white border border-transparent hover:border-gray-200 transition-colors">
+                                                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 shrink-0 ${userAnswers[q.id] === opt.charAt(0) ? 'border-indigo-600' : 'border-gray-400'}`}>
+                                                                {userAnswers[q.id] === opt.charAt(0) && <div className="w-3 h-3 rounded-full bg-indigo-600"></div>}
                                                             </div>
                                                             <input type="radio" name={`q${q.id}`} value={opt.charAt(0)} className="hidden" 
                                                                 disabled={showResults}
                                                                 checked={userAnswers[q.id] === opt.charAt(0)}
                                                                 onChange={() => setUserAnswers({...userAnswers, [q.id]: opt.charAt(0)})}
                                                             />
-                                                            <span className="text-xs text-gray-700">{opt}</span>
+                                                            <span className="text-lg text-gray-700 font-medium">{opt}</span>
                                                         </label>
                                                     ))}
                                                 </div>
                                             )}
 
-                                            {/* Matching Options (Compact) */}
+                                            {/* Matching Options (Larger Font) */}
                                             {q.type === 'matching' && (
-                                                <div className="flex gap-3 ml-6 mt-1">
+                                                <div className="flex gap-4 ml-8 mt-2">
                                                     {q.options.map(opt => (
                                                         <button key={opt} 
                                                             disabled={showResults}
                                                             onClick={() => setUserAnswers({...userAnswers, [q.id]: opt})}
-                                                            className={`w-8 h-8 rounded-full text-xs font-bold border transition-all ${userAnswers[q.id] === opt ? 'bg-indigo-600 text-white border-indigo-600 shadow' : 'bg-white text-gray-500 border-gray-300 hover:border-indigo-400'}`}>
+                                                            className={`w-12 h-12 rounded-full text-lg font-bold border-2 transition-all ${userAnswers[q.id] === opt ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg' : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400 hover:bg-indigo-50'}`}>
                                                             {opt}
                                                         </button>
                                                     ))}
@@ -299,8 +337,8 @@
 
                                             {/* Correct Answer */}
                                             {showResults && !isCorrect && (
-                                                <div className="mt-1 ml-6 text-xs text-red-600 font-bold">
-                                                    Ans: {q.answer}
+                                                <div className="mt-2 ml-8 text-sm font-bold text-red-600 bg-red-50 inline-block px-3 py-1 rounded">
+                                                    Correct Answer: {q.answer}
                                                 </div>
                                             )}
                                         </div>
@@ -310,16 +348,16 @@
                         </div>
                     </div>
 
-                    {/* TRANSCRIPT & AUDIO BAR (Optimized Height) */}
-                    <div className="h-48 bg-white border-t shadow-[0_-5px_20px_rgba(0,0,0,0.05)] z-30 relative flex flex-col">
+                    {/* TRANSCRIPT & AUDIO BAR (Fixed Bottom) */}
+                    <div className="h-48 bg-white border-t-2 border-indigo-100 flex flex-col shadow-[0_-10px_30px_rgba(0,0,0,0.08)] z-30 relative">
                         
                         {/* Auto-Scrolling Transcript */}
                         <div className="flex-1 overflow-y-auto p-4 bg-gray-50 border-b" ref={transcriptRef}>
                             <div className="max-w-4xl mx-auto space-y-2">
-                                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest sticky top-0 bg-gray-50 py-1">Live Transcript</h4>
+                                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest sticky top-0 bg-gray-50 py-1 w-full border-b border-gray-200 mb-2">Live Transcript</h4>
                                 {activeTest.script.map((line, idx) => (
-                                    <div key={idx} id={`line-${idx}`} className={`text-sm p-2 rounded transition-all duration-300 ${currentLine === idx ? 'bg-yellow-100 border-l-4 border-yellow-500 shadow-sm' : 'text-gray-400 opacity-70'}`}>
-                                        <span className={`font-bold mr-2 text-[10px] uppercase px-1.5 py-0.5 rounded ${line.speaker.includes('Dr') ? 'bg-red-100 text-red-700' : line.speaker === 'Jess' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>{line.speaker}</span>
+                                    <div key={idx} id={`line-${idx}`} className={`text-base p-2 rounded transition-all duration-300 ${currentLine === idx ? 'bg-yellow-100 border-l-4 border-yellow-500 shadow-sm text-gray-900' : 'text-gray-400 opacity-60'}`}>
+                                        <span className={`font-bold mr-2 text-xs uppercase px-1.5 py-0.5 rounded ${line.speaker.includes('Dr') || line.speaker === 'Tutor' ? 'bg-red-100 text-red-700' : line.speaker === 'Jess' || line.speaker === 'Student' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>{line.speaker}</span>
                                         {line.text}
                                     </div>
                                 ))}
@@ -327,23 +365,23 @@
                         </div>
 
                         {/* Player Controls */}
-                        <div className="h-14 bg-white px-6 flex items-center justify-between shrink-0">
+                        <div className="h-16 bg-white px-6 flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-4">
-                                <button onClick={toggleAudio} className={`w-10 h-10 rounded-full text-white flex items-center justify-center shadow hover:scale-105 transition-all ${isPlaying ? 'bg-rose-500' : 'bg-indigo-600'}`}>
-                                    <i className={`fas ${isPlaying ? 'fa-pause' : 'fa-play pl-0.5'} text-sm`}></i>
+                                <button onClick={toggleAudio} className={`w-12 h-12 rounded-full text-white flex items-center justify-center shadow-md hover:scale-105 transition-all ${isPlaying ? 'bg-rose-500' : 'bg-indigo-600'}`}>
+                                    <i className={`fas ${isPlaying ? 'fa-pause' : 'fa-play pl-1'} text-lg`}></i>
                                 </button>
                                 <div>
-                                    <div className="text-xs font-bold text-gray-800">Audio Track 3.4</div>
-                                    <div className="text-[10px] text-gray-500 font-mono">{isPlaying ? 'Playing (1.0x)...' : 'Paused'}</div>
+                                    <div className="text-sm font-bold text-gray-800">Track 3.4</div>
+                                    <div className="text-xs text-gray-500 font-mono">{isPlaying ? 'Playing (1.0x)...' : 'Paused'}</div>
                                 </div>
                             </div>
 
                             {!showResults ? (
-                                <button onClick={submit} className="bg-green-600 hover:bg-green-700 text-white px-6 py-1.5 rounded font-bold text-sm shadow transform transition hover:-translate-y-0.5">
-                                    Submit
+                                <button onClick={submit} className="bg-green-600 hover:bg-green-700 text-white px-8 py-2 rounded-lg font-bold text-base shadow transform transition hover:-translate-y-0.5">
+                                    Submit Answers
                                 </button>
                             ) : (
-                                <div className="text-sm font-bold text-gray-800 bg-gray-100 px-4 py-1.5 rounded border border-gray-300">
+                                <div className="text-lg font-bold text-gray-800 bg-gray-100 px-6 py-2 rounded border border-gray-300">
                                     Score: <span className={score >= 5 ? 'text-green-600' : 'text-red-600'}>{score} / 10</span>
                                 </div>
                             )}
@@ -370,11 +408,6 @@
                                 <div className="inline-block p-4 rounded-full bg-indigo-50 text-indigo-600 text-4xl mb-6 shadow-sm">
                                     <i className="fas fa-headphones-alt"></i>
                                 </div>
-                                <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 mb-4 tracking-tight">IELTS Prep Hub</h1>
-                                <p className="text-base text-gray-500 mb-8 leading-relaxed">
-                                    Practice <strong>Part 3 Discussions</strong> with AI voices.<br/>
-                                    Real-time transcripts • Exam-style questions
-                                </p>
                                 <button onClick={() => setView('menu')} className="bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-bold py-3 px-8 rounded-xl shadow-lg transform transition hover:scale-105 hover:shadow-xl active:scale-95">
                                     Enter Exam Mode <i className="fas fa-arrow-right ml-2"></i>
                                 </button>
