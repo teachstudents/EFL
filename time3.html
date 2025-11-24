@@ -1149,16 +1149,6 @@
         let timers = new Set();
         let cachedVoices = [];
         let voicesReady = false;
-        let currentVoiceIndex = 0;
-
-        const voiceNames = [
-          'Microsoft Eva Online (Natural) - English (United States)',
-          'Microsoft Ava Online (Natural) - English (United States)',
-          'Microsoft Brian Online (Natural) - English (United States)',
-          'Microsoft William Online (Natural) - English (United States)',
-          'Microsoft Andrew Online (Natural) - English (United States)',
-          'Microsoft Emma Online (Natural) - English (United States)'
-        ];
 
         // ======= TIMER & SPEECH HELPERS (FIXED) =======
         function clearTimer(ref) {
@@ -1236,17 +1226,14 @@
                 if (cachedVoices.length > 0) {
                     let selectedVoice;
                     if (lang === 'zh-CN') {
+                        // Keep Chinese voice logic unchanged
                         selectedVoice = cachedVoices.find(v => v.name.includes('Xiaoxiao')) || cachedVoices.find(v => v.lang === 'zh-CN');
                     } else {
-                         selectedVoice = cachedVoices.find(v =>
-                            v.name === voiceNames[currentVoiceIndex] ||
-                            v.name.includes('Eva') ||
-                            v.name.includes('Ava') ||
-                            v.name.includes('Brian') ||
-                            v.name.includes('William') ||
-                            v.name.includes('Andrew') ||
-                            v.name.includes('Emma')
-                        ) || cachedVoices.find(v => v.lang.startsWith('en')) || cachedVoices[0];
+                        // FORCE ANDREW AS DEFAULT ENGLISH VOICE
+                        // Look for Andrew explicitly, then fall back to any English voice
+                        selectedVoice = cachedVoices.find(v => v.name.includes('Andrew') && v.lang.startsWith('en')) ||
+                                        cachedVoices.find(v => v.name === 'Microsoft Andrew Online (Natural) - English (United States)') ||
+                                        cachedVoices.find(v => v.lang.startsWith('en'));
                     }
                     if (selectedVoice) u.voice = selectedVoice;
                 }
@@ -1258,9 +1245,6 @@
                 };
                 
                 speechSynthesis.speak(u);
-                if (lang.startsWith('en')) {
-                    currentVoiceIndex = (currentVoiceIndex + 1) % voiceNames.length;
-                }
             });
         }
         
@@ -1422,7 +1406,7 @@
                 
                 await speak(`Sorry, that's incorrect.`);
                 await speakChinese(`${answeringPlayer.split(' / ')[0]}，答错了。减五分，其他人加五分。`);
-                 
+                  
                 createFlyingTokens(buttons[choiceIndex], getPlayerScoreElement(answeringPlayer), '-5');
             }
             
