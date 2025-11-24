@@ -301,6 +301,26 @@
         .grade-btn:hover { transform: translateY(-5px); }
 
         .fireworks, .winner-firework, .celebration-burst { pointer-events: none; position: absolute; }
+        
+        /* Glitter CSS */
+        .glitter {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: linear-gradient(45deg, #ff69b4, #00ffff, #ffd700, #ff4757);
+            border-radius: 50%;
+            animation: glitterFloat 2s ease-out forwards;
+            pointer-events: none;
+            z-index: 2000; /* High Z-index to appear on top */
+        }
+
+        @keyframes glitterFloat {
+            0% { opacity: 1; transform: scale(0) rotate(0deg); }
+            25% { opacity: 1; transform: scale(1.5) rotate(90deg); }
+            50% { opacity: 0.8; transform: scale(1) rotate(180deg); }
+            75% { opacity: 0.6; transform: scale(1.2) rotate(270deg); }
+            100% { opacity: 0; transform: scale(0) rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -950,32 +970,48 @@
 
         function selectPlayersSequentially(avail, idx) {
             if (idx >= 3) { setTimeout(() => showPlayerCountdown(), 1000); return; }
+            
+            // Fix: Deterministically pick player first
+            const selIdx = Math.floor(Math.random() * avail.length);
+            const p = avail.splice(selIdx, 1)[0];
+            currentPlayers.push(p);
+            usedPlayers.push(p);
+            const pName = p.split(' / ')[0];
+
             const container = document.getElementById('shuffleContainer');
-            const names = Array.from(container.querySelectorAll('.shuffle-name'));
+            const targetElement = Array.from(container.querySelectorAll('.shuffle-name')).find(el => el.textContent === pName);
+
             let count = 0;
             const int = setInterval(async () => {
+                const names = Array.from(container.querySelectorAll('.shuffle-name'));
                 names.forEach(e => e.classList.remove('selected'));
-                const remaining = Array.from(container.querySelectorAll('.shuffle-name'));
-                if (remaining.length === 0) { clearInterval(int); return; }
-                const rand = Math.floor(Math.random()*remaining.length);
-                remaining[rand].classList.add('selected');
-                count++;
-                if (count > 10) {
+                
+                if (count < 10) {
+                    // Random scramble visual
+                    if (names.length > 0) {
+                        const rand = Math.floor(Math.random() * names.length);
+                        names[rand].classList.add('selected');
+                    }
+                } else {
+                    // Final tick: Force highlight correct element
                     clearInterval(int);
-                    const selIdx = Math.floor(Math.random()*avail.length);
-                    const p = avail.splice(selIdx, 1)[0];
-                    currentPlayers.push(p);
-                    usedPlayers.push(p);
+                    if (targetElement) targetElement.classList.add('selected');
                     
-                    names.forEach(e => { if(e.textContent === p.split(' / ')[0]) e.remove(); });
-                    const d = document.createElement('div');
-                    d.className = 'selected-player';
-                    d.textContent = p.split(' / ')[0];
-                    document.getElementById('selectedPlayers').appendChild(d);
-                    playCorrectSound();
-                    await speakChinese(p.split(' / ')[0]);
-                    setTimeout(() => selectPlayersSequentially(avail, idx+1), 500);
+                    setTimeout(async () => {
+                        if (targetElement) targetElement.remove();
+                        
+                        const d = document.createElement('div');
+                        d.className = 'selected-player';
+                        d.textContent = `P${idx + 1}: ${pName}`;
+                        document.getElementById('selectedPlayers').appendChild(d);
+                        
+                        playCorrectSound();
+                        await speakChinese(pName);
+                        
+                        setTimeout(() => selectPlayersSequentially(avail, idx + 1), 500);
+                    }, 500);
                 }
+                count++;
             }, 100);
         }
 
@@ -1048,6 +1084,7 @@
         }
         function createSparkles(b) {
             const r = b.getBoundingClientRect();
+            // Regular sparkles
             for(let i=0;i<10;i++) {
                 setTimeout(()=>{
                     const s = document.createElement('div'); s.className='sparkle';
@@ -1055,6 +1092,15 @@
                     s.style.top = r.top + Math.random()*r.height + 'px';
                     document.body.appendChild(s); setTimeout(()=>s.remove(), 1000);
                 }, i*50);
+            }
+            // Glitter
+            for(let i=0;i<20;i++) {
+                setTimeout(()=>{
+                    const g = document.createElement('div'); g.className='glitter';
+                    g.style.left = r.left + Math.random()*r.width + 'px';
+                    g.style.top = r.top + Math.random()*r.height + 'px';
+                    document.body.appendChild(g); setTimeout(()=>g.remove(), 2000);
+                }, i*30);
             }
         }
         function createShakeEffect(b) {
