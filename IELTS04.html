@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speaking Practice</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    /* Base Styles */
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+      overflow: hidden;
+      color: #2d3748;
+    }
+
+    /* Container */
+    .app-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      position: relative;
+    }
+
+    /* Cards/Screens */
+    .screen-card {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 1200px;
+      height: 95vh;
+      display: none; /* Hidden by default */
+      flex-direction: column;
+      animation: slideIn 0.4s ease-out;
+      position: relative;
+    }
+
+    .screen-card.active {
+      display: flex;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Setup Screen */
+    .student-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.8rem;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      max-height: 50vh;
+    }
+
+    .student-card {
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .student-card:hover { border-color: #667eea; transform: translateY(-2px); }
+    .student-card.selected { background: #ebf8ff; border-color: #4299e1; }
+    
+    .student-avatar {
+      width: 32px;
+      height: 32px;
+      background: #edf2f7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #4a5568;
+      font-size: 0.9rem;
+    }
+
+    /* Speaking Screen Layout */
+    .question-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      gap: 0.8rem; /* Reduced gap */
+    }
+
+    /* Big Question Box at Top */
+    .question-box {
+      background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 20px;
+      font-family: 'Fredoka', sans-serif;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(66, 153, 225, 0.4);
+      position: relative;
+      /* Reduced size as requested */
+      min-height: 25%; 
+      flex-grow: 0;
+      display: flex;
+      align-items: flex-start; /* Move text to top */
+      justify-content: center;
+      padding-top: 2.5rem; /* Space for timer */
+    }
+
+    .question-text-display {
+      font-size: 2.2rem; /* Slightly adjusted for space */
+      line-height: 1.2;
+      font-weight: 600;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-top: 0.5rem;
+    }
+
+    /* Info Bar Below Question */
+    .info-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f7fafc;
+      padding: 0.5rem 1.5rem;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      flex-shrink: 0;
+    }
+
+    /* Help Section (Word Bank) */
+    .help-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr; 
+      gap: 1rem;
+      flex-grow: 1; /* Allow to grow to fill space */
+      min-height: 0; /* Important for scroll */
+    }
+
+    .help-panel {
+      background: #fff;
+      border: 2px solid #edf2f7;
+      border-radius: 16px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .help-header {
+      font-family: 'Fredoka', sans-serif;
+      color: #4a5568;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: bold;
+    }
+
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      overflow-y: auto;
+      align-content: flex-start;
+      padding-bottom: 0.5rem;
+    }
+
+    .tag {
+      background: #f7fafc;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e0;
+      font-size: 0.9rem;
+      color: #2d3748;
+      font-weight: 600;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.05);
+    }
+    
+    .tag.special {
+        background: #ebf8ff;
+        border-color: #bee3f8;
+        color: #2b6cb0;
+    }
+    
+    .tag.idiom {
+        background: #f0fff4;
+        border-color: #9ae6b4;
+        color: #276749;
+        font-weight: 800;
+        width: 100%; /* Force idiom to own line */
+        text-align: center;
+    }
+
+    /* Timer & Progress */
+    .timer-float {
+      position: absolute;
+      top: 0.8rem;
+      right: 0.8rem;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+      color: white;
+      padding: 0.2rem 1.2rem;
+      border-radius: 50px;
+      font-weight: 800;
+      font-size: 1.8rem;
+      border: 2px solid rgba(255,255,255,0.4);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: auto;
+      flex-shrink: 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #48bb78, #38a169);
+      width: 100%;
+      transition: width 1s linear;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: 100%;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 15px rgba(0,0,0,0.2); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; background: #cbd5e0; }
+
+    /* Selection Screen */
+    .roulette-wrapper {
+      background: #2d3748;
+      color: white;
+      border-radius: 30px;
+      padding: 4rem 2rem;
+      text-align: center;
+      margin: 2rem 0;
+      border: 8px solid #4a5568;
+      box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+    }
+    .roulette-name { font-size: 4.5rem; font-family: 'Fredoka', sans-serif; text-shadow: 0 4px 0 #000; }
+
+    /* Countdown */
+    .giant-countdown {
+      font-size: 12rem;
+      font-weight: 900;
+      color: #4299e1;
+      text-align: center;
+      animation: pulse 1s infinite;
+      font-family: 'Fredoka', sans-serif;
+    }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+    /* Preview Screen Layout */
+    .preview-grid {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      gap: 1.5rem;
+    }
+    .preview-card {
+      flex: 1;
+      background: #ebf8ff;
+      border-left: 8px solid #4299e1;
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- 1. SETUP SCREEN -->
+  <div id="screen-setup" class="screen-card active">
+    <!-- Removed Grade 9 from title -->
+    <h1 class="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6 font-fredoka">IELTS Speaking Master</h1>
+    
+    <div class="grid grid-cols-2 gap-6 mb-6">
+      <div class="flex flex-col">
+        <label class="font-bold text-gray-600 mb-2 text-lg">📅 Practice Date</label>
+        <input type="date" id="date-picker" class="p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none text-xl font-bold text-gray-700">
+      </div>
+      <div class="flex flex-col">
+        <label class="font-bold text-gray-600 mb-2 text-lg">📚 Select Topic</label>
+        <select id="theme-select" class="p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none bg-white text-xl font-bold text-gray-700">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+    </div>
+
+    <div class="flex-grow flex flex-col min-h-0">
+      <div class="flex justify-between items-end mb-2">
+        <h2 class="text-2xl font-bold text-gray-700">🎓 Attendance</h2>
+        <button onclick="selectAllStudents()" class="text-blue-600 font-bold hover:bg-blue-50 px-3 py-1 rounded">Select All</button>
+      </div>
+      <div id="student-grid" class="student-grid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <button id="btn-start" class="btn-primary mt-6" disabled>🚀 Start Session</button>
+  </div>
+
+  <!-- 2. PREVIEW SCREEN -->
+  <div id="screen-preview" class="screen-card">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-3xl font-extrabold text-gray-800">Topic Preview</h2>
+      <div class="bg-red-100 text-red-600 font-black px-6 py-2 rounded-xl text-3xl shadow-sm border border-red-200" id="preview-timer">60</div>
+    </div>
+    
+    <div id="preview-content" class="preview-grid">
+      <!-- Populated by JS to fill screen -->
+    </div>
+  </div>
+
+  <!-- 3. SELECTION SCREEN -->
+  <div id="screen-selection" class="screen-card" style="max-width: 900px; justify-content: center;">
+    <h2 class="text-4xl font-extrabold text-gray-700 text-center mb-6">🎲 Who is speaking next?</h2>
+    <div class="roulette-wrapper">
+      <div id="roulette-display" class="roulette-name">...</div>
+    </div>
+  </div>
+
+  <!-- 4. COUNTDOWN SCREEN -->
+  <div id="screen-countdown" class="screen-card" style="justify-content: center;">
+    <h2 class="text-4xl font-bold text-gray-600 text-center mb-10">Get Ready!</h2>
+    <div id="countdown-display" class="giant-countdown">5</div>
+    <div id="next-speaker-name" class="text-4xl mt-12 font-bold text-blue-600 text-center"></div>
+  </div>
+
+  <!-- 5. SPEAKING SCREEN (MAIN) -->
+  <div id="screen-speaking" class="screen-card">
+    <div class="question-layout">
+      
+      <!-- Top: Big Question -->
+      <div class="question-box">
+        <div id="question-timer" class="timer-float">45</div>
+        <div id="question-text" class="question-text-display">
+          Question text goes here...
+        </div>
+      </div>
+
+      <!-- Middle: Info Bar -->
+      <div class="info-bar">
+        <div class="flex items-center gap-4">
+          <div class="bg-blue-100 p-3 rounded-full text-blue-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wide">Current Speaker</div>
+            <div id="active-speaker" class="text-2xl font-black text-gray-800">Student Name</div>
+          </div>
+        </div>
+
+        <div class="bg-gray-100 px-6 py-2 rounded-lg border border-gray-200">
+          <div class="text-xs font-bold text-gray-400 uppercase text-center">Current Section</div>
+          <div id="active-part" class="text-xl font-bold text-blue-600">Part 1</div>
+        </div>
+
+        <div id="recording-badge" class="flex items-center gap-3 bg-red-50 text-red-600 px-5 py-2 rounded-full border border-red-100 shadow-sm animate-pulse">
+           <div class="w-4 h-4 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.8)]"></div> 
+           <span class="font-bold tracking-wider">RECORDING</span>
+        </div>
+      </div>
+
+      <!-- Bottom: Help & Progress (Reordered) -->
+      <div class="help-grid">
+        <!-- 1. IELTS Toolkit (Left) -->
+        <div class="help-panel bg-purple-50 border-purple-100">
+          <div class="help-header text-purple-600">
+            <span>🚀</span> IELTS Toolkit
+          </div>
+          <div id="toolkit-container" class="tag-container">
+            <!-- Universal Cohesive Devices -->
+          </div>
+        </div>
+
+        <!-- 2. Idea Starters (Middle) -->
+        <div class="help-panel">
+          <div class="help-header text-blue-600">
+            <span>💡</span> Idea Starters
+          </div>
+          <div id="stems-container" class="tag-container"></div>
+        </div>
+
+        <!-- 3. Key Vocabulary (Right) -->
+        <div class="help-panel">
+          <div class="help-header text-green-600">
+            <span>📚</span> Key Vocabulary
+          </div>
+          <div id="words-container" class="tag-container"></div>
+        </div>
+      </div>
+
+      <div class="progress-track">
+        <div id="progress-bar" class="progress-fill"></div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- 6. FEEDBACK SCREEN -->
+  <div id="screen-feedback" class="screen-card" style="align-items: center; justify-content: center;">
+    <div class="text-center w-full max-w-4xl">
+      <div class="text-7xl mb-4 animate-bounce">🎉</div>
+      <h2 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 mb-4">Fantastic!</h2>
+      <p id="praise-text" class="text-2xl text-gray-600 mb-10 font-bold">Excellent fluency and vocabulary usage.</p>
+      
+      <div class="bg-white p-8 rounded-2xl shadow-xl border-l-8 border-blue-500 text-left mb-10 relative overflow-hidden">
+        <div class="absolute top-0 right-0 bg-blue-100 text-blue-600 px-4 py-1 rounded-bl-xl font-bold text-sm">SAMPLE ANSWER</div>
+        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <span>🤖</span> Listen to a Grade 9 Response:
+        </h3>
+        <p id="sample-answer-text" class="text-xl text-gray-700 leading-relaxed font-medium"></p>
+      </div>
+
+      <div class="flex flex-col items-center gap-2">
+        <div class="text-gray-400 font-bold text-sm uppercase">Auto-Next In</div>
+        <div id="auto-next-timer" class="text-4xl font-black text-gray-300">60</div>
+      </div>
+
+      <button id="btn-next-student" class="btn-primary mt-6 max-w-sm bg-gray-500">Skip Wait & Next Student →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/** * CONFIGURATION & DATA */
+const IELTS_TOOLKIT = [
+  "Let me see...", "That's an interesting question", "To be honest...", "Frankly speaking...",
+  "On the other hand...", "Furthermore...", "Consequently...", "For instance...",
+  "Another key point is...", "In contrast...", "Generally speaking...", "Specifically..."
+];
+
+const STUDENTS = [
+  { english: "Iris", chinese: "柴卓瑶" },
+  { english: "Max", chinese: "李之用" },
+  { english: "Cathy", chinese: "林云曦" },
+  { english: "Sandy", chinese: "刘珂含" },
+  { english: "Vicky", chinese: "骆梦乔" },
+  { english: "Jim", chinese: "宋昊轩" },
+  { english: "Jackie", chinese: "向家慕" },
+  { english: "Jay", chinese: "徐嘉灏" },
+  { english: "Grace", chinese: "杨馥宁" },
+  { english: "Emily", chinese: "张与卓" },
+  { english: "Rhea", chinese: "赵千梦" }
+];
+
+// Added Idioms to Themes
+const THEMES = [
+  {
+    name: "Hobbies & Free Time",
+    idiom: "Recharge one's batteries (充电/恢复体力)",
+    part1: "What do you usually do on weekends to relax?",
+    part1_stems: ["I tend to...", "My go-to activity is...", "I'm really into..."],
+    part1_words: ["unwind", "leisure", "passion", "recharge", "escapism"],
+    part1_sample: "On weekends, I usually unwind by reading fantasy novels. It's my go-to activity because it allows me to escape reality and recharge after a busy week at school.",
+    
+    part2: "Describe a hobby you really enjoy. What is it? When did you start? Why do you like it?",
+    part2_stems: ["One hobby I'm passionate about is...", "I took it up when...", "It appeals to me because..."],
+    part2_words: ["creative outlet", "therapeutic", "challenging", "sense of achievement"],
+    part2_sample: "I'm really passionate about digital photography. I took it up about two years ago using my phone. I find it incredibly therapeutic, and it serves as a creative outlet where I can capture the beauty of everyday moments.",
+    
+    part3: "Why is it important for students to have hobbies outside of school?",
+    part3_stems: ["Crucially...", "It fosters...", "Aside from academics..."],
+    part3_words: ["well-rounded", "mental well-being", "social skills", "balance"],
+    part3_sample: "It is crucial for students to have hobbies because it fosters a well-rounded personality. Aside from academics, hobbies provide a necessary break for mental well-being and can even help develop social skills if done in groups."
+  },
+  {
+    name: "School Life",
+    idiom: "Hit the books (用功读书)",
+    part1: "Which subject do you find most interesting at school?",
+    part1_stems: ["Without a doubt...", "I find ... fascinating because...", "I'm drawn to..."],
+    part1_words: ["engaging", "curriculum", "concepts", "practical", "theory"],
+    part1_sample: "Without a doubt, I find Physics the most fascinating. I'm drawn to understanding how the universe works, from the smallest atoms to massive galaxies. The practical experiments make the concepts really stick.",
+    
+    part2: "Describe your favorite teacher. Who are they? What do they teach? Why do you like them?",
+    part2_stems: ["The teacher who stands out is...", "Their teaching style is...", "I admire them for..."],
+    part2_words: ["inspirational", "approachable", "knowledgeable", "engaging", "mentor"],
+    part2_sample: "The teacher who stands out most to me is my English teacher, Mr. Smith. His teaching style is incredibly engaging; he doesn't just lecture, he brings stories to life. I admire him for being approachable and always willing to help us improve.",
+    
+    part3: "Do you think homework is useful for students?",
+    part3_stems: ["To some extent...", "Conversely...", "It reinforces..."],
+    part3_words: ["consolidation", "burden", "independent learning", "discipline"],
+    part3_sample: "To some extent, homework is useful as it reinforces what was learned in class. However, if there is too much, it becomes a burden. Ideally, it should encourage independent learning rather than just be busy work."
+  },
+  {
+    name: "Friends",
+    idiom: "Through thick and thin (同甘共苦)",
+    part1: "How often do you see your friends outside of school?",
+    part1_stems: ["Typically...", "We make a point to...", "Due to my schedule..."],
+    part1_words: ["catch up", "socialize", "bond", "hang out", "quality time"],
+    part1_sample: "Typically, I see my friends once a week on Saturdays. We make a point to catch up over bubble tea or a movie. During the week, we are usually too busy with homework to hang out properly.",
+    
+    part2: "Describe your best friend. How did you meet? What do you do together? Why are you close?",
+    part2_stems: ["My closest companion is...", "We crossed paths...", "Our bond is built on..."],
+    part2_words: ["inseparable", "mutual trust", "supportive", "confidant", "shared interests"],
+    part2_sample: "My closest companion is Max. We crossed paths in primary school and have been inseparable since. We love playing basketball together. Our bond is built on mutual trust; he is my confidant and always supports me.",
+    
+    part3: "What qualities make a good friend?",
+    part3_stems: ["Fundamentally...", "A key attribute is...", "Above all..."],
+    part3_words: ["loyalty", "empathy", "reliability", "non-judgmental"],
+    part3_sample: "Fundamentally, a good friend must be loyal and reliable. You need to know they have your back. Above all, empathy is key; a good friend listens without being judgmental and understands your feelings."
+  },
+  {
+    name: "Food & Snacks",
+    idiom: "Make my mouth water (令人垂涎/流口水)",
+    part1: "What is your favorite snack?",
+    part1_stems: ["I have a sweet tooth for...", "I crave...", "My absolute favorite is..."],
+    part1_words: ["savory", "nutritious", "guilty pleasure", "refreshing"],
+    part1_sample: "I have a sweet tooth, so my absolute favorite snack is dark chocolate. It's a bit of a guilty pleasure, but I find it really boosts my mood when I'm studying late at night.",
+    
+    part2: "Describe a special meal you had recently. What did you eat? Who were you with? Why was it special?",
+    part2_stems: ["A memorable dining experience was...", "The highlight was...", "The ambiance was..."],
+    part2_words: ["cuisine", "delicacy", "gathering", "atmosphere", "celebratory"],
+    part2_sample: "A memorable dining experience was my grandmother's birthday dinner last week. We had traditional dumplings and Peking duck. It was special not just because of the delicious delicacies, but because the whole extended family was there together.",
+    
+    part3: "Do you think young people today eat too much fast food?",
+    part3_stems: ["Undeniably...", "The convenience leads to...", "From a health perspective..."],
+    part3_words: ["obesity", "processed", "lifestyle", "dietary habits"],
+    part3_sample: "Undeniably, many young people consume too much fast food. The convenience and low cost are attractive, but from a health perspective, it's concerning. It often leads to poor dietary habits and health issues like obesity later in life."
+  },
+  {
+    name: "Social Media",
+    idiom: "Go viral (迅速走红)",
+    part1: "Which app do you use the most on your phone?",
+    part1_stems: ["I'm constantly on...", "I find myself scrolling...", "It's essential for..."],
+    part1_words: ["interface", "connect", "content", "algorithm", "addictive"],
+    part1_sample: "I'm constantly on WeChat. It's essential for both my social life and school communication. I also find myself scrolling through Douyin when I need a quick break, as the algorithm shows me really funny content.",
+    
+    part2: "Describe a website or app that helps you learn. What is it? How do you use it? Why is it helpful?",
+    part2_stems: ["An invaluable tool for me is...", "It features...", "It enhances my learning by..."],
+    part2_words: ["resource", "interactive", "comprehensive", "accessible"],
+    part2_sample: "An invaluable tool for me is Bilibili. While known for entertainment, it features amazing educational channels. I use it to watch physics tutorials. It enhances my learning by providing visual explanations that are often clearer than my textbooks.",
+    
+    part3: "Do teenagers spend too much time on their phones?",
+    part3_stems: ["It's a double-edged sword...", "Excessive screen time...", "We need to balance..."],
+    part3_words: ["detrimental", "virtual interaction", "sedentary", "moderation"],
+    part3_sample: "It's a double-edged sword. While phones connect us, excessive screen time is detrimental to our sleep and attention spans. I think teenagers often rely too much on virtual interaction and need to balance it with face-to-face communication."
+  },
+  {
+    name: "Sports",
+    idiom: "Give it my best shot (全力以赴)",
+    part1: "Do you prefer watching sports or playing sports?",
+    part1_stems: ["I'm more of a spectator...", "I definitely prefer participating...", "I find playing more..."],
+    part1_words: ["adrenaline", "competitive", "atmosphere", "physically demanding"],
+    part1_sample: "I definitely prefer participating. While watching is fun, playing gives me an adrenaline rush. I love the competitive nature of basketball and the feeling of physically pushing myself.",
+    
+    part2: "Describe a sport you would like to try in the future. What is it? Why do you want to try it?",
+    part2_stems: ["I've always been intrigued by...", "It seems incredibly...", "I'd love to attempt..."],
+    part2_words: ["extreme sport", "coordination", "endurance", "thrilling"],
+    part2_sample: "I've always been intrigued by surfing. It seems incredibly thrilling to ride the waves. I'd love to attempt it because it requires a unique mix of balance and harmony with nature, which looks very challenging but rewarding.",
+    
+    part3: "Why is PE class important in school?",
+    part3_stems: ["It's vital because...", "It combats...", "Beyond fitness..."],
+    part3_words: ["sedentary lifestyle", "teamwork", "stress relief", "discipline"],
+    part3_sample: "PE is vital because it combats the sedentary lifestyle of sitting in classrooms all day. Beyond just fitness, it teaches teamwork and discipline. It also serves as excellent stress relief for students under academic pressure."
+  },
+  {
+    name: "Movies",
+    idiom: "On the edge of my seat (扣人心弦)",
+    part1: "What kind of movies do you like best?",
+    part1_stems: ["I'm a huge fan of...", "I gravitate towards...", "My genre of choice is..."],
+    part1_words: ["sci-fi", "plot twists", "visual effects", "cinematography"],
+    part1_sample: "I'm a huge fan of Science Fiction. I gravitate towards movies that explore future possibilities or space travel, like Interstellar. I appreciate the stunning visual effects and mind-bending plot twists.",
+    
+    part2: "Describe a movie that made you laugh. What was it? Who was in it? Why was it funny?",
+    part2_stems: ["A film that had me in stitches was...", "The humor was...", "It starred..."],
+    part2_words: ["comedy", "hilarious", "witty", "slapstick", "dialogue"],
+    part2_sample: "A film that had me in stitches was 'Home Alone'. It's a classic comedy. The slapstick humor where the thieves get outsmarted by a kid is hilarious no matter how many times I watch it. The physical comedy is just brilliant.",
+    
+    part3: "Is it better to watch movies at home or in the cinema?",
+    part3_stems: ["There are pros and cons...", "The cinema offers...", "Home viewing is..."],
+    part3_words: ["immersive experience", "convenience", "social outing", "sound system"],
+    part3_sample: "There are pros and cons to both. The cinema offers an immersive experience with its massive screen and sound system, which is great for blockbusters. However, home viewing is unbeatable for convenience and comfort."
+  },
+  {
+    name: "Travel",
+    idiom: "Off the beaten track (人迹罕至/不落俗套)",
+    part1: "Do you like traveling by car or by plane?",
+    part1_stems: ["Given the choice...", "I prefer the speed of...", "Road trips are..."],
+    part1_words: ["efficiency", "scenic", "journey", "hassle", "destination"],
+    part1_sample: "Given the choice, I prefer the speed of a plane for long distances because of the efficiency. However, for shorter trips, road trips are more fun because you can enjoy the scenic route and stop whenever you want.",
+    
+    part2: "Describe a city you want to visit. Where is it? What is it famous for? Why do you want to go?",
+    part2_stems: ["Top of my bucket list is...", "It's renowned for...", "I'm dying to visit..."],
+    part2_words: ["architecture", "culture", "landmarks", "vibrant", "cuisine"],
+    part2_sample: "Top of my bucket list is Paris, France. It's renowned for its architecture like the Eiffel Tower and the Louvre museum. I'm dying to visit to experience the romantic atmosphere and try authentic French cuisine.",
+    
+    part3: "What can we learn from visiting other places?",
+    part3_stems: ["It broadens our horizons...", "We gain insight into...", "Exposure to..."],
+    part3_words: ["cultural diversity", "perspective", "tolerance", "history"],
+    part3_sample: "Visiting other places broadens our horizons significantly. We gain insight into how other people live, which fosters tolerance and understanding. Exposure to cultural diversity teaches us that there's more than one way to view the world."
+  },
+  {
+    name: "Festivals & Holidays",
+    idiom: "Have a blast (玩得很痛快)",
+    part1: "What is your favorite holiday of the year?",
+    part1_stems: ["I look forward to...", "Nothing beats...", "My favorite has to be..."],
+    part1_words: ["festive", "reunion", "atmosphere", "anticipation"],
+    part1_sample: "My favorite has to be the Spring Festival. Nothing beats the festive atmosphere and the anticipation of seeing my whole family. It's the one time of year everyone makes an effort to be together.",
+    
+    part2: "Describe how you celebrated a festival recently. What did you do? What did you eat? Who were you with?",
+    part2_stems: ["During the recent...", "We observed the tradition of...", "It was a joyous occasion because..."],
+    part2_words: ["gathering", "traditional", "customs", "feast", "celebration"],
+    part2_sample: "During the recent Mid-Autumn Festival, my family gathered in our garden. We observed the tradition of eating mooncakes and gazing at the full moon. It was a joyous occasion because my cousins from out of town came to visit.",
+    
+    part3: "Why are traditional festivals important?",
+    part3_stems: ["They preserve...", "They serve as a reminder...", "Culturally speaking..."],
+    part3_words: ["heritage", "identity", "continuity", "ancestors"],
+    part3_sample: "Traditional festivals are vital because they preserve our cultural heritage. They serve as a reminder of our history and ancestors. Without them, we might lose a sense of our identity and continuity as a people."
+  },
+  {
+    name: "Shopping & Fashion",
+    idiom: "Cost an arm and a leg (非常昂贵)",
+    part1: "Do you enjoy buying new clothes?",
+    part1_stems: ["I'm quite into...", "I view it as...", "Not particularly, because..."],
+    part1_words: ["fashion trends", "express myself", "chore", "retail therapy"],
+    part1_sample: "I'm quite into fashion, so I view buying clothes as a way to express myself. I enjoy looking for pieces that fit my style. It's a bit of retail therapy for me when I'm stressed.",
+    
+    part2: "Describe something you bought recently that you like. What is it? Where did you buy it? Why do you like it?",
+    part2_stems: ["I recently purchased...", "I picked it up at...", "It caught my eye because..."],
+    part2_words: ["good value", "quality", "design", "practical", "impulse buy"],
+    part2_sample: "I recently purchased a high-quality noise-canceling headphone set online. It caught my eye because of the sleek design. I like it because it's incredibly practical for studying in noisy environments.",
+    
+    part3: "Do you think famous brands are worth the money?",
+    part3_stems: ["It depends entirely on...", "Often you are paying for...", "In terms of quality..."],
+    part3_words: ["status symbol", "craftsmanship", "marketing", "durability"],
+    part3_sample: "It depends entirely on the item. Often you are paying for the marketing and status symbol rather than the product itself. However, for things like electronics or shoes, famous brands often offer better craftsmanship and durability."
+  }
+];
+
+let state = {
+  date: new Date().toISOString().split('T')[0],
+  selectedThemeIndex: 0,
+  selectedStudents: new Set(),
+  remainingStudents: [],
+  currentStudent: null,
+  step: 'setup', 
+  currentPart: 1,
+  timerInterval: null,
+  mediaRecorder: null,
+  audioChunks: [],
+  stream: null
+};
+
+/* --- AUDIO EFFECTS --- */
+// Using Web Audio API for synthesized sounds
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContext();
+
+function playTone(freq, type, duration) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+function playClickSound() { playTone(800, 'square', 0.05); }
+function playTickSound() { playTone(1200, 'sine', 0.05); }
+function playWinSound() { 
+  [400, 500, 600, 800].forEach((f, i) => setTimeout(() => playTone(f, 'triangle', 0.3), i * 100));
+}
+
+/* --- TTS --- */
+function speakText(text, onEndCallback) {
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  
+  const voices = window.speechSynthesis.getVoices();
+  
+  // Prioritize Andrew, Brian, or Emma
+  const targetVoice = voices.find(v => 
+    v.name.includes('Andrew') || 
+    v.name.includes('Brian') || 
+    v.name.includes('Emma')
+  );
+
+  // Fallback to Microsoft English if specific names missing, then generic English
+  const backupVoice = voices.find(v => v.name.includes('Microsoft') && v.lang.includes('en'));
+  
+  if (targetVoice) {
+    utterance.voice = targetVoice;
+  } else if (backupVoice) {
+    utterance.voice = backupVoice;
+  }
+  
+  utterance.rate = 0.85; // Slow down
+  utterance.onend = onEndCallback;
+  window.speechSynthesis.speak(utterance);
+}
+
+// Init voices
+window.speechSynthesis.onvoiceschanged = () => { console.log("Voices loaded"); };
+
+
+/* --- DOM & LOGIC --- */
+const screens = {
+  setup: document.getElementById('screen-setup'),
+  preview: document.getElementById('screen-preview'),
+  selection: document.getElementById('screen-selection'),
+  countdown: document.getElementById('screen-countdown'),
+  speaking: document.getElementById('screen-speaking'),
+  feedback: document.getElementById('screen-feedback')
+};
+
+function init() {
+  document.getElementById('date-picker').value = state.date;
+  const themeSelect = document.getElementById('theme-select');
+  THEMES.forEach((theme, index) => {
+    const opt = document.createElement('option');
+    opt.value = index;
+    opt.textContent = theme.name;
+    themeSelect.appendChild(opt);
+  });
+  renderStudentGrid();
+  document.getElementById('theme-select').addEventListener('change', (e) => state.selectedThemeIndex = parseInt(e.target.value));
+  document.getElementById('date-picker').addEventListener('change', (e) => state.date = e.target.value);
+  document.getElementById('btn-start').addEventListener('click', startPreview);
+  document.getElementById('btn-next-student').addEventListener('click', nextStudent);
+}
+
+function renderStudentGrid() {
+  const grid = document.getElementById('student-grid');
+  grid.innerHTML = '';
+  STUDENTS.forEach((student, index) => {
+    const el = document.createElement('div');
+    el.className = `student-card ${state.selectedStudents.has(index) ? 'selected' : ''}`;
+    el.onclick = () => toggleStudent(index);
+    el.innerHTML = `
+      <div class="student-avatar">${student.english.substring(0,2)}</div>
+      <div>
+        <div class="font-bold text-gray-700">${student.english}</div>
+        <div class="text-xs text-gray-400">${student.chinese}</div>
+      </div>
+    `;
+    grid.appendChild(el);
+  });
+  document.getElementById('btn-start').disabled = state.selectedStudents.size === 0;
+}
+
+function toggleStudent(index) {
+  if (state.selectedStudents.has(index)) state.selectedStudents.delete(index);
+  else state.selectedStudents.add(index);
+  renderStudentGrid();
+}
+
+function selectAllStudents() {
+  state.selectedStudents = new Set(STUDENTS.map((_, i) => i));
+  renderStudentGrid();
+}
+
+function switchScreen(screenName) {
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[screenName].classList.add('active');
+}
+
+// 1. PREVIEW
+async function startPreview() {
+  // Initialize Audio Context on user gesture
+  if (audioCtx.state === 'suspended') await audioCtx.resume();
+  
+  // Request Microphone Permission EARLY
+  try {
+    state.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    alert("Microphone access is required for recording!");
+    console.error(err);
+  }
+
+  const theme = THEMES[state.selectedThemeIndex];
+  const container = document.getElementById('preview-content');
+  
+  // Big Font, No Scroll Layout
+  container.innerHTML = `
+    <div class="preview-card bg-blue-50 border-l-8 border-blue-500">
+      <h3 class="text-2xl font-black text-blue-700 uppercase tracking-widest mb-2">Part 1 (45s)</h3>
+      <p class="text-3xl font-bold text-gray-800 leading-tight">${theme.part1}</p>
+    </div>
+    <div class="preview-card bg-green-50 border-l-8 border-green-500">
+      <h3 class="text-2xl font-black text-green-700 uppercase tracking-widest mb-2">Part 2 (2 min)</h3>
+      <p class="text-3xl font-bold text-gray-800 leading-tight">${theme.part2}</p>
+    </div>
+    <div class="preview-card bg-purple-50 border-l-8 border-purple-500">
+      <h3 class="text-2xl font-black text-purple-700 uppercase tracking-widest mb-2">Part 3 (1 min)</h3>
+      <p class="text-3xl font-bold text-gray-800 leading-tight">${theme.part3}</p>
+    </div>
+  `;
+
+  state.remainingStudents = Array.from(state.selectedStudents)
+    .sort(() => Math.random() - 0.5)
+    .map(i => STUDENTS[i]);
+
+  switchScreen('preview');
+  
+  let timeLeft = 60;
+  const timerDisplay = document.getElementById('preview-timer');
+  const interval = setInterval(() => {
+    timeLeft--;
+    timerDisplay.textContent = timeLeft;
+    if (timeLeft <= 10) playTickSound();
+    if(timeLeft <= 0) {
+      clearInterval(interval);
+      startSelection();
+    }
+  }, 1000);
+}
+
+// 2. SELECTION
+function startSelection() {
+  if(state.remainingStudents.length === 0) {
+    alert("All students have finished!");
+    location.reload();
+    return;
+  }
+  
+  switchScreen('selection');
+  const display = document.getElementById('roulette-display');
+  let counter = 0;
+  let speed = 50;
+  
+  const spin = () => {
+    const randomName = STUDENTS[Math.floor(Math.random() * STUDENTS.length)].english;
+    display.textContent = randomName;
+    playClickSound();
+    
+    counter++;
+    if(counter < 40) {
+      setTimeout(spin, speed);
+      speed += 5;
+    } else {
+      state.currentStudent = state.remainingStudents[0];
+      display.textContent = state.currentStudent.english;
+      display.style.color = '#48bb78';
+      playWinSound();
+      
+      // CONFETTI
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      setTimeout(startCountdown, 3000);
+    }
+  };
+  spin();
+}
+
+// 3. COUNTDOWN
+function startCountdown() {
+  switchScreen('countdown');
+  document.getElementById('next-speaker-name').textContent = `${state.currentStudent.english} (${state.currentStudent.chinese})`;
+  let timeLeft = 5;
+  const display = document.getElementById('countdown-display');
+  
+  const interval = setInterval(() => {
+    timeLeft--;
+    display.textContent = timeLeft;
+    playTickSound();
+    if(timeLeft <= 0) {
+      clearInterval(interval);
+      startSpeakingSession();
+    }
+  }, 1000);
+}
+
+// 4. SPEAKING SESSION
+function startSpeakingSession() {
+  switchScreen('speaking');
+  document.getElementById('active-speaker').textContent = state.currentStudent.english;
+  
+  // Start Recorder
+  if (state.stream) {
+    state.audioChunks = [];
+    state.mediaRecorder = new MediaRecorder(state.stream);
+    state.mediaRecorder.ondataavailable = e => state.audioChunks.push(e.data);
+    state.mediaRecorder.start();
+    document.getElementById('recording-badge').style.opacity = 1;
+  }
+
+  runPart(1);
+}
+
+function runPart(partNumber) {
+  state.currentPart = partNumber;
+  const theme = THEMES[state.selectedThemeIndex];
+  const qText = document.getElementById('question-text');
+  const pBar = document.getElementById('progress-bar');
+  const partLabel = document.getElementById('active-part');
+  
+  let question, duration, stems, words;
+  if(partNumber === 1) {
+    question = theme.part1; duration = 45; stems = theme.part1_stems; words = theme.part1_words;
+  } else if(partNumber === 2) {
+    question = theme.part2; duration = 120; stems = theme.part2_stems; words = theme.part2_words;
+  } else {
+    question = theme.part3; duration = 60; stems = theme.part3_stems; words = theme.part3_words;
+  }
+
+  partLabel.textContent = `Part ${partNumber}`;
+  qText.textContent = question;
+  pBar.style.width = '100%';
+  pBar.style.transition = 'none';
+  
+  renderTags('stems-container', stems);
+  renderTags('words-container', words);
+  renderTags('toolkit-container', IELTS_TOOLKIT, true);
+  
+  // Render Idiom in words container
+  const wordsContainer = document.getElementById('words-container');
+  const idiomTag = document.createElement('span');
+  idiomTag.className = 'tag idiom';
+  idiomTag.textContent = theme.idiom;
+  wordsContainer.prepend(idiomTag); // Add to top
+
+  speakText(question);
+
+  const timerDisplay = document.getElementById('question-timer');
+  let remaining = duration;
+  timerDisplay.textContent = remaining;
+
+  setTimeout(() => {
+    pBar.style.transition = `width ${duration}s linear`;
+    pBar.style.width = '0%';
+  }, 100);
+
+  if(state.timerInterval) clearInterval(state.timerInterval);
+
+  state.timerInterval = setInterval(() => {
+    remaining--;
+    timerDisplay.textContent = remaining;
+    
+    if(remaining <= 10) {
+       timerDisplay.style.background = 'red'; 
+       playTickSound();
+    } else {
+       timerDisplay.style.background = 'rgba(255,255,255,0.2)';
+    }
+
+    if(remaining <= 0) {
+      clearInterval(state.timerInterval);
+      if(partNumber < 3) runPart(partNumber + 1);
+      else finishStudent();
+    }
+  }, 1000);
+}
+
+function renderTags(containerId, items, isSpecial = false) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  items.forEach(item => {
+    const tag = document.createElement('span');
+    tag.className = `tag ${isSpecial ? 'special' : ''}`;
+    tag.textContent = item;
+    container.appendChild(tag);
+  });
+}
+
+// 5. FINISH & FEEDBACK
+function finishStudent() {
+  state.remainingStudents.shift();
+  
+  // Stop Recorder & Download
+  if (state.mediaRecorder && state.mediaRecorder.state !== 'inactive') {
+    state.mediaRecorder.onstop = () => {
+      const blob = new Blob(state.audioChunks, { type: 'audio/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${state.currentStudent.english}_${state.date}_IELTS_Practice.webm`;
+      a.click();
+    };
+    state.mediaRecorder.stop();
+  }
+
+  switchScreen('feedback');
+  confetti({ particleCount: 100, origin: { y: 0.8 } });
+  playWinSound();
+  
+  const theme = THEMES[state.selectedThemeIndex];
+  // Construct a comprehensive sample answer string
+  const fullSample = `Here are sample answers for ${theme.name}. Part 1: ${theme.part1_sample} Part 2: ${theme.part2_sample} Part 3: ${theme.part3_sample}`;
+  
+  // Display just Part 3 or a mix in the UI? 
+  // Let's display the Part 3 sample as text, but read ALL of them.
+  document.getElementById('sample-answer-text').innerHTML = `
+    <strong>Part 1:</strong> ${theme.part1_sample}<br><br>
+    <strong>Part 2:</strong> ${theme.part2_sample}<br><br>
+    <strong>Part 3:</strong> ${theme.part3_sample}
+  `;
+
+  // Read samples then start auto-next timer
+  speakText(fullSample, startAutoNextTimer);
+}
+
+function startAutoNextTimer() {
+  let waitTime = 60;
+  const timerDisplay = document.getElementById('auto-next-timer');
+  timerDisplay.textContent = waitTime;
+  
+  // Clear any existing timer to be safe
+  if(state.timerInterval) clearInterval(state.timerInterval);
+  
+  state.timerInterval = setInterval(() => {
+    waitTime--;
+    timerDisplay.textContent = waitTime;
+    if(waitTime <= 0) {
+      clearInterval(state.timerInterval);
+      nextStudent();
+    }
+  }, 1000);
+}
+
+function nextStudent() {
+  window.speechSynthesis.cancel();
+  if(state.timerInterval) clearInterval(state.timerInterval);
+  startSelection();
+}
+
+init();
+
+</script>
+</body>
+</html>
