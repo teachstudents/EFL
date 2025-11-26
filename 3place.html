@@ -442,7 +442,7 @@
                 </div>
             </div>
             <div class="round-info-display">
-                <span id="roundDisplay">Round 1 of 8</span> | Q: <span id="currentQuestion">1</span>/10
+                <span id="roundDisplay">Round 1 of 8</span> | Questions Left: <span id="questionsLeft">10</span>
             </div>
         </div>
     </div>
@@ -478,8 +478,8 @@
                 "李鹏潞 / LI, PENGLU", "梁锦天 / LING, JINTIAN", "刘景扬 / LIU, JINGYANG",
                 "龙俊志 / LONG, JUNZHI", "马赫 / MA, HE", "聂溪康 / NIE, XIKANG",
                 "庞云蔚 / PANG, YUNWEI", "曲家瑞 / QU, JIARUI", "孙诗童 / SUN, SHITONG",
-                "王子言 / WANG, ZIYAN", "杨晴珺 / YANG, QINGJUN", "张宸恺 / ZHANG, CHENKAI",
-                "赵浩文 / ZHAO, HAOWEN", "赵浩琳"
+                "王子言 / WANG, ZIYAN", "赵浩琳 / Howlin", "张宸恺 / ZHANG, CHENKAI",
+                "赵浩文 / ZHAO, HAOWEN",
             ],
             11: [
                 "柴卓瑶 / Iris", "李之用 / Max", "林云曦 / Cathy",
@@ -596,8 +596,11 @@
         let totalRounds = 8;
         let currentRound = 1;
         let currentQuestion = 1;
+        let maxQuestions = 10;
+        let isChampionship = false;
         let currentPlayers = [];
         let usedPlayers = [];
+        let roundWinners = new Set();
         let playerScores = {};
         let globalLeaderboard = {};
         let playerStreaks = {};
@@ -729,7 +732,7 @@
         }
 
         async function startNewQuestion() {
-            if (currentQuestion > 10) {
+            if (currentQuestion > maxQuestions) {
                 endRound();
                 return;
             }
@@ -746,7 +749,7 @@
             gameActive = true;
             timeLeft = 15;
             currentQuestionData = generateQuestion();
-            document.getElementById('currentQuestion').textContent = currentQuestion;
+            document.getElementById('questionsLeft').textContent = (maxQuestions - currentQuestion + 1);
             document.getElementById('progressFill').style.width = '100%';
             updateStreakDisplay();
             startTimer();
@@ -757,15 +760,21 @@
         function generateQuestion() {
             let difficulty, itemPool;
             
-            if (currentQuestion === 1) {
-                difficulty = 'easy';
-                itemPool = easyPlaces;
-            } else if (currentQuestion <= 5) {
-                difficulty = 'medium';
-                itemPool = mediumPlaces;
-            } else {
+            // Championship always uses Hard
+            if (isChampionship) {
                 difficulty = 'hard';
                 itemPool = hardPlaces;
+            } else {
+                if (currentQuestion === 1) {
+                    difficulty = 'easy';
+                    itemPool = easyPlaces;
+                } else if (currentQuestion <= 5) {
+                    difficulty = 'medium';
+                    itemPool = mediumPlaces;
+                } else {
+                    difficulty = 'hard';
+                    itemPool = hardPlaces;
+                }
             }
             
             const correctItem = itemPool[Math.floor(Math.random() * itemPool.length)];
@@ -849,9 +858,7 @@
                 playerScores[answeringPlayer] += points;
                 playCorrectSound();
                 
-                // Only reset other players streaks? No, only reset current player if wrong.
-                // Previous logic reset others, keeping that?
-                currentPlayers.forEach(p => { if (p !== answeringPlayer) playerStreaks[p] = 0; });
+                // Reset streak for current player if they were wrong previously? No, logic here is correct.
                 
                 let msg = `Correct!`;
                 if (playerStreaks[answeringPlayer] > 2) msg += ` ${playerStreaks[answeringPlayer]} in a row!`;
@@ -860,17 +867,22 @@
                 createFlyingTokens(playerButton, getPlayerScoreElement(answeringPlayer), `+${points}`);
                 if (playerStreaks[answeringPlayer] > 2) createStreakEffects(playerButton);
             } else {
+                // Incorrect logic: Lose points AND give to others
                 playerStreaks[answeringPlayer] = 0;
                 playerScores[answeringPlayer] -= 5;
+                
+                // Distribute points to other players
                 currentPlayers.forEach(p => {
                     if (p !== answeringPlayer) {
                         playerScores[p] += 5;
-                        // No flying tokens for others to avoid clutter, or target their score
+                        const scoreEl = getPlayerScoreElement(p);
+                        createFlyingTokens(playerButton, scoreEl, '+5');
                     }
                 });
+                
                 playWrongSound();
                 await speak(`Incorrect.`);
-                await speakBrian(`${answeringPlayer.split(' / ')[0]}, incorrect. Minus five points.`);
+                await speakBrian(`${answeringPlayer.split(' / ')[0]}, incorrect. Minus five points. Opponents get 5 points!`);
                 createFlyingTokens(playerButton, getPlayerScoreElement(answeringPlayer), '-5');
             }
             
@@ -890,8 +902,6 @@
             const buttons = document.querySelectorAll('.choice-button');
             buttons.forEach(button => button.disabled = true);
 
-            // Show correct answer on all panels or just generic? 
-            // Let's show correct answer generally since no one answered
             buttons.forEach((button) => {
                 if (button.textContent === currentQuestionData.correctItem.display.toLowerCase()) {
                     button.classList.add('correct');
@@ -915,6 +925,12 @@
             });
             
             const sortedPlayers = [...currentPlayers].sort((a, b) => playerScores[b] - playerScores[a]);
+            
+            // Record Winner if not championship
+            if (!isChampionship) {
+                roundWinners.add(sortedPlayers[0]);
+            }
+
             let leaderboardHTML = '<h3>Round Scores:</h3>';
             sortedPlayers.forEach((player, index) => {
                 const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
@@ -934,14 +950,23 @@
             createWinnerFireworks();
 
             const winner = sortedPlayers[0];
-            if (currentRound < totalRounds) {
-                await speak(`Round winner is ${winner.split(' / ')[1]}!`);
-                await speakBrian(`Congratulations ${winner.split(' / ')[0]}! You won this round!`);
-                makeTimeout(() => { nextRound(); }, 5000);
+            
+            if (!isChampionship) {
+                if (currentRound < totalRounds) {
+                    await speak(`Round winner is ${winner.split(' / ')[1]}!`);
+                    await speakBrian(`Congratulations ${winner.split(' / ')[0]}! You won this round!`);
+                    makeTimeout(() => { nextRound(); }, 5000);
+                } else {
+                    // Go to championship
+                    await speak(`Round winner is ${winner.split(' / ')[1]}!`);
+                    await speakBrian(`End of regular rounds. Preparing for Championship!`);
+                    makeTimeout(() => { startChampionshipRound(); }, 5000);
+                }
             } else {
-                const champion = globalSorted[0];
-                await speak(`Game Over! Champion is ${champion[0].split(' / ')[1]}!`);
-                await speakBrian(`The champion is... ${champion[0].split(' / ')[0]}!`);
+                // End of Championship
+                const champion = sortedPlayers[0];
+                await speak(`Championship Winner is ${champion.split(' / ')[1]}!`);
+                await speakBrian(`The Ultimate Champion is... ${champion.split(' / ')[0]}!`);
                 makeTimeout(() => { backToMenu(); }, 8000);
             }
         }
@@ -951,27 +976,53 @@
             document.getElementById('leaderboard').style.display = 'none';
             document.getElementById('streakIndicator').style.display = 'none';
             currentRound++;
-            if (currentRound > totalRounds) { backToMenu(); return; }
+            // Check handled in endRound, so here we just setup normal next round
             currentQuestion = 1;
+            maxQuestions = 10;
             document.getElementById('roundDisplay').textContent = `Round ${currentRound} of ${totalRounds}`;
             Object.keys(playerScores).forEach(p => playerScores[p] = 0);
             Object.keys(playerStreaks).forEach(p => playerStreaks[p] = 0);
-            if (currentRound === totalRounds) startFinalRound(); else selectNewPlayers();
+            selectNewPlayers();
         }
 
-        function startFinalRound() {
+        function startChampionshipRound() {
+            stopAllSpeech();
+            document.getElementById('leaderboard').style.display = 'none';
+            document.getElementById('streakIndicator').style.display = 'none';
+            
+            isChampionship = true;
+            currentRound++; // Logically round + 1
+            currentQuestion = 1;
+            maxQuestions = 5; // 5 complicated questions
+            
+            document.getElementById('roundDisplay').textContent = `🏆 CHAMPIONSHIP ROUND`;
+            
+            // Logic for championship players: Unique Winners first, then top scorers
+            let potentialPlayers = Array.from(roundWinners);
+            
+            // If we have less than 3 winners (duplicates won multiple rounds), fill with top global scorers who aren't winners
+            if (potentialPlayers.length < 3) {
+                 const sortedGlobal = Object.entries(globalLeaderboard).sort(([,a], [,b]) => b - a).map(([p]) => p);
+                 for (let p of sortedGlobal) {
+                     if (!potentialPlayers.includes(p)) {
+                         potentialPlayers.push(p);
+                         if (potentialPlayers.length >= 3) break;
+                     }
+                 }
+            }
+            
+            // Ensure we have exactly 3 for the layout
+            currentPlayers = potentialPlayers.slice(0, 3);
+            
+            Object.keys(playerScores).forEach(p => playerScores[p] = 0);
+            Object.keys(playerStreaks).forEach(p => playerStreaks[p] = 0);
+            
             const shuffleDiv = document.getElementById('nameShuffle');
-            shuffleDiv.querySelector('.shuffle-title').innerHTML = '🏆 FINAL ROUND! 🏆';
-            document.getElementById('shuffleContainer').innerHTML = '<div style="font-size: 24px; color: #666;">Top Players!</div>';
+            shuffleDiv.querySelector('.shuffle-title').innerHTML = '🏆 CHAMPIONSHIP PLAYOFF 🏆';
+            document.getElementById('shuffleContainer').innerHTML = '<div style="font-size: 24px; color: #666; margin-bottom: 20px;">Round Winners Compete!</div>';
             const selectedPlayersDiv = document.getElementById('selectedPlayers');
             selectedPlayersDiv.innerHTML = '';
-
-            let topPlayers = Object.entries(globalLeaderboard).sort(([, a], [, b]) => b - a).map(([player]) => player).slice(0, 3);
-            if (topPlayers.length < 3) {
-                const avail = studentNames.filter(n => !topPlayers.includes(n));
-                while(topPlayers.length < 3 && avail.length > 0) topPlayers.push(avail.splice(Math.floor(Math.random()*avail.length), 1)[0]);
-            }
-            currentPlayers = topPlayers;
+            
             currentPlayers.forEach((p, i) => {
                 const d = document.createElement('div');
                 d.className = 'selected-player';
@@ -984,8 +1035,14 @@
 
         function selectNewPlayers() {
             showNameShuffle();
-            if (usedPlayers.length >= studentNames.length) usedPlayers = [];
-            const avail = studentNames.filter(n => !usedPlayers.includes(n));
+            
+            let avail = studentNames.filter(n => !usedPlayers.includes(n));
+            
+            if (avail.length < 3) {
+                usedPlayers = [];
+                avail = [...studentNames];
+            }
+            
             const container = document.getElementById('shuffleContainer');
             container.innerHTML = '';
             document.getElementById('selectedPlayers').innerHTML = '';
@@ -1004,6 +1061,10 @@
         function selectPlayersSequentially(avail, idx) {
             if (idx >= 3) { setTimeout(() => showPlayerCountdown(), 1000); return; }
             
+            if (avail.length === 0) {
+                 avail = studentNames.filter(n => !currentPlayers.includes(n));
+            }
+
             const selIdx = Math.floor(Math.random() * avail.length);
             const p = avail.splice(selIdx, 1)[0];
             currentPlayers.push(p);
@@ -1036,7 +1097,7 @@
                         document.getElementById('selectedPlayers').appendChild(d);
                         
                         playCorrectSound();
-                        await speakBrian(pName); // Updated to Brian
+                        await speakBrian(pName); 
                         
                         setTimeout(() => selectPlayersSequentially(avail, idx + 1), 500);
                     }, 500);
@@ -1076,7 +1137,6 @@
         }
 
         function updateStreakDisplay() {
-            // Update individual player streaks
             currentPlayers.forEach((p, idx) => {
                 const streakDiv = document.getElementById(`streak${idx+1}`);
                 const badgesDiv = document.getElementById(`badges${idx+1}`);
@@ -1089,22 +1149,19 @@
                     streakDiv.style.display = 'none';
                 }
                 
-                // Simple badge logic
                 let badgesHTML = '';
                 if (streak >= 3) badgesHTML += '⚡';
                 if (streak >= 5) badgesHTML += '👑';
                 badgesDiv.innerHTML = badgesHTML;
             });
-            
-            // Hide global streak indicator as requested to be under players
             document.getElementById('streakIndicator').style.display = 'none';
         }
 
         function backToMenu() {
             stopAllSpeech();
             if(questionInterval) clearTimer(questionInterval);
-            gameActive = false; currentRound = 1; currentQuestion = 1;
-            currentPlayers = []; usedPlayers = []; playerScores = {}; playerStreaks = {}; globalLeaderboard = {};
+            gameActive = false; currentRound = 1; currentQuestion = 1; isChampionship = false;
+            currentPlayers = []; usedPlayers = []; playerScores = {}; playerStreaks = {}; globalLeaderboard = {}; roundWinners = new Set();
             ['leaderboard', 'learningPhase', 'nameShuffle', 'gameContainer', 'streakIndicator'].forEach(id => document.getElementById(id).style.display = 'none');
             document.getElementById('mainMenu').style.display = 'flex';
         }
@@ -1113,6 +1170,7 @@
             currentGrade = g;
             studentNames = studentsByGrade[g];
             totalRounds = g === 10 ? 6 : 5;
+            maxQuestions = 10;
             document.getElementById('roundDisplay').textContent = `Round 1 of ${totalRounds}`;
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('gameContainer').style.display = 'flex';
