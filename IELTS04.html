@@ -99,47 +99,36 @@
       display: flex;
       flex-direction: column;
       height: 100%;
-      gap: 0.8rem; /* Reduced gap */
+      gap: 1rem; /* Gap between top box and grid */
     }
 
     /* Big Question Box at Top - REDUCED SIZE */
     .question-box {
       background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
       color: white;
-      padding: 1.5rem;
+      padding: 1rem;
       border-radius: 20px;
       font-family: 'Fredoka', sans-serif;
       text-align: center;
       box-shadow: 0 8px 20px rgba(66, 153, 225, 0.4);
       position: relative;
-      min-height: 18%; /* Reduced from 25% */
+      min-height: 15%; /* Further reduced to save space */
       flex-grow: 0;
       display: flex;
-      align-items: flex-start; /* Move text to top */
+      align-items: center; /* Vertically center */
       justify-content: center;
-      padding-top: 1rem;
     }
 
     .question-text-display {
-      font-size: 1.8rem; /* Reduced from 2.2rem */
+      font-size: 1.6rem; 
       line-height: 1.2;
       font-weight: 600;
       text-shadow: 0 2px 4px rgba(0,0,0,0.1);
       margin-top: 0.5rem;
-      padding-right: 3rem; /* Make room for timer */
+      padding: 0 3rem; /* Padding for floating elements */
     }
 
-    /* Info Bar Below Question */
-    .info-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #f7fafc;
-      padding: 0.5rem 1.5rem;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      flex-shrink: 0;
-    }
+    /* Info Bar Removed - Styles Deleted */
 
     /* Help Section (Word Bank) - EXPANDED */
     .help-grid {
@@ -210,16 +199,41 @@
     /* Timer & Progress */
     .timer-float {
       position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
+      top: 50%;
+      right: 1rem;
+      transform: translateY(-50%);
       background: rgba(255,255,255,0.2);
       backdrop-filter: blur(4px);
       color: white;
       padding: 0.2rem 1.2rem;
       border-radius: 50px;
       font-weight: 800;
-      font-size: 1.5rem; /* Reduced slightly */
+      font-size: 1.5rem; 
       border: 2px solid rgba(255,255,255,0.4);
+    }
+
+    /* New subtle indicators inside question box */
+    .part-indicator {
+        position: absolute;
+        top: 0.5rem;
+        left: 1rem;
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.7);
+        letter-spacing: 0.1em;
+    }
+
+    .speaker-indicator {
+        position: absolute;
+        bottom: 0.5rem;
+        left: 1rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: white;
+        background: rgba(0,0,0,0.1);
+        padding: 0.1rem 0.6rem;
+        border-radius: 8px;
     }
 
     .progress-track {
@@ -386,36 +400,17 @@
       
       <!-- Top: Big Question -->
       <div class="question-box">
+        <!-- Integrated Info Indicators -->
+        <div id="part-indicator" class="part-indicator">Part 1</div>
+        <div id="speaker-indicator" class="speaker-indicator">Student</div>
+
         <div id="question-timer" class="timer-float">30</div>
         <div id="question-text" class="question-text-display">
           Question text goes here...
         </div>
       </div>
 
-      <!-- Middle: Info Bar -->
-      <div class="info-bar">
-        <div class="flex items-center gap-4">
-          <div class="bg-blue-100 p-3 rounded-full text-blue-600">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-          </div>
-          <div>
-            <div class="text-xs font-bold text-gray-400 uppercase tracking-wide">Current Speaker</div>
-            <div id="active-speaker" class="text-2xl font-black text-gray-800">Student Name</div>
-          </div>
-        </div>
-
-        <div class="bg-gray-100 px-6 py-2 rounded-lg border border-gray-200">
-          <div class="text-xs font-bold text-gray-400 uppercase text-center">Current Section</div>
-          <div id="active-part" class="text-xl font-bold text-blue-600">Part 1</div>
-        </div>
-
-        <div id="recording-badge" class="flex items-center gap-3 bg-red-50 text-red-600 px-5 py-2 rounded-full border border-red-100 shadow-sm animate-pulse">
-            <div class="w-4 h-4 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.8)]"></div> 
-            <span class="font-bold tracking-wider">RECORDING</span>
-        </div>
-      </div>
+      <!-- MIDDLE BAR REMOVED HERE -->
 
       <!-- Bottom: Help & Progress (Reordered) -->
       <div class="help-grid">
@@ -881,14 +876,13 @@ function startCountdown() {
 // 4. SPEAKING SESSION
 function startSpeakingSession() {
   switchScreen('speaking');
-  document.getElementById('active-speaker').textContent = state.currentStudent.english;
+  document.getElementById('speaker-indicator').textContent = state.currentStudent.english;
   
   if (state.stream) {
     state.audioChunks = [];
     state.mediaRecorder = new MediaRecorder(state.stream);
     state.mediaRecorder.ondataavailable = e => state.audioChunks.push(e.data);
     state.mediaRecorder.start();
-    document.getElementById('recording-badge').style.opacity = 1;
   }
 
   runPart(1);
@@ -899,7 +893,7 @@ function runPart(partNumber) {
   const theme = THEMES[state.selectedThemeIndex];
   const qText = document.getElementById('question-text');
   const pBar = document.getElementById('progress-bar');
-  const partLabel = document.getElementById('active-part');
+  const partIndicator = document.getElementById('part-indicator');
   
   let question, duration, stems, words;
   if(partNumber === 1) {
@@ -910,7 +904,7 @@ function runPart(partNumber) {
     question = theme.part3; duration = TIMING.part3; stems = theme.part3_stems; words = theme.part3_words;
   }
 
-  partLabel.textContent = `Part ${partNumber}`;
+  partIndicator.textContent = `Part ${partNumber}`;
   qText.textContent = question;
   pBar.style.width = '100%';
   pBar.style.transition = 'none';
