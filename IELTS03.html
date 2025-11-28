@@ -447,26 +447,40 @@
 
             // --- STRICT VOICE SELECTION ---
             const getVoicePair = () => {
-                // 1. Find the priority Edge Online Voices
-                const ava = voices.find(v => v.name.includes('Ava'));
-                const emma = voices.find(v => v.name.includes('Emma'));
-                const brian = voices.find(v => v.name.includes('Brian'));
-                const andrew = voices.find(v => v.name.includes('Andrew'));
+                // strict filter for specific Microsoft Multilingual voices
+                // Targets: Ava, Emma, Brian, Andrew
+                const targets = ['Ava', 'Emma', 'Brian', 'Andrew'];
+                
+                // Prioritize voices that match the "Microsoft ... Online (Natural)" pattern containing our targets
+                const validVoices = voices.filter(v => 
+                    v.name.includes('Microsoft') && 
+                    targets.some(t => v.name.includes(t))
+                );
 
-                // 2. Build Pools based strictly on these names
-                const females = [ava, emma].filter(Boolean);
-                const males = [brian, andrew].filter(Boolean);
+                const females = validVoices.filter(v => v.name.includes('Ava') || v.name.includes('Emma'));
+                const males = validVoices.filter(v => v.name.includes('Brian') || v.name.includes('Andrew'));
 
-                // 3. Fallback Logic (Safety Net for non-Edge browsers)
-                // Only used if specific names aren't found
-                const fFallback = females.length > 0 ? females : voices.filter(v => v.name.includes('Female') || v.name.includes('Zira'));
-                const mFallback = males.length > 0 ? males : voices.filter(v => v.name.includes('Male') || v.name.includes('David'));
+                // Strict Selection Logic:
+                // 1. If we have the specific Microsoft voices, use ONLY them.
+                // 2. If we don't have them (non-Edge browser), fallback to ANY available voice 
+                //    to prevent app crash, but prefer voices that might just have the name in them.
+                
+                let female = null;
+                let male = null;
 
-                const fPool = fFallback.length > 0 ? fFallback : voices;
-                const mPool = mFallback.length > 0 ? mFallback : voices;
+                if (females.length > 0) {
+                    female = females[Math.floor(Math.random() * females.length)];
+                } else {
+                     // Last resort fallback so app isn't silent on Chrome/Safari
+                    female = voices.find(v => v.name.includes('Female')) || voices[0];
+                }
 
-                const female = fPool[Math.floor(Math.random() * fPool.length)] || voices[0];
-                const male = mPool[Math.floor(Math.random() * mPool.length)] || voices[0];
+                if (males.length > 0) {
+                    male = males[Math.floor(Math.random() * males.length)];
+                } else {
+                    // Last resort fallback so app isn't silent on Chrome/Safari
+                    male = voices.find(v => v.name.includes('Male')) || voices[1] || voices[0];
+                }
 
                 return Math.random() > 0.5 ? { A: female, B: male } : { A: male, B: female };
             };
@@ -488,7 +502,7 @@
                     await new Promise(resolve => {
                         const utt = new SpeechSynthesisUtterance(line.text);
                         utt.voice = line.speaker === 'A' ? A : B;
-                        utt.rate = SPEECH_RATE; 
+                        utt.rate = SPEECH_RATE; // 0.85 rate as requested
                         utt.pitch = 1;
                         utt.lang = 'en-GB';
                         utt.onend = () => setTimeout(resolve, 500); 
