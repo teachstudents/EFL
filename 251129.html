@@ -50,25 +50,25 @@
 </head>
 <body class="flex items-center justify-center p-3 h-screen w-screen overflow-hidden">
     
-    <div id="app-container" class="w-full max-w-[1400px] h-full flex flex-col bg-white/60 rounded-2xl shadow-lg border border-gray-200 overflow-hidden backdrop-blur-sm">
+    <div id="app-container" class="w-full max-w-[1600px] h-full flex flex-col bg-white/60 rounded-3xl shadow-xl border border-gray-200 overflow-hidden backdrop-blur-sm">
         
         <!-- Welcome Screen -->
-        <div id="welcome-screen" class="absolute inset-0 z-50 bg-cream-card flex flex-col justify-center items-center p-8 overflow-y-auto">
-            <div id="name-entry-container" class="max-w-lg w-full text-center">
-                <h1 class="text-6xl font-bold text-green-heading mb-10">IELTS Prep</h1>
-                <input type="text" id="name-input" placeholder="Enter Your Name" class="w-full px-6 py-5 border-2 border-gray-200 rounded-2xl mb-8 text-center text-3xl outline-none focus:border-blue-500 focus:ring-0 transition-colors bg-white">
-                <button id="start-with-name-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 px-8 rounded-2xl text-2xl shadow-xl transition-transform transform hover:scale-[1.01]">Start Practice</button>
+        <div id="welcome-screen" class="absolute inset-0 z-50 bg-cream-card flex flex-col justify-center items-center p-10 overflow-y-auto">
+            <div id="name-entry-container" class="max-w-2xl w-full text-center">
+                <h1 class="text-7xl font-bold text-green-heading mb-12">IELTS Prep</h1>
+                <input type="text" id="name-input" placeholder="Enter Your Name" class="w-full px-8 py-6 border-2 border-gray-200 rounded-3xl mb-10 text-center text-4xl outline-none focus:border-blue-500 focus:ring-0 transition-colors bg-white shadow-sm">
+                <button id="start-with-name-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 px-10 rounded-3xl text-3xl shadow-xl transition-transform transform hover:scale-[1.01]">Start Practice</button>
             </div>
             
-            <div id="topic-selection-container" class="hidden w-full max-w-6xl flex flex-col h-full">
-                 <div class="flex justify-between items-end mb-6 flex-shrink-0 pt-4">
-                     <h1 class="text-4xl font-bold text-green-heading">Hello, <span id="user-name-display"></span>!</h1>
-                     <div class="text-xl font-bold text-blue-600" id="progress-text">0/10 Completed</div>
+            <div id="topic-selection-container" class="hidden w-full max-w-7xl flex flex-col h-full">
+                 <div class="flex justify-between items-end mb-8 flex-shrink-0 pt-6">
+                     <h1 class="text-5xl font-bold text-green-heading">Hello, <span id="user-name-display"></span>!</h1>
+                     <div class="text-2xl font-bold text-blue-600" id="progress-text">0/10 Completed</div>
                  </div>
-                 <div class="w-full bg-gray-200 rounded-full h-4 mb-8 flex-shrink-0">
-                    <div id="overall-progress-bar" class="bg-blue-600 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+                 <div class="w-full bg-gray-200 rounded-full h-5 mb-10 flex-shrink-0">
+                    <div id="overall-progress-bar" class="bg-blue-600 h-5 rounded-full transition-all duration-500" style="width: 0%"></div>
                  </div>
-                 <div id="topic-selection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 overflow-y-auto pb-6 custom-scroll pr-2"></div>
+                 <div id="topic-selection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto pb-8 custom-scroll pr-3"></div>
             </div>
         </div>
 
@@ -76,105 +76,105 @@
         <div id="practice-screen" class="hidden flex flex-col h-full relative">
             
             <!-- HEADER -->
-            <header class="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-sm z-20">
-                <div class="flex items-center gap-4 w-1/4">
-                    <button id="back-to-topics-btn" class="text-base bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded-lg border border-gray-200 flex items-center transition-colors">
-                        <i class="fas fa-home mr-2 text-green-600"></i>Home
+            <header class="flex-shrink-0 bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-sm z-20">
+                <div class="flex items-center gap-6 w-1/4">
+                    <button id="back-to-topics-btn" class="text-lg bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-3 px-6 rounded-xl border border-gray-200 flex items-center transition-colors shadow-sm">
+                        <i class="fas fa-home mr-3 text-green-600"></i>Home
                     </button>
-                    <div id="phase-indicator" class="text-sm font-bold text-green-700 uppercase tracking-widest bg-green-50 px-3 py-1.5 rounded-lg border border-green-100">PART 1</div>
+                    <div id="phase-indicator" class="text-base font-bold text-green-700 uppercase tracking-widest bg-green-50 px-4 py-2 rounded-xl border border-green-100">PART 1</div>
                 </div>
 
-                <div class="flex items-center justify-center gap-6 flex-grow">
-                    <button id="prev-btn" class="w-12 h-12 bg-white hover:bg-gray-50 text-gray-500 rounded-full border border-gray-200 shadow-sm flex items-center justify-center disabled:opacity-30 transition-transform active:scale-95">
-                        <i class="fas fa-chevron-left text-xl"></i>
+                <div class="flex items-center justify-center gap-8 flex-grow">
+                    <button id="prev-btn" class="w-14 h-14 bg-white hover:bg-gray-50 text-gray-500 rounded-full border border-gray-200 shadow-md flex items-center justify-center disabled:opacity-30 transition-transform active:scale-95">
+                        <i class="fas fa-chevron-left text-2xl"></i>
                     </button>
 
-                    <div class="flex items-center bg-gray-50 rounded-full px-4 py-2 border border-gray-200 shadow-inner gap-4">
-                        <div class="flex flex-col items-center justify-center min-w-[70px]">
-                            <div class="text-xl font-bold text-gray-700" id="timer-display">0:00</div>
-                            <div class="flex gap-2">
-                                <button id="pause-resume-btn" class="text-sm text-gray-500 hover:text-blue-600"><i class="fas fa-pause"></i></button>
-                                <button id="reset-timer-btn" class="text-sm text-gray-500 hover:text-red-600"><i class="fas fa-redo"></i></button>
+                    <div class="flex items-center bg-gray-50 rounded-full px-6 py-3 border border-gray-200 shadow-inner gap-6">
+                        <div class="flex flex-col items-center justify-center min-w-[90px]">
+                            <div class="text-2xl font-bold text-gray-700" id="timer-display">0:00</div>
+                            <div class="flex gap-3 mt-1">
+                                <button id="pause-resume-btn" class="text-base text-gray-500 hover:text-blue-600 p-1"><i class="fas fa-pause"></i></button>
+                                <button id="reset-timer-btn" class="text-base text-gray-500 hover:text-red-600 p-1"><i class="fas fa-redo"></i></button>
                             </div>
                         </div>
-                        <button id="prep-timer-btn" class="hidden text-sm font-bold bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-lg hover:bg-yellow-200 border border-yellow-200">1m PREP</button>
-                        <div class="relative w-14 h-14 flex items-center justify-center">
-                            <button id="record-btn" class="bg-red-500 hover:bg-red-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform"><i class="fas fa-microphone text-xl"></i></button>
-                            <button id="stop-record-btn" class="hidden bg-gray-800 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center animate-pulse"><i class="fas fa-stop text-xl"></i></button>
+                        <button id="prep-timer-btn" class="hidden text-base font-bold bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl hover:bg-yellow-200 border border-yellow-200">1m PREP</button>
+                        <div class="relative w-16 h-16 flex items-center justify-center">
+                            <button id="record-btn" class="bg-red-500 hover:bg-red-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform"><i class="fas fa-microphone text-2xl"></i></button>
+                            <button id="stop-record-btn" class="hidden bg-gray-800 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center animate-pulse"><i class="fas fa-stop text-2xl"></i></button>
                         </div>
-                        <div id="post-recording-actions" class="hidden flex items-center gap-3 ml-1 animate-fadeIn">
-                            <audio id="audio-player" controls class="h-8 w-32"></audio>
-                            <button id="download-btn" class="bg-blue-600 text-white w-10 h-10 rounded-full text-lg flex items-center justify-center shadow-md hover:bg-blue-700 transition-colors"><i class="fas fa-download"></i></button>
+                        <div id="post-recording-actions" class="hidden flex items-center gap-4 ml-2 animate-fadeIn">
+                            <audio id="audio-player" controls class="h-10 w-40"></audio>
+                            <button id="download-btn" class="bg-blue-600 text-white w-12 h-12 rounded-full text-xl flex items-center justify-center shadow-md hover:bg-blue-700 transition-colors"><i class="fas fa-download"></i></button>
                         </div>
                     </div>
 
-                    <button id="next-btn" class="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center disabled:opacity-50 transition-transform active:scale-95"><i class="fas fa-chevron-right text-xl"></i></button>
+                    <button id="next-btn" class="w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md flex items-center justify-center disabled:opacity-50 transition-transform active:scale-95"><i class="fas fa-chevron-right text-2xl"></i></button>
                 </div>
 
                 <div class="w-1/4 flex justify-end">
-                    <button id="samples-btn" class="text-base bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-5 rounded-lg shadow-md transition-colors ring-2 ring-yellow-200 hover:ring-yellow-300 flex items-center"><i class="fas fa-lightbulb mr-2"></i>Ideas</button>
+                    <button id="samples-btn" class="text-lg bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-colors ring-4 ring-yellow-100 hover:ring-yellow-200 flex items-center"><i class="fas fa-lightbulb mr-3"></i>Ideas</button>
                 </div>
             </header>
             
             <!-- MAIN CONTENT AREA -->
-            <main class="flex-grow flex flex-col min-h-0 overflow-hidden bg-[#FDFBF7] p-6">
+            <main class="flex-grow flex flex-col min-h-0 overflow-hidden bg-[#FDFBF7] p-8">
                 
                 <!-- Question Banner -->
-                <div id="question-container" class="bg-white px-8 py-5 rounded-2xl border border-gray-200 text-center shadow-sm flex-shrink-0 z-10 mb-6">
-                    <h2 id="question-text" class="text-2xl md:text-3xl font-bold leading-tight text-gray-800 cursor-pointer hover:text-blue-600 transition-colors" title="Click to hear question"></h2>
+                <div id="question-container" class="bg-white px-10 py-6 rounded-3xl border border-gray-200 text-center shadow-sm flex-shrink-0 z-10 mb-8">
+                    <h2 id="question-text" class="text-3xl md:text-4xl font-bold leading-snug text-gray-800 cursor-pointer hover:text-blue-600 transition-colors" title="Click to hear question"></h2>
                 </div>
 
                 <!-- Split Layout -->
-                <div class="flex-grow flex flex-col lg:flex-row min-h-0 gap-6">
+                <div class="flex-grow flex flex-col lg:flex-row min-h-0 gap-8">
                     
                     <!-- Left Panel: Speaking Aids -->
-                    <div class="w-full lg:w-[35%] flex flex-col gap-4">
+                    <div class="w-full lg:w-[35%] flex flex-col gap-6">
                         
                         <!-- Fillers -->
-                        <div id="template-container" class="bg-indigo-50/40 border border-indigo-100 rounded-2xl p-5 flex flex-col shadow-sm">
-                            <span class="text-sm font-bold text-indigo-700 uppercase tracking-wider mb-3">Fluency Booster</span>
-                            <div class="flex flex-wrap gap-2.5" id="fillers-list"></div>
+                        <div id="template-container" class="bg-indigo-50/40 border border-indigo-100 rounded-3xl p-6 flex flex-col shadow-sm">
+                            <span class="text-lg font-bold text-indigo-700 uppercase tracking-wider mb-4 flex items-center"><i class="fas fa-comments mr-2 opacity-70"></i> Fluency Booster</span>
+                            <div class="flex flex-wrap gap-3" id="fillers-list"></div>
                         </div>
 
                         <!-- Sentence Starters -->
-                        <div id="starters-container" class="flex-grow bg-blue-50/40 border border-blue-100 rounded-2xl p-5 shadow-sm overflow-y-auto custom-scroll">
-                            <span class="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 block">Sentence Starters</span>
-                            <div id="starters-list" class="flex flex-wrap gap-2.5 content-start"></div>
+                        <div id="starters-container" class="flex-grow bg-blue-50/40 border border-blue-100 rounded-3xl p-6 shadow-sm overflow-y-auto custom-scroll">
+                            <span class="text-lg font-bold text-blue-700 uppercase tracking-wider mb-4 block flex items-center"><i class="fas fa-play mr-2 opacity-70"></i> Sentence Starters</span>
+                            <div id="starters-list" class="flex flex-wrap gap-3 content-start"></div>
                         </div>
                     </div>
 
                     <!-- Right Panel: Vocabulary -->
-                    <div class="flex-1 bg-white/60 rounded-2xl border border-gray-200 shadow-sm p-5 overflow-y-auto custom-scroll">
-                        <div id="word-bank-container" class="h-full flex flex-col gap-4">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-sm font-bold text-green-700 uppercase tracking-wider">Vocabulary Power</span>
-                                <span class="text-xs text-green-600 font-normal italic bg-green-50 px-2 py-1 rounded">Tap words to listen</span>
+                    <div class="flex-1 bg-white/60 rounded-3xl border border-gray-200 shadow-sm p-6 overflow-y-auto custom-scroll">
+                        <div id="word-bank-container" class="h-full flex flex-col gap-6">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-lg font-bold text-green-700 uppercase tracking-wider flex items-center"><i class="fas fa-book mr-2 opacity-70"></i> Vocabulary Power</span>
+                                <span class="text-sm text-green-600 font-normal italic bg-green-50 px-3 py-1.5 rounded-lg border border-green-100">Tap words to listen</span>
                             </div>
                             
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
                                 <!-- Col 1: Words -->
-                                <div class="bg-green-50/40 border border-green-100 rounded-xl p-4 flex flex-col">
-                                    <span class="block text-xs text-green-800 font-bold mb-3 uppercase border-b border-green-200 pb-1">Topic Words</span>
-                                    <div id="word-bank-list" class="flex flex-wrap gap-2.5 content-start"></div>
+                                <div class="bg-green-50/40 border border-green-100 rounded-2xl p-5 flex flex-col">
+                                    <span class="block text-sm text-green-800 font-bold mb-4 uppercase border-b border-green-200 pb-2">Topic Words</span>
+                                    <div id="word-bank-list" class="flex flex-wrap gap-3 content-start"></div>
                                 </div>
 
                                 <!-- Col 2: Phrases -->
-                                <div class="bg-green-50/40 border border-green-100 rounded-xl p-4 flex flex-col">
-                                    <span class="block text-xs text-green-800 font-bold mb-3 uppercase border-b border-green-200 pb-1">Collocations</span>
-                                    <div id="collocations-list" class="flex flex-wrap gap-2.5 content-start"></div>
+                                <div class="bg-green-50/40 border border-green-100 rounded-2xl p-5 flex flex-col">
+                                    <span class="block text-sm text-green-800 font-bold mb-4 uppercase border-b border-green-200 pb-2">Collocations</span>
+                                    <div id="collocations-list" class="flex flex-wrap gap-3 content-start"></div>
                                 </div>
 
                                 <!-- Col 3: Advanced (Spanning) -->
-                                <div class="bg-purple-50/40 border border-purple-100 rounded-xl p-4 flex flex-col md:col-span-2">
-                                    <div class="flex justify-between items-center mb-3 border-b border-purple-100 pb-1">
-                                        <span class="text-xs text-purple-800 font-bold uppercase">Advanced Band 7-9</span>
+                                <div class="bg-purple-50/40 border border-purple-100 rounded-2xl p-5 flex flex-col md:col-span-2">
+                                    <div class="flex justify-between items-center mb-4 border-b border-purple-100 pb-2">
+                                        <span class="text-sm text-purple-800 font-bold uppercase">Advanced Band 7-9</span>
                                     </div>
-                                    <div id="advanced-vocab-list" class="flex flex-wrap gap-2.5 content-start"></div>
+                                    <div id="advanced-vocab-list" class="flex flex-wrap gap-3 content-start"></div>
                                     
                                     <!-- Idiom Footer -->
-                                    <div class="mt-4 pt-2 border-t border-purple-100 flex items-center bg-white/70 rounded-lg px-3 py-2">
-                                        <span class="text-xs font-bold text-orange-600 uppercase tracking-wide mr-3">Idiom:</span>
-                                        <div id="idiom-text" class="text-base font-medium text-gray-800 italic cursor-pointer hover:text-blue-600 truncate interactive-chip px-3 py-1 rounded" onclick="speak(this.textContent)"></div>
+                                    <div class="mt-6 pt-3 border-t border-purple-100 flex items-center bg-white/70 rounded-xl px-4 py-3 shadow-sm">
+                                        <span class="text-sm font-bold text-orange-600 uppercase tracking-wide mr-4">Idiom:</span>
+                                        <div id="idiom-text" class="text-lg font-medium text-gray-800 italic cursor-pointer hover:text-blue-600 truncate interactive-chip px-4 py-2 rounded-lg" onclick="speak(this.textContent)"></div>
                                     </div>
                                 </div>
                             </div>
@@ -184,58 +184,58 @@
             </main>
 
             <!-- Sample Answer Overlay -->
-            <div id="samples-container" class="hidden absolute bottom-0 left-0 right-0 bg-white border-t-4 border-yellow-200 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.15)] z-30 max-h-[65%] overflow-y-auto custom-scroll transition-transform">
-                <div class="p-8 bg-yellow-50/98 backdrop-blur-md">
-                    <div class="flex justify-between items-center mb-6 sticky top-0">
-                        <h3 class="text-lg font-bold uppercase tracking-wide text-yellow-800 flex items-center"><i class="fas fa-star mr-3 text-yellow-600"></i> Band 9 Model Answers</h3>
-                        <button id="close-samples-btn" class="text-yellow-700 hover:text-yellow-900 bg-yellow-200 hover:bg-yellow-300 rounded-full w-10 h-10 flex items-center justify-center transition-colors"><i class="fas fa-times text-lg"></i></button>
+            <div id="samples-container" class="hidden absolute bottom-0 left-0 right-0 bg-white border-t-8 border-yellow-200 shadow-[0_-8px_30px_-5px_rgba(0,0,0,0.2)] z-30 max-h-[70%] overflow-y-auto custom-scroll transition-transform">
+                <div class="p-10 bg-yellow-50/98 backdrop-blur-xl">
+                    <div class="flex justify-between items-center mb-8 sticky top-0">
+                        <h3 class="text-2xl font-bold uppercase tracking-wide text-yellow-800 flex items-center"><i class="fas fa-star mr-4 text-yellow-600"></i> Band 9 Model Answers</h3>
+                        <button id="close-samples-btn" class="text-yellow-700 hover:text-yellow-900 bg-yellow-200 hover:bg-yellow-300 rounded-full w-12 h-12 flex items-center justify-center transition-colors shadow-sm"><i class="fas fa-times text-xl"></i></button>
                     </div>
-                    <ul id="samples-list" class="space-y-6 list-none text-base text-gray-800 leading-relaxed font-medium"></ul>
+                    <ul id="samples-list" class="space-y-8 list-none text-lg text-gray-800 leading-relaxed font-medium"></ul>
                 </div>
             </div>
             
             <!-- Completion Celebration -->
             <div id="celebration-overlay" class="hidden absolute inset-0 bg-white/95 z-50 flex flex-col items-center justify-center text-center p-4">
-                <div class="bg-green-100 p-8 rounded-full mb-8 animate-bounce shadow-lg">
-                    <i class="fas fa-check text-7xl text-green-600"></i>
+                <div class="bg-green-100 p-10 rounded-full mb-10 animate-bounce shadow-xl">
+                    <i class="fas fa-check text-8xl text-green-600"></i>
                 </div>
-                <h2 class="text-4xl font-bold text-gray-800 mb-2">Topic Completed!</h2>
-                <p class="text-xl text-gray-600">Great work!</p>
+                <h2 class="text-5xl font-bold text-gray-800 mb-4">Topic Completed!</h2>
+                <p class="text-2xl text-gray-600">Great work!</p>
             </div>
         </div>
 
         <!-- Certificate Screen -->
-        <div id="certificate-screen" class="hidden bg-white p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center items-center relative overflow-y-auto">
-             <div id="certificate-to-download" class="w-full max-w-4xl bg-white p-16 rounded-2xl border-[16px] border-double border-blue-500 text-center relative shadow-2xl mb-8">
-                <div class="absolute top-0 left-0 w-full h-6 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500"></div>
-                <div class="flex justify-center mb-8"><i class="fas fa-medal text-9xl text-yellow-400 drop-shadow-lg"></i></div>
-                <h1 class="text-6xl font-serif font-bold text-gray-900 mb-4">Certificate of Achievement</h1>
-                <p class="text-2xl mt-4 text-gray-600 italic">This is to certify that</p>
-                <p id="certificate-name" class="text-6xl font-bold my-10 text-blue-700 font-serif border-b-4 border-gray-300 inline-block px-16 pb-4"></p>
-                <p class="text-2xl text-gray-700">has completed the <strong>IELTS Speaking Course</strong></p>
-                <p class="text-lg mt-8 text-gray-500">Date: <span id="certificate-date"></span></p>
+        <div id="certificate-screen" class="hidden bg-white p-12 rounded-3xl shadow-2xl h-full flex flex-col justify-center items-center relative overflow-y-auto">
+             <div id="certificate-to-download" class="w-full max-w-5xl bg-white p-20 rounded-3xl border-[20px] border-double border-blue-500 text-center relative shadow-2xl mb-10">
+                <div class="absolute top-0 left-0 w-full h-8 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500"></div>
+                <div class="flex justify-center mb-10"><i class="fas fa-medal text-9xl text-yellow-400 drop-shadow-xl scale-150"></i></div>
+                <h1 class="text-7xl font-serif font-bold text-gray-900 mb-6">Certificate of Achievement</h1>
+                <p class="text-3xl mt-6 text-gray-600 italic">This is to certify that</p>
+                <p id="certificate-name" class="text-7xl font-bold my-12 text-blue-700 font-serif border-b-8 border-gray-300 inline-block px-20 pb-6"></p>
+                <p class="text-3xl text-gray-700">has completed the <strong>IELTS Speaking Course</strong></p>
+                <p class="text-xl mt-12 text-gray-500">Date: <span id="certificate-date"></span></p>
             </div>
-            <div class="flex gap-6">
-                <button id="download-certificate-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-10 rounded-2xl shadow-xl transition-colors text-xl"><i class="fas fa-download mr-3"></i>Save</button>
-                <button id="back-to-main-menu-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 px-10 rounded-2xl shadow-xl transition-colors text-xl">Menu</button>
+            <div class="flex gap-8">
+                <button id="download-certificate-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-5 px-12 rounded-2xl shadow-xl transition-colors text-2xl"><i class="fas fa-download mr-4"></i>Save</button>
+                <button id="back-to-main-menu-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-5 px-12 rounded-2xl shadow-xl transition-colors text-2xl">Menu</button>
             </div>
         </div>
 
     </div>
 
     <!-- Confirmation Modal -->
-    <div id="confirmation-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-sm w-full">
-            <h3 class="text-2xl font-bold mb-3 text-gray-800">Exit?</h3>
-            <p class="text-lg text-gray-600 mb-8">Recording will be lost.</p>
-            <div class="flex justify-center gap-4">
-                <button id="modal-confirm-btn" class="bg-red-500 text-white font-bold py-3 px-8 rounded-xl text-base shadow-md hover:bg-red-600">Yes</button>
-                <button id="modal-cancel-btn" class="bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-xl text-base shadow-md hover:bg-gray-300">No</button>
+    <div id="confirmation-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl shadow-2xl p-10 text-center max-w-md w-full transform scale-100">
+            <h3 class="text-3xl font-bold mb-4 text-gray-800">Exit Practice?</h3>
+            <p class="text-xl text-gray-600 mb-10">Your current recording will be lost.</p>
+            <div class="flex justify-center gap-6">
+                <button id="modal-confirm-btn" class="bg-red-500 text-white font-bold py-4 px-10 rounded-2xl text-lg shadow-lg hover:bg-red-600 transition-colors">Yes, Exit</button>
+                <button id="modal-cancel-btn" class="bg-gray-200 text-gray-800 font-bold py-4 px-10 rounded-2xl text-lg shadow-lg hover:bg-gray-300 transition-colors">Cancel</button>
             </div>
         </div>
     </div>
     
-    <div id="error-message-box" class="hidden fixed top-6 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-8 py-3 rounded-full shadow-2xl z-50 font-bold text-lg">
+    <div id="error-message-box" class="hidden fixed top-8 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-10 py-4 rounded-full shadow-2xl z-50 font-bold text-xl">
         <span id="error-text"></span>
     </div>
 
@@ -248,7 +248,7 @@
                     type: "Part 1", 
                     question: "Let's talk about your hometown. Where are you from?", 
                     timer: 30, 
-                    fillers: ["Well, let me think...", "To be honest...", "I suppose..."], 
+                    fillers: ["Well, let me think...", "To be honest...", "I suppose...", "Actually...", "That's easy..."], 
                     starters: ["I come from...", "My hometown is...", "It is a city called..."], 
                     wordBank: ["Beijing", "capital", "province", "historical", "modern", "district", "residents", "suburbs", "urban"], 
                     collocations: ["densely populated", "located in", "famous for", "bustling streets", "local community", "hometown glory", "residential area"], 
@@ -263,7 +263,7 @@
                     type: "Part 2", 
                     question: "Describe a place in your hometown interesting to tourists.", 
                     timer: 90, 
-                    fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken..."], 
+                    fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken...", "I'd like to talk about...", "One place comes to mind..."], 
                     starters: ["I want to describe...", "It is located in...", "You can see..."], 
                     wordBank: ["Great Wall", "Palace", "Temple", "site", "museum", "park", "lake", "view"], 
                     collocations: ["tourist attraction", "ancient architecture", "breathtaking view", "cultural heritage", "must-visit spot", "flock to", "historical significance"], 
@@ -278,7 +278,7 @@
                     type: "Part 3", 
                     question: "How has your hometown changed recently?", 
                     timer: 60, 
-                    fillers: ["That's a good question...", "What I mean is...", "Another point is..."], 
+                    fillers: ["That's a good question...", "What I mean is...", "Another point is...", "It's hard to say, but...", "Generally speaking..."], 
                     starters: ["It has changed...", "In the past...", "Now we have..."], 
                     wordBank: ["skyscrapers", "subway", "traffic", "convenient", "economy", "shops", "roads", "tech"], 
                     collocations: ["urban development", "traffic congestion", "rapid change", "standard of living", "public transport", "shopping mall", "high-rise building"], 
@@ -291,89 +291,89 @@
                 }
             ],
             "School Life": [
-                { type: "Part 1", question: "Tell me about your school. What is your favorite subject?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose..."], starters: ["I study at...", "My favorite subject is...", "I find... very interesting."], wordBank: ["Maths", "English", "P.E.", "History", "Physics", "campus", "textbook", "experiment", "literature"], collocations: ["attend classes", "sit an exam", "favorite subject", "broaden my horizons", "gain knowledge", "highly qualified", "strict discipline"], advanced: ["curriculum", "fascinating", "compulsory"], idiom: "Hit the books", samples: ["<strong>Option 1:</strong> Well, let me think... I study at a large school in the city center. My favorite subject is English because it allows me to broaden my horizons. It helps me gain knowledge about other cultures.", "<strong>Option 2:</strong> To be honest, I find History fascinating. I study at a local middle school where the curriculum is quite demanding. We often have to hit the books hard before exams."] },
-                { type: "Part 2", question: "Describe a school project you worked hard on.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken..."], starters: ["I remember...", "I had to...", "It was difficult..."], wordBank: ["presentation", "research", "teamwork", "deadline", "effort", "grade"], collocations: ["meet a deadline", "group project", "give a presentation", "conduct research", "put effort into"], advanced: ["challenging", "collaborate", "accomplishment"], idiom: "Pass with flying colors", samples: ["<strong>Option 1:</strong> Actually, I need a moment... I remember a challenging group project for science. We had to conduct research on renewable energy. We collaborated well and put a lot of effort into it to meet the deadline. In the end, we passed with flying colors.", "<strong>Option 2:</strong> Let me see... One example comes to mind immediately. I had to give a presentation on ancient history. It was a huge accomplishment for me because I'm usually shy. I researched extensively and managed to overcome my nerves."] },
-                { type: "Part 3", question: "Do students have too much homework?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is..."], starters: ["Yes, I think...", "Compared to...", "It creates..."], wordBank: ["pressure", "stress", "review", "knowledge", "free time"], collocations: ["academic pressure", "heavy workload", "stay up late", "mental health", "balance work"], advanced: ["overwhelming", "detrimental", "essential"], idiom: "Burn the midnight oil", samples: ["<strong>Option 1:</strong> That's a good question. I suppose I strongly believe that we have too much homework. To put it another way, many students burn the midnight oil to finish tasks, which creates overwhelming pressure.", "<strong>Option 2:</strong> What I mean is, the heavy workload is detrimental to our mental health. We need more free time to balance work and play, but currently, the academic pressure is just too high."] }
+                { type: "Part 1", question: "Tell me about your school. What is your favorite subject?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose...", "As a matter of fact...", "Actually..."], starters: ["I study at...", "My favorite subject is...", "I find... very interesting."], wordBank: ["Maths", "English", "P.E.", "History", "Physics", "campus", "textbook", "experiment", "literature"], collocations: ["attend classes", "sit an exam", "favorite subject", "broaden my horizons", "gain knowledge", "highly qualified", "strict discipline"], advanced: ["curriculum", "fascinating", "compulsory"], idiom: "Hit the books", samples: ["<strong>Option 1:</strong> Well, let me think... I study at a large school in the city center. My favorite subject is English because it allows me to broaden my horizons. It helps me gain knowledge about other cultures.", "<strong>Option 2:</strong> To be honest, I find History fascinating. I study at a local middle school where the curriculum is quite demanding. We often have to hit the books hard before exams."] },
+                { type: "Part 2", question: "Describe a school project you worked hard on.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken...", "I recall...", "Let me gather my thoughts..."], starters: ["I remember...", "I had to...", "It was difficult..."], wordBank: ["presentation", "research", "teamwork", "deadline", "effort", "grade"], collocations: ["meet a deadline", "group project", "give a presentation", "conduct research", "put effort into"], advanced: ["challenging", "collaborate", "accomplishment"], idiom: "Pass with flying colors", samples: ["<strong>Option 1:</strong> Actually, I need a moment... I remember a challenging group project for science. We had to conduct research on renewable energy. We collaborated well and put a lot of effort into it to meet the deadline. In the end, we passed with flying colors.", "<strong>Option 2:</strong> Let me see... One example comes to mind immediately. I had to give a presentation on ancient history. It was a huge accomplishment for me because I'm usually shy. I researched extensively and managed to overcome my nerves."] },
+                { type: "Part 3", question: "Do students have too much homework?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is...", "From my perspective...", "I strongly believe..."], starters: ["Yes, I think...", "Compared to...", "It creates..."], wordBank: ["pressure", "stress", "review", "knowledge", "free time"], collocations: ["academic pressure", "heavy workload", "stay up late", "mental health", "balance work"], advanced: ["overwhelming", "detrimental", "essential"], idiom: "Burn the midnight oil", samples: ["<strong>Option 1:</strong> That's a good question. I suppose I strongly believe that we have too much homework. To put it another way, many students burn the midnight oil to finish tasks, which creates overwhelming pressure.", "<strong>Option 2:</strong> What I mean is, the heavy workload is detrimental to our mental health. We need more free time to balance work and play, but currently, the academic pressure is just too high."] }
             ],
             "Food & Festivals": [
-                { type: "Part 1", question: "What is your favorite Chinese dish?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose..."], starters: ["My favorite dish is...", "I really love...", "It tastes..."], wordBank: ["Peking Duck", "Dumplings", "Hot Pot", "spicy", "savory"], collocations: ["traditional dish", "mouth-watering", "rich flavor", "staple food", "authentic taste"], advanced: ["delicacy", "appetizing", "nutritious"], idiom: "Make my mouth water", samples: ["<strong>Option 1:</strong> Well, let me think... Oh, definitely Peking Duck. It's a traditional delicacy. The crispy skin makes my mouth water every time I think about it.", "<strong>Option 2:</strong> To be honest, without a doubt, Hot Pot. I really love the spicy and rich flavor. It's a very appetizing way to eat vegetables and meat together."] },
-                { type: "Part 2", question: "Describe a traditional festival.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken..."], starters: ["I'd like to talk about...", "It happens in...", "My family usually..."], wordBank: ["Spring Festival", "reunion", "red envelopes", "lanterns", "fireworks"], collocations: ["family reunion", "festive atmosphere", "celebrate together", "pay respects", "exchange gifts"], advanced: ["significance", "commemorate", "prosperity"], idiom: "Feast for the eyes", samples: ["<strong>Option 1:</strong> Let me see... I'd like to talk about Spring Festival. It has huge significance for us. My family usually has a big reunion dinner. The fireworks at night are truly a feast for the eyes.", "<strong>Option 2:</strong> Actually, I need a moment... Well, generally, I enjoy the Lantern Festival. It marks the end of the New Year. We admire the lanterns, which creates a wonderful festive atmosphere. We also eat sweet dumplings to commemorate the day."] },
-                { type: "Part 3", question: "Why is it important to learn about festivals?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is..."], starters: ["It is important because...", "It helps us...", "If we don't..."], wordBank: ["culture", "identity", "history", "preserve", "values"], collocations: ["cultural heritage", "keep traditions alive", "sense of belonging", "pass down"], advanced: ["vital", "inheritance", "appreciation"], idiom: "Cup of tea", samples: ["<strong>Option 1:</strong> That's a good question. Generally speaking, it's vital because it connects us to our cultural heritage. It helps us keep traditions alive for the next generation.", "<strong>Option 2:</strong> What I mean is, festivals give us a sense of belonging. Understanding our history and values is key to preserving our identity."] }
+                { type: "Part 1", question: "What is your favorite Chinese dish?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose...", "Oh, definitely...", "Without a doubt..."], starters: ["My favorite dish is...", "I really love...", "It tastes..."], wordBank: ["Peking Duck", "Dumplings", "Hot Pot", "spicy", "savory", "sweet", "bitter", "salty"], collocations: ["traditional dish", "mouth-watering", "rich flavor", "staple food", "authentic taste", "culinary skills", "home-cooked meal"], advanced: ["delicacy", "appetizing", "nutritious", "gastronomy", "authentic"], idiom: "Make my mouth water", samples: ["<strong>Option 1:</strong> Well, let me think... Oh, definitely Peking Duck. It's a traditional delicacy. The crispy skin makes my mouth water every time I think about it.", "<strong>Option 2:</strong> To be honest, without a doubt, Hot Pot. I really love the spicy and rich flavor. It's a very appetizing way to eat vegetables and meat together."] },
+                { type: "Part 2", question: "Describe a traditional festival.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken...", "Hmm...", "Well, generally..."], starters: ["I'd like to talk about...", "It happens in...", "My family usually..."], wordBank: ["Spring Festival", "reunion", "red envelopes", "lanterns", "fireworks", "customs", "ancestors", "decorations"], collocations: ["family reunion", "festive atmosphere", "celebrate together", "pay respects", "exchange gifts", "quality time", "lunar calendar"], advanced: ["significance", "commemorate", "prosperity", "symbolize", "annual"], idiom: "Feast for the eyes", samples: ["<strong>Option 1:</strong> Let me see... I'd like to talk about Spring Festival. It has huge significance for us. My family usually has a big reunion dinner. The fireworks at night are truly a feast for the eyes.", "<strong>Option 2:</strong> Actually, I need a moment... Well, generally, I enjoy the Lantern Festival. It marks the end of the New Year. We admire the lanterns, which creates a wonderful festive atmosphere. We also eat sweet dumplings to commemorate the day."] },
+                { type: "Part 3", question: "Why is it important to learn about festivals?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is...", "Generally speaking...", "The way I see it..."], starters: ["It is important because...", "It helps us...", "If we don't..."], wordBank: ["culture", "identity", "history", "preserve", "values", "roots", "heritage", "generations"], collocations: ["cultural heritage", "keep traditions alive", "sense of belonging", "pass down", "national identity", "historical significance", "cultural values"], advanced: ["vital", "inheritance", "appreciation", "continuity", "unification"], idiom: "Cup of tea", samples: ["<strong>Option 1:</strong> That's a good question. Generally speaking, it's vital because it connects us to our cultural heritage. It helps us keep traditions alive for the next generation.", "<strong>Option 2:</strong> What I mean is, festivals give us a sense of belonging. Understanding our history and values is key to preserving our identity."] }
             ],
             "Hobbies": [
-                { type: "Part 1", question: "What do you do in your free time?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose..."], starters: ["In my free time...", "I usually...", "I am a fan of..."], wordBank: ["basketball", "reading", "games", "music", "draw"], collocations: ["spare time", "leisure activity", "unwind", "creative outlet"], advanced: ["recreational", "passionate", "pursue"], idiom: "Let off steam", samples: ["<strong>Option 1:</strong> Well, let me think... As a matter of fact, I love sports. I often play basketball to let off steam after school. It's my favorite recreational activity.", "<strong>Option 2:</strong> To be honest, I am a fan of reading. In my spare time, I pursue my interest in sci-fi novels. It helps me unwind and relax."] },
-                { type: "Part 2", question: "Describe a hobby you want to try.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken..."], starters: ["I want to try...", "It looks...", "I need to..."], wordBank: ["skiing", "coding", "photography", "piano", "exciting"], collocations: ["take up", "develop skills", "master the art", "broaden interests"], advanced: ["acquire", "captivating", "expertise"], idiom: "Give it a shot", samples: ["<strong>Option 1:</strong> Actually, I need a moment... That's an interesting choice... I really want to try skiing. What I mean is, I want to give it a shot because sliding down snowy mountains looks captivating.", "<strong>Option 2:</strong> Let me see... I've thought about photography. It looks exciting to capture moments. I would need to acquire some expertise in lighting, but I want to master the art."] },
-                { type: "Part 3", question: "Are hobbies important for students?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is..."], starters: ["Yes, because...", "Hobbies provide...", "Without hobbies..."], wordBank: ["mental health", "creativity", "social", "balance", "stress"], collocations: ["well-rounded", "relieve stress", "maintain balance", "boost confidence"], advanced: ["integral", "therapeutic", "holistic"], idiom: "All work and no play", samples: ["<strong>Option 1:</strong> That's a good question. I'm convinced that hobbies are integral. Overall, I believe 'all work and no play' is bad for students, so hobbies provide necessary balance.", "<strong>Option 2:</strong> Another point worth mentioning is that hobbies are therapeutic. They allow students to relieve stress and develop a well-rounded personality outside of school."] }
+                { type: "Part 1", question: "What do you do in your free time?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose...", "As a matter of fact...", "Actually..."], starters: ["In my free time...", "I usually...", "I am a fan of..."], wordBank: ["basketball", "reading", "games", "music", "draw", "painting", "novel", "relax"], collocations: ["spare time", "leisure activity", "unwind", "creative outlet", "avid reader", "pass the time", "stay active"], advanced: ["recreational", "passionate", "pursue", "enthusiastic", "engage"], idiom: "Let off steam", samples: ["<strong>Option 1:</strong> Well, let me think... As a matter of fact, I love sports. I often play basketball to let off steam after school. It's my favorite recreational activity.", "<strong>Option 2:</strong> To be honest, I am a fan of reading. In my spare time, I pursue my interest in sci-fi novels. It helps me unwind and relax."] },
+                { type: "Part 2", question: "Describe a hobby you want to try.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken...", "Interesting...", "I've thought..."], starters: ["I want to try...", "It looks...", "I need to..."], wordBank: ["skiing", "coding", "photography", "piano", "exciting", "instrument", "skill", "creative"], collocations: ["take up", "develop skills", "master the art", "broaden interests", "artistic expression", "challenge myself", "learn the basics"], advanced: ["acquire", "captivating", "expertise", "proficient", "dedication"], idiom: "Give it a shot", samples: ["<strong>Option 1:</strong> Actually, I need a moment... That's an interesting choice... I really want to try skiing. What I mean is, I want to give it a shot because sliding down snowy mountains looks captivating.", "<strong>Option 2:</strong> Let me see... I've thought about photography. It looks exciting to capture moments. I would need to acquire some expertise in lighting, but I want to master the art."] },
+                { type: "Part 3", question: "Are hobbies important for students?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is...", "Absolutely...", "I'm convinced..."], starters: ["Yes, because...", "Hobbies provide...", "Without hobbies..."], wordBank: ["mental health", "creativity", "social", "balance", "stress", "academic", "pressure", "lifestyle"], collocations: ["well-rounded", "relieve stress", "maintain balance", "boost confidence", "escape reality", "social skills", "personal growth"], advanced: ["integral", "therapeutic", "holistic", "essential", "beneficial"], idiom: "All work and no play", samples: ["<strong>Option 1:</strong> That's a good question. I'm convinced that hobbies are integral. Overall, I believe 'all work and no play' is bad for students, so hobbies provide necessary balance.", "<strong>Option 2:</strong> Another point worth mentioning is that hobbies are therapeutic. They allow students to relieve stress and develop a well-rounded personality outside of school."] }
             ],
             "Family & Friends": [
-                { type: "Part 1", question: "Who are you closest to in your family?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose..."], starters: ["I am closest to...", "We often...", "She helps me..."], wordBank: ["mother", "father", "grandma", "supportive", "kind"], collocations: ["get along", "close relationship", "family bond", "quality time"], advanced: ["inseparable", "confide", "guidance"], idiom: "Flesh and blood", samples: ["<strong>Option 1:</strong> Well, let me think... I'd have to say I am closest to my mother. She is my flesh and blood and always supports me. I can confide in her about anything.", "<strong>Option 2:</strong> I suppose probably my grandma. We have a very close relationship. We spend quality time together every weekend, and she gives me great guidance."] },
-                { type: "Part 2", question: "Describe your best friend.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken..."], starters: ["My best friend is...", "We met...", "He/She is..."], wordBank: ["cheerful", "honest", "reliable", "funny", "tall"], collocations: ["childhood friend", "have in common", "sense of humor", "shared interests"], advanced: ["trustworthy", "dependable", "bond"], idiom: "Through thick and thin", samples: ["<strong>Option 1:</strong> Let me see... Let me gather my thoughts... My best friend is Li Ming. We've been friends through thick and thin. Another point worth mentioning is his great sense of humor.", "<strong>Option 2:</strong> Actually, I need a moment... I've known Anna for ages. She is incredibly dependable. We have a lot in common, especially our shared interests in music. Our bond is very strong."] },
-                { type: "Part 3", question: "What makes a 'good friend'?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is..."], starters: ["A good friend...", "The main quality...", "I value..."], wordBank: ["honesty", "loyalty", "trust", "listener", "support"], collocations: ["mutual respect", "stand by you", "keep a secret"], advanced: ["integrity", "empathy", "reliable"], idiom: "Shoulder to cry on", samples: ["<strong>Option 1:</strong> That's a good question. It depends on how you look at it, but I tend to think that honesty is key. You need a shoulder to cry on who will also tell you the truth.", "<strong>Option 2:</strong> What I mean is, in my opinion, empathy is the most important quality. A good friend should have integrity and stand by you when things get tough."] }
+                { type: "Part 1", question: "Who are you closest to in your family?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose...", "I'd say...", "Probably..."], starters: ["I am closest to...", "We often...", "She helps me..."], wordBank: ["mother", "father", "grandma", "supportive", "kind", "sibling", "cousin", "strict"], collocations: ["get along", "close relationship", "family bond", "quality time", "look up to", "confide in", "mutual respect"], advanced: ["inseparable", "confide", "guidance", "cherish", "unwavering"], idiom: "Flesh and blood", samples: ["<strong>Option 1:</strong> Well, let me think... I'd have to say I am closest to my mother. She is my flesh and blood and always supports me. I can confide in her about anything.", "<strong>Option 2:</strong> I suppose probably my grandma. We have a very close relationship. We spend quality time together every weekend, and she gives me great guidance."] },
+                { type: "Part 2", question: "Describe your best friend.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken...", "I've known...", "My best friend..."], starters: ["My best friend is...", "We met...", "He/She is..."], wordBank: ["cheerful", "honest", "reliable", "funny", "tall", "secret", "trust", "memory"], collocations: ["childhood friend", "have in common", "sense of humor", "shared interests", "enjoy company", "trust implicitly", "count on"], advanced: ["trustworthy", "dependable", "bond", "supportive", "genuine"], idiom: "Through thick and thin", samples: ["<strong>Option 1:</strong> Let me see... Let me gather my thoughts... My best friend is Li Ming. We've been friends through thick and thin. Another point worth mentioning is his great sense of humor.", "<strong>Option 2:</strong> Actually, I need a moment... I've known Anna for ages. She is incredibly dependable. We have a lot in common, especially our shared interests in music. Our bond is very strong."] },
+                { type: "Part 3", question: "What makes a 'good friend'?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is...", "It depends...", "In my opinion..."], starters: ["A good friend...", "The main quality...", "I value..."], wordBank: ["honesty", "loyalty", "trust", "listener", "support", "forgive", "kindness", "help"], collocations: ["mutual respect", "stand by you", "keep a secret", "good listener", "offer advice", "supportive nature", "trustworthy friend"], advanced: ["integrity", "empathy", "reliable", "compassion", "sincerity"], idiom: "Shoulder to cry on", samples: ["<strong>Option 1:</strong> That's a good question. It depends on how you look at it, but I tend to think that honesty is key. You need a shoulder to cry on who will also tell you the truth.", "<strong>Option 2:</strong> What I mean is, in my opinion, empathy is the most important quality. A good friend should have integrity and stand by you when things get tough."] }
             ],
             "Technology": [
-                { type: "Part 1", question: "How often do you use a mobile phone?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose..."], starters: ["I use it...", "Every day...", "I mainly use..."], wordBank: ["chatting", "WeChat", "homework", "games", "daily"], collocations: ["browse internet", "scroll media", "stay connected", "check notifications"], advanced: ["indispensable", "device", "frequently"], idiom: "Glued to the screen", samples: ["<strong>Option 1:</strong> Well, let me think... mostly I use my phone every day. In other words, I'm often glued to the screen in the evenings checking homework.", "<strong>Option 2:</strong> To be honest, it is an indispensable device for me. I use it frequently to stay connected with my friends via WeChat."] },
-                { type: "Part 2", question: "Describe a useful app for studies.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken..."], starters: ["I often use...", "It helps me...", "It has..."], wordBank: ["dictionary", "translate", "online", "efficient", "video"], collocations: ["user-friendly", "educational tool", "access resources", "improve skills"], advanced: ["comprehensive", "innovative", "accessible"], idiom: "At your fingertips", samples: ["<strong>Option 1:</strong> Let me see... Let me reflect on that... A good example would be Pleco. It puts definitions at your fingertips, which helps me read difficult English books.", "<strong>Option 2:</strong> Actually, I need a moment... One app I use is Duolingo. It is a comprehensive educational tool. It helps me improve my skills in a fun way due to its innovative design."] },
-                { type: "Part 3", question: "Do children spend too much time on screens?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is..."], starters: ["Yes, it is...", "Many children...", "It affects..."], wordBank: ["addicted", "eyesight", "health", "social", "distraction"], collocations: ["screen time", "sedentary lifestyle", "face-to-face", "attention span"], advanced: ["excessive", "consequences", "moderation"], idiom: "Double-edged sword", samples: ["<strong>Option 1:</strong> That's a good question. From my perspective, technology is a double-edged sword. While it’s true that screens help us learn, I think children spend excessive time on them.", "<strong>Option 2:</strong> What I mean is, undoubtedly, yes. The consequences of too much screen time are a sedentary lifestyle and poor eyesight. We need more moderation."] }
+                { type: "Part 1", question: "How often do you use a mobile phone?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose...", "Mostly...", "Actually..."], starters: ["I use it...", "Every day...", "I mainly use..."], wordBank: ["chatting", "WeChat", "homework", "games", "daily", "smartphone", "app", "internet"], collocations: ["browse internet", "scroll media", "stay connected", "check notifications", "send messages", "daily routine", "screen time"], advanced: ["indispensable", "device", "frequently", "integral", "rely"], idiom: "Glued to the screen", samples: ["<strong>Option 1:</strong> Well, let me think... mostly I use my phone every day. In other words, I'm often glued to the screen in the evenings checking homework.", "<strong>Option 2:</strong> To be honest, it is an indispensable device for me. I use it frequently to stay connected with my friends via WeChat."] },
+                { type: "Part 2", question: "Describe a useful app for studies.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken...", "Let me reflect...", "One app..."], starters: ["I often use...", "It helps me...", "It has..."], wordBank: ["dictionary", "translate", "online", "efficient", "video", "platform", "search", "download"], collocations: ["user-friendly", "educational tool", "access resources", "improve skills", "search for info", "highly recommended", "boost productivity"], advanced: ["comprehensive", "innovative", "accessible", "invaluable", "feature"], idiom: "At your fingertips", samples: ["<strong>Option 1:</strong> Let me see... Let me reflect on that... A good example would be Pleco. It puts definitions at your fingertips, which helps me read difficult English books.", "<strong>Option 2:</strong> Actually, I need a moment... One app I use is Duolingo. It is a comprehensive educational tool. It helps me improve my skills in a fun way due to its innovative design."] },
+                { type: "Part 3", question: "Do children spend too much time on screens?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is...", "From my view...", "It's serious..."], starters: ["Yes, it is...", "Many children...", "It affects..."], wordBank: ["addicted", "eyesight", "health", "social", "distraction", "focus", "limit", "control"], collocations: ["screen time", "sedentary lifestyle", "face-to-face", "attention span", "physical health", "mental well-being", "social interaction"], advanced: ["excessive", "consequences", "moderation", "detrimental", "addiction"], idiom: "Double-edged sword", samples: ["<strong>Option 1:</strong> That's a good question. From my perspective, technology is a double-edged sword. While it’s true that screens help us learn, I think children spend excessive time on them.", "<strong>Option 2:</strong> What I mean is, undoubtedly, yes. The consequences of too much screen time are a sedentary lifestyle and poor eyesight. We need more moderation."] }
             ],
             "Travel": [
-                { type: "Part 1", question: "Do you like traveling?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose..."], starters: ["Yes, I love...", "I enjoy...", "It gives me..."], wordBank: ["explore", "culture", "relax", "food", "scenery"], collocations: ["tourist destination", "local cuisine", "go sightseeing", "broaden mind"], advanced: ["exotic", "picturesque", "memorable"], idiom: "Travel light", samples: ["<strong>Option 1:</strong> Well, let me think... You know... That’s an interesting question. I’d probably say yes, because I love exploring new cultures and local cuisines.", "<strong>Option 2:</strong> To be honest, certainly! I enjoy seeing picturesque scenery. It helps me relax and broaden my mind. I usually try to travel light."] },
-                { type: "Part 2", question: "Describe a city you visited.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken..."], starters: ["I visited...", "It is in...", "It is famous..."], wordBank: ["Shanghai", "Chengdu", "pandas", "spicy", "history"], collocations: ["scenic spot", "memorable experience", "ancient history", "local specialty"], advanced: ["iconic", "magnificent", "bustling"], idiom: "Off the beaten track", samples: ["<strong>Option 1:</strong> Let me see... I'll tell you about Chengdu. It is famous for Giant Pandas. In addition, the spicy hotpot there is an unforgettable experience.", "<strong>Option 2:</strong> Actually, I need a moment... One memorable trip was to Shanghai. It is a bustling city with iconic skyscrapers. Walking along the Bund was a magnificent experience."] },
-                { type: "Part 3", question: "Car vs High-speed train?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is..."], starters: ["I prefer...", "Trains are...", "Cars are..."], wordBank: ["fast", "convenient", "traffic", "comfortable", "time"], collocations: ["public transport", "high-speed network", "traffic jam", "cost-effective"], advanced: ["punctual", "efficient", "preferable"], idiom: "Hustle and bustle", samples: ["<strong>Option 1:</strong> That's a good question. There's no doubt that trains are better. On the one hand, cars are private, but on the other hand, high-speed trains avoid the hustle and bustle of traffic.", "<strong>Option 2:</strong> What I mean is, I prefer trains because they are punctual and efficient. Driving can lead to getting stuck in a traffic jam, which is not preferable."] }
+                { type: "Part 1", question: "Do you like traveling?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose...", "You know...", "Certainly..."], starters: ["Yes, I love...", "I enjoy...", "It gives me..."], wordBank: ["explore", "culture", "relax", "food", "scenery", "trip", "vacation", "flight"], collocations: ["tourist destination", "local cuisine", "go sightseeing", "broaden mind", "escape the city", "cultural experience", "breathtaking view"], advanced: ["exotic", "picturesque", "memorable", "rejuvenate", "adventure"], idiom: "Travel light", samples: ["<strong>Option 1:</strong> Well, let me think... You know... That’s an interesting question. I’d probably say yes, because I love exploring new cultures and local cuisines.", "<strong>Option 2:</strong> To be honest, certainly! I enjoy seeing picturesque scenery. It helps me relax and broaden my mind. I usually try to travel light."] },
+                { type: "Part 2", question: "Describe a city you visited.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken...", "I'll tell you...", "One trip..."], starters: ["I visited...", "It is in...", "It is famous..."], wordBank: ["Shanghai", "Chengdu", "pandas", "spicy", "history", "museum", "mountain", "river"], collocations: ["scenic spot", "memorable experience", "ancient history", "local specialty", "cultural heritage", "must-see", "tourist hotspot"], advanced: ["iconic", "magnificent", "bustling", "vibrant", "landmark"], idiom: "Off the beaten track", samples: ["<strong>Option 1:</strong> Let me see... I'll tell you about Chengdu. It is famous for Giant Pandas. In addition, the spicy hotpot there is an unforgettable experience.", "<strong>Option 2:</strong> Actually, I need a moment... One memorable trip was to Shanghai. It is a bustling city with iconic skyscrapers. Walking along the Bund was a magnificent experience."] },
+                { type: "Part 3", question: "Car vs High-speed train?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is...", "No doubt...", "It's clear..."], starters: ["I prefer...", "Trains are...", "Cars are..."], wordBank: ["fast", "convenient", "traffic", "comfortable", "time", "ticket", "station", "drive"], collocations: ["public transport", "high-speed network", "traffic jam", "cost-effective", "environmentally friendly", "punctual service", "travel time"], advanced: ["punctual", "efficient", "preferable", "reliable", "congestion"], idiom: "Hustle and bustle", samples: ["<strong>Option 1:</strong> That's a good question. There's no doubt that trains are better. On the one hand, cars are private, but on the other hand, high-speed trains avoid the hustle and bustle of traffic.", "<strong>Option 2:</strong> What I mean is, I prefer trains because they are punctual and efficient. Driving can lead to getting stuck in a traffic jam, which is not preferable."] }
             ],
             "Animals & Pets": [
-                { type: "Part 1", question: "Do you have a pet?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose..."], starters: ["I have a...", "My favorite...", "I don't..."], wordBank: ["dog", "cat", "rabbit", "cute", "loyal"], collocations: ["keep a pet", "furry friend", "take care of", "animal lover"], advanced: ["companion", "affectionate", "responsibility"], idiom: "Cat nap", samples: ["<strong>Option 1:</strong> Well, let me think... Actually... Well, I don't have a pet, but I love cats. They are cute furry friends who love to take a cat nap in the sun.", "<strong>Option 2:</strong> To be honest, yes, I do. I have a dog. He is a loyal companion. Being an animal lover, I enjoy the responsibility of taking care of him."] },
-                { type: "Part 2", question: "Describe an interesting animal.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken..."], starters: ["I think...", "It lives...", "It looks..."], wordBank: ["panda", "elephant", "wild", "bamboo", "nature"], collocations: ["endangered species", "natural habitat", "wild animal", "unique features"], advanced: ["fascinating", "distinctive", "conservation"], idiom: "Gentle giant", samples: ["<strong>Option 1:</strong> Let me see... I think the Giant Panda is interesting. They are gentle giants that live in bamboo forests. They have unique habits, such as eating all day.", "<strong>Option 2:</strong> Actually, I need a moment... I think elephants are fascinating. They are intelligent wild animals. Sadly, they are an endangered species and need conservation in their natural habitat."] },
-                { type: "Part 3", question: "Why do people keep pets?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is..."], starters: ["People keep...", "Pets provide...", "For old people..."], wordBank: ["company", "friend", "duty", "lonely", "stress"], collocations: ["loyal companion", "provide company", "emotional support", "relieve loneliness"], advanced: ["alleviate", "bond", "unconditional"], idiom: "Man's best friend", samples: ["<strong>Option 1:</strong> That's a good question. It's hard to say, but... That’s a tough question, but I guess people want companionship. A dog is known as man's best friend for a reason.", "<strong>Option 2:</strong> What I mean is, I imagine it's for emotional support. Pets offer unconditional love which helps alleviate stress and relieve loneliness for many people."] }
+                { type: "Part 1", question: "Do you have a pet?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose...", "Actually...", "Sadly no..."], starters: ["I have a...", "My favorite...", "I don't..."], wordBank: ["dog", "cat", "rabbit", "cute", "loyal", "fur", "feed", "walk"], collocations: ["keep a pet", "furry friend", "take care of", "animal lover", "domestic animal", "loyal companion", "play with"], advanced: ["companion", "affectionate", "responsibility", "adorable", "bond"], idiom: "Cat nap", samples: ["<strong>Option 1:</strong> Well, let me think... Actually... Well, I don't have a pet, but I love cats. They are cute furry friends who love to take a cat nap in the sun.", "<strong>Option 2:</strong> To be honest, yes, I do. I have a dog. He is a loyal companion. Being an animal lover, I enjoy the responsibility of taking care of him."] },
+                { type: "Part 2", question: "Describe an interesting animal.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken...", "I think...", "One animal..."], starters: ["I think...", "It lives...", "It looks..."], wordBank: ["panda", "elephant", "wild", "bamboo", "nature", "forest", "zoo", "fur"], collocations: ["endangered species", "natural habitat", "wild animal", "unique features", "protect wildlife", "animal kingdom", "native to"], advanced: ["fascinating", "distinctive", "conservation", "habitat", "species"], idiom: "Gentle giant", samples: ["<strong>Option 1:</strong> Let me see... I think the Giant Panda is interesting. They are gentle giants that live in bamboo forests. They have unique habits, such as eating all day.", "<strong>Option 2:</strong> Actually, I need a moment... I think elephants are fascinating. They are intelligent wild animals. Sadly, they are an endangered species and need conservation in their natural habitat."] },
+                { type: "Part 3", question: "Why do people keep pets?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is...", "Hard to say...", "I imagine..."], starters: ["People keep...", "Pets provide...", "For old people..."], wordBank: ["company", "friend", "duty", "lonely", "stress", "care", "family", "love"], collocations: ["loyal companion", "provide company", "emotional support", "relieve loneliness", "reduce stress", "part of the family", "unconditional love"], advanced: ["alleviate", "bond", "unconditional", "companionship", "responsibility"], idiom: "Man's best friend", samples: ["<strong>Option 1:</strong> That's a good question. It's hard to say, but... That’s a tough question, but I guess people want companionship. A dog is known as man's best friend for a reason.", "<strong>Option 2:</strong> What I mean is, I imagine it's for emotional support. Pets offer unconditional love which helps alleviate stress and relieve loneliness for many people."] }
             ],
             "Environment": [
-                { type: "Part 1", question: "Is there a park near you?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose..."], starters: ["Yes, there is...", "It is called...", "I go there..."], wordBank: ["trees", "flowers", "lake", "exercise", "grass"], collocations: ["fresh air", "green space", "morning exercise", "public park"], advanced: ["tranquil", "scenic", "vicinity"], idiom: "Breath of fresh air", samples: ["<strong>Option 1:</strong> Well, let me think... Well, I guess... Yes, there is a community park. It's a breath of fresh air in the busy city with lots of green space.", "<strong>Option 2:</strong> To be honest, yes, there is a scenic park in the vicinity. I go there for morning exercise to enjoy the tranquil atmosphere."] },
-                { type: "Part 2", question: "Describe how you help the environment.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken..."], starters: ["I try to...", "My family...", "At school..."], wordBank: ["recycle", "water", "lights", "plastic", "waste"], collocations: ["save energy", "eco-friendly", "reduce waste", "public transport"], advanced: ["sustainable", "conserve", "eco-conscious"], idiom: "Do my bit", samples: ["<strong>Option 1:</strong> Actually, I need a moment... Thinking about it... I try to save electricity to do my bit. To put it another way, I always turn off lights when I leave a room.", "<strong>Option 2:</strong> Let me see... One thing I do is use public transport. Being eco-conscious is important. I also try to reduce waste by avoiding plastic bags to live a sustainable life."] },
-                { type: "Part 3", question: "Biggest environmental problems?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is..."], starters: ["The biggest...", "Cities have...", "We have..."], wordBank: ["pollution", "smog", "noise", "waste", "rubbish"], collocations: ["global warming", "air quality", "noise pollution", "carbon footprint"], advanced: ["severe", "contamination", "hazardous"], idiom: "Tip of the iceberg", samples: ["<strong>Option 1:</strong> That's a good question. That's a serious issue... Air pollution is huge. But that's just the tip of the iceberg; we also have too much waste. So, to sum up, pollution is the main issue.", "<strong>Option 2:</strong> What I mean is, I'm worried about the severe contamination of our water. Also, the carbon footprint of cities is too high, leading to global warming."] }
+                { type: "Part 1", question: "Is there a park near you?", timer: 30, fillers: ["Well, let me think...", "To be honest...", "I suppose...", "Well, yes...", "Not really..."], starters: ["Yes, there is...", "It is called...", "I go there..."], wordBank: ["trees", "flowers", "lake", "exercise", "grass", "bench", "nature", "walk"], collocations: ["fresh air", "green space", "morning exercise", "public park", "peace and quiet", "natural beauty", "community park"], advanced: ["tranquil", "scenic", "vicinity", "atmosphere", "recreational"], idiom: "Breath of fresh air", samples: ["<strong>Option 1:</strong> Well, let me think... Well, I guess... Yes, there is a community park. It's a breath of fresh air in the busy city with lots of green space.", "<strong>Option 2:</strong> To be honest, yes, there is a scenic park in the vicinity. I go there for morning exercise to enjoy the tranquil atmosphere."] },
+                { type: "Part 2", question: "Describe how you help the environment.", timer: 90, fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken...", "Thinking...", "I try to..."], starters: ["I try to...", "My family...", "At school..."], wordBank: ["recycle", "water", "lights", "plastic", "waste", "rubbish", "energy", "clean"], collocations: ["save energy", "eco-friendly", "reduce waste", "public transport", "protect the planet", "environmentally friendly", "sort rubbish"], advanced: ["sustainable", "conserve", "eco-conscious", "preservation", "impact"], idiom: "Do my bit", samples: ["<strong>Option 1:</strong> Actually, I need a moment... Thinking about it... I try to save electricity to do my bit. To put it another way, I always turn off lights when I leave a room.", "<strong>Option 2:</strong> Let me see... One thing I do is use public transport. Being eco-conscious is important. I also try to reduce waste by avoiding plastic bags to live a sustainable life."] },
+                { type: "Part 3", question: "Biggest environmental problems?", timer: 60, fillers: ["That's a good question...", "What I mean is...", "Another point is...", "Serious issue...", "I'm worried..."], starters: ["The biggest...", "Cities have...", "We have..."], wordBank: ["pollution", "smog", "noise", "waste", "rubbish", "factory", "smoke", "health"], collocations: ["global warming", "air quality", "noise pollution", "carbon footprint", "climate change", "industrial waste", "environmental protection"], advanced: ["severe", "contamination", "hazardous", "pollutant", "emission"], idiom: "Tip of the iceberg", samples: ["<strong>Option 1:</strong> That's a good question. That's a serious issue... Air pollution is huge. But that's just the tip of the iceberg; we also have too much waste. So, to sum up, pollution is the main issue.", "<strong>Option 2:</strong> What I mean is, I'm worried about the severe contamination of our water. Also, the carbon footprint of cities is too high, leading to global warming."] }
             ],
              "Sports": [
                 { 
                     type: "Part 1", 
                     question: "Do you like playing sports?", 
                     timer: 30, 
-                    fillers: ["Well, let me think...", "To be honest...", "I suppose..."], 
+                    fillers: ["Well, let me think...", "To be honest...", "I suppose...", "Not really...", "Absolutely..."], 
                     starters: ["Yes, I like...", "I play...", "I'm not sporty..."], 
                     wordBank: ["basketball", "football", "swim", "run", "active", "gym", "team", "ball"], 
                     collocations: ["keep fit", "team sport", "regular exercise", "physical activity", "stay healthy", "join a club", "workout routine"], 
                     advanced: ["vigorous", "beneficial", "sedentary", "athletic", "stamina"], 
                     idiom: "Get the ball rolling", 
                     samples: [
-                        "<strong>Option 1:</strong> To be honest... Absolutely! I am a big fan of basketball. It is a vigorous team sport that helps me keep fit and build stamina. I try to get the ball rolling every weekend with my friends at the court.",
-                        "<strong>Option 2:</strong> Well, let me think... To be honest, I'm not very sporty. I lead a bit of a sedentary lifestyle. However, I do enjoy a quick swim occasionally because I know regular exercise is beneficial for my health."
+                        "<strong>Option 1:</strong> Absolutely! I am a big fan of basketball. It is a vigorous team sport that helps me keep fit and build stamina. I try to get the ball rolling every weekend with my friends at the court.",
+                        "<strong>Option 2:</strong> To be honest, I'm not very sporty. I lead a bit of a sedentary lifestyle. However, I do enjoy a quick swim occasionally because I know regular exercise is beneficial for my health."
                     ] 
                 },
                 { 
                     type: "Part 2", 
                     question: "Describe a sport you would like to try.", 
                     timer: 90, 
-                    fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken..."], 
+                    fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken...", "I've wanted to...", "It looks fun..."], 
                     starters: ["I want to try...", "It looks...", "I need to learn..."], 
                     wordBank: ["skiing", "surfing", "tennis", "diving", "gear", "coach", "lesson", "safe"], 
                     collocations: ["physical strength", "requires equipment", "adrenaline rush", "extreme sport", "master the skill", "take up", "outdoor activity"], 
                     advanced: ["exhilarating", "endurance", "agility", "coordination", "technique"], 
                     idiom: "Give it my best shot", 
                     samples: [
-                        "<strong>Option 1:</strong> Actually, I need a moment... I've always wanted to try surfing. It looks like an exhilarating extreme sport. It requires good balance and physical strength to stand on the board. Even though it seems hard, I want to give it my best shot.",
-                        "<strong>Option 2:</strong> Let me see... Interesting question. I want to try tennis. It requires agility and coordination. I would need to take lessons from a coach to master the skill and technique. It seems like a great outdoor activity to take up."
+                        "<strong>Option 1:</strong> I've always wanted to try surfing. It looks like an exhilarating extreme sport. It requires good balance and physical strength to stand on the board. Even though it seems hard, I want to give it my best shot.",
+                        "<strong>Option 2:</strong> Interesting question. I want to try tennis. It requires agility and coordination. I would need to take lessons from a coach to master the skill and technique. It seems like a great outdoor activity to take up."
                     ] 
                 },
                 { 
                     type: "Part 3", 
                     question: "Why is it important for children to play sports?", 
                     timer: 60, 
-                    fillers: ["That's a good question...", "What I mean is...", "Another point is..."], 
+                    fillers: ["That's a good question...", "What I mean is...", "Another point is...", "I feel that...", "It's essential..."], 
                     starters: ["It helps them...", "Sports teach...", "They learn..."], 
                     wordBank: ["health", "teamwork", "confidence", "fun", "friends", "win", "lose", "rule"], 
                     collocations: ["build character", "team spirit", "healthy lifestyle", "social skills", "mental health", "fair play", "cooperation skill"], 
                     advanced: ["resilience", "collaboration", "fundamental", "discipline", "competitiveness"], 
                     idiom: "Healthy body, healthy mind", 
                     samples: [
-                        "<strong>Option 1:</strong> That's a good question. I feel that it is essential because sports build character. Children learn fundamental skills like teamwork and collaboration. As they say, 'healthy body, healthy mind', so it boosts their mental health too.",
-                        "<strong>Option 2:</strong> What I mean is, mainly, it teaches discipline and resilience. Through competition, they learn to handle winning and losing. It also promotes a healthy lifestyle and improves their social skills by playing with others."
+                        "<strong>Option 1:</strong> I feel that it is essential because sports build character. Children learn fundamental skills like teamwork and collaboration. As they say, 'healthy body, healthy mind', so it boosts their mental health too.",
+                        "<strong>Option 2:</strong> Mainly, it teaches discipline and resilience. Through competition, they learn to handle winning and losing. It also promotes a healthy lifestyle and improves their social skills by playing with others."
                     ] 
                 }
             ]
@@ -437,9 +437,9 @@
         // --- INIT ---
         function init() {
             try {
-                const saved = localStorage.getItem('ieltsG7v6'); // Bump version to clear old cache if needed
+                const saved = localStorage.getItem('ieltsG7v7'); // Version bump
                 if(saved) state.completed = JSON.parse(saved);
-                const name = localStorage.getItem('ieltsG7v6Name');
+                const name = localStorage.getItem('ieltsG7v7Name');
                 if(name) { state.user = name; ui.nameInput.value = name; }
                 updateProgress();
             } catch(e){}
@@ -499,10 +499,10 @@
             Object.keys(practiceData).forEach(t => {
                 const btn = document.createElement('button');
                 const isDone = state.completed[t];
-                btn.className = `p-6 rounded-2xl text-left border-2 transition-all transform hover:scale-[1.02] flex items-center justify-between ${isDone ? 'bg-green-50 border-green-200' : 'bg-white border-gray-100 hover:border-blue-200 hover:shadow-md'}`;
+                btn.className = `p-8 rounded-3xl text-left border-2 transition-all transform hover:scale-[1.02] flex items-center justify-between ${isDone ? 'bg-green-50 border-green-200' : 'bg-white border-gray-100 hover:border-blue-200 hover:shadow-xl'}`;
                 btn.innerHTML = `
-                    <span class="font-bold text-2xl ${isDone ? 'text-green-700' : 'text-gray-800'}">${t}</span>
-                    ${isDone ? '<i class="fas fa-check-circle text-green-500 text-2xl"></i>' : '<i class="fas fa-chevron-right text-gray-300 text-xl"></i>'}
+                    <span class="font-bold text-3xl ${isDone ? 'text-green-700' : 'text-gray-800'}">${t}</span>
+                    ${isDone ? '<i class="fas fa-check-circle text-green-500 text-3xl"></i>' : '<i class="fas fa-chevron-right text-gray-300 text-2xl"></i>'}
                 `;
                 btn.onclick = () => loadTopic(t);
                 ui.topicSelection.appendChild(btn);
@@ -522,7 +522,7 @@
         function loadQuestion() {
             if (state.qIndex >= state.questions.length) {
                 state.completed[state.topic] = true;
-                localStorage.setItem('ieltsG7v6', JSON.stringify(state.completed));
+                localStorage.setItem('ieltsG7v7', JSON.stringify(state.completed));
                 ui.celebration.classList.remove('hidden');
                 setTimeout(() => {
                     ui.celebration.classList.add('hidden');
@@ -565,11 +565,11 @@
             ui.samplesList.innerHTML = '';
             (q.samples || []).forEach(s => {
                 const li = document.createElement('li');
-                li.className = "mb-4 border-b border-yellow-100 pb-2 last:border-0";
+                li.className = "mb-6 border-b-2 border-yellow-100 pb-4 last:border-0";
                 li.innerHTML = `
                     <div class="flex items-start">
-                        <i class="fas fa-quote-left text-yellow-500 mr-2 mt-1"></i>
-                        <span class="text-gray-800">${s}</span>
+                        <i class="fas fa-quote-left text-yellow-500 mr-3 mt-1 text-xl"></i>
+                        <span class="text-gray-800 text-xl leading-relaxed">${s}</span>
                     </div>`;
                 ui.samplesList.appendChild(li);
             });
@@ -583,7 +583,8 @@
             const textColors = { indigo: 'text-indigo-700', blue: 'text-blue-700', green: 'text-green-700', purple: 'text-purple-700' };
             items.forEach(txt => {
                 const span = document.createElement('span');
-                span.className = `bg-white border ${borderColors[color]} ${textColors[color]} px-3 py-1.5 rounded-lg text-sm font-medium interactive-chip mb-2 mr-2 inline-block shadow-sm hover:bg-gray-50`;
+                // Increased text size from text-sm to text-base/text-lg
+                span.className = `bg-white border-2 ${borderColors[color]} ${textColors[color]} px-4 py-2 rounded-xl text-base font-semibold interactive-chip mb-2 mr-2 inline-block shadow-sm hover:bg-gray-50`;
                 span.innerText = txt;
                 span.onclick = () => window.speak(txt);
                 container.appendChild(span);
@@ -596,7 +597,7 @@
             state.prepMode = false;
             if(ui.timerDisplay) {
                 ui.timerDisplay.innerText = "0:00";
-                ui.timerDisplay.className = "text-sm font-bold text-gray-700";
+                ui.timerDisplay.className = "text-xl font-bold text-gray-700";
             }
             if(ui.recordBtn) ui.recordBtn.classList.remove('hidden');
             if(ui.stopBtn) ui.stopBtn.classList.add('hidden');
@@ -605,7 +606,6 @@
                 ui.postActions.classList.remove('flex');
             }
             if(ui.recordingStatus) ui.recordingStatus.classList.add('hidden');
-            // Hide sample container by default on new question
             ui.samplesContainer.classList.add('hidden');
             if(state.mediaRecorder && state.mediaRecorder.state === 'recording') state.mediaRecorder.stop();
         }
@@ -616,8 +616,8 @@
             state.paused = false;
             state.prepMode = isPrep;
             updateTimerDisplay();
-            if(isPrep) ui.timerDisplay.className = "text-sm font-bold text-yellow-600";
-            else ui.timerDisplay.className = "text-sm font-bold text-gray-700";
+            if(isPrep) ui.timerDisplay.className = "text-xl font-bold text-yellow-600";
+            else ui.timerDisplay.className = "text-xl font-bold text-gray-700";
             state.timer = setInterval(() => {
                 if(!state.paused) {
                     state.timeLeft--;
@@ -681,7 +681,7 @@
             const val = ui.nameInput.value.trim();
             if(!val) return;
             state.user = val;
-            localStorage.setItem('ieltsG7v6Name', val);
+            localStorage.setItem('ieltsG7v7Name', val);
             document.getElementById('name-entry-container').classList.add('hidden');
             ui.topicContainer.classList.remove('hidden');
             ui.topicContainer.classList.add('flex');
@@ -710,6 +710,7 @@
         ui.modalConfirm.onclick = () => {
             ui.modal.classList.add('hidden');
             resetUI();
+            ui.samplesContainer.classList.add('hidden'); // Ensure samples close
             ui.practiceScreen.classList.add('hidden');
             ui.welcomeScreen.classList.remove('hidden');
             renderTopics();
