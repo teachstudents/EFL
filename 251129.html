@@ -107,9 +107,23 @@
                             <button id="record-btn" class="bg-red-500 hover:bg-red-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform"><i class="fas fa-microphone text-2xl"></i></button>
                             <button id="stop-record-btn" class="hidden bg-gray-800 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center animate-pulse"><i class="fas fa-stop text-2xl"></i></button>
                         </div>
+                        
+                        <!-- Post Recording Actions -->
                         <div id="post-recording-actions" class="hidden flex items-center gap-4 ml-2 animate-fadeIn">
                             <audio id="audio-player" controls class="h-10 w-40"></audio>
-                            <button id="download-btn" class="bg-blue-600 text-white w-12 h-12 rounded-full text-xl flex items-center justify-center shadow-md hover:bg-blue-700 transition-colors"><i class="fas fa-download"></i></button>
+                            <!-- Download Button -->
+                            <button id="download-btn" class="bg-blue-600 text-white w-12 h-12 rounded-full text-xl flex items-center justify-center shadow-md hover:bg-blue-700 transition-colors" title="Download Recording">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <!-- Upload Button -->
+                            <a id="sharepoint-upload-link" 
+                               href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="bg-green-600 text-white w-12 h-12 rounded-full text-xl flex items-center justify-center shadow-md hover:bg-green-700 transition-colors"
+                               title="Upload to Folder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </a>
                         </div>
                     </div>
 
@@ -266,14 +280,14 @@
                     type: "Part 2", 
                     question: "Describe a place in your hometown interesting to tourists.", 
                     timer: 90, 
-                    fillers: ["Actually, I need a moment...", "Let me see...", "If I'm not mistaken...", "I'd like to talk about...", "One place comes to mind..."], 
+                    fillers: ["Actually...", "Let me see...", "If I'm not mistaken...", "I'd like to talk about...", "One place comes to mind..."], 
                     starters: ["I want to describe...", "It is located in...", "You can see..."], 
                     wordBank: ["Great Wall", "Palace", "Temple", "site", "museum", "park", "lake", "view"], 
                     collocations: ["tourist attraction", "ancient architecture", "breathtaking view", "cultural heritage", "must-visit spot", "flock to", "historical significance"], 
                     advanced: ["magnificent", "preservation", "iconic", "awe-inspiring", "splendor"], 
                     idiom: "A stone's throw away", 
                     samples: [
-                        "<strong>Actually, I need a moment...</strong> I want to describe the <strong>Forbidden City</strong>. It is a <strong>magnificent</strong> <strong>Palace</strong> <strong>located in</strong> the center of Beijing. It is a major <strong>tourist attraction</strong> because of its <strong>ancient architecture</strong> and <strong>historical significance</strong>. It is really <strong>awe-inspiring</strong> to see the <strong>splendor</strong> of the emperors' home.",
+                        "<strong>Actually...</strong> I want to describe the <strong>Forbidden City</strong>. It is a <strong>magnificent</strong> <strong>Palace</strong> <strong>located in</strong> the center of Beijing. It is a major <strong>tourist attraction</strong> because of its <strong>ancient architecture</strong> and <strong>historical significance</strong>. It is really <strong>awe-inspiring</strong> to see the <strong>splendor</strong> of the emperors' home.",
                         "<strong>Let me see...</strong> I'd describe the <strong>Summer Palace</strong>. It is <strong>famous for</strong> its <strong>breathtaking view</strong> of the <strong>lake</strong>. It is just <strong>a stone's throw away</strong> from my school. Visitors <strong>flock to</strong> see the <strong>iconic</strong> <strong>Temples</strong> and enjoy the <strong>cultural heritage</strong>."
                     ] 
                 },
@@ -404,6 +418,7 @@
             postActions: document.getElementById('post-recording-actions'),
             audioPlayer: document.getElementById('audio-player'),
             downloadBtn: document.getElementById('download-btn'),
+            uploadLink: document.getElementById('sharepoint-upload-link'),
             recordingStatus: document.getElementById('recording-status'),
             prevBtn: document.getElementById('prev-btn'),
             nextBtn: document.getElementById('next-btn'),
@@ -442,15 +457,14 @@
         // --- INIT ---
         function init() {
             try {
-                const saved = localStorage.getItem('ieltsG7v9'); // Version bump
+                const saved = localStorage.getItem('ieltsG7v12'); 
                 if(saved) state.completed = JSON.parse(saved);
-                const name = localStorage.getItem('ieltsG7v9Name');
+                const name = localStorage.getItem('ieltsG7v12Name');
                 if(name) { state.user = name; ui.nameInput.value = name; }
                 updateProgress();
             } catch(e){}
             initializeTTS();
             
-            // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
                 if (e.code === 'Space' && !ui.practiceScreen.classList.contains('hidden')) {
                     e.preventDefault(); 
@@ -466,7 +480,6 @@
             });
         }
         
-        // --- TTS Logic with Priority Voices ---
         function initializeTTS() {
             return new Promise((resolve) => {
                 if (!tts) { ttsInitialized = true; return resolve(); }
@@ -474,31 +487,18 @@
                     const allVoices = tts.getVoices();
                     if (allVoices.length === 0) return;
                     const enVoices = allVoices.filter(v => v.lang.startsWith('en'));
-                    // Targeted list of "Online" high quality voices from Microsoft + Common High Quality
-                    const preferredNames = [
-                        "Microsoft Andrew Online (Natural)", "Microsoft Emma Online (Natural)", 
-                        "Microsoft Ava Online (Natural)", "Microsoft Brian Online (Natural)",
-                        "Microsoft Aria Online (Natural)", "Microsoft Guy Online (Natural)",
-                        "Google US English", "Samantha", "Daniel"
-                    ];
+                    const preferredNames = ["Microsoft Emma Online (Natural)", "Microsoft Andrew Online (Natural)", "Microsoft Ava Online (Natural)", "Microsoft Brian Online (Natural)", "Google US English", "Samantha", "Daniel"];
                     let highQualityVoices = [];
                     
-                    // STRICT MATCHING first for Online voices
                     preferredNames.forEach(name => {
                         const found = enVoices.find(v => v.name.includes(name));
                         if(found && !highQualityVoices.includes(found)) highQualityVoices.push(found);
                     });
                     
-                    // Fallback to any "Natural" voice if specific ones missed
                     if(highQualityVoices.length < 4) {
                          enVoices.forEach(v => {
-                             if(v.name.includes("Natural") && !highQualityVoices.includes(v)) highQualityVoices.push(v);
+                             if(!highQualityVoices.includes(v)) highQualityVoices.push(v);
                          });
-                    }
-                    
-                    // Fallback to standard
-                    if(highQualityVoices.length < 4) {
-                        enVoices.forEach(v => { if(!highQualityVoices.includes(v)) highQualityVoices.push(v); });
                     }
                     
                     const topics = Object.keys(practiceData);
@@ -561,7 +561,7 @@
         function loadQuestion() {
             if (state.qIndex >= state.questions.length) {
                 state.completed[state.topic] = true;
-                localStorage.setItem('ieltsG7v9', JSON.stringify(state.completed));
+                localStorage.setItem('ieltsG7v12', JSON.stringify(state.completed));
                 ui.celebration.classList.remove('hidden');
                 fireConfetti();
                 setTimeout(() => {
@@ -630,7 +630,6 @@
             });
         }
 
-        // --- STOP RECORDER (UPDATED TO AUTO DOWNLOAD) ---
         function stopRec() { 
              if (state.mediaRecorder && state.mediaRecorder.state !== 'inactive') {
                 state.mediaRecorder.onstop = () => {
@@ -639,17 +638,22 @@
                     const url = URL.createObjectURL(blob);
                     ui.audioPlayer.src = url;
                     
-                    ui.stopBtn.classList.add('hidden');
-                    ui.recordingStatus.classList.add('hidden');
-                    ui.recordBtn.classList.add('hidden');
-                    ui.postActions.classList.remove('hidden');
-                    ui.postActions.classList.add('flex');
+                    if(ui.stopBtn) ui.stopBtn.classList.add('hidden');
+                    if(ui.recordingStatus) ui.recordingStatus.classList.add('hidden');
+                    if(ui.recordBtn) ui.recordBtn.classList.add('hidden');
+                    if(ui.postActions) {
+                        ui.postActions.classList.remove('hidden');
+                        ui.postActions.classList.add('flex');
+                    }
 
                     const dateStr = new Date().toISOString().split('T')[0];
                     const userName = state.user || 'Student';
+                    const topicName = state.topic.replace(/\s+/g, '_');
+                    const fileName = `${userName}_${topicName}_Q${state.qIndex + 1}.webm`;
+
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `${userName}_${dateStr}_IELTS_Practice.webm`;
+                    a.download = fileName;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
@@ -749,14 +753,19 @@
                 state.mediaRecorder = new MediaRecorder(stream);
                 state.audioChunks = [];
                 state.mediaRecorder.ondataavailable = e => state.audioChunks.push(e.data);
-                // onstop handled in stopRec
+                state.mediaRecorder.onstop = () => {
+                    state.blob = new Blob(state.audioChunks, {type:'audio/webm'});
+                    ui.audioPlayer.src = URL.createObjectURL(state.blob);
+                    ui.stopBtn.classList.add('hidden');
+                    ui.recordingStatus.classList.add('hidden');
+                    ui.recordBtn.classList.add('hidden');
+                    ui.postActions.classList.remove('hidden');
+                    ui.postActions.classList.add('flex');
+                };
                 state.mediaRecorder.start();
                 ui.recordBtn.classList.add('hidden');
                 ui.stopBtn.classList.remove('hidden');
                 ui.recordingStatus.classList.remove('hidden');
-                ui.postActions.classList.remove('hidden'); // Hide previous
-                ui.postActions.classList.add('hidden');
-                ui.postActions.classList.remove('flex');
             } catch(e) { alert("Mic Error"); }
         }
 
@@ -772,7 +781,7 @@
             const val = ui.nameInput.value.trim();
             if(!val) return;
             state.user = val;
-            localStorage.setItem('ieltsG7v9Name', val);
+            localStorage.setItem('ieltsG7v12Name', val);
             document.getElementById('name-entry-container').classList.add('hidden');
             ui.topicContainer.classList.remove('hidden');
             ui.topicContainer.classList.add('flex');
