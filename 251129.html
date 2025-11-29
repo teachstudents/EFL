@@ -61,58 +61,58 @@
             </div>
             
             <div id="topic-selection-container" class="hidden w-full max-w-7xl flex flex-col h-full">
-                 <div class="flex justify-between items-end mb-6 flex-shrink-0 pt-6">
+                 <div class="flex justify-between items-end mb-8 flex-shrink-0 pt-6">
                      <h1 class="text-5xl font-bold text-green-heading">Hello, <span id="user-name-display"></span>!</h1>
                      <div class="text-2xl font-bold text-blue-600" id="progress-text">0/10 Completed</div>
                  </div>
-                 <div class="w-full bg-gray-200 rounded-full h-4 mb-8 flex-shrink-0">
-                    <div id="overall-progress-bar" class="bg-blue-600 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+                 <div class="w-full bg-gray-200 rounded-full h-5 mb-10 flex-shrink-0">
+                    <div id="overall-progress-bar" class="bg-blue-600 h-5 rounded-full transition-all duration-500" style="width: 0%"></div>
                  </div>
-                 <div id="topic-selection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 overflow-y-auto pb-8 custom-scroll pr-3"></div>
+                 <div id="topic-selection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto pb-8 custom-scroll pr-3"></div>
             </div>
         </div>
 
         <!-- Main Practice Screen -->
         <div id="practice-screen" class="hidden flex flex-col h-full relative">
             
-            <!-- HEADER (Reduced Size by ~20%) -->
-            <header class="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-sm z-20">
-                <div class="flex items-center gap-4 w-1/4">
-                    <button id="back-to-topics-btn" class="text-base bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded-xl border border-gray-200 flex items-center transition-colors shadow-sm">
-                        <i class="fas fa-home mr-2 text-green-600"></i>Home
+            <!-- HEADER -->
+            <header class="flex-shrink-0 bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-sm z-20">
+                <div class="flex items-center gap-6 w-1/4">
+                    <button id="back-to-topics-btn" class="text-lg bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-3 px-6 rounded-xl border border-gray-200 flex items-center transition-colors shadow-sm">
+                        <i class="fas fa-home mr-3 text-green-600"></i>Home
                     </button>
-                    <div id="phase-indicator" class="text-sm font-bold text-green-700 uppercase tracking-widest bg-green-50 px-3 py-1.5 rounded-xl border border-green-100">PART 1</div>
+                    <div id="phase-indicator" class="text-base font-bold text-green-700 uppercase tracking-widest bg-green-50 px-4 py-2 rounded-xl border border-green-100">PART 1</div>
                 </div>
 
-                <div class="flex items-center justify-center gap-6 flex-grow">
-                    <button id="prev-btn" class="w-12 h-12 bg-white hover:bg-gray-50 text-gray-500 rounded-full border border-gray-200 shadow-md flex items-center justify-center disabled:opacity-30 transition-transform active:scale-95">
-                        <i class="fas fa-chevron-left text-xl"></i>
+                <div class="flex items-center justify-center gap-8 flex-grow">
+                    <button id="prev-btn" class="w-14 h-14 bg-white hover:bg-gray-50 text-gray-500 rounded-full border border-gray-200 shadow-md flex items-center justify-center disabled:opacity-30 transition-transform active:scale-95">
+                        <i class="fas fa-chevron-left text-2xl"></i>
                     </button>
 
-                    <div class="flex items-center bg-gray-50 rounded-full px-5 py-2 border border-gray-200 shadow-inner gap-4">
-                        <div class="flex flex-col items-center justify-center min-w-[70px]">
-                            <div class="text-lg font-bold text-gray-700" id="timer-display">0:00</div>
-                            <div class="flex gap-2 mt-0.5">
-                                <button id="pause-resume-btn" class="text-sm text-gray-500 hover:text-blue-600 p-0.5"><i class="fas fa-pause"></i></button>
-                                <button id="reset-timer-btn" class="text-sm text-gray-500 hover:text-red-600 p-0.5"><i class="fas fa-redo"></i></button>
+                    <div class="flex items-center bg-gray-50 rounded-full px-6 py-3 border border-gray-200 shadow-inner gap-6">
+                        <div class="flex flex-col items-center justify-center min-w-[90px]">
+                            <div class="text-2xl font-bold text-gray-700" id="timer-display">0:00</div>
+                            <div class="flex gap-3 mt-1">
+                                <button id="pause-resume-btn" class="text-base text-gray-500 hover:text-blue-600 p-1"><i class="fas fa-pause"></i></button>
+                                <button id="reset-timer-btn" class="text-base text-gray-500 hover:text-red-600 p-1"><i class="fas fa-redo"></i></button>
                             </div>
                         </div>
-                        <button id="prep-timer-btn" class="hidden text-sm font-bold bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-lg hover:bg-yellow-200 border border-yellow-200">1m PREP</button>
-                        <div class="relative w-14 h-14 flex items-center justify-center">
-                            <button id="record-btn" class="bg-red-500 hover:bg-red-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform"><i class="fas fa-microphone text-xl"></i></button>
-                            <button id="stop-record-btn" class="hidden bg-gray-800 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center animate-pulse"><i class="fas fa-stop text-xl"></i></button>
+                        <button id="prep-timer-btn" class="hidden text-base font-bold bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl hover:bg-yellow-200 border border-yellow-200">1m PREP</button>
+                        <div class="relative w-16 h-16 flex items-center justify-center">
+                            <button id="record-btn" class="bg-red-500 hover:bg-red-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform"><i class="fas fa-microphone text-2xl"></i></button>
+                            <button id="stop-record-btn" class="hidden bg-gray-800 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center animate-pulse"><i class="fas fa-stop text-2xl"></i></button>
                         </div>
-                        <div id="post-recording-actions" class="hidden flex items-center gap-3 ml-1 animate-fadeIn">
-                            <audio id="audio-player" controls class="h-8 w-36"></audio>
-                            <button id="download-btn" class="bg-blue-600 text-white w-10 h-10 rounded-full text-lg flex items-center justify-center shadow-md hover:bg-blue-700 transition-colors"><i class="fas fa-download"></i></button>
+                        <div id="post-recording-actions" class="hidden flex items-center gap-4 ml-2 animate-fadeIn">
+                            <audio id="audio-player" controls class="h-10 w-40"></audio>
+                            <button id="download-btn" class="bg-blue-600 text-white w-12 h-12 rounded-full text-xl flex items-center justify-center shadow-md hover:bg-blue-700 transition-colors"><i class="fas fa-download"></i></button>
                         </div>
                     </div>
 
-                    <button id="next-btn" class="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md flex items-center justify-center disabled:opacity-50 transition-transform active:scale-95"><i class="fas fa-chevron-right text-xl"></i></button>
+                    <button id="next-btn" class="w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md flex items-center justify-center disabled:opacity-50 transition-transform active:scale-95"><i class="fas fa-chevron-right text-2xl"></i></button>
                 </div>
 
                 <div class="w-1/4 flex justify-end">
-                    <button id="samples-btn" class="text-base bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-5 rounded-xl shadow-md transition-colors ring-4 ring-yellow-100 hover:ring-yellow-200 flex items-center"><i class="fas fa-lightbulb mr-2"></i>Ideas</button>
+                    <button id="samples-btn" class="text-lg bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-colors ring-4 ring-yellow-100 hover:ring-yellow-200 flex items-center"><i class="fas fa-lightbulb mr-3"></i>Ideas</button>
                 </div>
             </header>
             
@@ -120,12 +120,12 @@
             <main class="flex-grow flex flex-col min-h-0 overflow-hidden bg-[#FDFBF7] p-6">
                 
                 <!-- Question Banner -->
-                <div id="question-container" class="bg-white px-8 py-5 rounded-3xl border border-gray-200 text-center shadow-sm flex-shrink-0 z-10 mb-6">
+                <div id="question-container" class="bg-white px-10 py-6 rounded-3xl border border-gray-200 text-center shadow-sm flex-shrink-0 z-10 mb-8">
                     <h2 id="question-text" class="text-3xl md:text-4xl font-bold leading-snug text-gray-800 cursor-pointer hover:text-blue-600 transition-colors" title="Click to hear question"></h2>
                 </div>
 
                 <!-- Split Layout -->
-                <div class="flex-grow flex flex-col lg:flex-row min-h-0 gap-6">
+                <div class="flex-grow flex flex-col lg:flex-row min-h-0 gap-8">
                     
                     <!-- Left Panel: Speaking Aids & Advanced -->
                     <div class="w-full lg:w-[35%] flex flex-col gap-5 overflow-y-auto custom-scroll pr-1">
@@ -240,7 +240,7 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- DATA: Updated with Bolded Vocabulary in Samples ---
+        // --- DATA: Full 10 Topics with Rich Content ---
         const practiceData = {
             "Hometown": [
                 { 
@@ -648,13 +648,28 @@
         }
 
         async function startRec() {
+            let options = {};
+            const types = [
+                "audio/webm",
+                "audio/mp4",
+                "audio/ogg",
+                "audio/wav",
+                "audio/aac"
+            ];
+            for (const type of types) {
+                if (MediaRecorder.isTypeSupported(type)) {
+                    options.mimeType = type;
+                    break;
+                }
+            }
+            
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({audio:true});
-                state.mediaRecorder = new MediaRecorder(stream);
+                state.mediaRecorder = new MediaRecorder(stream, options);
                 state.audioChunks = [];
                 state.mediaRecorder.ondataavailable = e => state.audioChunks.push(e.data);
                 state.mediaRecorder.onstop = () => {
-                    state.blob = new Blob(state.audioChunks, {type:'audio/webm'});
+                    state.blob = new Blob(state.audioChunks, {type: options.mimeType || 'audio/webm'});
                     ui.audioPlayer.src = URL.createObjectURL(state.blob);
                     ui.stopBtn.classList.add('hidden');
                     ui.recordingStatus.classList.add('hidden');
