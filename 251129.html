@@ -65,6 +65,19 @@
         /* Custom Classes for the Theme */
         .text-green-heading { color: #15803d; } /* Green 700 */
         .bg-cream-card { background-color: #ffffff; }
+        
+        /* Interactive Chips */
+        .interactive-chip {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .interactive-chip:hover {
+            transform: translateY(-1px);
+            filter: brightness(0.95);
+        }
+        .interactive-chip:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body class="flex items-center justify-center p-2 sm:p-4">
@@ -72,7 +85,7 @@
     <div id="app-container" class="w-full max-w-xl mx-auto text-center h-full flex flex-col">
         
         <!-- Welcome Screen -->
-        <div id="welcome-screen" class="bg-cream-card shadow-lg p-6 sm:p-8 rounded-2xl h-full flex flex-col justify-center overflow-y-auto border border-gray-100">
+        <div id="welcome-screen" class="bg-cream-card shadow-lg p-6 sm:p-8 rounded-2xl h-full flex flex-col justify-center overflow-y-auto border border-gray-100 relative">
             <div id="name-entry-container">
                 <h1 class="text-3xl font-bold text-green-heading mb-2">IELTS Prep: Grade 7</h1>
                 <p class="text-sm text-gray-500 mb-6">Complete 10 Topics covering Part 1, 2 & 3</p>
@@ -80,14 +93,21 @@
                 <button id="start-with-name-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-xl shadow-md transition-colors">Start Practice</button>
             </div>
             <div id="topic-selection-container" class="hidden h-full flex flex-col">
-                 <h1 class="text-2xl font-bold text-green-heading mb-2 flex-shrink-0">Hello, <span id="user-name-display"></span>!</h1>
+                 <div class="flex justify-between items-end mb-2 flex-shrink-0">
+                     <h1 class="text-2xl font-bold text-green-heading text-left">Hello, <span id="user-name-display"></span>!</h1>
+                     <div class="text-xs font-bold text-blue-600" id="progress-text">0/10 Completed</div>
+                 </div>
+                 
+                 <!-- Progress Bar -->
+                 <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 flex-shrink-0">
+                    <div id="overall-progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                 </div>
                  
                  <div id="instructions" class="text-xs text-gray-600 mb-4 text-left space-y-1 p-3 bg-blue-50 rounded-lg flex-shrink-0 border border-blue-100">
                       <p><strong>Goal:</strong> Complete all 10 Topics.</p>
-                      <p>Each topic has:</p>
                       <ul class="list-disc pl-4 text-blue-700">
                           <li><strong>Part 1:</strong> Warm-up (30s)</li>
-                          <li><strong>Part 2:</strong> Long Turn (90s)</li>
+                          <li><strong>Part 2:</strong> Long Turn (90s) - <em>Includes 1 min Prep!</em></li>
                           <li><strong>Part 3:</strong> Discussion (60s)</li>
                       </ul>
                  </div>
@@ -99,7 +119,7 @@
         </div>
 
         <!-- Main Practice Screen -->
-        <div id="practice-screen" class="hidden bg-cream-card shadow-lg rounded-2xl app-shell border border-gray-100">
+        <div id="practice-screen" class="hidden bg-cream-card shadow-lg rounded-2xl app-shell border border-gray-100 relative">
             
             <!-- HEADER -->
             <header class="flex-shrink-0 bg-[#F9FAFB] p-3 border-b border-gray-200 rounded-t-2xl">
@@ -138,7 +158,12 @@
                                 </svg>
                                 <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700">0:00</div>
                             </div>
-                            <div class="flex gap-1 mt-1">
+                            <!-- Prep Timer Button (Hidden by default) -->
+                            <button id="prep-timer-btn" class="hidden mt-1 text-[9px] uppercase font-bold bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded hover:bg-yellow-200">
+                                1m Prep
+                            </button>
+                            <!-- Normal Controls -->
+                            <div id="normal-timer-controls" class="flex gap-1 mt-1">
                                 <button id="pause-resume-btn" class="w-5 h-5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center text-[10px]">
                                     <i class="fas fa-pause"></i>
                                 </button>
@@ -189,7 +214,7 @@
                 
                 <!-- 1. Question Card -->
                 <div id="question-container" class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center text-center">
-                    <h2 id="question-text" class="text-lg sm:text-xl font-bold leading-relaxed text-gray-800"></h2>
+                    <h2 id="question-text" class="text-lg sm:text-xl font-bold leading-relaxed text-gray-800 cursor-pointer hover:text-blue-600 transition-colors" title="Click to hear question"></h2>
                 </div>
 
                 <!-- 2. Fillers & Fluency (Indigo Box) -->
@@ -238,7 +263,7 @@
                         <!-- Idiom -->
                         <div class="border-t border-green-200/60 pt-2 flex items-center">
                             <span class="text-[10px] font-bold text-green-600 uppercase tracking-wide mr-2">Idiom:</span>
-                            <div id="idiom-text" class="text-sm font-semibold text-green-800 italic"></div>
+                            <div id="idiom-text" class="text-sm font-semibold text-green-800 italic interactive-chip px-2 rounded hover:bg-green-100" onclick="speak(this.textContent)"></div>
                         </div>
                     </div>
                 </div>
@@ -255,6 +280,13 @@
                 <!-- Spacer for scrolling -->
                 <div class="h-4"></div>
             </main>
+            
+            <!-- Completion Celebration Overlay -->
+            <div id="celebration-overlay" class="hidden absolute inset-0 bg-white/90 z-50 flex flex-col items-center justify-center text-center p-4">
+                <i class="fas fa-check-circle text-6xl text-green-500 mb-4 animate-bounce"></i>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Topic Completed!</h2>
+                <p class="text-gray-600">Great job! Returning to menu...</p>
+            </div>
         </div>
 
         <!-- Certificate Screen -->
@@ -690,6 +722,8 @@
             topicSelectionContainer: document.getElementById('topic-selection-container'),
             userNameDisplay: document.getElementById('user-name-display'),
             topicSelection: document.getElementById('topic-selection'),
+            overallProgressBar: document.getElementById('overall-progress-bar'),
+            progressText: document.getElementById('progress-text'),
             
             // Header Controls
             prevBtn: document.getElementById('prev-btn'),
@@ -703,6 +737,8 @@
             stopRecordBtn: document.getElementById('stop-record-btn'),
             pauseResumeBtn: document.getElementById('pause-resume-btn'),
             resetTimerBtn: document.getElementById('reset-timer-btn'),
+            prepTimerBtn: document.getElementById('prep-timer-btn'),
+            normalTimerControls: document.getElementById('normal-timer-controls'),
             postRecordingActions: document.getElementById('post-recording-actions'),
             audioPlayer: document.getElementById('audio-player'),
             downloadBtn: document.getElementById('download-btn'),
@@ -721,6 +757,7 @@
             wordBankList: document.getElementById('word-bank-list'),
             collocationsList: document.getElementById('collocations-list'),
             idiomText: document.getElementById('idiom-text'),
+            celebrationOverlay: document.getElementById('celebration-overlay'),
             
             // Overlays
             errorMessagebox: document.getElementById('error-message-box'),
@@ -744,6 +781,7 @@
         let recordedBlob = null;
         let completedTopics = {};
         let currentTimerDuration = 0;
+        let isPrepMode = false;
 
         const FULL_DASH_ARRAY = 283;
         
@@ -751,6 +789,20 @@
         const synth = window.speechSynthesis;
         let preferredVoice = null;
         let ttsInitialized = false;
+
+        // Make speak function global for onclick handlers
+        window.speak = function(text) {
+            if (!ttsInitialized || !synth || !text) return;
+            try {
+                if (synth.speaking) synth.cancel();
+                setTimeout(() => {
+                    const utterThis = new SpeechSynthesisUtterance(text);
+                    if (preferredVoice) utterThis.voice = preferredVoice;
+                    utterThis.rate = 0.85; // Slow down
+                    synth.speak(utterThis);
+                }, 100);
+            } catch (e) { console.error(e); }
+        }
 
         function initializeTTS() {
             return new Promise((resolve) => {
@@ -779,19 +831,6 @@
             });
         }
 
-        function speak(text) {
-            if (!ttsInitialized || !synth || !text) return;
-            try {
-                if (synth.speaking) synth.cancel();
-                setTimeout(() => {
-                    const utterThis = new SpeechSynthesisUtterance(text);
-                    if (preferredVoice) utterThis.voice = preferredVoice;
-                    utterThis.rate = 0.85; // Slow down
-                    synth.speak(utterThis);
-                }, 100);
-            } catch (e) { console.error(e); }
-        }
-
         // --- Local Storage ---
         function loadProgress() {
             try {
@@ -799,12 +838,22 @@
                 if (saved) completedTopics = JSON.parse(saved);
                 const name = localStorage.getItem('ieltsG7v3Name');
                 if (name) { userName = name; ui.nameInput.value = name; }
+                updateProgressUI();
             } catch (e) {}
         }
 
         function saveProgress() {
             localStorage.setItem('ieltsG7v3Completed', JSON.stringify(completedTopics));
             if(userName) localStorage.setItem('ieltsG7v3Name', userName);
+            updateProgressUI();
+        }
+        
+        function updateProgressUI() {
+            const total = Object.keys(practiceData).length;
+            const completed = Object.keys(completedTopics).length;
+            const percent = (completed / total) * 100;
+            ui.overallProgressBar.style.width = `${percent}%`;
+            ui.progressText.textContent = `${completed}/${total} Completed`;
         }
 
         // --- Logic ---
@@ -849,17 +898,9 @@
         }
 
         function loadQuestion() {
+            // Check for completion of Topic (Part 3 done)
             if (currentQuestionIndex >= currentQuestions.length) {
-                completedTopics[currentTopicKey] = true;
-                saveProgress();
-                
-                if (Object.keys(completedTopics).length === Object.keys(practiceData).length) {
-                    showCertificate();
-                } else {
-                    ui.practiceScreen.classList.add('hidden');
-                    ui.welcomeScreen.classList.remove('hidden');
-                    initializeTopics();
-                }
+                completeTopic();
                 return;
             }
 
@@ -870,16 +911,28 @@
             
             ui.phaseIndicator.textContent = q.type.toUpperCase();
             ui.questionText.textContent = q.question;
-            speak(q.question);
+            ui.questionText.onclick = () => window.speak(q.question);
+            window.speak(q.question);
+            
+            // --- Part 2 Special Logic (Prep Timer) ---
+            if (q.type.includes("Part 2")) {
+                ui.prepTimerBtn.classList.remove('hidden');
+                ui.normalTimerControls.classList.add('hidden');
+            } else {
+                ui.prepTimerBtn.classList.add('hidden');
+                ui.normalTimerControls.classList.remove('hidden');
+                startTimer(q.timer);
+            }
+            currentTimerDuration = q.timer;
             
             // --- Step 2: Fluency Booster (Fillers + Template) ---
-            // Render 3 Fillers as pills
             ui.fillersList.innerHTML = '';
             if (q.fillers && q.fillers.length > 0) {
                 q.fillers.forEach(filler => {
                     const span = document.createElement('span');
-                    span.className = `bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full text-xs font-medium`;
+                    span.className = `bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full text-xs font-medium interactive-chip`;
                     span.textContent = filler;
+                    span.onclick = () => window.speak(filler);
                     ui.fillersList.appendChild(span);
                 });
             }
@@ -892,7 +945,7 @@
             
             // --- Step 3: Vocabulary Power ---
             renderList(ui.wordBankList, q.wordBank, 'green');
-            renderList(ui.collocationsList, q.collocations || [], 'purple');
+            renderList(ui.collocationsList, q.collocations || [], 'green'); // Using same green style for ease
             ui.idiomText.textContent = q.idiom ? `"${q.idiom}"` : "";
             ui.wordBankContainer.classList.remove('hidden');
             
@@ -907,9 +960,32 @@
             
             // Button States
             ui.prevBtn.disabled = currentQuestionIndex === 0;
-            
-            currentTimerDuration = q.timer;
-            startTimer(q.timer);
+        }
+        
+        function completeTopic() {
+            if (!completedTopics[currentTopicKey]) {
+                completedTopics[currentTopicKey] = true;
+                saveProgress();
+                
+                // Show celebration
+                ui.celebrationOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    ui.celebrationOverlay.classList.add('hidden');
+                    returnToMenuOrCert();
+                }, 2000);
+            } else {
+                returnToMenuOrCert();
+            }
+        }
+        
+        function returnToMenuOrCert() {
+            if (Object.keys(completedTopics).length === Object.keys(practiceData).length) {
+                showCertificate();
+            } else {
+                ui.practiceScreen.classList.add('hidden');
+                ui.welcomeScreen.classList.remove('hidden');
+                initializeTopics();
+            }
         }
         
         function resetUIState() {
@@ -920,6 +996,10 @@
             ui.recordingStatus.classList.add('hidden');
             ui.samplesContainer.classList.add('hidden');
             ui.samplesBtn.classList.remove('hidden');
+            clearInterval(timerInterval);
+            isPrepMode = false;
+            ui.timerDisplay.classList.remove("text-yellow-600");
+            ui.timerDisplay.classList.add("text-gray-700");
             if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
         }
 
@@ -931,14 +1011,13 @@
                 bgClass = 'bg-blue-100 text-blue-800 border border-blue-200';
             } else if (color === 'green') {
                 bgClass = 'bg-green-100 text-green-800 border border-green-200';
-            } else if (color === 'purple') {
-                bgClass = 'bg-purple-100 text-purple-800 border border-purple-200';
-            }
+            } 
             
             items.forEach(text => {
                 const span = document.createElement('span');
-                span.className = `${bgClass} px-3 py-1 rounded-full text-xs sm:text-sm font-medium shadow-sm`;
+                span.className = `${bgClass} px-3 py-1 rounded-full text-xs sm:text-sm font-medium shadow-sm interactive-chip`;
                 span.textContent = text;
+                span.onclick = () => window.speak(text);
                 container.appendChild(span);
             });
         }
@@ -976,13 +1055,22 @@
         }
 
         // --- Timer ---
-        function startTimer(seconds) {
+        function startTimer(seconds, isPrep = false) {
             clearInterval(timerInterval);
             let timeLeft = seconds;
             updateTimerUI(timeLeft, seconds);
             
             isTimerPaused = false;
-            ui.pauseResumeBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            if(!isPrep) ui.pauseResumeBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            
+            // Visual cue for prep
+            if(isPrep) {
+                ui.timerDisplay.classList.remove("text-gray-700");
+                ui.timerDisplay.classList.add("text-yellow-600");
+            } else {
+                ui.timerDisplay.classList.add("text-gray-700");
+                ui.timerDisplay.classList.remove("text-yellow-600");
+            }
 
             timerInterval = setInterval(() => {
                 if(!isTimerPaused) {
@@ -990,7 +1078,14 @@
                     updateTimerUI(timeLeft, seconds);
                     if (timeLeft <= 0) {
                         clearInterval(timerInterval);
-                        if (mediaRecorder && mediaRecorder.state === 'recording') stopRecording();
+                        if (isPrep) {
+                            // Prep finished, start main timer
+                            ui.prepTimerBtn.classList.add('hidden');
+                            ui.normalTimerControls.classList.remove('hidden');
+                            startTimer(currentTimerDuration); // Start speaking timer
+                        } else {
+                            if (mediaRecorder && mediaRecorder.state === 'recording') stopRecording();
+                        }
                     }
                 }
             }, 1000);
@@ -1045,6 +1140,10 @@
             }
         };
         
+        ui.prepTimerBtn.onclick = () => {
+            startTimer(60, true); // Start 60s prep
+        };
+        
         ui.downloadBtn.onclick = () => {
             if(!recordedBlob) return;
             const a = document.createElement('a');
@@ -1087,6 +1186,7 @@
             
             ui.practiceScreen.classList.add('hidden');
             ui.welcomeScreen.classList.remove('hidden');
+            updateProgressUI();
             initializeTopics();
         };
         
@@ -1112,6 +1212,7 @@
         ui.backToMainMenuBtn.onclick = () => {
             ui.certificateScreen.classList.add('hidden');
             ui.welcomeScreen.classList.remove('hidden');
+            updateProgressUI();
             initializeTopics();
         }
 
