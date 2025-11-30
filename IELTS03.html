@@ -126,6 +126,13 @@
         // --- UTILITIES ---
         const PRAISES = ["Brilliant!", "Spot on!", "Excellent!", "Perfect!", "Well done!", "Fantastic!"];
 
+        // Helper for ordinals (st, nd, rd, th)
+        const getOrdinal = (n) => {
+            const s = ["th", "st", "nd", "rd"];
+            const v = n % 100;
+            return n + (s[(v - 20) % 10] || s[v] || s[0]);
+        };
+
         const checkAnswer = (user, correct, type) => {
             if (!user) return false;
             const u = user.toLowerCase().trim().replace(/[\s-]/g, '');
@@ -158,55 +165,101 @@
             switch (category.id) {
                 case 1: // Names & Spelling
                     const surname = rand(NAMES);
-                    const spelling = surname.split('').join('... ');
+                    // Updated: Use commas to force pauses between letters for clarity
+                    const spellingAudio = surname.toUpperCase().split('').join(', ');
+                    const spellingDisplay = surname.toUpperCase().split('').join('... ');
                     q.stem = "Write the correct spelling of the surname.";
                     q.answer = surname;
                     q.script = [
                         { speaker: 'A', text: `Can I have your surname for the form, please?` },
                         { speaker: 'B', text: `Yes, it's ${surname}.` },
                         { speaker: 'A', text: `Could you spell that for me?` },
-                        { speaker: 'B', text: `Certainly. It is ${spelling}.` },
-                        { speaker: 'A', text: `${spelling}. Thank you.` } 
+                        { speaker: 'B', text: `Certainly. It is ${spellingAudio}.` },
+                        { speaker: 'A', text: `${spellingDisplay}. Thank you.` } 
                     ];
                     break;
                 case 2: // Phone / ID
                     const p1 = randInt(100, 999);
-                    const p2 = randInt(1000, 9999);
-                    const wrongP2 = p2 + randInt(1, 9);
+                    // Updated logic: Include "double" digits logic for realism
+                    const digitA = randInt(0, 9);
+                    const digitB = randInt(0, 9);
+                    const digitC = randInt(0, 9);
+                    
+                    let p2_str, spokenP2;
+                    // 50% chance of double pattern
+                    if (Math.random() > 0.3) {
+                        const pattern = randInt(1, 3);
+                        if (pattern === 1) { // e.g. 7725 -> "double 7, 2, 5"
+                             p2_str = `${digitA}${digitA}${digitB}${digitC}`;
+                             spokenP2 = `double ${digitA}, ${digitB}, ${digitC}`;
+                        } else if (pattern === 2) { // e.g. 5772 -> "5, double 7, 2"
+                             p2_str = `${digitA}${digitB}${digitB}${digitC}`;
+                             spokenP2 = `${digitA}, double ${digitB}, ${digitC}`;
+                        } else { // e.g. 5277 -> "5, 2, double 7"
+                             p2_str = `${digitA}${digitB}${digitC}${digitC}`;
+                             spokenP2 = `${digitA}, ${digitB}, double ${digitC}`;
+                        }
+                    } else {
+                        const digitD = randInt(0, 9);
+                        p2_str = `${digitA}${digitB}${digitC}${digitD}`;
+                        spokenP2 = `${digitA}, ${digitB}, ${digitC}, ${digitD}`;
+                    }
+
+                    // Generate a "wrong" version for the script context
+                    const wrongLast = (parseInt(p2_str[3]) + 1) % 10;
+                    const wrongP2_str = p2_str.substring(0, 3) + wrongLast;
+                    
+                    const p1_split = p1.toString().split('').join(' ');
+
                     q.stem = "Write the phone number.";
-                    q.answer = `07${p1} ${p2}`;
+                    q.answer = `07${p1} ${p2_str}`;
                     q.script = [
                         { speaker: 'A', text: `What's the best contact number for you?` },
-                        { speaker: 'B', text: `Well, my old number was 07${p1} ${wrongP2}, but I've lost that phone.` },
+                        { speaker: 'B', text: `Well, my old number ended in ${wrongP2_str}, but I've changed it.` },
                         { speaker: 'A', text: `Oh, I see. So what is the current one?` },
-                        { speaker: 'B', text: `It is 07${p1} ${p2}.` },
-                        { speaker: 'A', text: `07${p1} ${p2}. Got it.` } 
+                        { speaker: 'B', text: `It is oh seven ${p1_split}, ${spokenP2}.` },
+                        { speaker: 'A', text: `07${p1} ${p2_str}. Got it.` } 
                     ];
                     break;
                 case 3: // Dates
                     const month = rand(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']);
                     const day = randInt(10, 28);
+                    const wrongDay = day - 5;
+                    // Updated: Use getOrdinal utility for correct th/st/nd/rd suffixes
+                    const dateCorrect = `${getOrdinal(day)} of ${month}`;
+                    const dateWrong = `${getOrdinal(wrongDay)} of ${month}`;
+                    
                     const event = rand(EVENTS);
                     q.stem = `On what date will the ${event} take place?`;
-                    q.answer = `${day}th ${month}`;
+                    q.answer = `${getOrdinal(day)} ${month}`;
                     q.script = [
-                        { speaker: 'A', text: `Shall we book the venue for the ${day - 5}th of ${month}?` },
+                        { speaker: 'A', text: `Shall we book the venue for the ${dateWrong}?` },
                         { speaker: 'B', text: `I'm afraid it's fully booked then.` },
-                        { speaker: 'B', text: `The only date available for the ${event} is the ${day}th of ${month}.` },
-                        { speaker: 'A', text: `Okay, let's go with the ${day}th of ${month} then.` } 
+                        { speaker: 'B', text: `The only date available for the ${event} is the ${dateCorrect}.` },
+                        { speaker: 'A', text: `Okay, let's go with the ${dateCorrect} then.` } 
                     ];
                     break;
                 case 4: // Times
-                    const hr = randInt(2, 10);
+                    const hr = randInt(1, 11);
                     const min = rand([15, 30, 45, 10, 20, 40, 50]);
                     const dest = rand(TRAIN_DESTINATIONS);
+                    
+                    // Updated logic: Natural spoken times
+                    let spokenTime = "";
+                    if (min === 15) spokenTime = `quarter past ${hr}`;
+                    else if (min === 30) spokenTime = `half past ${hr}`;
+                    else if (min === 45) spokenTime = `quarter to ${hr + 1}`;
+                    else spokenTime = `${hr} ${min}`; 
+                    
+                    const minStr = min < 10 ? `0${min}` : min;
+
                     q.stem = `What time does the train to ${dest} leave?`;
-                    q.answer = `${hr}:${min}`;
+                    q.answer = `${hr}:${minStr}`;
                     q.script = [
                         { speaker: 'A', text: `Does the train to ${dest} leave at ${hr} o'clock?` },
                         { speaker: 'B', text: `No, that's the slow train.` },
-                        { speaker: 'B', text: `The express departs at ${hr}:${min}.` },
-                        { speaker: 'A', text: `Right, ${hr}:${min}. I'd better hurry.` } 
+                        { speaker: 'B', text: `The express departs at ${spokenTime}.` },
+                        { speaker: 'A', text: `Right, ${spokenTime}. I'd better hurry.` } 
                     ];
                     break;
                 case 5: // Schedules
