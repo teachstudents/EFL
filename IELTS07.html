@@ -22,7 +22,7 @@
             line-height: 1.3;
         }
         .container {
-            max-width: 980px; /* Widened slightly to accommodate larger text */
+            max-width: 980px; 
             margin: 0 auto;
             background: var(--paper);
             padding: 15px;
@@ -92,10 +92,9 @@
             border-left: 4px solid #ddd;
         }
         
-        /* Increased Label Size (30% bump) */
+        /* Large Font Styles */
         label { display: block; margin-bottom: 4px; cursor: pointer; font-size: 1.2rem; }
         
-        /* Increased Input Size (30% bump) */
         input[type="text"], input[type="number"] {
             padding: 5px 8px;
             border: 1px solid #999;
@@ -119,7 +118,7 @@
             margin-bottom: 0;
             height: 100%; 
             box-sizing: border-box;
-            font-size: 1.2rem; /* Increased from 0.9rem */
+            font-size: 1.2rem;
         }
         .mcq-grid p { font-size: 1.2rem; font-weight: 500; }
         
@@ -130,14 +129,14 @@
             .mcq-grid { grid-template-columns: 1fr; }
         }
 
-        /* LARGE FONT FOR SECTIONS 1 & 4 (Linear Layouts) */
+        /* LARGE FONT FOR SECTIONS 1 & 4 */
         .large-font-section .question-block {
-            font-size: 1.5rem; /* Increased from 1.15rem */
+            font-size: 1.5rem; 
             line-height: 1.5;
         }
         .large-font-section input[type="text"], 
         .large-font-section input[type="number"] {
-            font-size: 1.4rem; /* Increased from 1.1rem */
+            font-size: 1.4rem; 
             padding: 6px 10px;
             width: 220px; 
         }
@@ -193,7 +192,6 @@
 
 <div class="container">
     
-    <!-- Integrated Header -->
     <div class="header-controls">
         <button class="section-btn" style="flex: 0 0 auto; background: #333; color: white;" onclick="calculateFinalScore()">
             Final Score
@@ -217,7 +215,7 @@
 
     <form id="test-form" onsubmit="return false;">
         
-        <!-- SECTION 1 (Large Font) -->
+        <!-- SECTION 1 -->
         <div id="sec-1" class="test-section active large-font-section">
             <h2>Section 1: Job Enquiry</h2>
             <div class="question-block">
@@ -238,7 +236,7 @@
             </div>
         </div>
 
-        <!-- SECTION 2 (MCQ Grid) -->
+        <!-- SECTION 2 -->
         <div id="sec-2" class="test-section">
             <h2>Section 2: Gym Orientation</h2>
             
@@ -292,7 +290,7 @@
             </div>
         </div>
 
-        <!-- SECTION 3 (MCQ Grid) -->
+        <!-- SECTION 3 -->
         <div id="sec-3" class="test-section">
             <h2>Section 3: Business Case Study</h2>
             
@@ -352,7 +350,7 @@
             </div>
         </div>
 
-        <!-- SECTION 4 (Large Font) -->
+        <!-- SECTION 4 -->
         <div id="sec-4" class="test-section active large-font-section">
             <h2>Section 4: History of the Bicycle</h2>
             <div class="question-block">
@@ -459,7 +457,7 @@
     // --- 2. TTS ENGINE ---
     const synth = window.speechSynthesis;
     let isPlaying = false;
-    let currentSection = 0;
+    let currentSection = 1; // Default to 1
     let currentIndex = 0;
     let utterance = null;
     let voices = [];
@@ -499,6 +497,17 @@
         if(allBtns[secNum]) allBtns[secNum].classList.add('active');
 
         currentSection = secNum;
+        
+        // Hide transcript if section changes, or keep it open but update content? 
+        // Better to hide to avoid confusion, or refresh it. 
+        // Let's refresh it if it's already open.
+        const transcriptDiv = document.getElementById('transcript-container');
+        if (transcriptDiv.style.display === 'block') {
+            transcriptDiv.innerHTML = script
+                .filter(s => s.s === currentSection)
+                .map(s => `<div class="script-line">${s.t}</div>`).join('');
+        }
+
         currentIndex = script.findIndex(line => line.s === secNum);
         
         if (currentIndex !== -1) {
@@ -636,7 +645,10 @@
         if (div.style.display === 'block') {
             div.style.display = 'none';
         } else {
-            div.innerHTML = script.map(s => `<div class="script-line">${s.t}</div>`).join('');
+            // Updated to filter by currentSection!
+            div.innerHTML = script
+                .filter(s => s.s === currentSection)
+                .map(s => `<div class="script-line">${s.t}</div>`).join('');
             div.style.display = 'block';
         }
     }
