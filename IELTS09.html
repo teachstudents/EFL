@@ -215,7 +215,7 @@
 
     <form id="test-form" onsubmit="return false;">
         
-        <!-- SECTION 1 (CLOSED) -->
+        <!-- SECTION 1 (Active) -->
         <div id="sec-1" class="test-section active large-font-section">
             <h2>Section 1: Venue Booking Form</h2>
             <div class="question-block">
@@ -236,7 +236,7 @@
             </div>
         </div>
 
-        <!-- SECTION 2 (CLOSED) -->
+        <!-- SECTION 2 (Hidden) -->
         <div id="sec-2" class="test-section">
             <h2>Section 2: Museum Guide</h2>
             
@@ -290,7 +290,7 @@
             </div>
         </div>
 
-        <!-- SECTION 3 (CLOSED) -->
+        <!-- SECTION 3 (Hidden) -->
         <div id="sec-3" class="test-section">
             <h2>Section 3: Geography Field Trip</h2>
             
@@ -350,8 +350,8 @@
             </div>
         </div>
 
-        <!-- SECTION 4 (CLOSED) -->
-        <div id="sec-4" class="test-section active large-font-section">
+        <!-- SECTION 4 (Hidden - Fixed active bug) -->
+        <div id="sec-4" class="test-section large-font-section">
             <h2>Section 4: Bee Conservation</h2>
             <div class="question-block">
                 <h3>Importance of Bees</h3>
@@ -388,7 +388,9 @@
         { s:1, t: "Good afternoon, Grandview Hotel. How may I help you?", v: "Emma" },
         { s:1, t: "Hello, I'd like to book a room for a family party.", v: "Andrew" },
         { s:1, t: "Wonderful. I can help with that. Can I take your name first?", v: "Emma" },
-        { s:1, t: "Yes, it's Baxter. That's B-A-X-T-E-R.", v: "Andrew" },
+        { s:1, t: "Yes, it's Baxter.", v: "Andrew" },
+        { s:1, t: "Could you spell that for me, please?", v: "Emma" },
+        { s:1, t: "Certainly. B-A-X-T-E-R.", v: "Andrew" },
         { s:1, t: "B-A-X-T-E-R. Thank you Mr. Baxter. And what date were you thinking of?", v: "Emma" },
         { s:1, t: "We are hoping for the 24th of August.", v: "Andrew" },
         { s:1, t: "Let me check availability... Yes, the 24th of August is free.", v: "Emma" },
@@ -553,7 +555,8 @@
 
     // --- 3. UI LOGIC ---
     function checkAnswers() {
-        const activeDiv = document.querySelector('.test-section.active');
+        // Use logic state to ensure we check the intended active section
+        const activeDiv = document.getElementById('sec-' + currentSection);
         if(!activeDiv) {
             alert("No section is currently active.");
             return;
