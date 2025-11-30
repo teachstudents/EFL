@@ -499,26 +499,41 @@
         function initializeTTS() {
             return new Promise((resolve) => {
                 if (!tts) { ttsInitialized = true; return resolve(); }
+                
                 const setVoices = () => {
                     const allVoices = tts.getVoices();
                     if (allVoices.length === 0) return;
-                    const enVoices = allVoices.filter(v => v.lang.startsWith('en'));
-                    const preferredNames = ["Emma", "Ava", "Brian", "Andrew", "Stefano", "Natural", "Google US English", "Microsoft Zira", "Samantha", "Daniel"];
-                    let highQualityVoices = [];
+
+                    // STRICT MAPPING: Only allow these 4 voices.
+                    // We iterate through them to find the exact voice objects provided by the browser.
+                    const preferredNames = ["Andrew", "Brian", "Emma", "Ava"];
+                    let selectedVoices = [];
+
+                    // Try to find each preferred voice strictly
                     preferredNames.forEach(name => {
-                        const found = enVoices.find(v => v.name.includes(name));
-                        if(found && !highQualityVoices.includes(found)) highQualityVoices.push(found);
+                        const found = allVoices.find(v => v.name.includes(name));
+                        if(found) selectedVoices.push(found);
                     });
-                    if(highQualityVoices.length < 4) {
-                        enVoices.forEach(v => { if(!highQualityVoices.includes(v)) highQualityVoices.push(v); });
+
+                    // FALLBACK: If the device has NONE of the preferred voices (e.g. mobile Safari), 
+                    // we must fall back to any English voice to prevent the app from being silent.
+                    // However, if even one preferred voice exists, we ONLY use that list.
+                    if(selectedVoices.length === 0) {
+                        selectedVoices = allVoices.filter(v => v.lang.startsWith('en'));
                     }
+
+                    // Assign voices to topics cyclically using ONLY the selected list
                     const topics = Object.keys(practiceData);
                     topics.forEach((topic, index) => {
-                        topicVoices[topic] = highQualityVoices[index % highQualityVoices.length];
+                        // This modulo operator guarantees we only pick from the preferred list [0, 1, 2, 3]
+                        // e.g., Topic 5 gets preferredNames[1] (Brian)
+                        topicVoices[topic] = selectedVoices[index % selectedVoices.length];
                     });
+
                     ttsInitialized = true;
                     resolve();
                 };
+                
                 if (tts.getVoices().length > 0) setVoices();
                 else tts.onvoiceschanged = setVoices;
             });
@@ -530,8 +545,11 @@
                 if (tts.speaking) tts.cancel();
                 const u = new SpeechSynthesisUtterance(text);
                 const currentTopic = state.topic || Object.keys(practiceData)[0]; 
+                
+                // Strict assignment
                 if (topicVoices[currentTopic]) u.voice = topicVoices[currentTopic];
-                u.rate = 0.85; 
+                
+                u.rate = 0.85; // Slowed down for clarity
                 u.pitch = 1;
                 tts.speak(u);
             } catch (e) { console.error(e); }
