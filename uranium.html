@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Troubled Waters: Uranium, Rights & Heritage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        /* --- Desert/Canyon Theme Animation --- */
+        @keyframes canyonColors {
+            0% { background-color: #451a03; } /* amber-950 */
+            25% { background-color: #7c2d12; } /* orange-900 */
+            50% { background-color: #78350f; } /* amber-900 */
+            75% { background-color: #57534e; } /* stone-600 */
+            100% { background-color: #451a03; } /* amber-950 */
+        }
+        body {
+            font-family: 'Inter', sans-serif; /* Global Sans-Serif */
+            overscroll-behavior: none;
+            animation: canyonColors 120s linear infinite;
+            padding-top: 85px;
+            color: #1f2937;
+        }
+        
+        /* Strict Sans-Serif Enforcement */
+        h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea {
+            font-family: 'Inter', sans-serif !important;
+            letter-spacing: -0.01em;
+        }
+        
+        /* Large Sample Sentences */
+        .sample-sentence {
+            font-size: 1.75rem; /* Increased size */
+            line-height: 1.4;
+            font-weight: 500;
+            color: #92400e; /* amber-800 */
+            font-style: italic;
+        }
+        
+        #background-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+        }
+        .page { display: none; position: relative; }
+        .page.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* --- Buttons & UI Components --- */
+        .action-button, .nav-button, .quiz-option, .tfng-button, .word-bank-word, .btn-animated-3d, .perspective-tab {
+            transition: all 0.15s ease-out;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -2px rgba(0,0,0,0.1), inset 0 -2px 0 0 rgba(0,0,0,0.2);
+            border: none;
+            cursor: pointer;
+        }
+        .action-button:hover, .nav-button:hover, .quiz-option:hover:not(:disabled), .tfng-button:hover:not(:disabled), .word-bank-word:hover, .btn-animated-3d:hover, .perspective-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px -3px rgba(0,0,0,0.3), 0 4px 6px -4px rgba(0,0,0,0.1), inset 0 -2px 0 0 rgba(0,0,0,0.2);
+        }
+        .action-button:active, .nav-button:active, .quiz-option:active, .tfng-button:active, .btn-animated-3d:active, .perspective-tab:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 2px -1px rgba(0,0,0,0.2);
+        }
+        
+        /* Gap Fill Styles */
+        .gap-fill-container .gap {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 120px; height: 44px; padding: 0 8px;
+            border-bottom: 3px solid #d97706; /* amber-600 */
+            margin: 0 4px;
+            vertical-align: middle; background-color: rgba(255, 251, 235, 0.8);
+            font-weight: bold; color: #92400e;
+            border-radius: 4px 4px 0 0;
+        }
+        .word-bank-word {
+            cursor: grab; padding: 10px 20px; border-radius: 8px;
+            background-color: #fffbeb; border: 2px solid #fcd34d;
+            user-select: none; font-weight: 600; color: #78350f;
+            font-size: 1.1rem;
+        }
+        .word-bank-word.selected { outline: 3px solid #f59e0b; transform: scale(1.05); background-color: #fef3c7; }
+        .gap.correct .word-bank-word { background-color: #dcfce7; border-color: #22c55e; color: #15803d; }
+        .gap.incorrect .word-bank-word { background-color: #fee2e2; border-color: #ef4444; color: #b91c1c; }
+
+        /* Toasts */
+        .feedback-toast, .badge-toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            padding: 12px 24px; border-radius: 9999px; color: white;
+            font-weight: bold; z-index: 200;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            animation: slideUpFadeIn 0.5s ease-out, slideDownFadeOut 0.5s ease-in 3.5s forwards;
+        }
+        .feedback-toast.correct { background-color: #15803d; /* green-700 */ }
+        .feedback-toast.encouraging { background-color: #c2410c; /* orange-700 */ }
+        .badge-toast { background: linear-gradient(45deg, #f59e0b, #b45309); animation-duration: 4.5s; }
+        @keyframes slideUpFadeIn { from { opacity: 0; bottom: 0; } to { opacity: 1; bottom: 20px; } }
+        @keyframes slideDownFadeOut { from { opacity: 1; bottom: 20px; } to { opacity: 0; bottom: 0; } }
+
+        /* Progress & Layout */
+        #progress-container { background-color: #e7e5e4; border-radius: 9999px; overflow: hidden; height: 8px; width: 100%; margin-top: 8px; }
+        #progress-bar { height: 100%; width: 0%; background-color: #d97706; transition: width 0.5s ease-out; }
+        
+        .shake { animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+
+        /* Print & Certificate */
+        @media print {
+            body * { visibility: hidden; }
+            #certificate-to-print, #certificate-to-print * { visibility: visible; }
+            #certificate-to-print { position: absolute; left: 0; top: 0; width: 100%; padding: 40px; border: 10px solid #78350f; background: #fff; }
+        }
+
+        /* Particles */
+        #emoji-floating-container { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
+        .floating-emoji { position: absolute; font-size: 24px; opacity: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        @keyframes floatUp { 0% { transform: translateY(110vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; } }
+        .particle { position: fixed; pointer-events: none; z-index: 9999; border-radius: 50%; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f5f5f4; }
+        ::-webkit-scrollbar-thumb { background: #a8a29e; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #78716c; }
+
+        /* Teacher View Toggle */
+        .teacher-only { display: none; border-left: 4px solid #b45309; background-color: #fff7ed; padding: 1rem; margin-top: 1rem; border-radius: 0.5rem; }
+        .show-teacher .teacher-only { display: block; animation: fadeIn 0.3s; }
+        
+        /* Play Audio Button */
+        .play-audio-btn { display: inline-flex; align-items: center; gap: 0.5rem; background-color: #e0f2fe; color: #0369a1; padding: 0.5rem 1rem; border-radius: 9999px; font-weight: 600; font-size: 0.9rem; transition: background-color 0.2s; }
+        .play-audio-btn:hover { background-color: #bae6fd; }
+        .speaker-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; display: block; }
+    </style>
+</head>
+<body class="antialiased text-gray-800 text-lg">
+    <canvas id="background-canvas"></canvas>
+    <div id="reward-animation-container" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[60]"></div>
+
+    <!-- Header -->
+    <header id="nav-header" class="fixed top-0 left-0 right-0 z-50 p-2" style="display: none;">
+        <div class="max-w-2xl mx-auto bg-white/95 backdrop-blur-sm shadow-xl rounded-full p-2 border border-stone-200">
+            <div class="flex justify-between items-center gap-2">
+                <button onclick="goBack()" class="nav-button bg-stone-200 hover:bg-stone-300 text-stone-700 font-bold p-2 rounded-full w-10 h-10 flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <div class="flex flex-col items-center">
+                    <div class="font-bold text-sm text-amber-700 px-3 whitespace-nowrap uppercase tracking-wider">Troubled Waters</div>
+                    <div class="text-xs text-stone-500">Unit 3: Energy & Ethics</div>
+                </div>
+                <div class="flex items-center gap-2">
+                     <button onclick="toggleTeacherMode()" class="nav-button p-2 rounded-full hover:bg-amber-100 text-amber-600" title="Teacher View">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    </button>
+                    <button onclick="toggleTTS(this)" class="nav-button p-2 rounded-full hover:bg-stone-200" title="Toggle Sound">
+                        <svg class="w-5 h-5 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 5.858a3 3 0 104.243 4.243M9 12l4.243 4.243"></path></svg>
+                    </button>
+                    <button onclick="navigateTo('main-menu')" class="nav-button bg-stone-800 text-amber-50 font-bold p-2 rounded-full hover:bg-stone-900 w-10 h-10 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4h.01M5 19h14"></path></svg>
+                    </button>
+                    <button onclick="goNext()" class="nav-button bg-amber-600 hover:bg-amber-700 text-white font-bold p-2 rounded-full w-10 h-10 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+        </div>
+    </header>
+
+    <div id="emoji-floating-container" aria-hidden="true"></div>
+
+    <!-- Main Content Area -->
+    <div id="app-container" class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8 pb-32">
+        <section id="page-title-screen" class="page active text-center bg-white/95 backdrop-blur rounded-2xl shadow-2xl p-8 border-t-8 border-amber-700">
+            <div class="h-full flex flex-col justify-center items-center min-h-[60vh]">
+                <div class="mb-6 text-6xl animate-pulse">☢️ 🦅 💧</div>
+                <h1 id="main-title" class="text-5xl md:text-6xl font-bold text-stone-900 mb-4 tracking-tight"></h1>
+                <p id="main-subtitle" class="text-xl md:text-2xl text-amber-800 italic mb-8"></p>
+                <div class="bg-amber-50 p-6 rounded-xl border border-amber-200 max-w-lg mx-auto mb-8 shadow-inner">
+                    <p class="text-stone-700 text-lg"><strong>Context:</strong> Preparatory Unit for Germany Study Track</p>
+                    <p class="text-stone-700 text-lg"><strong>Themes:</strong> Heimat, Harmony, Energiewende</p>
+                </div>
+                <button onclick="startApp()" class="action-button bg-amber-700 text-white font-bold py-4 px-10 rounded-full text-2xl hover:bg-amber-800 shadow-lg border-b-4 border-amber-900">BEGIN INVESTIGATION</button>
+            </div>
+        </section>
+        <div id="dynamic-pages-container"></div>
+    </div>
+    
+    <script>
+        // ===================================================================================
+        // --- LESSON CONTENT CONFIGURATION (UNIT 3: TROUBLED WATERS) ---
+        // ===================================================================================
+        const lessonData = {
+            title: "Troubled Waters",
+            subtitle: "Uranium, Rights & Heritage",
+            startPageId: 'title-screen',
+            homePageId: 'main-menu',
+            mainMenu: [
+                { id: 'menu-warmup', text: '1. Warm-Up: The Nuclear Paradox <span aria-hidden="true">⚡</span>', color: 'amber', target: 'warm-up-debate' },
+                { id: 'menu-vocab', text: '2. Core Vocabulary & Speech <span aria-hidden="true">📖</span>', color: 'stone', target: 'vocab-intro' },
+                { id: 'menu-reading', text: '3. Core Text: "Troubled Waters" <span aria-hidden="true">📰</span>', color: 'orange', target: 'reading-main' },
+                { id: 'menu-listening-1', text: '4. Listening: Town Hall Debate <span aria-hidden="true">🎧</span>', color: 'teal', target: 'listening-1' },
+                { id: 'menu-listening-2', text: '5. Listening: History Report <span aria-hidden="true">📻</span>', color: 'cyan', target: 'listening-2' },
+                { id: 'menu-jigsaw', text: '6. Jigsaw: 4 Perspectives <span aria-hidden="true">🧩</span>', color: 'yellow', target: 'jigsaw-hub' },
+                { id: 'menu-socratic', text: '7. Socratic Seminar Prep <span aria-hidden="true">🤔</span>', color: 'blue', target: 'socratic-prep' },
+                { id: 'menu-roleplay', text: '8. GRASPS: Town Hall Hearing <span aria-hidden="true">⚖️</span>', color: 'indigo', target: 'town-hall-hub' },
+                { id: 'menu-teacher', text: 'Teacher Resources (Hidden) <span aria-hidden="true">🔒</span>', color: 'rose', target: 'teacher-hub' }
+            ],
+            vocabulary: [
+                { word: 'Aquifer', def: 'An underground layer of rock that holds water, like a sponge.', sentence: 'The Havasupai fear the mine will contaminate the Redwall Aquifer.' },
+                { word: 'Permeability', def: 'The ability of a material (like rock) to let liquid pass through it.', sentence: 'High permeability means water travels quickly through the rock.' },
+                { word: 'Indigenous', def: 'Native to a specific region; existing there before colonization.', sentence: 'We must respect the rights of Indigenous peoples.' },
+                { word: 'Contamination', def: 'The action of making something impure or poisonous.', sentence: 'Radioactive contamination is invisible but deadly.' },
+                { word: 'Breccia Pipe', def: 'A vertical column of broken rock where uranium is often found.', sentence: 'The Pinyon Plain Mine targets a high-grade breccia pipe.' },
+                { word: 'Tailings', def: 'The waste material left over after the valuable metal is removed from ore.', sentence: 'Uranium tailings can remain radioactive for thousands of years.' },
+                { word: 'Yellowcake', def: 'A type of uranium concentrate powder obtained from leach solutions.', sentence: 'Trucks carry yellowcake from the mine to the processing plant.' },
+                { word: 'Sovereignty', def: 'The authority of a state to govern itself.', sentence: 'The tribe asserted their sovereignty over the land and water.' },
+                { word: 'Stewardship', def: 'The job of supervising or taking care of something.', sentence: 'Indigenous peoples often view land stewardship as a sacred duty.' },
+                { word: 'Precautionary Principle', def: 'The idea that if an action might cause harm, it should be avoided.', sentence: 'German law often follows the Precautionary Principle.' }
+            ],
+            pages: [
+                // 1. Warm-Up
+                { id: 'warm-up-debate', type: 'simple', content: { title: 'The Nuclear Paradox <span aria-hidden="true">⚡</span>', text: 'Nuclear energy produces zero carbon emissions, but it creates radioactive waste. Is it "Clean Energy"?' } },
+                { id: 'warm-up-timer', type: 'timer', content: { title: '4-Corner Debate', text: 'You have 2 minutes. Choose a corner: "Strongly Agree", "Agree", "Disagree", "Strongly Disagree". Discuss with your group: "Nuclear power is necessary to stop climate change."', duration: 120, timerId: 'warmup-timer' } },
+
+                // 2. Vocab Intro Page (Before cards)
+                { id: 'vocab-intro', type: 'simple', content: { title: 'Core Vocabulary <span aria-hidden="true">📖</span>', text: 'We will now review the key terms. Each term will appear on its own page with audio. Listen carefully to the pronunciation.' } },
+                { id: 'vocab-game', type: 'vocab-game', content: { title: 'Vocabulary Check <span aria-hidden="true">🎮</span>'} },
+
+                // 3. Reading Main
+                { id: 'reading-main', type: 'html-content', content: { title: 'Troubled Waters <span aria-hidden="true">📰</span>', html: `
+                    <div class="space-y-6 text-left leading-relaxed">
+                        <div class="bg-amber-50 p-6 rounded-lg border-l-4 border-amber-600 shadow-sm">
+                            <h3 class="text-2xl font-bold text-amber-900 mb-2">The "Swiss Cheese" Risk</h3>
+                            <p>Imagine the earth beneath the Grand Canyon not as solid rock, but as a block of Swiss cheese—full of holes, cracks, and vertical columns. This is the central argument of the Havasupai Tribe against the Pinyon Plain Uranium Mine. They rely on the <strong>Redwall Aquifer</strong>, a deep underground water source that feeds the stunning turquoise waterfalls of their canyon home. They fear that mining the uranium in the <strong>breccia pipes</strong> (vertical columns of broken rock) will pierce the protective layers, allowing radioactive water to leak down into their only water supply.</p>
+                        </div>
+                        <div class="bg-stone-50 p-6 rounded-lg border-l-4 border-stone-600 shadow-sm">
+                            <h3 class="text-2xl font-bold text-stone-900 mb-2">The Legacy of 1872</h3>
+                            <p>Why is this allowed? The answer lies in the <em>General Mining Act of 1872</em>. This US law, written during the Gold Rush, allows citizens to claim minerals on public land basically for free. It treats mining as the "highest and best use" of the land. Although President Biden established a new National Monument in 2023 to protect the area, the Pinyon Plain Mine has "valid existing rights" because their claim is older. They argue they are operating legally and safely.</p>
+                        </div>
+                        <div class="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-600 shadow-sm">
+                            <h3 class="text-2xl font-bold text-orange-900 mb-2">The Clean Energy Dilemma</h3>
+                            <p>Here lies the global paradox. To fight climate change, the world (including China and formerly Germany) looks for carbon-free energy. Uranium is the fuel for nuclear power. The mining company argues that by extracting uranium here, they are helping the US achieve energy independence and fight global warming. But the Havasupai ask: <em>"Is it clean energy if it destroys our culture and poisons our water?"</em></p>
+                        </div>
+                    </div>` } },
+                { id: 'reading-quiz-mcq', type: 'quiz-mcq', content: { title: 'Reading Comprehension', questions: [] } },
+                { id: 'reading-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Geological Dictation', sentences: [], wordBank: [] } },
+
+                // 4. Listening 1: Town Hall Debate
+                { id: 'listening-1', type: 'dialogue', content: { 
+                    title: 'Listening 1: The Debate <span aria-hidden="true">🗣️</span>', 
+                    dialogue: `Moderator: Welcome to the hearing. We will hear from Mr. Henderson, representing the mining company, and Ms. Elena, a tribal elder. Mr. Henderson, you may begin.
+
+Mr. Henderson: Thank you. I want to be clear: clean energy is the future. Our uranium provides carbon-free electricity for millions of homes. We follow the strictest environmental regulations. The breccia pipe is isolated from the aquifer by impermeable rock. There is zero evidence of contamination.
+
+Elena: Zero evidence? You speak of models and charts. We speak of history. We have seen the "orphan mines" left behind—holes in the ground that still poison our sheep and our people. You say the rock is solid, but the water flows. The "Swiss Cheese" geology means you cannot guarantee safety.
+
+Mr. Henderson: Ms. Elena, that was the past. Modern mining uses state-of-the-art technology. We have monitoring wells. If there is a leak, we will know immediately.
+
+Elena: And then what? Once the water is poisoned, you cannot un-poison it. You cannot filter radiation out of a sacred spring. Your "monitoring" is just watching a disaster happen. We demand the Precautionary Principle: if it might cause harm, do not do it.` 
+                } },
+                { id: 'listening-1-quiz', type: 'quiz-mcq', content: { title: 'Listening 1: Quiz', questions: [] } },
+
+                // 5. Listening 2: History Report
+                { id: 'listening-2', type: 'dialogue', content: {
+                    title: 'Listening 2: Historical Context <span aria-hidden="true">📻</span>',
+                    dialogue: `Narrator: To understand the fear in the Grand Canyon region, we must look back to 1979. In a place called Church Rock, New Mexico, a dam holding back uranium tailings broke.
+
+Narrator: It released over one thousand tons of solid radioactive mill waste and ninety-four million gallons of acidic, radioactive liquid into the Puerco River.
+
+Narrator: This accident released more radiation than the famous Three Mile Island incident, yet it received very little national attention. The contamination flowed downstream through Navajo lands, affecting livestock and drinking water for years.
+
+Narrator: This history of "Yellowcake" and broken promises creates a deep mistrust today. When mining companies promise safety, Indigenous communities remember Church Rock.`
+                } },
+                { id: 'listening-2-quiz', type: 'quiz-gap-fill', content: { title: 'Listening 2: Gap Fill', sentences: [], wordBank: [] } },
+
+                // 6. Jigsaw Hub
+                { id: 'jigsaw-hub', type: 'html-content', content: { title: 'Jigsaw: 4 Perspectives <span aria-hidden="true">🧩</span>', html: `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-stone-100 rounded-lg">
+                            <h4 class="font-bold text-stone-800">1. The Geologist</h4>
+                            <p class="text-sm mb-2">Analyzes rock permeability and aquifer depth.</p>
+                            <button onclick="showPerspective('geo')" class="perspective-tab w-full bg-stone-600 text-white p-2 rounded">View Evidence</button>
+                        </div>
+                        <div class="p-4 bg-amber-100 rounded-lg">
+                            <h4 class="font-bold text-amber-800">2. The Havasupai Elder</h4>
+                            <p class="text-sm mb-2">Focuses on spiritual connection and history.</p>
+                            <button onclick="showPerspective('elder')" class="perspective-tab w-full bg-amber-600 text-white p-2 rounded">View Evidence</button>
+                        </div>
+                        <div class="p-4 bg-blue-100 rounded-lg">
+                            <h4 class="font-bold text-blue-800">3. The Mining CEO</h4>
+                            <p class="text-sm mb-2">Focuses on energy independence and jobs.</p>
+                            <button onclick="showPerspective('ceo')" class="perspective-tab w-full bg-blue-600 text-white p-2 rounded">View Evidence</button>
+                        </div>
+                        <div class="p-4 bg-emerald-100 rounded-lg">
+                            <h4 class="font-bold text-emerald-800">4. The Legal Analyst</h4>
+                            <p class="text-sm mb-2">Focuses on the 1872 Mining Law vs. 2023 Monument.</p>
+                            <button onclick="showPerspective('law')" class="perspective-tab w-full bg-emerald-600 text-white p-2 rounded">View Evidence</button>
+                        </div>
+                    </div>
+                    <div id="perspective-content" class="mt-6 p-6 bg-white rounded shadow-inner border border-gray-200 min-h-[200px]">
+                        <p class="text-gray-500 text-center italic">Select a perspective above to reveal their key arguments.</p>
+                    </div>` } },
+
+                // 7. Global Connections
+                { id: 'global-connections', type: 'html-content', content: { title: 'Deep Dive: Making it Relevant <span aria-hidden="true">🌍</span>', html: `
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-bold text-red-700 mb-2">🇨🇳 China Connection</h3>
+                            <p><strong>Development vs. Heritage:</strong> Just as China balances modernization (Three Gorges Dam, High-Speed Rail) with preserving ancient sites, the US struggles here. <br><em>Question: Think of a project in China. What was gained? What was lost?</em></p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-bold text-yellow-600 mb-2">🇩🇪 Germany Connection</h3>
+                            <p><strong>The Precautionary Principle (Vorsorgeprinzip):</strong> In German law, if an action <em>might</em> cause harm, the burden of proof is on the company to prove it is safe. <br><em>Contrast:</em> The US 1872 Law assumes mining is good until proven bad.</p>
+                        </div>
+                    </div>` } },
+
+                // 8. Socratic Prep
+                { id: 'socratic-prep', type: 'html-content', content: { title: 'Socratic Seminar Prep <span aria-hidden="true">🤔</span>', html: `
+                    <h3 class="text-2xl font-bold text-cyan-800 mb-4">Essential Question:</h3>
+                    <p class="text-xl italic mb-6">"Does the global need for carbon-free energy justify local environmental destruction?"</p>
+                    <div class="bg-cyan-50 p-6 rounded-lg">
+                        <h4 class="font-bold mb-2">Preparation Prompts:</h4>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Define "Clean Energy" from the Tribe's perspective vs. the CEO's perspective.</li>
+                            <li>If the mine leaks in 50 years, who pays? (Accountability)</li>
+                            <li>Is the 1872 Mining Law obsolete in 2025?</li>
+                        </ul>
+                    </div>` } },
+                
+                // 9. GRASPS Town Hall
+                { id: 'town-hall-hub', type: 'html-content', content: { title: 'GRASPS: Town Hall Hearing <span aria-hidden="true">⚖️</span>', html: `
+                    <div class="bg-white p-6 rounded-lg shadow-lg text-left">
+                        <h3 class="text-2xl font-bold text-indigo-900 mb-4">Your Mission</h3>
+                        <p><strong>Goal:</strong> Convince the court to either REVOKE or UPHOLD the mining permit.</p>
+                        <p><strong>Role:</strong> You are an expert witness (Geologist, Tribal Leader, or Company Rep).</p>
+                        <p><strong>Audience:</strong> The International Environmental Court.</p>
+                        <p><strong>Situation:</strong> Emergency Review of the Pinyon Plain Mine Permit.</p>
+                        <hr class="my-4">
+                        <h4 class="font-bold text-indigo-700">Language Scaffolds (Modals of Probability):</h4>
+                        <ul class="list-none space-y-2 mt-2 bg-indigo-50 p-4 rounded">
+                            <li>"The scientific data suggests that contamination <strong>could</strong> occur..."</li>
+                            <li>"It is <strong>highly unlikely</strong> that the aquifer will be breached..."</li>
+                            <li>"We <strong>must</strong> prioritize the irreversible damage to..."</li>
+                        </ul>
+                    </div>` } },
+
+                // 10. Teacher Hub (Hidden by default)
+                { id: 'teacher-hub', type: 'html-content', content: { title: 'Teacher Resource Pack <span aria-hidden="true">👩‍🏫</span>', html: `
+                    <div class="text-left space-y-4">
+                        <div class="p-4 bg-rose-50 border border-rose-200 rounded">
+                            <h3 class="font-bold text-rose-800">Part 16: Pacing Guide</h3>
+                            <p><strong>Lesson 1:</strong> Investigation (Warm-up, Reading, Jigsaw) - 90 mins</p>
+                            <p><strong>Lesson 2:</strong> Analysis (Socratic Seminar, Global Connections) - 90 mins</p>
+                            <p><strong>Lesson 3:</strong> Application (Town Hall Role Play) - 90 mins</p>
+                        </div>
+                        <div class="p-4 bg-rose-50 border border-rose-200 rounded">
+                            <h3 class="font-bold text-rose-800">Part 20: Historical Deep Dive</h3>
+                            <p>The "Yellowcake" Boom (1950s): Navajo miners worked without protection. A legacy of lung cancer.</p>
+                            <p>The 2023 Monument: "Baaj Nwaavjo I'tah Kukveni" protects 1 million acres, but valid existing rights remain.</p>
+                        </div>
+                        <div class="p-4 bg-rose-50 border border-rose-200 rounded">
+                            <h3 class="font-bold text-rose-800">Part 18: Differentiation</h3>
+                            <p><strong>Support:</strong> Provide sentence stems for the debate.</p>
+                            <p><strong>Challenge:</strong> Require students to cite specific isotope data from Part 11.</p>
+                        </div>
+                    </div>` } },
+
+                 { id: 'certificate', type: 'certificate', content: { title: 'Unit Complete! <span aria-hidden="true">🎉</span>', text: 'You are ready for the Energiewende debate.' } }
+            ]
+        };
+
+        // --- Helper: Perspective Content ---
+        const perspectives = {
+            geo: "<h4 class='font-bold text-stone-800'>Geological Evidence</h4><p>The mine shaft penetrates the Coconino Sandstone aquifer. While the company claims the rock is 'impermeable' (water can't pass), independent data shows high levels of water inflow (flooding) in the mine shaft. This suggests fractures exists—the 'Swiss Cheese' effect.</p>",
+            elder: "<h4 class='font-bold text-amber-800'>Cultural Evidence</h4><p>Red Butte (Wicahwi Isaman) is our sacred mountain. It is the lungs of our grandmother earth. Contaminating the water isn't just a health risk; it is a spiritual death. We have lived here for 12,000 years. We did not consent to this.</p>",
+            ceo: "<h4 class='font-bold text-blue-800'>Economic Evidence</h4><p>This is the highest-grade uranium deposit in the USA. One pound of uranium produces as much energy as 20,000 pounds of coal. If you want a carbon-free future, you need nuclear power. We follow all EPA regulations strictly.</p>",
+            law: "<h4 class='font-bold text-emerald-800'>Legal Evidence</h4><p>The 1872 Mining Law grants 'valid existing rights'. Even though the National Monument was created in 2023, this mine's claim predates it. Legally, the government cannot stop them without paying billions in compensation.</p>"
+        };
+
+        window.showPerspective = function(key) {
+            const container = document.getElementById('perspective-content');
+            container.innerHTML = perspectives[key];
+            container.classList.remove('bg-white');
+            container.classList.add('bg-gray-50', 'transition-all');
+            speechService.speak(container.innerText);
+        }
+
+        // --- Enhanced Speech Service with 4-Person Cast ---
+        class SpeechService {
+             constructor() { 
+                 this.synth = window.speechSynthesis; 
+                 this.isInitialized = false; 
+                 this.isTtsEnabled = true; 
+                 this.voices = {}; 
+                 this.speechRate = 0.85; // Slow down to 85%
+             }
+             async _setupVoices() {
+                 const voicesPromise = new Promise(resolve => { if (this.synth.getVoices().length) return resolve(this.synth.getVoices()); this.synth.onvoiceschanged = () => resolve(this.synth.getVoices()); });
+                 const availableVoices = await voicesPromise;
+                 
+                 // Prioritize specific Microsoft Natural Voices
+                 this.voices['andrew'] = availableVoices.find(v => v.name.includes("Andrew") && v.name.includes("Natural")) || availableVoices.find(v => v.lang === 'en-US' && v.name.includes("Male")) || availableVoices[0];
+                 this.voices['emma'] = availableVoices.find(v => v.name.includes("Emma") && v.name.includes("Natural")) || availableVoices.find(v => v.lang === 'en-US' && v.name.includes("Female")) || availableVoices[0];
+                 this.voices['brian'] = availableVoices.find(v => v.name.includes("Brian") && v.name.includes("Natural")) || availableVoices.find(v => v.lang === 'en-GB' && v.name.includes("Male")) || availableVoices[0];
+                 this.voices['ava'] = availableVoices.find(v => v.name.includes("Ava") && v.name.includes("Natural")) || availableVoices.find(v => v.lang === 'en-US' && v.name.includes("Female") && v.name !== this.voices['emma']?.name) || availableVoices[0];
+                 
+                 this.voices['default'] = this.voices['andrew'];
+             }
+             async init() { if (this.isInitialized) return; try { const warmUp = new SpeechSynthesisUtterance(' '); warmUp.volume = 0; this.synth.speak(warmUp); this.synth.cancel(); await this._setupVoices(); this.isInitialized = true; } catch (e) { console.error("Speech init failed", e); } }
+             
+             _cleanTextForSpeech(text) { const tempDiv = document.createElement('div'); const textWithoutSpans = text.replace(/<span aria-hidden="true">.*?<\/span>/g, ' '); tempDiv.innerHTML = textWithoutSpans; return tempDiv.innerText || tempDiv.textContent || ''; }
+             
+             async speak(text, voiceKey = 'default') { 
+                 if (!this.isInitialized || !this.isTtsEnabled || !text) return; 
+                 if (this.synth.speaking) this.cancel(); 
+                 const utterance = new SpeechSynthesisUtterance(this._cleanTextForSpeech(text)); 
+                 utterance.voice = this.voices[voiceKey] || this.voices['default']; 
+                 utterance.rate = this.speechRate; 
+                 this.synth.speak(utterance); 
+             }
+             
+             async speakDialogue(dialogueText) {
+                 if (!this.isInitialized || !this.isTtsEnabled) return;
+                 this.cancel();
+                 const lines = dialogueText.split('\n\n');
+                 let index = 0;
+                 const playNext = () => {
+                     if (index >= lines.length) return;
+                     const line = lines[index];
+                     const parts = line.split(': ');
+                     const speaker = parts[0].toLowerCase();
+                     const text = parts[1] || parts[0];
+                     
+                     const utterance = new SpeechSynthesisUtterance(this._cleanTextForSpeech(text));
+                     
+                     // Cast mapping
+                     if (speaker.includes('moderator')) utterance.voice = this.voices['brian'];
+                     else if (speaker.includes('henderson')) utterance.voice = this.voices['andrew'];
+                     else if (speaker.includes('elena')) utterance.voice = this.voices['emma'];
+                     else utterance.voice = this.voices['ava']; // Narrator
+                     
+                     utterance.rate = this.speechRate;
+                     utterance.onend = () => { index++; playNext(); };
+                     this.synth.speak(utterance);
+                 };
+                 playNext();
+             }
+
+             cancel() { if (this.synth) this.synth.cancel(); }
+             toggleTTS(forceState) { this.isTtsEnabled = forceState === undefined ? !this.isTtsEnabled : forceState; if (!this.isTtsEnabled) this.cancel(); return this.isTtsEnabled; }
+        }
+
+        const speechService = new SpeechService();
+        let score = 0, currentPage = lessonData.startPageId;
+        let pageSequence = [];
+
+        // --- Standard Navigation Logic ---
+        window.startApp = async function() { await speechService.init(); navigateTo(lessonData.homePageId); }
+        window.navigateTo = (pageId) => {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(`page-${pageId}`);
+            if(target) target.classList.add('active');
+            currentPage = pageId;
+            updateNavButtons();
+            
+            // 1. Auto-Play for Vocab Cards
+            if (pageId.startsWith('vocab-') && pageId !== 'vocab-intro' && pageId !== 'vocab-game') {
+                const index = parseInt(pageId.split('-')[1]);
+                const v = lessonData.vocabulary[index];
+                const voice = index % 2 === 0 ? 'andrew' : 'emma';
+                speechService.speak(`${v.word}. ${v.def}. Example: ${v.sentence}`, voice);
+            } 
+            // 2. Auto-Play for Main Reading Article
+            else if (pageId === 'reading-main' && speechService.isTtsEnabled) {
+                // Get the text content, cleaning up the extra newlines/spaces
+                const rawText = target.innerText.replace(/\s+/g, ' '); 
+                // Use a neutral narrator voice
+                speechService.speak(rawText, 'ava');
+            }
+            // 3. Handle TTS for other simple pages (excluding dialogues which wait for button)
+            else if(speechService.isTtsEnabled && !pageId.includes('listening-')) {
+                 const text = target.querySelector('.readable-content') ? target.querySelector('.readable-content').innerText : (lessonData.pages.find(p => p.id === pageId)?.content.title || '');
+                 if(text) speechService.speak(text);
+            }
+            
+            if (pageId === 'warm-up-timer') startTimer(120, document.getElementById('warmup-timer'));
+            if (pageId === 'vocab-game') startVocabGame();
+        }
+        
+        window.goBack = () => { const idx = pageSequence.indexOf(currentPage); if(idx > 0) navigateTo(pageSequence[idx-1]); }
+        window.goNext = () => { const idx = pageSequence.indexOf(currentPage); if(idx < pageSequence.length-1) navigateTo(pageSequence[idx+1]); }
+        
+        function updateNavButtons() {
+            document.getElementById('nav-header').style.display = currentPage === lessonData.startPageId ? 'none' : 'block';
+        }
+
+        function toggleTeacherMode() {
+            document.body.classList.toggle('show-teacher');
+            const btn = document.querySelector('button[onclick="toggleTeacherMode()"]');
+            btn.classList.toggle('bg-amber-100');
+        }
+
+        // --- Populating Quizzes (Expanded) ---
+        function initQuizzes() {
+            // Reading Quiz (5 Questions)
+            const mcq = lessonData.pages.find(p => p.id === 'reading-quiz-mcq');
+            mcq.content.questions = [
+                { question: 'What is the "Swiss Cheese" metaphor describing?', options: ['The type of food miners eat.', 'The fractured nature of the rock layers.', 'The holes in the mining law.', 'The shape of the uranium.'], correctAnswer: 'The fractured nature of the rock layers.' },
+                { question: 'Why does the 1872 Mining Law matter here?', options: ['It forbids mining in canyons.', 'It allows mining claims on public land for free.', 'It protects Indigenous rights.', 'It was written by Germans.'], correctAnswer: 'It allows mining claims on public land for free.' },
+                { question: 'What is the "Redwall Aquifer"?', options: ['A red sandstone statue.', 'A deep underground water source.', 'A type of nuclear reactor.', 'A legal term.'], correctAnswer: 'A deep underground water source.' },
+                { question: 'Why do the Havasupai oppose the mine?', options: ['They want a share of the profits.', 'They fear contamination of their water source.', 'They prefer coal power.', 'They want to mine it themselves.'], correctAnswer: 'They fear contamination of their water source.' },
+                { question: 'What mineral is being mined at Pinyon Plain?', options: ['Gold', 'Copper', 'Uranium', 'Coal'], correctAnswer: 'Uranium' }
+            ];
+
+            const gap = lessonData.pages.find(p => p.id === 'reading-quiz-gap-fill');
+            gap.content.sentences = [
+                { text: ['The tribe fears the mine will', 'their water source.'], answer: 'contaminate' },
+                { text: ['Rock with high', 'allows water to move through it quickly.'], answer: 'permeability' },
+                { text: ['The', 'Principle suggests avoiding actions that might cause harm.'], answer: 'Precautionary' },
+                { text: ['The', 'rights of the Havasupai predate the US government.'], answer: 'Indigenous' },
+                { text: ['The vertical column of broken rock is called a', 'pipe.'], answer: 'breccia' },
+                { text: ['The 1872 law allows for the extraction of minerals on', 'land.'], answer: 'public' }
+            ];
+            gap.content.wordBank = ['contaminate', 'permeability', 'Precautionary', 'Indigenous', 'breccia', 'public'];
+
+            // Listening 1 Quiz (Expanded)
+            const l1q = lessonData.pages.find(p => p.id === 'listening-1-quiz');
+            l1q.content.questions = [
+                { question: 'What does Mr. Henderson claim about the breccia pipe?', options: ['It is full of holes.', 'It is isolated by impermeable rock.', 'It is already contaminated.', 'It is located in Germany.'], correctAnswer: 'It is isolated by impermeable rock.' },
+                { question: 'What is Elena’s main concern?', options: ['The cost of electricity.', 'The history of "orphan mines" and water flow.', 'The lack of jobs.', 'The color of the uranium.'], correctAnswer: 'The history of "orphan mines" and water flow.' },
+                { question: 'What principle does Elena demand?', options: ['The Precautionary Principle.', 'The 1872 Mining Law.', 'The Clean Energy Act.', 'The General Mining Act.'], correctAnswer: 'The Precautionary Principle.' }
+            ];
+
+            // Listening 2 Quiz (Expanded)
+            const l2q = lessonData.pages.find(p => p.id === 'listening-2-quiz');
+            l2q.content.sentences = [
+                { text: ['In 1979, a dam holding', 'broke at Church Rock.'], answer: 'tailings' },
+                { text: ['The accident released radioactive', 'into the Puerco River.'], answer: 'waste' },
+                { text: ['This history creates a deep', 'between tribes and mining companies.'], answer: 'mistrust' },
+                { text: ['The Church Rock spill released more radiation than', 'Mile Island.'], answer: 'Three' }
+            ];
+            l2q.content.wordBank = ['tailings', 'waste', 'mistrust', 'Three'];
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('main-title').innerHTML = lessonData.title;
+            document.getElementById('main-subtitle').innerHTML = lessonData.subtitle;
+            initQuizzes();
+            
+            // Build Pages
+            const container = document.getElementById('dynamic-pages-container');
+            
+            // Build Sequence
+            pageSequence = [lessonData.homePageId];
+            lessonData.mainMenu.forEach(item => {
+                 pageSequence.push(item.target);
+                 
+                 // Handle Vocab Pages Expansion
+                 if(item.target === 'vocab-intro') {
+                     lessonData.vocabulary.forEach((_, i) => pageSequence.push(`vocab-${i}`));
+                     pageSequence.push('vocab-game');
+                 }
+                 
+                 // Add sub-pages logic
+                 if(item.target === 'reading-main') pageSequence.push('reading-quiz-mcq', 'reading-quiz-gap-fill');
+                 if(item.target === 'listening-1') pageSequence.push('listening-1-quiz');
+                 if(item.target === 'listening-2') pageSequence.push('listening-2-quiz');
+            });
+            pageSequence.push('certificate');
+
+            // Render Pages
+            lessonData.pages.forEach(page => {
+                const div = document.createElement('section');
+                div.id = `page-${page.id}`;
+                div.className = 'page';
+                
+                let innerHTML = '';
+                if(page.type === 'simple' || page.type === 'timer') {
+                    innerHTML = `<div class="bg-white/95 rounded-2xl shadow-lg p-8 pt-12"><h2 class="text-3xl font-bold text-amber-900 mb-4">${page.content.title}</h2><p class="text-xl">${page.content.text}</p>${page.type==='timer'?'<div id="'+page.content.timerId+'" class="text-4xl font-bold text-amber-600 mt-4 p-4 bg-amber-50 rounded inline-block">02:00</div>':''}</div>`;
+                } else if (page.type === 'html-content') {
+                    innerHTML = `<div class="bg-white/95 rounded-2xl shadow-lg p-6 pt-12"><h2 class="text-3xl font-bold text-amber-900 mb-6">${page.content.title}</h2>${page.content.html}</div>`;
+                } else if (page.type === 'dialogue') {
+                    const dialogueHTML = page.content.dialogue.split('\n\n').map(line => {
+                        const parts = line.split(': ');
+                        const isAndrew = parts[0].includes('Henderson') || parts[0].includes('Moderator');
+                        return `<div class="mb-4 text-left p-3 rounded ${isAndrew ? 'bg-blue-50 ml-8' : 'bg-amber-50 mr-8'}"><strong class="block text-sm ${isAndrew ? 'text-blue-800' : 'text-amber-800'} mb-1">${parts[0]}</strong><p>${parts[1]||parts[0]}</p></div>`;
+                    }).join('');
+                    
+                    innerHTML = `<div class="bg-white/95 rounded-2xl shadow-lg p-6 pt-12 text-center">
+                        <h2 class="text-3xl font-bold text-amber-900 mb-4">${page.content.title}</h2>
+                        <button onclick="speechService.speakDialogue(\`${page.content.dialogue.replace(/`/g, '\\`')}\`)" class="play-audio-btn mb-6"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Play Audio Transcript</button>
+                        <div class="max-h-[50vh] overflow-y-auto text-lg space-y-4 px-2 border-t border-stone-200 pt-4">${dialogueHTML}</div>
+                    </div>`;
+                } else if (page.type === 'quiz-mcq') {
+                     // SHUFFLE MCQ OPTIONS
+                     const shuffledQuestions = page.content.questions.map((q, i) => {
+                         const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+                         return `<div class="bg-stone-50 p-4 rounded"><p class="font-bold mb-2">${i+1}. ${q.question}</p><div class="grid gap-2">${shuffledOptions.map(opt => `<button onclick="checkMcq(this, ${opt===q.correctAnswer})" class="quiz-option bg-white border border-gray-300 p-2 rounded text-left hover:bg-amber-50">${opt}</button>`).join('')}</div></div>`;
+                     }).join('');
+                     innerHTML = `<div class="bg-white/95 rounded-2xl shadow-lg p-8 pt-12"><h2 class="text-3xl font-bold text-amber-900 mb-6">${page.content.title}</h2><div class="space-y-6">${shuffledQuestions}</div></div>`;
+                } else if (page.type === 'quiz-gap-fill') {
+                     // SHUFFLE WORD BANK
+                     const shuffledBank = [...page.content.wordBank].sort(() => Math.random() - 0.5);
+                     innerHTML = `<div class="bg-white/95 rounded-2xl shadow-lg p-8 pt-12"><h2 class="text-3xl font-bold text-amber-900 mb-6">${page.content.title}</h2><div class="gap-fill-container text-left space-y-4">${page.content.sentences.map((s,i) => `<p class="text-xl">${i+1}. ${s.text[0]} <span class="gap" data-answer="${s.answer}" onclick="fillGap(this)"></span> ${s.text[1]||''}</p>`).join('')}</div><div class="mt-8 flex flex-wrap gap-2 justify-center">${shuffledBank.map(w => `<button onclick="selectWord('${w}')" class="word-bank-word">${w}</button>`).join('')}</div></div>`;
+                } else if (page.type === 'certificate') {
+                     innerHTML = `<div class="bg-white rounded-2xl shadow-lg p-8 text-center pt-16 relative overflow-hidden"><canvas id="completion-canvas"></canvas><div class="relative z-10"><h2 class="text-5xl font-bold text-amber-500 mb-4">${page.content.title}</h2><p class="text-2xl text-gray-600 mb-8">${page.content.text}</p><div id="certificate-to-print" class="max-w-xl mx-auto bg-white p-8 rounded-lg border-8 double border-amber-800 text-left"><h3 class="text-3xl font-serif font-bold text-amber-900 text-center mb-4">Certificate of Completion</h3><p class="text-center italic text-stone-600 mb-6">"Heimat & Harmony"</p><p class="text-xl mb-4 text-center">This certifies readiness for the</p><p class="text-2xl font-bold text-amber-700 text-center mb-6">Energiewende Unit</p></div><div class="flex justify-center gap-4 mt-8"><button onclick="window.print()" class="action-button bg-stone-700 text-white font-bold py-2 px-6 rounded-full">Print</button></div></div></div>`;
+                } else if (page.type === 'vocab-game') {
+                     innerHTML = `<div class="bg-white/95 rounded-2xl shadow-lg p-8 pt-12"><h2 class="text-3xl font-bold text-amber-900 mb-4">${page.content.title}</h2><div id="vocab-game-area" class="text-center"><p id="vocab-def" class="text-2xl mb-6 italic"></p><div id="vocab-opts" class="grid grid-cols-2 gap-4"></div></div></div>`;
+                }
+
+                div.innerHTML = innerHTML;
+                container.appendChild(div);
+            });
+            
+            // Generate Individual Vocab Pages
+            lessonData.vocabulary.forEach((v, i) => {
+                const div = document.createElement('section');
+                div.id = `page-vocab-${i}`;
+                div.className = 'page';
+                div.innerHTML = `
+                    <div class="bg-white/95 rounded-2xl shadow-xl p-8 pt-16 flex flex-col items-center justify-center min-h-[50vh] text-center border-t-8 border-amber-500">
+                        <div class="mb-4 text-stone-400 text-sm uppercase tracking-widest font-semibold">Vocabulary Card ${i+1}/${lessonData.vocabulary.length}</div>
+                        <h2 class="text-6xl font-black text-amber-900 mb-6 tracking-tight">${v.word}</h2>
+                        <p class="text-2xl text-stone-800 mb-8 max-w-2xl font-medium">${v.def}</p>
+                        <div class="bg-amber-50 p-8 rounded-xl border border-amber-200 max-w-2xl w-full shadow-sm">
+                            <p class="sample-sentence">"${v.sentence}"</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            // Build Menu
+            const menuContainer = document.getElementById('dynamic-pages-container').appendChild(document.createElement('div'));
+            menuContainer.id = 'page-main-menu';
+            menuContainer.className = 'page';
+            menuContainer.innerHTML = `<div class="bg-white/90 rounded-2xl shadow-lg p-8"><h2 class="text-4xl font-bold text-center text-stone-800 mb-8">Investigative Menu</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4">${lessonData.mainMenu.map(item => `<button onclick="navigateTo('${item.target}')" class="${item.id==='menu-teacher'?'teacher-only':''} btn-animated-3d bg-${item.color}-600 text-white font-bold text-xl p-4 rounded-lg w-full text-left shadow-md border-b-4 border-${item.color}-800 hover:brightness-110">${item.text}</button>`).join('')}</div></div>`;
+            
+            // Add particles
+            spawnFloatingEmoji();
+        });
+
+        // --- Game Logic Stubs ---
+        let selectedWordForGap = '';
+        window.selectWord = (w) => { selectedWordForGap = w; document.querySelectorAll('.word-bank-word').forEach(el => el.classList.toggle('selected', el.innerText===w)); }
+        window.fillGap = (el) => { if(!selectedWordForGap) return; el.innerText = selectedWordForGap; el.classList.toggle('correct', selectedWordForGap === el.dataset.answer); el.classList.toggle('incorrect', selectedWordForGap !== el.dataset.answer); }
+        window.checkMcq = (btn, isCorrect) => { 
+            if(isCorrect) { btn.classList.add('bg-green-100', 'border-green-500'); score+=10; showToast(true); spawnReward(btn); } 
+            else { btn.classList.add('bg-red-100', 'border-red-500', 'shake'); showToast(false); }
+        }
+        function startTimer(duration, display) {
+            let timer = duration, minutes, seconds;
+            let interval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+                display.textContent = minutes + ":" + seconds;
+                if (--timer < 0) clearInterval(interval);
+            }, 1000);
+        }
+        function startVocabGame() {
+            const vocab = lessonData.vocabulary[Math.floor(Math.random()*lessonData.vocabulary.length)];
+            document.getElementById('vocab-def').innerText = vocab.def;
+            const opts = [vocab.word, 'Isotope', 'Yellowcake', 'Tailings'].sort(()=>Math.random()-0.5);
+            document.getElementById('vocab-opts').innerHTML = opts.map(o => `<button onclick="checkMcq(this, '${o}'==='${vocab.word}')" class="quiz-option p-4 bg-stone-100 rounded text-xl font-bold hover:bg-amber-100">${o}</button>`).join('');
+        }
+        
+        // --- Visual FX ---
+        function showToast(correct) {
+            const t = document.createElement('div');
+            t.className = `feedback-toast ${correct?'correct':'encouraging'}`;
+            t.innerText = correct ? "Correct! Evidence Logged." : "Review the data again.";
+            document.body.appendChild(t);
+            setTimeout(()=>t.remove(), 2000);
+        }
+        function spawnReward(el) {
+            // Simple particle burst
+        }
+        function spawnFloatingEmoji() {
+            const container = document.getElementById('emoji-floating-container');
+            const emojis = ['☢️', '💧', '🦅', '🏜️', '⚡', '⚖️'];
+            setInterval(() => {
+                const el = document.createElement('div');
+                el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                el.className = 'floating-emoji';
+                el.style.left = Math.random() * 100 + 'vw';
+                el.style.animation = `floatUp ${10 + Math.random() * 10}s linear forwards`;
+                container.appendChild(el);
+                setTimeout(() => el.remove(), 20000);
+            }, 3000);
+        }
+
+    </script>
+</body>
+</html>
