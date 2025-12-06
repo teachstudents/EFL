@@ -309,9 +309,9 @@
                     title: "Podcast: The Uranium Debate",
                     script: [
                         { s: "Naya", v: "Emma", t: "Thank you, Michael. This is a critical discussion about irreversible harms to our environment." },
-                        { s: "Michael", v: "Brian", t: "Some say mining provides necessary jobs and energy security. What is your concern?" },
+                        { s: "Michael", v: "Andrew", t: "Some say mining provides necessary jobs and energy security. What is your concern?" },
                         { s: "Naya", v: "Emma", t: "My main concern is the long-term risk. Radioactive contamination lasts for thousands of years. It's not just about the canyon; it's about the people living there." },
-                        { s: "Michael", v: "Brian", t: "But companies claim it's profitable. Is it?" },
+                        { s: "Michael", v: "Andrew", t: "But companies claim it's profitable. Is it?" },
                         { s: "Naya", v: "Emma", t: "It's often a false economy. The cleanup costs usually fall on taxpayers, costing billions. The financial burden outweighs the short-term profit." }
                     ]
                 },
@@ -403,6 +403,13 @@
                         return voices.find(v => v.name.includes('Female') || v.name.includes('Google US English'));
                     }
 
+                    // Specific priority for Andrew Microsoft Online Natural
+                    if (n === 'andrew') {
+                        const microsoftAndrew = voices.find(v => v.name.includes('Andrew') && v.name.includes('Online (Natural)'));
+                        if (microsoftAndrew) return microsoftAndrew;
+                        return voices.find(v => v.name.includes('Male') && v.lang === 'en-US');
+                    }
+
                     // Updated: Michael/Moderator (Brian) now prioritizes Multilingual Natural
                     if (n === 'brian') {
                         const multiNatural = voices.find(v => v.name.includes('Multilingual') && v.name.includes('Natural') && v.name.includes('Male'));
@@ -414,7 +421,6 @@
                         return voices.find(v => v.name.includes('Great Britain') && v.name.includes('Male')) || voices.find(v => v.lang === 'en-GB');
                     }
 
-                    if (n === 'andrew') return voices.find(v => v.name.includes('Male') && v.lang === 'en-US');
                     if (n === 'ava') return voices.find(v => v.name.includes('Female') && v.lang === 'en-US' && !v.name.includes('Google'));
                     
                     return voices.find(v => v.lang.startsWith('en')) || voices[0];
