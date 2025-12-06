@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Orleans: Culture, Resilience & Mardi Gras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        @keyframes mardiGras {
+            0% { background-color: #581c87; } /* purple-900 */
+            25% { background-color: #166534; } /* green-800 */
+            50% { background-color: #f59e0b; } /* amber-500 */
+            75% { background-color: #166534; } /* green-800 */
+            100% { background-color: #581c87; } /* purple-900 */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior: none;
+            animation: mardiGras 240s linear infinite;
+            padding-top: 85px;
+        }
+        #background-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+        }
+        .page { display: none; position: relative; }
+        .page.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .action-button, .nav-button, .quiz-option, .tfng-button, .word-bank-word, .btn-animated-3d {
+            transition: all 0.15s ease-out;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2), 0 2px 4px -2px rgba(0,0,0,0.1), inset 0 -4px 0 0 rgba(0,0,0,0.2);
+            border: none;
+        }
+        .action-button:hover, .nav-button:hover, .quiz-option:hover:not(:disabled), .tfng-button:hover:not(:disabled), .word-bank-word:hover, .btn-animated-3d:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px -3px rgba(0,0,0,0.2), 0 4px 6px -4px rgba(0,0,0,0.1), inset 0 -4px 0 0 rgba(0,0,0,0.2);
+        }
+        .action-button:active, .nav-button:active, .quiz-option:active, .tfng-button:active, .btn-animated-3d:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 2px -1px rgba(0,0,0,0.2), 0 1px 2px -2px rgba(0,0,0,0.1), inset 0 -2px 0 0 rgba(0,0,0,0.2);
+        }
+        
+        /* Gap Fill Styles */
+        .gap-fill-container .gap {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 120px; height: 44px; padding: 0 4px;
+            border: 2px dashed #9ca3af; border-radius: 8px; margin: 0 4px;
+            vertical-align: middle; background-color: #f3f4f6;
+        }
+        .word-bank-word {
+            cursor: grab; padding: 8px 16px; border-radius: 8px;
+            background-color: white; user-select: none;
+        }
+        .word-bank-word.selected { outline: 2px solid #6366f1; transform: scale(1.05); }
+        .gap .word-bank-word { cursor: pointer; }
+        .gap.correct .word-bank-word { background-color: #dcfce7; border-color: #22c55e; color: #15803d; }
+        .gap.incorrect .word-bank-word { background-color: #fee2e2; border-color: #ef4444; color: #b91c1c; }
+
+        .feedback-toast, .badge-toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            padding: 12px 24px; border-radius: 9999px; color: white;
+            font-weight: bold; z-index: 200;
+            animation: slideUpFadeIn 0.5s ease-out, slideDownFadeOut 0.5s ease-in 3.5s forwards;
+        }
+        .feedback-toast.correct { background-color: #22c55e; }
+        .feedback-toast.encouraging { background-color: #f59e0b; }
+        .badge-toast { background: linear-gradient(45deg, #fde047, #f97316); }
+        @keyframes slideUpFadeIn { from { opacity: 0; bottom: 0; } to { opacity: 1; bottom: 20px; } }
+        @keyframes slideDownFadeOut { from { opacity: 1; bottom: 20px; } to { opacity: 0; bottom: 0; } }
+
+        #completion-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        
+        #progress-container { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 8px; width: 100%; margin-top: 8px; }
+        #progress-bar { height: 100%; width: 0%; background-color: #a855f7; transition: width 0.5s ease-out; }
+        
+        #vocab-game-timer-bar { height: 6px; background-color: #a855f7; transition: width 0.1s linear; }
+        
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .shake { animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #certificate-to-print, #certificate-to-print * { visibility: visible; }
+            #certificate-to-print { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+        .readable-content { display: block; }
+    </style>
+</head>
+<body class="antialiased text-gray-800 text-lg">
+    <canvas id="background-canvas"></canvas>
+    <div id="reward-animation-container" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[60]"></div>
+
+    <header id="nav-header" class="fixed top-0 left-0 right-0 z-50 p-2" style="display: none;">
+        <div class="max-w-md mx-auto bg-white/90 backdrop-blur-sm shadow-lg rounded-full p-2">
+            <div class="flex justify-center items-center gap-2">
+                <button onclick="goBack()" class="nav-button bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold p-2 rounded-full" aria-label="Go Back">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <div class="font-bold text-base text-purple-600 px-3 whitespace-nowrap">Points 🎷: <span id="score-display" aria-live="polite">0</span></div>
+                <button onclick="navigateTo('main-menu')" class="nav-button bg-gray-800 text-white font-bold p-2 rounded-full hover:bg-gray-900" aria-label="Main Menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                </button>
+                <button onclick="toggleTTS(this)" class="nav-button p-2 rounded-full hover:bg-gray-200" title="Sound On" aria-label="Toggle Text to Speech">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 5.858a3 3 0 104.243 4.243M9 12l4.243 4.243"></path></svg>
+                </button>
+                <button onclick="goNext()" class="nav-button bg-purple-600 hover:bg-purple-700 text-white font-bold p-2 rounded-full" aria-label="Go Next">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+            <div id="progress-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div id="progress-bar"></div>
+            </div>
+        </div>
+    </header>
+
+    <div id="app-container" class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+        <section id="page-title-screen" class="page active text-center bg-white rounded-2xl shadow-lg p-8">
+            <div class="h-full flex flex-col justify-center items-center">
+                <h1 id="main-title" class="text-5xl md:text-6xl font-bold text-slate-800 mb-4"></h1>
+                <p id="main-subtitle" class="text-xl md:text-2xl text-gray-600 mb-8"></p>
+                <div id="main-svg-container" class="rounded-lg mb-8 w-full max-w-lg mx-auto" aria-hidden="true"></div>
+                <button onclick="startApp()" class="action-button bg-purple-600 text-white font-bold py-3 px-8 rounded-full text-2xl hover:bg-purple-700">START LESSON</button>
+            </div>
+        </section>
+        <div id="dynamic-pages-container"></div>
+    </div>
+    
+    <script>
+        // ===================================================================================
+        // --- LESSON CONTENT CONFIGURATION ---
+        // ===================================================================================
+        const lessonData = {
+            title: "New Orleans: Full Edition",
+            subtitle: "Part 1: The City & Culture | Part 2: Mardi Gras & Resilience <span aria-hidden='true'>🎷🎭🐊</span>",
+            startPageId: 'title-screen',
+            homePageId: 'main-menu',
+            mainMenu: [
+                { id: 'menu-tps', text: '0. Think-Pair-Share <span aria-hidden="true">🧠</span>', color: 'green', target: 'tps-start' },
+                { id: 'menu-goals', text: '1. Learning Goals <span aria-hidden="true">🎯</span>', color: 'teal', target: 'learning-goals' },
+                { id: 'menu-warmup', text: '2. Warm-Up & Vocab <span aria-hidden="true">📚</span>', color: 'sky', target: 'warm-up' },
+                { id: 'menu-vocab-game', text: 'Vocab Game <span aria-hidden="true">🎮</span>', color: 'sky', target: 'vocab-game'},
+                { id: 'menu-reading', text: '3. Reading & Comp <span aria-hidden="true">📖</span>', color: 'blue', target: 'reading-main' },
+                { id: 'menu-convo', text: '4. Conversation <span aria-hidden="true">🗣️</span>', color: 'indigo', target: 'conversation-practice' },
+                { id: 'menu-lecture-environment', text: '5. Listening: Environment <span aria-hidden="true">🌪️</span>', color: 'amber', target: 'lecture-environment-pre' },
+                { id: 'menu-discussion', text: '6. Listening: Discussion <span aria-hidden="true">💬</span>', color: 'lime', target: 'discussion-pre' },
+                { id: 'menu-part2', text: '7. PART 2: Mardi Gras & Resilience <span aria-hidden="true">🎭</span>', color: 'violet', target: 'part2-intro' },
+                { id: 'menu-thinking', text: '8. Thinking & Exam Prep <span aria-hidden="true">📝</span>', color: 'purple', target: 'thinking-prompts' },
+                { id: 'menu-final', text: '9. Final Project <span aria-hidden="true">✍️</span>', color: 'rose', target: 'final-project-hub' },
+            ],
+            vocabulary: [
+                { word: 'Jazz', def: 'A style of music that originated in New Orleans.', sentence: 'Jazz music can be heard all over the streets of New Orleans.' },
+                { word: 'Creole', def: 'A cultural blend of French, African, and Spanish influences.', sentence: 'Creole cuisine is famous for its rich flavors and unique spices.' },
+                { word: 'Mardi Gras', def: 'Carnival festival before Lent, celebrated with parades.', sentence: 'During Mardi Gras, the city is filled with color and excitement.' },
+                { word: 'Resilience', def: 'The ability to recover from difficulties.', sentence: 'The people of New Orleans showed incredible resilience after the hurricane.' },
+                { word: 'Hurricane', def: 'A powerful storm with strong winds and heavy rain.', sentence: 'Hurricane Katrina was a devastating event in the city\'s history.' },
+                { word: 'Float', def: 'Decorated platform in a parade.', sentence: 'The float riders waved to the crowd from the giant colorful float.' },
+                { word: 'Beads', def: 'Decorative necklaces thrown during parades.', sentence: 'I caught a handful of shiny purple beads at the parade.' },
+                { word: 'Revelry', def: 'Noisy celebration and joy.', sentence: 'The streets were filled with the sounds of revelry and laughter.' },
+                { word: 'Brass Band', def: 'Musical group with brass instruments.', sentence: 'The brass band marched down the street playing loud, happy music.' },
+                { word: 'Pageantry', def: 'Elaborate display or ceremony.', sentence: 'The pageantry of the masked ball was amazing to watch.' }
+            ],
+            pages: [
+                { id: 'tps-start', type: 'simple', content: { title: 'Activity: Think-Pair-Share <span aria-hidden="true">🧠</span>', text: 'Let\'s explore cultural traditions.' } },
+                { id: 'tps-think', type: 'timer', content: { title: '1. Think <span aria-hidden="true">🤔</span>', text: 'Think about a cultural tradition or festival in your hometown. What does it celebrate? How does it bring people together?', duration: 120, timerId: 'timer-think' } },
+                { id: 'tps-pair', type: 'timer', content: { title: '2. Pair <span aria-hidden="true">👥</span>', text: 'With a partner, discuss how your local tradition compares to a big, famous festival like Mardi Gras in New Orleans.', duration: 180, timerId: 'timer-pair' } },
+                { id: 'tps-share', type: 'timer', content: { title: '3. Share <span aria-hidden="true">🗣️</span>', text: 'Let\'s share our ideas. How do festivals and traditions shape the identity of a city?', duration: 300, timerId: 'timer-share' } },
+                
+                { id: 'learning-goals', type: 'html-content', content: { title: 'Learning Goals <span aria-hidden="true">🎯</span>', html: `<div class="text-left space-y-4"><p><strong class="text-teal-600">Learning Intention:</strong> We are learning about New Orleans to understand how culture and history influence a city's identity.</p><hr class="my-4"><h3 class="text-2xl font-bold text-teal-600 mb-3">Success Criteria</h3><ul class="list-disc list-inside space-y-2 text-xl"><li>I can describe the key musical and cultural features of New Orleans.</li><li>I can compare New Orleans life with my own hometown.</li><li>I can analyze how cultural diversity contributes to resilience.</li></ul></div>` } },
+                
+                { id: 'warm-up', type: 'html-content', content: { title: 'Background-Building Questions <span aria-hidden="true">📚</span>', html: `<ol class="list-decimal list-inside space-y-4 text-xl text-left"><li>What kind of music do you think of when you hear "New Orleans"? 🎺</li><li>Have you ever been to a big festival or parade? What was it like?</li><li>What do you think helps a community stay strong after a difficult event?</li><li>What is "Creole" food? 🍲</li></ol>` } },
+                { id: 'vocab-start', type: 'simple', content: { title: 'Unit Vocabulary <span aria-hidden="true">📚</span>', text: 'Let\'s learn the key terms for this unit. Click the "Next" arrow to cycle through the words.' } },
+                { id: 'vocab-game', type: 'vocab-game', content: { title: 'Vocabulary Review Game <span aria-hidden="true">🎮</span>'} },
+                
+                { id: 'reading-main', type: 'html-content', content: { title: 'Reading: A City of Culture and Strength <span aria-hidden="true">📖</span>', html: `<div class="space-y-6 text-left"><div class="bg-purple-50 p-4 rounded-lg"><h4 class="font-bold text-xl text-purple-800">Location and History 🗺️</h4><p>New Orleans is located in Louisiana, USA. Founded by the French in 1718, its history is a blend of French, African, Spanish, and Caribbean cultures.</p></div><div class="bg-green-50 p-4 rounded-lg"><h4 class="font-bold text-xl text-green-800">Music and Festivals 🎶</h4><p>New Orleans is the birthplace of <strong>Jazz</strong>. The most famous celebration is <strong>Mardi Gras</strong>, an annual festival of colorful parades and costumes.</p></div><div class="bg-amber-50 p-4 rounded-lg"><h4 class="font-bold text-xl text-amber-800">Resilience 🌪️</h4><p>In 2005, <strong>Hurricane Katrina</strong> brought devastation. The people showed incredible <strong>resilience</strong>, rebuilding their city with strength and creativity.</p></div></div>` } },
+                { id: 'reading-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Comprehension: Gap-Fill', sentences: [] } },
+                { id: 'reading-quiz-tfng', type: 'quiz-tfng', content: { title: 'Comprehension: True/False', questions: [] } },
+                { id: 'reading-quiz-mcq', type: 'quiz-mcq', content: { title: 'Comprehension: Multiple Choice', questions: [] } },
+                
+                { id: 'conversation-practice', type: 'dialogue', content: { title: 'Conversation Practice <span aria-hidden="true">🗣️</span>', dialogue: "A: Have you ever heard of New Orleans?\n\nB: Yes! It’s famous for jazz music and Mardi Gras, right? 🎷🎭\n\nA: Exactly. The music there is amazing.\n\nB: I heard they had a big hurricane a while ago.\n\nA: Yes, Hurricane Katrina. It was devastating, but the people showed incredible resilience.\n\nB: That’s so inspiring. I’d love to visit someday." } },
+
+                { id: 'lecture-environment-pre', type: 'html-content', content: { title: 'Pre-Listening: Environmental Challenges <span aria-hidden="true">🌪️</span>', html: `<div class="text-left space-y-4 text-xl"><p>Consider: Why might a city built below sea level be at risk?</p></div>`}},
+                { id: 'lecture-environment-main', type: 'dialogue', content: { title: 'Listening: Environmental Challenges', dialogue: "Professor: Good morning. Today, we're focusing on New Orleans. It faces significant environmental challenges, particularly vulnerability to hurricanes. Leo, why is it vulnerable?\n\nLeo: It's below sea level, isn't it? And right by the coast.\n\nProfessor: Correct. Its low elevation makes it susceptible to flooding. Sofia, what about the wetlands?\n\nSofia: Aren't they disappearing?\n\nProfessor: Yes. Wetlands used to buffer storms, but they are eroding. In 2005, Hurricane Katrina caused the levees to fail, flooding 80% of the city. Rising sea levels due to climate change only make this worse. Resilience and foresight are essential for the future." }},
+                { id: 'lecture-environment-quiz-mcq', type: 'quiz-mcq', content: { title: 'Environmental Challenges Quiz (MCQ)', questions: [] } },
+                { id: 'lecture-environment-quiz-tfng', type: 'quiz-tfng', content: { title: 'Environmental Challenges Quiz (TFNG)', questions: [] } },
+                
+                { id: 'discussion-pre', type: 'html-content', content: { title: 'Pre-Listening: Classroom Discussion <span aria-hidden="true">💬</span>', html: `<div class="text-left space-y-4 text-xl"><p>Consider: What makes a place feel 'authentic'?</p></div>`}},
+                { id: 'discussion-main', type: 'dialogue', content: { title: 'Listening: Classroom Discussion', dialogue: "Professor: Welcome back. Let's discuss New Orleans. Emily, what stood out to you?\n\nEmily: The mix of cultures—French, Spanish, African.\n\nProfessor: Oliver?\n\nOliver: The jazz music. It's massive there.\n\nProfessor: Correct. What about challenges?\n\nEmily: Environmental threats like coastal erosion.\n\nOliver: And keeping the culture authentic with so many tourists.\n\nProfessor: Exactly. It's a balance between economy and culture." }},
+                { id: 'discussion-quiz-mcq', type: 'quiz-mcq', content: { title: 'Discussion Quiz (MCQ)', questions: [] } },
+                { id: 'discussion-quiz-tfng', type: 'quiz-tfng', content: { title: 'Discussion Quiz (TFNG)', questions: [] } },
+
+                { id: 'part2-intro', type: 'html-content', content: { title: 'Part 2: Mardi Gras & Resilience <span aria-hidden="true">🎭</span>', html: `
+                    <div class="text-left space-y-4">
+                        <h3 class="text-2xl font-bold text-violet-700">Learning Objectives</h3>
+                        <ul class="list-disc list-inside space-y-2 text-lg">
+                            <li>Describe core Mardi Gras traditions (parades, floats, beads).</li>
+                            <li>Summarize the impact of Hurricane Katrina and community resilience.</li>
+                            <li>Discuss the origins of jazz and brass bands.</li>
+                        </ul>
+                        <div class="bg-gray-100 p-4 rounded-lg mt-4">
+                            <h4 class="font-bold">Part 2 Warm-Up:</h4>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>When you hear "festival", what images come to mind?</li>
+                                <li>Why might music help people recover after a disaster?</li>
+                            </ol>
+                        </div>
+                    </div>` 
+                }},
+                { id: 'part2-reading-1', type: 'dialogue', content: { 
+                    title: 'Culture & Resilience in New Orleans', 
+                    dialogue: "Brian: Mardi Gras Traditions. Mardi Gras is a festival that fills New Orleans with joy and color. People wear masks and brightly designed costumes. The city hosts parades where decorated floats travel along the route and riders wave to the crowd. From the floats, beads and confetti are thrown to celebrate. Families share feasts, and lively music and dance turn the streets into one big celebration.\n\nHurricane Katrina and Resilience. In 2005, Hurricane Katrina struck New Orleans, causing severe flooding after the levees failed. More than 1,800 lives were lost, and over 400,000 residents were displaced. The devastation—damage to homes, schools, and roads—was estimated at $125 billion. Yet the community responded with strength and hope. Traditions like Mardi Gras helped people rebuild their identity and support one another.\n\nMusic and Cultural Identity. New Orleans is a cultural crossroads shaped by African American, Creole, French, and Caribbean traditions. Jazz, born here, grew from African rhythms, blues, and European harmonies. After Katrina, brass bands filled the streets, offering hope and unity. Mardi Gras embodies the city’s spirit: pageantry, revelry, and street parties blend with brass band rhythms to create a unique experience. The parade route becomes a stage for float riders, mask makers, and tradition keepers. These customs highlight solidarity, perseverance, and cultural pride. Ultimately, Mardi Gras and music transcend entertainment; they are living symbols of identity and strength." 
+                }},
+                { id: 'part2-quiz-1-tf', type: 'quiz-tfng', content: { title: 'Reading 1: True/False', questions: [] } },
+                { id: 'part2-quiz-1-mcq', type: 'quiz-mcq', content: { title: 'Reading 1: Multiple Choice', questions: [] } },
+                { id: 'part2-quiz-1-gap', type: 'quiz-gap-fill', content: { title: 'Reading 1: Gap Fill', sentences: [] } },
+
+                { id: 'part2-reading-2', type: 'dialogue', content: { 
+                    title: 'Personal Story: Resilience', 
+                    dialogue: "Emma: I grew up in New Orleans, a city in Louisiana near the Gulf of Mexico. My hometown is famous for Mardi Gras, a huge festival that fills the streets with color and joy. Every year, I watch the parades move along the parade route, with decorated floats carrying float riders who throw beads and confetti into the cheering crowd. People wear bright costumes and masks, and the air is full of music and dance. Families gather for a big feast, and the whole city feels alive with the spirit of celebration. For us, Mardi Gras is more than a party—it is a tradition that connects generations and shows our culture and heritage.\n\nBut life here has not always been easy. In 2005, Hurricane Katrina changed everything. The storm caused terrible flooding when the levees broke. More than 1,800 people lost their lives, and hundreds of thousands became homeless. The devastation was shocking—homes, schools, and streets were destroyed, and the cost reached about $125 billion. I remember seeing families leave their neighborhoods, carrying what little they had left. Yet, even in that dark time, our community showed resilience. We rebuilt our homes, kept our traditions, and held on to hope. Mardi Gras returned, and it became a symbol of strength and unity.\n\nMusic helped us heal. New Orleans is the birthplace of jazz, a style that grew from African rhythms, blues, and European harmonies. After Katrina, brass bands played in the streets, lifting spirits and reminding us who we are. During Mardi Gras, the sound of trumpets and drums mixes with laughter and revelry. The pageantry of the floats, the street parties, and even elegant events like a masked ball show that our city is alive. Artists like mask makers and tradition keepers work hard to preserve our long-standing customs. For me, Mardi Gras and music are not just entertainment—they are living symbols of identity, perseverance, and celebration." 
+                }},
+                { id: 'part2-quiz-2-tf', type: 'quiz-tfng', content: { title: 'Resilience Story: True/False', questions: [] } },
+                { id: 'part2-quiz-2-mcq', type: 'quiz-mcq', content: { title: 'Resilience Story: Multiple Choice', questions: [] } },
+                { id: 'part2-quiz-2-gap', type: 'quiz-gap-fill', content: { title: 'Resilience Story: Gap Fill', sentences: [] } },
+
+                { id: 'part2-reading-3', type: 'dialogue', content: { 
+                    title: 'Personal Story: Mardi Gras', 
+                    dialogue: "Andrew: I grew up in New Orleans, and nothing compares to Mardi Gras, our biggest festival of the year. Every February, the city turns colorful with bright decorations and joyful crowds. People wear masks to hide their faces and costumes in every color you can imagine. The streets fill with parades, and each parade route is lined with cheering families. Huge floats—decorated platforms—roll by, carrying float riders who toss shiny beads and showers of confetti into the crowd. Children laugh as they catch necklaces, and everyone feels the spirit of celebration.\n\nMardi Gras is more than fun; it is a tradition that shows our culture and heritage. We have street parties with lively music, and sometimes elegant events like a masked ball, a formal dance where everyone wears masks. Brass instruments play in brass bands, and the rhythm makes people want to dance. Families share a big feast, and the whole city joins in the revelry, the noisy joy that makes Mardi Gras famous. For us, this is not just a carnival—it is a way to keep our tradition keepers proud and our community strong." 
+                }},
+                { id: 'part2-quiz-3-tf', type: 'quiz-tfng', content: { title: 'Mardi Gras Story: True/False', questions: [] } },
+                { id: 'part2-quiz-3-mcq', type: 'quiz-mcq', content: { title: 'Mardi Gras Story: Multiple Choice', questions: [] } },
+                { id: 'part2-quiz-3-gap', type: 'quiz-gap-fill', content: { title: 'Mardi Gras Story: Gap Fill', sentences: [] } },
+
+                { id: 'part2-reading-4', type: 'dialogue', content: { 
+                    title: 'Personal Story: Jazz', 
+                    dialogue: "Andrew: I grew up in New Orleans, a city in Louisiana near the Gulf of Mexico. Every year, our streets come alive for Mardi Gras, the most famous festival in the United States. It is more than a carnival; it is a celebration of who we are. The parades roll down the parade route, lined with cheering crowds. Brightly decorated floats carry float riders who toss shiny beads and showers of confetti into the air. People wear colorful costumes and masks, and the sound of brass bands fills the city. Families gather for a big feast, and laughter mixes with the rhythm of music and dance. This is our tradition, a piece of our heritage that connects generations.\n\nBut Mardi Gras is not only about floats and parties—it is deeply tied to the history of jazz. Jazz was born here in New Orleans more than a century ago. It grew from African rhythms, blues melodies, and European harmonies, creating a new sound full of energy and freedom. During Mardi Gras, you can hear jazz everywhere: in street parties, at elegant masked balls, and along the parade route where brass bands play lively tunes. The music reflects resilience and creativity, values that define our city. After Hurricane Katrina devastated New Orleans in 2005, music helped us heal. Brass bands marched through flooded streets, reminding us that even in hard times, our spirit cannot be broken.\n\nFor me, Mardi Gras and jazz are more than entertainment—they are living symbols of identity and strength. The pageantry of the floats, the joyful revelry, and the sound of trumpets and drums show the world what New Orleans means: solidarity, perseverance, and cultural pride. When I hear that music and see the colors of Mardi Gras, I know I am home." 
+                }},
+                { id: 'part2-quiz-4-tf', type: 'quiz-tfng', content: { title: 'Jazz Story: True/False', questions: [] } },
+                { id: 'part2-quiz-4-mcq', type: 'quiz-mcq', content: { title: 'Jazz Story: Multiple Choice', questions: [] } },
+                { id: 'part2-quiz-4-gap', type: 'quiz-gap-fill', content: { title: 'Jazz Story: Gap Fill', sentences: [] } },
+
+                { id: 'part2-interview', type: 'dialogue', content: { 
+                    title: 'Interview: Voices of New Orleans', 
+                    dialogue: "Emma: Hello everyone, and welcome to Voices of New Orleans! I’m your host, Jamie, and today we’re exploring the heartbeat of our city—Mardi Gras, the birth of jazz, and how music helped us rise after Hurricane Katrina. Joining me is Alex, a local historian and musician who knows these streets better than anyone. Alex, thanks for being here.\n\nAndrew: Thanks, Jamie! It’s great to share the story of our traditions and the sound that makes New Orleans unique.\n\nEmma: Let’s start with Mardi Gras. For someone who’s never been, what’s it like to stand on the parade route during the big day?\n\nAndrew: It’s electric! Imagine floats rolling by, covered in bright colors, with float riders tossing shiny beads and showers of confetti into the crowd. People wear masks and costumes, and the air is alive with brass band music. Families share a big feast, and laughter mixes with the rhythm of dance. It’s not just a carnival—it’s a tradition that shows our culture and heritage.\n\nEmma: That sounds incredible. How long has Mardi Gras been part of New Orleans life?\n\nAndrew: The roots go back centuries, tied to French Catholic customs. Over time, it became a public celebration with pageantry, revelry, and even elegant events like a masked ball. Today, Mardi Gras is a mix of old and new—street parties, jazz, and floats that turn the city into one big stage.\n\nEmma: Speaking of jazz, how did this music start here?\n\nAndrew: Jazz was born in New Orleans in the early 1900s. It grew from African rhythms, blues, and European harmonies. The first jazz recordings came out in 1917, but the roots go back to brass bands and second-line parades. Instruments like trumpet, trombone, clarinet, and the big sousaphone gave jazz its marching power. During Mardi Gras, you hear jazz everywhere—at masked balls, along the parade route, and in second-line dances. It’s music that celebrates freedom and creativity.\n\nEmma: What makes those instruments so special for Mardi Gras?\n\nAndrew: They’re loud, portable, and full of character. A brass band can turn any street into a stage. The trumpet leads the melody, the trombone slides through harmonies, and the clarinet dances around them. Add drums and a sousaphone, and you’ve got a sound that moves people—literally!\n\nEmma: Then came Katrina. How did music help after the storm?\n\nAndrew: Katrina was devastating—over 1,800 lives lost, hundreds of thousands homeless, and $125 billion in damage. But music became our lifeline. Brass bands played in flooded streets, reminding us who we are. Weekly second lines returned as acts of resilience. And projects like the Musicians’ Village, led by Harry Connick Jr. and Branford Marsalis, built homes and the Ellis Marsalis Center for Music. Jazz didn’t just entertain—it healed and united us.\n\nEmma: So Mardi Gras and jazz aren’t just fun—they’re symbols of strength.\n\nAndrew: Exactly. The pageantry, the revelry, the sound of trumpets and drums—they tell the world that New Orleans stands strong. Our tradition keepers, mask makers, and musicians keep that spirit alive." 
+                }},
+                { id: 'part2-quiz-5-tf', type: 'quiz-tfng', content: { title: 'Interview: True/False', questions: [] } },
+                { id: 'part2-quiz-5-mcq', type: 'quiz-mcq', content: { title: 'Interview: Multiple Choice', questions: [] } },
+                { id: 'part2-quiz-5-gap', type: 'quiz-gap-fill', content: { title: 'Interview: Gap Fill', sentences: [] } },
+
+                { id: 'thinking-prompts', type: 'html-content', content: { title: 'Thinking & Exam Prep <span aria-hidden="true">📝</span>', html: `<div class="text-left space-y-8"><div><h3 class="text-2xl font-bold text-purple-600 mb-3">Higher-Order Thinking</h3><ul class="list-disc list-inside space-y-2 text-lg"><li><b>Analyze:</b> How does cultural blending influence music?</li><li><b>Evaluate:</b> Is cultural diversity a strength during crisis?</li></ul></div></div>` } },
+                { id: 'final-project-hub', type: 'html-content', content: { title: 'Final Project Hub <span aria-hidden="true">✍️</span>', html: `<div class="bg-white rounded-2xl shadow-xl p-8 text-left"><h2 class="text-3xl font-bold text-violet-600 mb-4">GRASPS Task: A Tale of Two Cities 🎭</h2><p>Create a presentation comparing New Orleans culture with your hometown.</p></div>` } },
+                { id: 'writing-task', type: 'writing-task', content: { title: 'Project Writing Activity <span aria-hidden="true">✍️</span>', prompt: 'Compare a local tradition with Mardi Gras.', starters: ["New Orleans is world-famous for...", "In my hometown, we have..."], wordBank: ['celebration', 'community', 'Creole', 'culture', 'diversity', 'festival', 'heritage', 'jazz', 'Mardi Gras', 'music', 'resilience'] } },
+                { id: 'self-assessment', type: 'html-content', content: { title: 'Self-Assessment <span aria-hidden="true">🧑‍🏫</span>', html: `<div class="text-left"><ol class="list-decimal list-inside space-y-4 text-xl"><li>What was the most interesting connection I found?</li></ol></div>` } },
+                { id: 'certificate', type: 'certificate', content: { title: 'Module Complete! <span aria-hidden="true">🎉</span>', text: 'You have successfully completed the "New Orleans: Full Edition" module.', certificateTitle: 'Certificate of Cultural Exploration' } }
+            ]
+        };
+
+        class SpeechService {
+             constructor() {
+                 this.synth = window.speechSynthesis;
+                 this.isInitialized = false;
+                 this.isTtsEnabled = true;
+                 this.voices = {};
+                 this.speechRate = 0.85;
+                 this.isDialoguePlaying = false;
+                 this.keepAliveInterval = null;
+             }
+             _startKeepAlive() { if (this.keepAliveInterval) clearInterval(this.keepAliveInterval); this.keepAliveInterval = setInterval(() => { if (this.synth && !this.synth.speaking) { this.synth.pause(); this.synth.resume(); } }, 12000); }
+             async _setupVoices() {
+                 const voicesPromise = new Promise(resolve => { if (this.synth.getVoices().length) return resolve(this.synth.getVoices()); this.synth.onvoiceschanged = () => resolve(this.synth.getVoices()); });
+                 const availableVoices = await voicesPromise;
+                 const speakerToVoiceMap = {
+                    'emma': ['Microsoft Emma Online (Natural) - English (United States)', 'Microsoft Ava Online (Natural) - English (United States)', 'Google US English'],
+                    'andrew': ['Microsoft Andrew Online (Natural) - English (United States)', 'Microsoft Brian Online (Natural) - English (United States)', 'Google US English'],
+                    'brian': ['Microsoft Brian Online (Natural) - English (United States)', 'Microsoft Andrew Online (Natural) - English (United States)', 'Google US English'],
+                    'a': ['Microsoft Emma Online (Natural) - English (United States)'],
+                    'b': ['Microsoft Brian Online (Natural) - English (United States)'],
+                    'professor': ['Microsoft Brian Online (Natural) - English (United States)'],
+                 };
+                 for (const speaker in speakerToVoiceMap) {
+                     const voicePriorityList = speakerToVoiceMap[speaker];
+                     for (const voiceName of voicePriorityList) {
+                         const foundVoice = availableVoices.find(v => v.name.includes(voiceName) || v.name === voiceName);
+                         if (foundVoice) { this.voices[speaker] = foundVoice; break; }
+                     }
+                 }
+                 this.voices['default'] = this.voices['emma'] || availableVoices[0];
+             }
+             async init() { if (this.isInitialized) return; try { this.synth.cancel(); await this._setupVoices(); this.isInitialized = true; this._startKeepAlive(); } catch (e) { console.error("Speech init failed:", e); } }
+             _cleanTextForSpeech(text) { const tempDiv = document.createElement('div'); const textWithoutSpans = text.replace(/<span aria-hidden="true">.*?<\/span>/g, ' '); tempDiv.innerHTML = textWithoutSpans; return (tempDiv.textContent || '').replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, ''); }
+             async speak(text, { onEndCallback = null, voiceKey = 'default' } = {}) { 
+                if (!this.isInitialized || !this.isTtsEnabled || !text) { if (onEndCallback) onEndCallback(); return; } 
+                this.synth.cancel(); const cleanText = this._cleanTextForSpeech(text); 
+                const utter = new SpeechSynthesisUtterance(cleanText); 
+                utter.voice = this.voices[voiceKey] || this.voices['default']; 
+                utter.rate = this.speechRate; 
+                utter.onend = () => { if (onEndCallback) onEndCallback(); };
+                this.synth.speak(utter); 
+            }
+             async speakDialogue(text) { 
+                 if (!this.isInitialized || !this.isTtsEnabled || !text || this.isDialoguePlaying) return; 
+                 this.cancel(); this.isDialoguePlaying = true; 
+                 const lines = text.split('\n').filter(line => line.trim() !== '' && line.includes(':')); 
+                 const queue = lines.map(line => { 
+                     const [speaker, ...parts] = line.split(':'); 
+                     let voiceKey = speaker.toLowerCase().trim();
+                     if (voiceKey.includes('host') || voiceKey.includes('jamie')) voiceKey = 'emma';
+                     if (voiceKey.includes('guest') || voiceKey.includes('alex')) voiceKey = 'andrew';
+                     return { text: this._cleanTextForSpeech(parts.join(':').trim()), voiceKey: voiceKey }; 
+                 }).filter(item => item.text); 
+                 
+                 const playNext = () => { 
+                     if (queue.length > 0 && this.isTtsEnabled) { 
+                         const item = queue.shift(); 
+                         const utter = new SpeechSynthesisUtterance(item.text); 
+                         utter.voice = this.voices[item.voiceKey] || this.voices['default']; 
+                         utter.rate = this.speechRate; 
+                         utter.onend = playNext; 
+                         this.synth.speak(utter); 
+                     } else { this.isDialoguePlaying = false; } 
+                 }; playNext(); 
+             }
+             cancel() { if (this.synth) { this.isDialoguePlaying = false; this.synth.cancel(); } }
+             toggleTTS() { this.isTtsEnabled = !this.isTtsEnabled; if (!this.isTtsEnabled) this.cancel(); return this.isTtsEnabled; }
+        }
+
+        const speechService = new SpeechService();
+        let score = 0, currentPage = lessonData.startPageId, timerInterval;
+        const pageHistory = [lessonData.startPageId];
+        let pageSequence = [];
+        let completedSections = new Set();
+        let selectedWord = { element: null, text: '' };
+        let vocabGameTimer;
+
+        const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        const noiseSynth = new Tone.NoiseSynth().toDestination();
+        
+        function playCorrectSound() { if (!speechService.isTtsEnabled) return; try { synth.triggerAttackRelease(["C5", "E5", "G5"], "8n"); } catch(e) {} }
+        function playIncorrectSound() { if (!speechService.isTtsEnabled) return; try { noiseSynth.triggerAttackRelease("4n"); } catch(e) {} }
+
+        function triggerRewardAnimation() {
+            const container = document.getElementById('reward-animation-container');
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'absolute'; confetti.style.left = `${Math.random() * 100}vw`; confetti.style.top = `${Math.random() * -50}px`;
+                confetti.style.width = '8px'; confetti.style.height = '8px'; confetti.style.backgroundColor = ['#a855f7', '#16a34a', '#facc15'][Math.floor(Math.random()*3)];
+                container.appendChild(confetti);
+                confetti.animate([{ transform: `translateY(0)`, opacity: 1 }, { transform: `translateY(100vh)`, opacity: 0 }], { duration: 2000 + Math.random() * 2000 }).onfinish = () => confetti.remove();
+            }
+        }
+
+        function updateProgressBar() { 
+            const progress = (completedSections.size / lessonData.mainMenu.length) * 100;
+            const bar = document.getElementById('progress-bar');
+            if (bar) bar.style.width = `${progress}%`;
+            const container = document.getElementById('progress-container');
+            if (container) container.setAttribute('aria-valuenow', Math.round(progress));
+        }
+        
+        function markSectionAsComplete(pageId) { const item = lessonData.mainMenu.find(m => m.target === pageId || (pageId.startsWith('part2') && m.id === 'menu-part2')); if(item && !completedSections.has(item.id)) { completedSections.add(item.id); updateProgressBar(); } }
+
+        window.startApp = async () => { await speechService.init(); await Tone.start(); navigateTo(lessonData.homePageId); };
+        window.navigateTo = (pageId) => {
+            if (pageId === currentPage) return;
+            const prev = document.getElementById(`page-${currentPage}`);
+            const next = document.getElementById(`page-${pageId}`);
+            if (prev) prev.classList.remove('active');
+            if (next) next.classList.add('active');
+            
+            currentPage = pageId;
+            pageHistory.push(pageId);
+            
+            // Clear previous game state
+            if (vocabGameTimer) {
+                clearTimeout(vocabGameTimer);
+                vocabGameTimer = null;
+            }
+            
+            speechService.cancel();
+            
+            const pageData = lessonData.pages.find(p => p.id === pageId);
+            
+            // TTS Logic for ALL page types
+            if (pageData) {
+                if (pageData.type === 'dialogue') {
+                    speechService.speakDialogue(pageData.content.dialogue);
+                } else if (pageData.id.startsWith('vocab-') && pageData.content.text) {
+                    speechService.speak(pageData.content.text, {voiceKey: 'andrew'});
+                } else if (pageData.id.startsWith('vocab-') && !pageData.content.text) {
+                    // For specific vocab cards
+                    const word = document.querySelector(`#page-${pageId} h2`).innerText;
+                    speechService.speak(word, {voiceKey: 'andrew'});
+                } else {
+                    // Universal text extractor
+                    let textToRead = "";
+                    if (pageData.type.includes('quiz')) {
+                        textToRead = pageData.content.title + ". Please answer the questions below.";
+                    } else if (pageData.type === 'vocab-game') {
+                         textToRead = "Vocabulary Review Game. Match the definition to the word.";
+                    } else {
+                         // Try to find the readable content wrapper first
+                         const pageEl = document.getElementById(`page-${pageId}`);
+                         if (pageEl) {
+                             const readable = pageEl.querySelector('.readable-content');
+                             textToRead = readable ? readable.innerText : pageEl.innerText;
+                             // Clean up button text from reading
+                             textToRead = textToRead.replace(/Start Game|Next|Back|Menu/g, "");
+                         }
+                    }
+                    if (textToRead) {
+                        speechService.speak(textToRead, { voiceKey: 'emma' });
+                    }
+                }
+            }
+            
+            document.getElementById('nav-header').style.display = pageId === 'title-screen' ? 'none' : 'block';
+            if (pageId.includes('part2') || pageId.includes('reading-')) markSectionAsComplete(pageId);
+            updateProgressBar();
+        };
+        
+        window.goNext = () => { const idx = pageSequence.indexOf(currentPage); if(idx < pageSequence.length - 1) navigateTo(pageSequence[idx + 1]); };
+        window.goBack = () => { if(pageHistory.length > 1) { pageHistory.pop(); navigateTo(pageHistory.pop()); } };
+        
+        window.toggleTTS = (btn) => { 
+            const enabled = speechService.toggleTTS(); 
+            btn.querySelector('svg').style.color = enabled ? '#4b5563' : '#9ca3af'; 
+            btn.title = enabled ? "Sound On" : "Sound Off";
+        };
+
+        function updateScore(pts) { score += pts; document.getElementById('score-display').textContent = score; }
+        function showFeedback(correct) { 
+            const toast = document.createElement('div'); toast.className = `feedback-toast ${correct?'correct':'encouraging'}`; 
+            toast.textContent = correct ? "Correct! 🌟" : "Try again."; 
+            document.body.appendChild(toast); setTimeout(() => toast.remove(), 2000); 
+        }
+
+        window.checkTfngAnswer = (btn, chosen, correct) => {
+            const isCorrect = chosen === correct;
+            btn.parentElement.childNodes.forEach(b => b.disabled = true);
+            if(isCorrect) { updateScore(10); playCorrectSound(); triggerRewardAnimation(); btn.classList.add('bg-green-500'); }
+            else { playIncorrectSound(); btn.classList.add('bg-red-500'); }
+            showFeedback(isCorrect);
+        };
+
+        window.checkMcqAnswer = (btn, isCorrect) => {
+            btn.parentElement.childNodes.forEach(b => b.disabled = true);
+            if(isCorrect === 'true' || isCorrect === true) { updateScore(10); playCorrectSound(); triggerRewardAnimation(); btn.classList.add('bg-green-500', 'text-white'); }
+            else { playIncorrectSound(); btn.classList.add('bg-red-500', 'text-white'); }
+            showFeedback(isCorrect === 'true' || isCorrect === true);
+        };
+
+        function initGapFill(pid) {
+            const p = document.getElementById(pid); const gaps = p.querySelectorAll('.gap'); const words = p.querySelectorAll('.word-bank-word');
+            let selected = null;
+            words.forEach(w => w.onclick = () => { if(selected) selected.classList.remove('selected'); selected = w; w.classList.add('selected'); });
+            gaps.forEach(g => g.onclick = () => { 
+                if(g.children.length) { p.querySelector('.word-bank-container').appendChild(g.children[0]); g.classList.remove('correct','incorrect'); }
+                if(selected) { g.appendChild(selected); const correct = selected.dataset.word.toLowerCase() === g.dataset.answer.toLowerCase(); g.classList.add(correct?'correct':'incorrect'); if(correct){ updateScore(10); playCorrectSound(); } else playIncorrectSound(); selected.classList.remove('selected'); selected = null; }
+            });
+        }
+
+        // --- VOCAB GAME ---
+        function startVocabGame() {
+            let qIdx = 0;
+            const qs = [...lessonData.vocabulary].sort(() => 0.5 - Math.random());
+            
+            // Explicit check to prevent crashes if vocab list is empty or undefined
+            if (!qs || qs.length === 0) {
+                document.getElementById('vocab-game-definition').textContent = "Error: No vocabulary loaded.";
+                return;
+            }
+
+            const next = () => {
+                if(qIdx >= qs.length) { 
+                    document.getElementById('vocab-game-definition').textContent = "Game Over! Great job!"; 
+                    document.getElementById('vocab-game-options').innerHTML = "";
+                    return; 
+                }
+                const q = qs[qIdx];
+                document.getElementById('vocab-game-definition').textContent = q.def;
+                
+                // Ensure unique options
+                const distractors = lessonData.vocabulary
+                    .filter(v => v.word !== q.word)
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 3);
+                    
+                const opts = [q.word, ...distractors.map(d => d.word)].sort(()=>0.5-Math.random());
+                
+                const con = document.getElementById('vocab-game-options'); 
+                con.innerHTML = '';
+                
+                opts.forEach(o => {
+                    const b = document.createElement('button'); 
+                    // Added text-gray-900 to ensure visibility
+                    b.className = 'quiz-option p-4 rounded-lg bg-gray-100 hover:bg-gray-200 text-lg font-semibold text-gray-900 border border-gray-300 shadow-sm transition-all'; 
+                    b.textContent = o;
+                    b.onclick = () => { 
+                        // Disable all buttons to prevent double clicking
+                        Array.from(con.children).forEach(child => child.disabled = true);
+                        
+                        if(o === q.word){ 
+                            updateScore(5); 
+                            playCorrectSound(); 
+                            b.classList.remove('bg-gray-100', 'text-gray-900');
+                            b.classList.add('bg-green-500', 'text-white', 'border-green-600'); 
+                            vocabGameTimer = setTimeout(()=>{ qIdx++; next(); }, 1000); 
+                        } else { 
+                            playIncorrectSound(); 
+                            b.classList.remove('bg-gray-100', 'text-gray-900');
+                            b.classList.add('bg-red-500', 'text-white', 'border-red-600');
+                            
+                            // Highlight correct answer
+                            Array.from(con.children).forEach(child => {
+                                if (child.textContent === q.word) {
+                                    child.classList.remove('bg-gray-100', 'text-gray-900');
+                                    child.classList.add('bg-green-500', 'text-white', 'border-green-600');
+                                }
+                            });
+                            
+                            vocabGameTimer = setTimeout(()=>{ qIdx++; next(); }, 1500); 
+                        }
+                    };
+                    con.appendChild(b);
+                });
+            };
+            next();
+        }
+
+        function populateAllQuizzes() {
+            // Original Quizzes
+            const rGap = lessonData.pages.find(p=>p.id==='reading-quiz-gap-fill');
+            if(rGap) rGap.content.sentences = [{text:["New Orleans is located in", ", USA."], answer:"Louisiana"}, {text:["The city is famous for", "music."], answer:"jazz"}, {text:["Mardi Gras is a", "."], answer:"festival"}];
+            const rTf = lessonData.pages.find(p=>p.id==='reading-quiz-tfng');
+            if(rTf) rTf.content.questions = [{statement:'Jazz started in New York.', correctAnswer:'False'}, {statement:'Mardi Gras is a festival.', correctAnswer:'True'}];
+            
+            // --- PART 2 QUIZZES ---
+            
+            // Text 1: General (Brian)
+            const p2q1_tf = lessonData.pages.find(p => p.id === 'part2-quiz-1-tf');
+            p2q1_tf.content.questions = [
+                { statement: 'Float riders throw beads and confetti to the crowd.', correctAnswer: 'True' },
+                { statement: 'Hurricane Katrina happened in 2010.', correctAnswer: 'False' },
+                { statement: 'New Orleans culture is influenced by Spanish and French traditions.', correctAnswer: 'True' }
+            ];
+            const p2q1_mcq = lessonData.pages.find(p => p.id === 'part2-quiz-1-mcq');
+            p2q1_mcq.content.questions = [
+                { question: 'What is a "float" in Mardi Gras?', options: ['A type of boat', 'A decorated platform in a parade', 'A balloon'], correctAnswer: 'A decorated platform in a parade' },
+                { question: 'What does "resilience" mean here?', options: ['Giving up', 'Celebrating', 'Recovering from difficulties'], correctAnswer: 'Recovering from difficulties' }
+            ];
+            const p2q1_gap = lessonData.pages.find(p => p.id === 'part2-quiz-1-gap');
+            p2q1_gap.content.sentences = [
+                { text: ["Mardi Gras is a large", "that fills New Orleans with joy."], answer: "festival" },
+                { text: ["In 2005, Hurricane", "struck the city."], answer: "Katrina" },
+                { text: ["Jazz music reflects", "and creativity."], answer: "resilience" }
+            ];
+
+            // Text 2: Narrative Katrina (Emma)
+            const p2q2_tf = lessonData.pages.find(p => p.id === 'part2-quiz-2-tf');
+            p2q2_tf.content.questions = [
+                { statement: 'More than 1,800 people lost their lives in the hurricane.', correctAnswer: 'True' },
+                { statement: 'The cost of the damage was estimated at $1 million.', correctAnswer: 'False' }
+            ];
+            const p2q2_mcq = lessonData.pages.find(p => p.id === 'part2-quiz-2-mcq');
+            p2q2_mcq.content.questions = [
+                { question: 'What helps the narrator connect generations?', options: ['The internet', 'Mardi Gras traditions', 'School'], correctAnswer: 'Mardi Gras traditions' },
+                { question: 'What instrument is mentioned as lifting spirits?', options: ['Piano', 'Violin', 'Trumpet'], correctAnswer: 'Trumpet' }
+            ];
+            const p2q2_gap = lessonData.pages.find(p => p.id === 'part2-quiz-2-gap');
+            p2q2_gap.content.sentences = [
+                { text: ["Music helped us", "after the storm."], answer: "heal" },
+                { text: ["We rebuilt our homes and kept our", "alive."], answer: "traditions" }
+            ];
+
+            // Text 3: Narrative Mardi Gras (Andrew)
+            const p2q3_tf = lessonData.pages.find(p => p.id === 'part2-quiz-3-tf');
+            p2q3_tf.content.questions = [
+                { statement: 'People wear masks during Mardi Gras to hide their faces.', correctAnswer: 'True' },
+                { statement: 'Mardi Gras happens in August.', correctAnswer: 'False' }
+            ];
+            const p2q3_mcq = lessonData.pages.find(p => p.id === 'part2-quiz-3-mcq');
+            p2q3_mcq.content.questions = [
+                { question: 'What is "revelry"?', options: ['Quiet prayer', 'Noisy joy and celebration', 'Working hard'], correctAnswer: 'Noisy joy and celebration' },
+                { question: 'What event is described as a formal dance?', options: ['Street party', 'Masked ball', 'Parade'], correctAnswer: 'Masked ball' }
+            ];
+            const p2q3_gap = lessonData.pages.find(p => p.id === 'part2-quiz-3-gap');
+            p2q3_gap.content.sentences = [
+                { text: ["Huge", "roll by carrying riders."], answer: "floats" },
+                { text: ["Riders toss shiny", "into the crowd."], answer: "beads" }
+            ];
+
+            // Text 4: Narrative Jazz (Andrew)
+            const p2q4_tf = lessonData.pages.find(p => p.id === 'part2-quiz-4-tf');
+            p2q4_tf.content.questions = [
+                { statement: 'Jazz was born in New Orleans over a century ago.', correctAnswer: 'True' },
+                { statement: 'Jazz is only played inside concert halls.', correctAnswer: 'False' }
+            ];
+            const p2q4_mcq = lessonData.pages.find(p => p.id === 'part2-quiz-4-mcq');
+            p2q4_mcq.content.questions = [
+                { question: 'What does the music reflect?', options: ['Sadness only', 'Resilience and creativity', 'Silence'], correctAnswer: 'Resilience and creativity' },
+                { question: 'What defines the "pageantry" of Mardi Gras?', options: ['Grand public display', 'Secret meetings', 'Written exams'], correctAnswer: 'Grand public display' }
+            ];
+            const p2q4_gap = lessonData.pages.find(p => p.id === 'part2-quiz-4-gap');
+            p2q4_gap.content.sentences = [
+                { text: ["Jazz grew from African rhythms and", "harmonies."], answer: "European" },
+                { text: ["Brass bands marched through", "streets."], answer: "flooded" }
+            ];
+
+            // Interview (Emma/Andrew)
+            const p2q5_tf = lessonData.pages.find(p => p.id === 'part2-quiz-5-tf');
+            p2q5_tf.content.questions = [
+                { statement: 'Alex is a local historian and musician.', correctAnswer: 'True' },
+                { statement: 'The first jazz recordings were made in 2005.', correctAnswer: 'False' }
+            ];
+            const p2q5_mcq = lessonData.pages.find(p => p.id === 'part2-quiz-5-mcq');
+            p2q5_mcq.content.questions = [
+                { question: 'What instruments give jazz its marching power?', options: ['Guitar and Piano', 'Trumpet, trombone, and sousaphone', 'Violin and Cello'], correctAnswer: 'Trumpet, trombone, and sousaphone' },
+                { question: 'What was the Musicians’ Village project?', options: ['A new parade', 'A housing project for musicians', 'A food festival'], correctAnswer: 'A housing project for musicians' }
+            ];
+            const p2q5_gap = lessonData.pages.find(p => p.id === 'part2-quiz-5-gap');
+            p2q5_gap.content.sentences = [
+                { text: ["The roots of Mardi Gras go back to", "Catholic customs."], answer: "French" },
+                { text: ["Jazz didn't just entertain—it", "us."], answer: "healed" }
+            ];
+        }
+
+        function createPageElement(id, html) {
+            const sec = document.createElement('section'); sec.id = `page-${id}`; sec.className = 'page';
+            sec.innerHTML = html; document.getElementById('dynamic-pages-container').appendChild(sec);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Build Pages
+            document.getElementById('main-title').innerHTML = lessonData.title;
+            document.getElementById('main-subtitle').innerHTML = lessonData.subtitle;
+            document.getElementById('main-svg-container').innerHTML = `<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="grad-nola" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" /><stop offset="50%" style="stop-color:#581c87;stop-opacity:1" /><stop offset="100%" style="stop-color:#166534;stop-opacity:1" /></linearGradient></defs><rect width="600" height="300" fill="url(#grad-nola)"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="#fefce8" font-weight="bold">The Big Easy</text></svg>`;
+
+            // Sequence Logic - Moved populateAllQuizzes here to ensure data is ready before creating elements
+            populateAllQuizzes();
+
+            const menu = document.createElement('div'); menu.className = "bg-white rounded-2xl shadow-lg p-8";
+            menu.innerHTML = `<h2 class="text-4xl font-bold text-center mb-8">Main Menu</h2><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${lessonData.mainMenu.map(i=>`<button onclick="navigateTo('${i.target}')" class="btn-animated-3d ${i.color==='green'?'bg-green-500':i.color==='violet'?'bg-violet-500':i.color==='sky'?'bg-sky-500':'bg-blue-500'} text-white font-bold p-4 rounded-xl">${i.text}</button>`).join('')}</div>`;
+            createPageElement('main-menu', menu.outerHTML);
+
+            lessonData.vocabulary.forEach((v, i) => createPageElement(`vocab-${i}`, `<div class="bg-white rounded-2xl shadow-lg p-8 text-center pt-16"><div class="readable-content"><h2 class="text-5xl font-bold text-gray-800 mb-4">${v.word}</h2><p class="text-2xl text-gray-600 mb-4">${v.def}</p><p class="italic text-xl">"${v.sentence}"</p></div></div>`));
+            
+            lessonData.pages.forEach(p => {
+                if(p.type === 'simple' || p.type === 'timer' || p.type === 'html-content') {
+                   createPageElement(p.id, `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16 text-center"><div class="readable-content"><h2 class="text-4xl font-bold mb-4">${p.content.title}</h2><div class="${p.type==='html-content'?'text-left':''}">${p.content.html || p.content.text}</div></div>${p.type==='timer'?`<div id="${p.content.timerId}" class="text-4xl font-bold mt-4"></div>`:''}</div>`);
+                   if(p.type==='timer') { /* logic handled in navigateTo */ }
+                } else if (p.type === 'dialogue') {
+                    const lines = p.content.dialogue.split('\n').map(l => {
+                        if(!l.includes(':')) return `<p>${l}</p>`;
+                        const [sp, txt] = l.split(':'); return `<p class="mb-2"><strong class="text-purple-700">${sp}:</strong> ${txt}</p>`;
+                    }).join('');
+                    createPageElement(p.id, `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><h2 class="text-3xl font-bold mb-6 text-center">${p.content.title}</h2><div class="bg-gray-50 p-6 rounded-lg max-h-[60vh] overflow-y-auto text-left leading-relaxed">${lines}</div></div>`);
+                } else if (p.type.includes('quiz')) {
+                    let html = '';
+                    if(p.type === 'quiz-tfng') {
+                        // Strict True/False for updated pages
+                        const options = ['True', 'False']; 
+                        html = p.content.questions ? p.content.questions.map((q,i)=> `<div class="flex items-center gap-4 p-4 bg-gray-50 rounded mb-2"><div class="flex gap-2">${options.map(o=>`<button onclick="checkTfngAnswer(this,'${o}','${q.correctAnswer}')" class="tfng-button bg-${o==='True'?'blue':'red'}-500 text-white font-bold px-3 py-1 rounded">${o}</button>`).join('')}</div><p>${i+1}. ${q.statement}</p></div>`).join('') : '';
+                    } else if (p.type === 'quiz-mcq') {
+                        html = p.content.questions ? p.content.questions.map((q,i)=> `<div class="mb-6"><p class="font-bold mb-2">${i+1}. ${q.question}</p><div class="grid grid-cols-1 md:grid-cols-2 gap-2">${q.options.map(o=>`<button onclick="checkMcqAnswer(this,'${o === q.correctAnswer}')" class="quiz-option p-3 bg-gray-100 rounded text-left">${o}</button>`).join('')}</div></div>`).join('') : '';
+                    } else if (p.type === 'quiz-gap-fill') {
+                        html = `<div class="gap-fill-container" id="gap-con-${p.id}">${p.content.sentences ? p.content.sentences.map((s,i)=>`<p class="text-lg mb-4">${i+1}. ${s.text[0]} <span class="gap" data-answer="${s.answer}"></span> ${s.text[1]}</p>`).join(''):''}</div><div class="word-bank-container mt-6 flex flex-wrap gap-2 justify-center bg-gray-100 p-4 rounded">${p.content.sentences ? p.content.sentences.map(s=>`<div class="word-bank-word" data-word="${s.answer}">${s.answer}</div>`).sort(()=>0.5-Math.random()).join(''):''}</div>`;
+                    }
+                    createPageElement(p.id, `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16"><h2 class="text-3xl font-bold text-center mb-6">${p.content.title}</h2><div>${html}</div></div>`);
+                    if(p.type === 'quiz-gap-fill') setTimeout(() => initGapFill(`page-${p.id}`), 500);
+                } else if (p.type === 'vocab-game') {
+                    createPageElement(p.id, `<div class="bg-white rounded-2xl shadow-lg p-8 pt-16 text-center"><h2 class="text-3xl font-bold mb-4">${p.content.title}</h2><button onclick="startVocabGame()" class="bg-blue-500 text-white p-3 rounded font-bold">Start Game</button><div id="vocab-game-definition" class="text-2xl font-semibold my-6 min-h-[4rem]" aria-live="polite"></div><div id="vocab-game-options" class="grid grid-cols-2 gap-4" aria-live="polite"></div></div>`);
+                }
+            });
+
+            // Sequence Logic
+            const flattened = [];
+            const add = (id) => { if(!flattened.includes(id)) flattened.push(id); };
+            lessonData.mainMenu.forEach(m => {
+                add(m.target);
+                if(m.target === 'warm-up') lessonData.vocabulary.forEach((_,i) => add(`vocab-${i}`));
+                if(m.target === 'part2-intro') {
+                    ['part2-reading-1','part2-quiz-1-tf','part2-quiz-1-mcq','part2-quiz-1-gap',
+                     'part2-reading-2','part2-quiz-2-tf','part2-quiz-2-mcq','part2-quiz-2-gap',
+                     'part2-reading-3','part2-quiz-3-tf','part2-quiz-3-mcq','part2-quiz-3-gap',
+                     'part2-reading-4','part2-quiz-4-tf','part2-quiz-4-mcq','part2-quiz-4-gap',
+                     'part2-interview','part2-quiz-5-tf','part2-quiz-5-mcq','part2-quiz-5-gap'].forEach(add);
+                }
+            });
+            pageSequence = flattened;
+
+            const bgCanvas = document.getElementById('background-canvas');
+            const ctx = bgCanvas.getContext('2d');
+            let particles = [];
+            function anim() {
+                bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
+                ctx.clearRect(0,0,bgCanvas.width, bgCanvas.height);
+                if(Math.random()>0.9) particles.push({x:Math.random()*bgCanvas.width, y:bgCanvas.height, s:Math.random()+1, t:['🎭','🎷','⚜️'][Math.floor(Math.random()*3)]});
+                particles.forEach((p,i) => { p.y-=p.s; ctx.font='20px serif'; ctx.fillText(p.t, p.x, p.y); if(p.y<-20) particles.splice(i,1); });
+                requestAnimationFrame(anim);
+            }
+            anim();
+        });
+    </script>
+</body>
+</html>
