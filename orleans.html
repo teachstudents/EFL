@@ -167,17 +167,28 @@
                 { id: 'menu-vocab-game', text: 'Vocab Game <span aria-hidden="true">🎮</span>', color: 'sky', target: 'vocab-game'},
                 { id: 'menu-reading', text: '3. Reading & Comprehension <span aria-hidden="true">📖</span>', color: 'blue', target: 'reading-main' },
                 { id: 'menu-convo', text: '4. Conversation Practice <span aria-hidden="true">🗣️</span>', color: 'indigo', target: 'conversation-practice' },
-                { id: 'menu-lecture-environment', text: '5. Listening: Environmental Challenges <span aria-hidden="true">🌪️</span>', color: 'amber', target: 'lecture-environment-pre' },
-                { id: 'menu-discussion', text: '6. Listening: Classroom Discussion <span aria-hidden="true">💬</span>', color: 'lime', target: 'discussion-pre' },
-                { id: 'menu-thinking', text: '7. Thinking & Exam Prep <span aria-hidden="true">📝</span>', color: 'purple', target: 'thinking-prompts' },
-                { id: 'menu-final', text: '8. Final Project <span aria-hidden="true">✍️</span>', color: 'violet', target: 'final-project-hub' },
+                { id: 'menu-lecture-geo', text: '5. Listening: Geography & History <span aria-hidden="true">🗺️</span>', color: 'orange', target: 'lecture-geo-history-pre' },
+                { id: 'menu-lecture-mardigras', text: '6. Listening: Mardi Gras & Resilience <span aria-hidden="true">🎭</span>', color: 'rose', target: 'lecture-mardigras-pre' },
+                { id: 'menu-lecture-festival', text: '7. Listening: The Festival Spirit <span aria-hidden="true">🎉</span>', color: 'pink', target: 'lecture-festival-pre' },
+                { id: 'menu-lecture-jazz', text: '8. Listening: Tradition & Jazz <span aria-hidden="true">🎷</span>', color: 'cyan', target: 'lecture-jazz-pre' },
+                { id: 'menu-lecture-voices', text: '9. Listening: Voices of New Orleans <span aria-hidden="true">🎙️</span>', color: 'emerald', target: 'lecture-voices-pre' },
+                { id: 'menu-lecture-environment', text: '10. Listening: Environmental Challenges <span aria-hidden="true">🌪️</span>', color: 'amber', target: 'lecture-environment-pre' },
+                { id: 'menu-discussion', text: '11. Listening: Classroom Discussion <span aria-hidden="true">💬</span>', color: 'lime', target: 'discussion-pre' },
+                { id: 'menu-thinking', text: '12. Thinking & Exam Prep <span aria-hidden="true">📝</span>', color: 'purple', target: 'thinking-prompts' },
+                { id: 'menu-final', text: '13. Final Project <span aria-hidden="true">✍️</span>', color: 'violet', target: 'final-project-hub' },
             ],
             vocabulary: [
                 { word: 'Jazz', def: 'A style of music that originated in New Orleans.', sentence: 'Jazz music can be heard all over the streets of New Orleans.' },
                 { word: 'Creole', def: 'A cultural blend of French, African, and Spanish influences.', sentence: 'Creole cuisine is famous for its rich flavors and unique spices.' },
                 { word: 'Mardi Gras', def: 'A festival celebrated with parades, music, and costumes.', sentence: 'During Mardi Gras, the city is filled with color and excitement.' },
                 { word: 'Resilience', def: 'The ability to recover from difficulties.', sentence: 'The people of New Orleans showed incredible resilience after the hurricane.' },
-                { word: 'Hurricane', def: 'A powerful storm with strong winds and heavy rain.', sentence: 'Hurricane Katrina was a devastating event in the city\'s history.' }
+                { word: 'Hurricane', def: 'A powerful storm with strong winds and heavy rain.', sentence: 'Hurricane Katrina was a devastating event in the city\'s history.' },
+                // NEW VOCABULARY WORDS
+                { word: 'Float', def: 'A decorated platform used in a parade.', sentence: 'The colorful floats rolled down the street during Mardi Gras.' },
+                { word: 'Mask', def: 'A covering for the face used for disguise.', sentence: 'Everyone wore a mask to the masquerade ball.' },
+                { word: 'Beads', def: 'Small pieces of plastic or glass threaded on a string.', sentence: 'We caught shiny beads thrown from the floats.' },
+                { word: 'Second Line', def: 'A tradition where people dance behind a brass band.', sentence: 'We joined the second line and danced through the streets.' },
+                { word: 'Gumbo', def: 'A famous stew from Louisiana with strong flavors.', sentence: 'My grandmother makes the best seafood gumbo.' }
             ],
             pages: [
                 // 0. Think Pair Share
@@ -241,21 +252,56 @@
                 // 4. Conversation Practice
                 { id: 'conversation-practice', type: 'dialogue', content: { title: 'Conversation Practice <span aria-hidden="true">🗣️</span>', dialogue: "A: Have you ever heard of New Orleans?\n\nB: Yes! It’s famous for jazz music and Mardi Gras, right? 🎷🎭\n\nA: Exactly. The music there is amazing.\n\nB: I heard they had a big hurricane a while ago.\n\nA: Yes, Hurricane Katrina. It was devastating, but the people showed incredible resilience and rebuilt their city.\n\nB: That’s so inspiring. I’d love to visit someday and hear live jazz in the French Quarter.\n\nA: Me too! And we have to try some real gumbo! 🍲" } },
 
-                // 5. Listening: Environmental Challenges
+                // 5. Lecture: Geography & History
+                { id: 'lecture-geo-history-pre', type: 'html-content', content: { title: 'Pre-Listening: Geography & History <span aria-hidden="true">🗺️</span>', html: `<div class="text-left space-y-4 text-xl"><p>Before listening to the lecture, consider these questions:</p><ol class="list-decimal list-inside pl-4 space-y-2"><li>Why are so many major cities built next to large rivers?</li><li>What dangers might exist for a city built below sea level?</li><li>How does the history of who "owned" a city affect its culture today?</li></ol></div>`}},
+                { id: 'lecture-geo-history-main', type: 'dialogue', content: { title: 'Listening: Geography & History', dialogue: "Professor: Good day. Today, we will be examining the city of New Orleans, located in the state of Louisiana. Our essential question is: How does a city's unique geography both create its vibrant culture and expose it to profound environmental risks? I will outline this lecture in three parts. First, we'll cover the city's critical geographical setting. Second, we will review its complex colonial history and the data behind its growth. And finally, we will analyze the severe environmental threat it faces, supported by specific numbers.\n\nProfessor: Let's begin with geography. New Orleans is strategically placed on the Mississippi River Delta. Its location near the mouth of this massive river made it a vital port for trade, today handling over 90 million tons of cargo annually. However, this location is its greatest vulnerability. The city is built on subsided land, and over 50% of its area is below sea level, protected by a system of levees.\n\nProfessor: Now for its history. The city was founded by the French in 1718. This unique geography made it a prize for colonial powers. It was ceded to Spain, then returned to France, before being sold to the United States as part of the Louisiana Purchase in 1803. Let me repeat that date: 1803. That purchase, for 15 million dollars, added 828,000 square miles to the United States. This churn of cultures is fundamental to the city's character.\n\nProfessor: Finally, the modern environmental threat. The Mississippi River Delta is experiencing one of the most severe rates of coastal erosion in the world. The US Geological Survey estimates Louisiana loses a land mass equivalent to a football field every 100 minutes. The result of this vulnerability was seen on August 29, 2005, when Hurricane Katrina made landfall. The storm surge, exceeding 20 feet in some areas, caused a catastrophic failure of the levee system, flooding over 80% of the city and causing an estimated 125 billion dollars in damage. So to review the key data: Founded in 1718, purchased in 1803, the city's economic power as a port is countered by its extreme geographical vulnerability, tragically demonstrated by the 2005 Katrina disaster." } },
+                { id: 'lecture-geo-history-quiz-mcq', type: 'quiz-mcq', content: { title: 'Geography & History Quiz (MCQ)', questions: [] } },
+                { id: 'lecture-geo-history-quiz-tfng', type: 'quiz-tfng', content: { title: 'Geography & History Quiz (TFNG)', questions: [] } },
+                { id: 'lecture-geo-history-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Geography & History Quiz (Gap Fill)', sentences: [] } },
+
+                // 6. Listening: Mardi Gras & Resilience
+                { id: 'lecture-mardigras-pre', type: 'html-content', content: { title: 'Pre-Listening: Mardi Gras & Resilience <span aria-hidden="true">🎭</span>', html: `<div class="text-left space-y-4 text-xl"><p>Before listening to this personal story, consider:</p><ol class="list-decimal list-inside pl-4 space-y-2"><li>What makes a festival more than just a "party"?</li><li>How can music help people heal after a tragedy?</li><li>Have you ever seen pictures of Mardi Gras? What did you notice?</li></ol></div>`}},
+                { id: 'lecture-mardigras-main', type: 'dialogue', content: { title: 'Listening: A Personal Story', dialogue: "Narrator: I grew up in New Orleans, a city in Louisiana, near the Gulf of Mexico. My hometown is famous for Mardi Gras, a huge festival that fills the streets with color and joy. Every year, I watch the parades move along the parade route, with decorated floats carrying float riders who throw beads and confetti into the cheering crowd. People wear bright costumes and masks, and the air is full of music and dance. Families gather for a big feast, and the whole city feels alive with celebration spirit.\n\nNarrator: For us, Mardi Gras is more than a party. It is a tradition that connects generations and shows our culture and heritage. But life here has not always been easy. In 2005, Hurricane Katrina changed everything. The storm caused terrible flooding when the levees broke. More than 1,800 people died, and hundreds of thousands became homeless. The devastation was shocking. Homes, schools, and streets were destroyed, and the cost reached about 125 billion dollars. I remember seeing families leave their neighborhoods, carrying what little they had left.\n\nNarrator: Yet, even in that dark time, our community showed resilience. We rebuilt our homes, kept our traditions, and held on to hope. Mardi Gras returned, and it became a symbol of strength and unity. Music helped us heal. New Orleans is the birthplace of Jazz, a style that grew from African rhythms, blues, and European harmonies. After Katrina, brass bands played in the streets, lifting spirits and reminding us who we are.\n\nNarrator: During Mardi Gras, the sound of trumpets and drums mixes with laughter and revelry. The pageantry of the floats, the street parties, and even elegant events like a masked ball, show that our city is alive. Artists like mask makers and tradition keepers work hard to preserve our customs. For me, Mardi Gras and music are not just entertainment. They are living symbols of identity, perseverance, and celebration." } },
+                { id: 'lecture-mardigras-quiz-mcq', type: 'quiz-mcq', content: { title: 'Mardi Gras & Resilience Quiz (MCQ)', questions: [] } },
+                { id: 'lecture-mardigras-quiz-tfng', type: 'quiz-tfng', content: { title: 'Mardi Gras & Resilience Quiz (TFNG)', questions: [] } },
+                { id: 'lecture-mardigras-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Mardi Gras & Resilience Quiz (Gap Fill)', sentences: [] } },
+
+                // 7. Listening: The Festival Spirit
+                { id: 'lecture-festival-pre', type: 'html-content', content: { title: 'Pre-Listening: The Festival Spirit <span aria-hidden="true">🎉</span>', html: `<div class="text-left space-y-4 text-xl"><p>Before listening to this description of the festival, think about:</p><ol class="list-decimal list-inside pl-4 space-y-2"><li>What colors do you associate with celebrations?</li><li>Why do people wear masks at some festivals?</li><li>What kinds of things might people throw from floats?</li></ol></div>`}},
+                { id: 'lecture-festival-main', type: 'dialogue', content: { title: 'Listening: The Festival Spirit', dialogue: "Narrator: I grew up in New Orleans, and nothing compares to Mardi Gras, our biggest festival of the year. Every February, the city turns colorful, with bright decorations and joyful crowds. People wear masks to hide their faces and costumes in every color you can imagine. The streets fill with parades, and each parade route is lined with cheering families. Huge floats, decorated platforms, roll by, carrying float riders who toss shiny beads and showers of confetti into the cheering crowd. Children laugh as they catch necklaces, and everyone feels the celebration spirit. Mardi Gras is more than fun. It is a tradition that shows our culture and heritage. We have street parties with lively music, and sometimes elegant events like a masked ball, a formal dance where everyone wears masks. Brass instruments play in brass bands, and the rhythm makes people want to dance. Families share a big feast, and the whole city joins in the revelry, the noisy joy that makes Mardi Gras famous. For us, this is not just a carnival. It is a way to keep our tradition keepers proud and our community strong." } },
+                { id: 'lecture-festival-quiz-mcq', type: 'quiz-mcq', content: { title: 'The Festival Spirit Quiz (MCQ)', questions: [] } },
+                { id: 'lecture-festival-quiz-tfng', type: 'quiz-tfng', content: { title: 'The Festival Spirit Quiz (TFNG)', questions: [] } },
+                { id: 'lecture-festival-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'The Festival Spirit Quiz (Gap Fill)', sentences: [] } },
+
+                // 8. Listening: Tradition & Jazz
+                { id: 'lecture-jazz-pre', type: 'html-content', content: { title: 'Pre-Listening: Tradition & Jazz <span aria-hidden="true">🎷</span>', html: `<div class="text-left space-y-4 text-xl"><p>Before listening, think about:</p><ol class="list-decimal list-inside pl-4 space-y-2"><li>How can a festival connect different generations?</li><li>What instruments are typically found in a Jazz band?</li><li>Why is history important to a city's identity?</li></ol></div>`}},
+                { id: 'lecture-jazz-main', type: 'dialogue', content: { title: 'Listening: Tradition & Jazz', dialogue: "Narrator: I grew up in New Orleans, a city in Louisiana near the Gulf of Mexico. Every year, our streets come alive for Mardi Gras, the most famous festival in the United States. It is more than a carnival; it is a celebration of who we are. The parades roll down the parade route, lined with cheering crowds. Brightly decorated floats carry float riders, who toss shiny beads and showers of confetti into the air. People wear colorful costumes and masks, and the sound of brass bands fills the city. Families gather for a big feast, and laughter mixes with the rhythm of music and dance. This is our tradition, a piece of our heritage that connects generations. But Mardi Gras is not only about floats and parties; it is deeply tied to the history of Jazz. Jazz was born here in New Orleans more than a century ago. It grew from African rhythms, blues melodies, and European harmonies, creating a new sound full of energy and freedom. During Mardi Gras, you can hear Jazz everywhere: in street parties, at elegant masked balls, and along the parade route where brass bands play lively tunes. The music reflects resilience and creativity, values that define our city. After Hurricane Katrina devastated New Orleans in 2005, music helped us heal. Brass bands marched through flooded streets, reminding us that even in hard times, our spirit cannot be broken. For me, Mardi Gras and Jazz are more than entertainment. They are living symbols of identity and strength. The pageantry of the floats, the joyful revelry, and the sound of trumpets and drums show the world what New Orleans means: solidarity, perseverance, and cultural pride. When I hear that music and see the colors of Mardi Gras, I know I am home." } },
+                { id: 'lecture-jazz-quiz-mcq', type: 'quiz-mcq', content: { title: 'Tradition & Jazz Quiz (MCQ)', questions: [] } },
+                { id: 'lecture-jazz-quiz-tfng', type: 'quiz-tfng', content: { title: 'Tradition & Jazz Quiz (TFNG)', questions: [] } },
+                { id: 'lecture-jazz-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Tradition & Jazz Quiz (Gap Fill)', sentences: [] } },
+
+                // 9. Listening: Voices of New Orleans
+                { id: 'lecture-voices-pre', type: 'html-content', content: { title: 'Pre-Listening: Voices of New Orleans <span aria-hidden="true">🎙️</span>', html: `<div class="text-left space-y-4 text-xl"><p>Before listening to this interview, consider:</p><ol class="list-decimal list-inside pl-4 space-y-2"><li>What is an oral history? Why is it important to hear stories from locals?</li><li>How do you think music helps to tell the story of a place?</li><li>What emotions might a historian feel when talking about their city's traditions?</li></ol></div>`}},
+                { id: 'lecture-voices-main', type: 'dialogue', content: { title: 'Listening: Voices of New Orleans', dialogue: "Jamie: Welcome to 'Voices of New Orleans'. I'm your host Jamie, and today we're exploring the heartbeat of our city: Mardi Gras, the birth of Jazz, and how music helped us rise after Hurricane Katrina. Joining me is Alex, a local historian and musician who knows these streets better than anyone. Alex, thanks for being here.\n\nAlex: Thanks Jamie. It's great to share the story of our traditions and the sound that makes New Orleans unique.\n\nJamie: Let's start with Mardi Gras. For someone who's never been, what's it like to stand on the parade route during the big day?\n\nAlex: It's electric. Imagine floats rolling by, covered in bright colors, with float riders tossing shiny beads and showers of confetti into the crowd. People wear masks and costumes, and the air is alive with brass band music. Families share a big feast, and laughter mixes with the rhythm of dance. It's not just a carnival. It's a tradition that shows our culture and heritage.\n\nJamie: That sounds incredible. How long has Mardi Gras been part of New Orleans life?\n\nAlex: The roots go back centuries, tied to French Catholic customs. Over time, it became a public celebration with pageantry, revelry, and even elegant events like a masked ball. Today, Mardi Gras is a mix of old and new—street parties, jazz, and floats that turn the city into one big stage.\n\nJamie: Speaking of Jazz, how did this music start here?\n\nAlex: Jazz was born in New Orleans in the early 1900s. It grew from African rhythms, blues, and European harmonies, creating a new sound full of energy and freedom. The first Jazz recordings came out in 1917, but the roots go back to brass bands and second-line parades. Instruments like trumpet, trombone, clarinet, and the big sousaphone gave Jazz its marching power. During Mardi Gras, you hear jazz everywhere—at masked balls, along the parade route, and in second-line dances. It's music that celebrates freedom and creativity.\n\nJamie: What makes those instruments so special for Mardi Gras?\n\nAlex: What makes those instruments so special for Mardi Gras is... well, it's the brass, isn't it? The trumpets, trombones, saxophones, tubas... they're loud, vibrant, and can be played while marching, which is essential for our parades. And the drums, of course, providing that driving rhythm. Together, they create a joyful, improvisational sound that truly embodies the spirit of New Orleans. It's music that makes you move, that celebrates life, and that carries the stories of our city in every note. It's very much a living, breathing part of the celebration itself.\n\nJamie: That's beautifully put. It's clear that the music, like the parades, is woven into the very fabric of New Orleans: identity and resilience. Thank you for this incredibly insightful look into Mardi Gras, Jazz, and the enduring spirit of your city. It's been a true pleasure.\n\nAlex: My pleasure Jamie. It's always a joy to share the heart of New Orleans with the world. Keep that music playing, and let the good times roll." } },
+                { id: 'lecture-voices-quiz-mcq', type: 'quiz-mcq', content: { title: 'Voices of New Orleans Quiz (MCQ)', questions: [] } },
+                { id: 'lecture-voices-quiz-tfng', type: 'quiz-tfng', content: { title: 'Voices of New Orleans Quiz (TFNG)', questions: [] } },
+                { id: 'lecture-voices-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Voices of New Orleans Quiz (Gap Fill)', sentences: [] } },
+
+                // 10. Listening: Environmental Challenges (Formerly 9)
                 { id: 'lecture-environment-pre', type: 'html-content', content: { title: 'Pre-Listening: Environmental Challenges <span aria-hidden="true">🌪️</span>', html: `<div class="text-left space-y-4 text-xl"><p>Before listening to the lecture, consider these questions:</p><ol class="list-decimal list-inside pl-4 space-y-2"><li>Why might a city built near a large river and the ocean be at risk?</li><li>What does the word "resilience" mean to you in the context of a community?</li></ol></div>`}},
                 { id: 'lecture-environment-main', type: 'dialogue', content: { title: 'Listening: Environmental Challenges', dialogue: "Professor: Good morning, class. Today, we're going to focus on a city we've touched upon briefly, New Orleans. While it's celebrated for its vibrant culture and history, it also faces significant environmental challenges. Today we'll explore one major problem: its vulnerability to hurricanes and the impacts of climate change. So to begin, based on what we know about New Orleans' geography, why is it particularly vulnerable to hurricanes and flooding? What geographical features make it susceptible, Leo?\n\nLeo: Well, Dr. Reed, it's uh, really low down, isn't it? Like, below sea level in some parts. And it's uh, right by the coast near the Gulf of Mexico where hurricanes come from.\n\nProfessor: Excellent points, Leo. New Orleans' low elevation, with much of the city built on drained swampland and actually below sea level, makes it highly susceptible to flooding. Its location on the Gulf Coast puts it directly in the path of hurricanes. In addition to this, Sofia, what role do the surrounding natural landscapes play in its vulnerability? Think about the Mississippi River Delta and the wetlands.\n\nSofia: Um, aren't the swamps and wetlands supposed to, like, protect the city, like act as a buffer? But maybe they're disappearing?\n\nProfessor: You're touching on a critical issue, Sofia. Historically, the extensive wetlands and barrier islands of the Mississippi River Delta provided a natural buffer against storm surges from hurricanes. However, due to factors like subsidence, the sinking of land, erosion, and the channeling of the Mississippi River, these protective wetlands are rapidly disappearing. This loss leaves New Orleans more exposed. We cannot discuss this vulnerability without mentioning Hurricane Katrina in 2005. What were some of the major consequences of Hurricane Katrina for New Orleans, Leo?\n\nLeo: Oh, that was uh, really bad, right? The levees broke and uh, most of the city flooded, and lots of people lost their homes and had to leave.\n\nProfessor: Tragically, yes, Leo. The failure of the levee system was a catastrophic event, leading to widespread and prolonged flooding of about 80% of the city. The human cost was immense, with significant loss of life and the displacement of hundreds of thousands of residents. The economic and social impacts were devastating and long-lasting. Looking ahead, how does climate change exacerbate New Orleans' vulnerability to hurricanes and flooding? What are the connections, Sofia?\n\nSofia: Um, climate change is making the sea level rise, right? So that makes the flooding worse. And maybe it makes hurricanes stronger?\n\nProfessor: You're exactly right, Sofia. Rising sea levels, a direct consequence of climate change, mean that storm surges from hurricanes can reach higher and push further inland. Additionally, warmer ocean waters can fuel more intense hurricanes, increasing the threat to coastal cities like New Orleans. So, New Orleans faces a complex and ongoing challenge: its geographical vulnerability, the loss of natural protections, and the intensifying effects of climate change. The city and its residents have demonstrated incredible resilience, but addressing these issues requires significant effort. For our enduring understanding question today, considering the significant environmental challenges facing New Orleans, particularly its vulnerability to hurricanes, flooding, and the impacts of climate change, what virtues or values do you believe are most essential for the residents and leadership of New Orleans in facing and adapting to these ongoing threats? What can we learn from their situation about community, resilience, and planning for the future in the face of environmental challenges? Leo?\n\nLeo: I guess resilience is a big one like you said, bouncing back after something like Katrina. And community spirit, helping each other out when things are bad, and maybe a determination to rebuild and protect their city.\n\nSofia: And I think, um, maybe adaptability, like finding new ways to live with the risks. And, um, foresight, planning for future storms and sea level rise. And, um, hope, not giving up on their city.\n\nProfessor: Excellent and very insightful points, both of you. Resilience in the face of repeated disasters, a strong sense of community and mutual support, determination to protect their unique heritage and home, adaptability in developing new strategies for living with environmental risks, foresight in planning and investing in infrastructure and restoration, and unwavering hope for the future of their city. These virtues and values are clearly essential for New Orleans. Their situation teaches us profound lessons about the importance of community cohesion, resilience, proactive adaptation, and long-term planning when facing significant environmental challenges, lessons that are increasingly relevant for coastal communities worldwide. Thank you both, Sofia and Leo, for your thoughtful contributions today, and thank you all for joining us for this discussion on the environmental challenges facing New Orleans." }},
                 { id: 'lecture-environment-quiz-mcq', type: 'quiz-mcq', content: { title: 'Environmental Challenges Quiz (MCQ)', questions: [] } },
                 { id: 'lecture-environment-quiz-tfng', type: 'quiz-tfng', content: { title: 'Environmental Challenges Quiz (TFNG)', questions: [] } },
                 { id: 'lecture-environment-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Environmental Challenges Quiz (Gap Fill)', sentences: [] } },
                 
-                // 6. Listening: Classroom Discussion
+                // 11. Listening: Classroom Discussion
                 { id: 'discussion-pre', type: 'html-content', content: { title: 'Pre-Listening: Classroom Discussion <span aria-hidden="true">💬</span>', html: `<div class="text-left space-y-4 text-xl"><p>Before listening, consider:</p><ol class="list-decimal list-inside pl-4 space-y-2"><li>What makes a place feel "authentic"?</li><li>How can music and food tell the story of a city's history?</li></ol></div>`}},
                 { id: 'discussion-main', type: 'dialogue', content: { title: 'Listening: Classroom Discussion', dialogue: "Professor: Alright class, welcome back. Today, we're going to explore a city unlike any other: New Orleans, Louisiana. Known as the 'Big Easy', it's a place steeped in music, culture, and a remarkable history of resilience. To kick us off, Emily, coming from Australia, what were your initial impressions or anything that stood out to you about New Orleans?\n\nEmily: Thanks, professor. I guess what struck me first was the incredible mix of cultures. It seems like it's got French, Spanish, African, and American influences all blended together, which sounds really unique.\n\nProfessor: That's a great observation, Emily. That blend of influences is really at the heart of New Orleans. Oliver, from the UK, what aspects of its culture or perhaps its reputation for music resonate with you?\n\nOliver: Hello, professor. I've always associated New Orleans with jazz music. It seems like that's a massive part of its identity. I'm keen to learn more about how that musical heritage developed.\n\nProfessor: Absolutely, Oliver. New Orleans is the birthplace of jazz, and music is woven into the fabric of daily life there, from the streets to the clubs. Beyond the music, what about its unique culture and traditions? Emily, what did you find interesting?\n\nEmily: I was really interested in the festivals, especially Mardi Gras. It looks like such a huge, colorful celebration. And the food! I've heard so much about Creole and Cajun food, I'd love to try it.\n\nProfessor: Mardi Gras is certainly iconic, Emily. It's a massive celebration of life and culture. And the food, New Orleans cuisine is legendary, a delicious mix of Creole and Cajun influences. Oliver, the city also has a deep and complex history, including its resilience in the face of challenges. What did you learn about that?\n\nOliver: Yes, professor. I read about Hurricane Katrina and the flooding. It sounded absolutely horrific, but also about how the community really came together to help each other and rebuild. The resilience of the people seems incredible.\n\nProfessor: You've highlighted a pivotal moment, Oliver. Hurricane Katrina was devastating, but the spirit of the people and their determination to rebuild is truly inspiring. It's a testament to the city's resilience. While New Orleans has overcome much, it still faces challenges. Emily, what are some of the ongoing issues?\n\nEmily: I think one of the biggest challenges I read about is the environmental threat, particularly coastal erosion. Being below sea level in many parts makes it really vulnerable. And I guess like many popular tourist cities, balancing that with local life must be hard.\n\nProfessor: Those are significant points, Emily. Coastal erosion is a serious environmental threat, and addressing economic disparities and crime are crucial for the city's future. Oliver, what about the challenge of preserving its unique cultural authenticity amidst growing tourism?\n\nOliver: I agree with Emily. Tourism is obviously important, but how do they keep the French Quarter and other historic areas from just becoming, I don't know, a theme park? Preserving the real culture must be a constant effort.\n\nProfessor: That's a vital balance to strike, Oliver. Tourism is economically important, but it needs to be managed in a way that respects and supports the local culture, not dilutes it. So, in conclusion, New Orleans is a city of vibrant contradictions, a place that has faced immense hardship but continues to celebrate life through its music, food, and unique cultural traditions. Its resilience is as much a part of its identity as its festive spirit. Thank you both for sharing your insights into this extraordinary city." }},
                 { id: 'discussion-quiz-mcq', type: 'quiz-mcq', content: { title: 'Discussion Quiz (MCQ)', questions: [] } },
                 { id: 'discussion-quiz-tfng', type: 'quiz-tfng', content: { title: 'Discussion Quiz (TFNG)', questions: [] } },
                 { id: 'discussion-quiz-gap-fill', type: 'quiz-gap-fill', content: { title: 'Discussion Quiz (Gap Fill)', sentences: [] } },
                 
-                // 7. Thinking & Exam Prep
+                // 12. Thinking & Exam Prep
                 { id: 'thinking-prompts', type: 'html-content', content: { title: 'Thinking & Exam Prep <span aria-hidden="true">📝</span>', html: `
                                         <div class="text-left space-y-8">
                                             <div>
@@ -273,7 +319,7 @@
                                             </div>
                                         </div>` } },
 
-                // 8. Final Project
+                // 13. Final Project
                 { id: 'final-project-hub', type: 'html-content', content: { title: 'Final Project Hub <span aria-hidden="true">✍️</span>', html: `
                                         <div class="bg-white rounded-2xl shadow-xl p-8 text-left">
                                         <h2 class="text-3xl font-bold text-violet-600 mb-4">GRASPS Task: A Tale of Two Cities 🎭</h2>
@@ -317,7 +363,7 @@
                  this.isInitialized = false;
                  this.isTtsEnabled = true;
                  this.voices = {};
-                 this.speechRate = 0.85;
+                 this.speechRate = 1.0; 
                  this.isDialoguePlaying = false;
                  this.keepAliveInterval = null;
              }
@@ -349,6 +395,9 @@
                     'a': ['Microsoft Emma Online (Natural) - English (United States)', 'Microsoft Ava Online (Natural) - English (United States)'],
                     'b': ['Microsoft Brian Online (Natural) - English (United States)', 'Microsoft Andrew Online (Natural) - English (United States)'],
                     'professor': ['Microsoft Brian Online (Natural) - English (United States)', 'Google US English'],
+                    'narrator': ['Microsoft Christopher Online (Natural) - English (United States)', 'Google US English'],
+                    'jamie': ['Microsoft Emma Online (Natural) - English (United States)', 'Google US English'],
+                    'alex': ['Microsoft Andrew Online (Natural) - English (United States)', 'Google US English'],
                     'emily': ['Microsoft Emma Online (Natural) - English (United States)', 'Google US English'],
                     'oliver': ['Microsoft Andrew Online (Natural) - English (United States)', 'Google US English'],
                  };
@@ -362,6 +411,9 @@
                      if (chosenVoice) { this.voices[speaker] = chosenVoice; } else { console.warn(`Could not find specified voices for speaker: "${speaker}"`); }
                  }
                  this.voices['default'] = availableVoices.find(v => v.name === 'Microsoft Ava Online (Natural) - English (United States)') || availableVoices.find(v => v.lang === 'en-US');
+                 
+                 // Explicitly setting Brian voice if available for use in vocab
+                 this.voices['b'] = availableVoices.find(v => v.name === 'Microsoft Brian Online (Natural) - English (United States)') || this.voices['default'];
              }
 
              async init() {
@@ -581,8 +633,17 @@
                 } else if (targetPage) {
                     const readableContent = targetPage.querySelector('.readable-content');
                     const titleElement = targetPage.querySelector('h2, h3');
-                    if (readableContent) speechService.speak(readableContent.innerText);
-                    else if (titleElement) speechService.speak(titleElement.innerText);
+                    let contentToSpeak = readableContent ? readableContent.innerText : (titleElement ? titleElement.innerText : '');
+                    let voice = 'default';
+                    if (currentPage.startsWith('vocab-')) {
+                       voice = 'b';
+                    } else if (currentPage === 'reading-main') {
+                       voice = 'oliver';
+                       if (currentPage === 'reading-main') {
+                           contentToSpeak = Array.from(targetPage.querySelectorAll('h4, p')).map(el => el.innerText).join(' ');
+                       }
+                    }
+                    speechService.speak(contentToSpeak, { voiceKey: voice });
                 }
             }
         };
@@ -645,8 +706,10 @@
                     const titleElement = targetPage.querySelector('h2, h3');
                     let contentToSpeak = readableContent ? readableContent.innerText : (titleElement ? titleElement.innerText : '');
                     let voice = 'default';
-                    if (pageId.startsWith('vocab-') || pageId === 'reading-main') {
-                       voice = 'oliver'; // Andrew voice
+                    if (pageId.startsWith('vocab-')) {
+                       voice = 'b';
+                    } else if (pageId === 'reading-main') {
+                       voice = 'oliver';
                        if (pageId === 'reading-main') {
                            contentToSpeak = Array.from(targetPage.querySelectorAll('h4, p')).map(el => el.innerText).join(' ');
                        }
@@ -770,8 +833,8 @@
             function handleGapClick(e) {
                 const clickedGap = e.currentTarget;
                 if(clickedGap.children.length > 0) {
-                     wordBank.appendChild(clickedGap.children[0]);
-                     clickedGap.classList.remove('correct', 'incorrect');
+                      wordBank.appendChild(clickedGap.children[0]);
+                      clickedGap.classList.remove('correct', 'incorrect');
                 }
                 if (!selectedWord.element) return;
                 clickedGap.appendChild(selectedWord.element);
@@ -934,6 +997,136 @@
                 { question: 'What does “resilience” mean?', options: ['Giving up', 'Being strong after difficulty', 'Celebrating', 'Cooking food'], correctAnswer: 'Being strong after difficulty' }
             ];
 
+            // NEW Geography & History Quizzes
+            const geoMcq = lessonData.pages.find(p => p.id === 'lecture-geo-history-quiz-mcq');
+            if(geoMcq) geoMcq.content.questions = [
+                { question: 'What river delta is New Orleans located on?', options: ['Nile', 'Amazon', 'Mississippi', 'Colorado'], correctAnswer: 'Mississippi' },
+                { question: 'In what year was New Orleans founded by the French?', options: ['1492', '1620', '1718', '1803'], correctAnswer: '1718' },
+                { question: 'How much did the US pay for the Louisiana Purchase?', options: ['$1 million', '$15 million', '$50 million', '$100 million'], correctAnswer: '$15 million' },
+                { question: 'How much land does Louisiana lose to erosion every 100 minutes?', options: ['A tennis court', 'A football field', 'A city block', 'An acre'], correctAnswer: 'A football field' },
+                { question: 'What was the estimated damage cost of Hurricane Katrina?', options: ['$50 billion', '$75 billion', '$100 billion', '$125 billion'], correctAnswer: '$125 billion' }
+            ];
+            const geoTfng = lessonData.pages.find(p => p.id === 'lecture-geo-history-quiz-tfng');
+            if(geoTfng) geoTfng.content.questions = [
+                { statement: 'New Orleans handles over 90 million tons of cargo annually.', correctAnswer: 'True' },
+                { statement: 'The city is built entirely on solid bedrock.', correctAnswer: 'False' },
+                { statement: 'The Louisiana Purchase added 828,000 square miles to the US.', correctAnswer: 'True' },
+                { statement: 'Hurricane Katrina struck New Orleans in September 2010.', correctAnswer: 'False' },
+                { statement: 'The storm surge from Katrina exceeded 20 feet in some areas.', correctAnswer: 'True' }
+            ];
+            const geoGap = lessonData.pages.find(p => p.id === 'lecture-geo-history-quiz-gap-fill');
+            if(geoGap) geoGap.content.sentences = [
+                { text: ["New Orleans is strategically placed on the", "River Delta."], answer: "Mississippi" },
+                { text: ["Over 50% of the city's area is below", "level."], answer: "sea" },
+                { text: ["The city was sold to the US as part of the", "Purchase."], answer: "Louisiana" },
+                { text: ["Hurricane Katrina caused a catastrophic failure of the", "system."], answer: "levee" },
+                { text: ["The storm caused an estimated 125", "dollars in damage."], answer: "billion" }
+            ];
+
+            // NEW Mardi Gras & Resilience Quizzes
+            const mardiMcq = lessonData.pages.find(p => p.id === 'lecture-mardigras-quiz-mcq');
+            if(mardiMcq) mardiMcq.content.questions = [
+                { question: 'What do people throw from floats during Mardi Gras parades?', options: ['Coins', 'Beads and confetti', 'Flowers', 'Candy'], correctAnswer: 'Beads and confetti' },
+                { question: 'How many people died in Hurricane Katrina according to the speaker?', options: ['Over 1,800', 'Exactly 500', 'About 10,000', 'Less than 100'], correctAnswer: 'Over 1,800' },
+                { question: 'New Orleans is considered the birthplace of which music genre?', options: ['Rock and Roll', 'Country', 'Jazz', 'Classical'], correctAnswer: 'Jazz' },
+                { question: 'What did brass bands do after the hurricane?', options: ['They stopped playing', 'They played in the streets to lift spirits', 'They left the city forever', 'They only played in concert halls'], correctAnswer: 'They played in the streets to lift spirits' },
+                { question: 'What do Mardi Gras and music represent to the narrator?', options: ['Just entertainment', 'Ways to make money', 'Identity, perseverance, and celebration', 'Ancient history'], correctAnswer: 'Identity, perseverance, and celebration' }
+            ];
+            const mardiTfng = lessonData.pages.find(p => p.id === 'lecture-mardigras-quiz-tfng');
+            if(mardiTfng) mardiTfng.content.questions = [
+                { statement: 'Mardi Gras is described as just a party for tourists.', correctAnswer: 'False' },
+                { statement: 'Hurricane Katrina struck New Orleans in 2005.', correctAnswer: 'True' },
+                { statement: 'The cost of the devastation was about 1 million dollars.', correctAnswer: 'False' },
+                { statement: 'Jazz music grew from a mix of African rhythms, blues, and European harmonies.', correctAnswer: 'True' },
+                { statement: 'The narrator feels that traditions like Mardi Gras help connect generations.', correctAnswer: 'True' }
+            ];
+            const mardiGap = lessonData.pages.find(p => p.id === 'lecture-mardigras-quiz-gap-fill');
+            if(mardiGap) mardiGap.content.sentences = [
+                { text: ["My hometown is famous for", ", a huge festival."], answer: "Mardi Gras" },
+                { text: ["In 2005, Hurricane", "changed everything."], answer: "Katrina" },
+                { text: ["The storm caused terrible flooding when the", "broke."], answer: "levees" },
+                { text: ["New Orleans is the birthplace of", "."], answer: "Jazz" },
+                { text: ["Mardi Gras is a tradition that connects", "."], answer: "generations" }
+            ];
+
+            // NEW The Festival Spirit Quizzes
+            const festivalMcq = lessonData.pages.find(p => p.id === 'lecture-festival-quiz-mcq');
+            if(festivalMcq) festivalMcq.content.questions = [
+                { question: 'When does the Mardi Gras festival take place?', options: ['Every February', 'Every July', 'In December', 'During Summer'], correctAnswer: 'Every February' },
+                { question: 'What do people wear to hide their faces?', options: ['Hats', 'Sunglasses', 'Masks', 'Makeup'], correctAnswer: 'Masks' },
+                { question: 'What do float riders throw into the crowd?', options: ['Food and drinks', 'Shiny beads and confetti', 'Toys and games', 'Paper planes'], correctAnswer: 'Shiny beads and confetti' },
+                { question: 'What kind of music makes people want to dance?', options: ['Rock bands', 'Brass bands', 'Classical orchestras', 'Pop singers'], correctAnswer: 'Brass bands' },
+                { question: 'What is Mardi Gras for the tradition keepers?', options: ['Just a carnival', 'A way to make money', 'A way to keep them proud', 'A boring event'], correctAnswer: 'A way to keep them proud' }
+            ];
+            const festivalTfng = lessonData.pages.find(p => p.id === 'lecture-festival-quiz-tfng');
+            if(festivalTfng) festivalTfng.content.questions = [
+                { statement: 'Mardi Gras is the smallest festival of the year.', correctAnswer: 'False' },
+                { statement: 'The parade route is lined with cheering families.', correctAnswer: 'True' },
+                { statement: 'Children laugh as they catch balls.', correctAnswer: 'False' },
+                { statement: 'A masked ball is a formal dance where everyone wears masks.', correctAnswer: 'True' },
+                { statement: 'The narrator says Mardi Gras is more than just fun.', correctAnswer: 'True' }
+            ];
+            const festivalGap = lessonData.pages.find(p => p.id === 'lecture-festival-quiz-gap-fill');
+            if(festivalGap) festivalGap.content.sentences = [
+                { text: ["Every February, the city turns", "with bright decorations."], answer: "colorful" },
+                { text: ["Float riders toss shiny", "and showers of confetti."], answer: "beads" },
+                { text: ["The streets fill with", "and joyful crowds."], answer: "parades" },
+                { text: ["Brass instruments play in", "bands."], answer: "brass" },
+                { text: ["It is a way to keep our", "keepers proud."], answer: "tradition" }
+            ];
+
+            // NEW Tradition & Jazz Quizzes
+            const jazzMcq = lessonData.pages.find(p => p.id === 'lecture-jazz-quiz-mcq');
+            if(jazzMcq) jazzMcq.content.questions = [
+                { question: 'What three musical elements created Jazz?', options: ['Rock, Pop, and Blues', 'African rhythms, Blues, and European harmonies', 'Classical, Country, and Folk', 'Electronic, Dance, and Hip Hop'], correctAnswer: 'African rhythms, Blues, and European harmonies' },
+                { question: 'According to the speaker, what does the music reflect?', options: ['Sadness and anger', 'Silence and peace', 'Resilience and creativity', 'Boredom and routine'], correctAnswer: 'Resilience and creativity' },
+                { question: 'What did brass bands do after the floods?', options: ['They stayed home', 'They marched through flooded streets', 'They stopped playing music', 'They moved to another city'], correctAnswer: 'They marched through flooded streets' },
+                { question: 'What does Mardi Gras mean to the narrator?', options: ['Just a holiday', 'A time to sleep', 'Solidarity, perseverance, and cultural pride', 'A way to make money'], correctAnswer: 'Solidarity, perseverance, and cultural pride' },
+                { question: 'Where is New Orleans located?', options: ['Near the Atlantic Ocean', 'Near the Pacific Ocean', 'Near the Gulf of Mexico', 'In the middle of the desert'], correctAnswer: 'Near the Gulf of Mexico' }
+            ];
+            const jazzTfng = lessonData.pages.find(p => p.id === 'lecture-jazz-quiz-tfng');
+            if(jazzTfng) jazzTfng.content.questions = [
+                { statement: 'Mardi Gras is described as just a carnival.', correctAnswer: 'False' },
+                { statement: 'Jazz was born in New Orleans more than a century ago.', correctAnswer: 'True' },
+                { statement: 'Float riders keep the beads for themselves.', correctAnswer: 'False' },
+                { statement: 'Music helped the community heal after Hurricane Katrina.', correctAnswer: 'True' },
+                { statement: 'Families gather for a big feast during the festival.', correctAnswer: 'True' }
+            ];
+            const jazzGap = lessonData.pages.find(p => p.id === 'lecture-jazz-quiz-gap-fill');
+            if(jazzGap) jazzGap.content.sentences = [
+                { text: ["Mardi Gras is a celebration of who we", "."], answer: "are" },
+                { text: ["Jazz grew from African rhythms and European", "."], answer: "harmonies" },
+                { text: ["The sound of", "bands fills the city."], answer: "brass" },
+                { text: ["Music helped us", "after the hurricane."], answer: "heal" },
+                { text: ["They are living symbols of", "and strength."], answer: "identity" }
+            ];
+
+            // NEW Voices of New Orleans Quizzes (V4)
+            const voicesMcq = lessonData.pages.find(p => p.id === 'lecture-voices-quiz-mcq');
+            if(voicesMcq) voicesMcq.content.questions = [
+                { question: 'Who is the guest, Alex, in this interview?', options: ['A chef', 'A local historian and musician', 'A float builder', 'A tourist'], correctAnswer: 'A local historian and musician' },
+                { question: 'When did the first Jazz recordings come out?', options: ['1803', '1900', '1917', '2005'], correctAnswer: '1917' },
+                { question: 'Which instrument is NOT mentioned by Alex as essential for parades?', options: ['Trumpet', 'Trombone', 'Electric Guitar', 'Tuba'], correctAnswer: 'Electric Guitar' },
+                { question: 'What does Alex say Mardi Gras is a mix of?', options: ['Old and new', 'Water and fire', 'Day and night', 'Summer and winter'], correctAnswer: 'Old and new' },
+                { question: 'According to Alex, what does Jazz music celebrate?', options: ['Silence and sleep', 'Freedom and creativity', 'War and conflict', 'Sadness and loss'], correctAnswer: 'Freedom and creativity' }
+            ];
+            const voicesTfng = lessonData.pages.find(p => p.id === 'lecture-voices-quiz-tfng');
+            if(voicesTfng) voicesTfng.content.questions = [
+                { statement: 'Mardi Gras roots go back centuries to French Catholic customs.', correctAnswer: 'True' },
+                { statement: 'Alex says the air during Mardi Gras is silent.', correctAnswer: 'False' },
+                { statement: 'Jazz grew from a mix of African rhythms, blues, and European harmonies.', correctAnswer: 'True' },
+                { statement: 'The sousaphone is a small, quiet instrument.', correctAnswer: 'False' },
+                { statement: 'Jamie concludes that music is woven into the fabric of New Orleans.', correctAnswer: 'True' }
+            ];
+            const voicesGap = lessonData.pages.find(p => p.id === 'lecture-voices-quiz-gap-fill');
+            if(voicesGap) voicesGap.content.sentences = [
+                { text: ["Mardi Gras is a tradition that shows our culture and", "."], answer: "heritage" },
+                { text: ["Jazz was born in New Orleans in the early", "."], answer: "1900s" },
+                { text: ["The music carries the", "of our city in every note."], answer: "stories" },
+                { text: ["Brass bands play while", ", which is essential for parades."], answer: "marching" },
+                { text: ["It's always a joy to share the", "of New Orleans with the world."], answer: "heart" }
+            ];
+
             // Classroom Discussion Quizzes
             const discussionMcq = lessonData.pages.find(p => p.id === 'discussion-quiz-mcq');
             if(discussionMcq) discussionMcq.content.questions = [
@@ -1012,7 +1205,7 @@
             buildPageToMenuMap();
 
             const menuButtons = lessonData.mainMenu.map(item => {
-                const colors = { green: 'bg-green-500 border-green-700', blue: 'bg-blue-500 border-blue-700', sky: 'bg-sky-500 border-sky-700', amber: 'bg-amber-500 border-amber-700', rose: 'bg-rose-500 border-rose-700', violet: 'bg-violet-500 border-violet-700', teal: 'bg-teal-500 border-teal-700', orange: 'bg-orange-500 border-orange-700', indigo: 'bg-indigo-500 border-indigo-700', lime: 'bg-lime-500 border-lime-700', emerald: 'bg-emerald-500 border-emerald-700', red: 'bg-red-500 border-red-700', purple: 'bg-purple-500 border-purple-700' };
+                const colors = { green: 'bg-green-500 border-green-700', blue: 'bg-blue-500 border-blue-700', sky: 'bg-sky-500 border-sky-700', amber: 'bg-amber-500 border-amber-700', rose: 'bg-rose-500 border-rose-700', violet: 'bg-violet-500 border-violet-700', teal: 'bg-teal-500 border-teal-700', orange: 'bg-orange-500 border-orange-700', indigo: 'bg-indigo-500 border-indigo-700', lime: 'bg-lime-500 border-lime-700', emerald: 'bg-emerald-500 border-emerald-700', red: 'bg-red-500 border-red-700', purple: 'bg-purple-500 border-purple-700', pink: 'bg-pink-500 border-pink-700', cyan: 'bg-cyan-500 border-cyan-700' };
                 return `<button id="menu-btn-${item.id}" onclick="navigateTo('${item.target}')" class="btn-animated-3d ${colors[item.color] || colors['green']} text-white font-bold text-xl p-4 rounded-xl">${item.text}</button>`;
             }).join('');
             createPageElement(lessonData.homePageId, `<div class="bg-white rounded-2xl shadow-lg p-8"><h2 class="text-4xl font-bold text-center text-slate-800 mb-8">Main Menu</h2><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${menuButtons}</div></div>`);
@@ -1021,6 +1214,11 @@
                 'warm-up': ['vocab-start'], 
                 'vocab-start': lessonData.vocabulary.map((v, i) => `vocab-${i}`), 
                 'reading-main': ['reading-quiz-gap-fill', 'reading-quiz-tfng', 'reading-quiz-mcq'],
+                'lecture-geo-history-pre': ['lecture-geo-history-main', 'lecture-geo-history-quiz-mcq', 'lecture-geo-history-quiz-tfng', 'lecture-geo-history-quiz-gap-fill'],
+                'lecture-mardigras-pre': ['lecture-mardigras-main', 'lecture-mardigras-quiz-mcq', 'lecture-mardigras-quiz-tfng', 'lecture-mardigras-quiz-gap-fill'],
+                'lecture-festival-pre': ['lecture-festival-main', 'lecture-festival-quiz-mcq', 'lecture-festival-quiz-tfng', 'lecture-festival-quiz-gap-fill'],
+                'lecture-jazz-pre': ['lecture-jazz-main', 'lecture-jazz-quiz-mcq', 'lecture-jazz-quiz-tfng', 'lecture-jazz-quiz-gap-fill'],
+                'lecture-voices-pre': ['lecture-voices-main', 'lecture-voices-quiz-mcq', 'lecture-voices-quiz-tfng', 'lecture-voices-quiz-gap-fill'],
                 'lecture-environment-pre': ['lecture-environment-main', 'lecture-environment-quiz-mcq', 'lecture-environment-quiz-tfng', 'lecture-environment-quiz-gap-fill'],
                 'discussion-pre': ['discussion-main', 'discussion-quiz-mcq', 'discussion-quiz-tfng', 'discussion-quiz-gap-fill'],
                 'final-project-hub': ['writing-task', 'self-assessment', 'certificate'] 
@@ -1071,7 +1269,8 @@
                     case 'quiz-gap-fill':
                         let questionsHTML = '';
                         if (page.type === 'quiz-tfng' && page.content.questions) {
-                            questionsHTML = page.content.questions.map((q, i) => `<div class="question-group flex items-center gap-4 p-4 rounded-lg bg-gray-100"><div class="flex-shrink-0 flex gap-2">${['True', 'False', 'Not Given'].map(l => `<button onclick="checkTfngAnswer(this, '${l}', '${q.correctAnswer}')" class="tfng-button bg-${l==='True'?'blue':l==='False'?'red':'gray'}-500 text-white font-bold w-12 h-10 rounded-full">${l.charAt(0)}</button>`).join('')}</div><p>${i + 1}. ${q.statement}</p></div>`).join('');
+                            // CHANGED: Removed 'Not Given' from the map function
+                            questionsHTML = page.content.questions.map((q, i) => `<div class="question-group flex items-center gap-4 p-4 rounded-lg bg-gray-100"><div class="flex-shrink-0 flex gap-2">${['True', 'False'].map(l => `<button onclick="checkTfngAnswer(this, '${l}', '${q.correctAnswer}')" class="tfng-button bg-${l==='True'?'blue':l==='False'?'red':'gray'}-500 text-white font-bold w-12 h-10 rounded-full">${l.charAt(0)}</button>`).join('')}</div><p>${i + 1}. ${q.statement}</p></div>`).join('');
                         } else if (page.type === 'quiz-mcq' && page.content.questions) {
                             questionsHTML = page.content.questions.map((q, i) => `<div class="question-group ${i > 0 ? 'border-t pt-6 mt-6' : ''}"><p class="font-semibold mb-2">${i + 1}. ${q.question}</p><div class="grid grid-cols-1 md:grid-cols-2 gap-2">${q.options.map(o => `<button onclick="checkMcqAnswer(this, '${o.replace(/'/g, "\\'")}' === '${q.correctAnswer.replace(/'/g, "\\'")}')" data-correct="${o === q.correctAnswer}" class="quiz-option p-3 rounded-lg text-left bg-gray-100 hover:bg-gray-200 border border-gray-200">${o}</button>`).join('')}</div></div>`).join('');
                         } else if (page.type === 'quiz-gap-fill' && page.content.sentences) {
@@ -1163,7 +1362,7 @@
                         x: Math.random() * bgCanvas.width, 
                         y: bgCanvas.height + 20, 
                         radius: Math.random() * 20 + 10, 
-                        speed: Math.random() * 1 + 0.5, 
+                        speed: Math.random() * 0.3 + 0.1, 
                         char: chars[Math.floor(Math.random() * chars.length)],
                         opacity: Math.random() * 0.5 + 0.1
                     });
@@ -1176,4 +1375,3 @@
     </script>
 </body>
 </html>
-
