@@ -325,13 +325,19 @@
     // --- DATA ---
     const defaultRosters = {
         "IELTS Group": ["Iris", "Max", "Cathy", "Sandy", "Vicky", "Jim", "Jackie", "Jay", "Grace", "Emily", "Rhea"],
-        "Grade 10": ["Dino", "Tracy", "Billie", "Jessie", "Von Tony", "Jim", "Andrew", "Mark", "Leo", "Apollo", "Lion"],
-        "Grade 12": ["Anna", "Mia", "Kenn", "Max", "Sky", "Sheng", "Keying", "Cen", "Xifei", "Jiaqi", "Zack"]
+        "Grade 10": [
+            "Dino", "Tracy", "Billie", "Jessie", "Von Tony", "Jim", "Andrew", "Mark", "Leo", 
+            "Apollo", "Lion", "Tony", "Alex", "Jenny", "Steven", "Mike", "Haolin"
+        ],
+        "Grade 12": [
+            "Anna", "Mia", "Kenn", "Max", "Sky", "Sheng", "Keying", "Cen", "Xifei", "Jiaqi", 
+            "Zack", "Azure", "Joe"
+        ]
     };
 
     // --- INIT ---
     document.getElementById('lessonDate').value = new Date().toISOString().split('T')[0];
-    let allClasses = JSON.parse(localStorage.getItem('efl_rosters_v17')) || defaultRosters;
+    let allClasses = JSON.parse(localStorage.getItem('efl_rosters_v20')) || defaultRosters;
     
     // Init Class Selector
     const sel = document.getElementById('classSelector');
