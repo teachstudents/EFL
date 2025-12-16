@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
             --space-dark: #0D0D2B;
@@ -14,6 +15,7 @@
             --space-light: #2C2C6A;
             --primary-glow: #00E5FF;
             --secondary-glow: #FF00FF;
+            --glass-bg: rgba(29, 29, 74, 0.85);
         }
 
         * {
@@ -31,6 +33,7 @@
             position: relative;
         }
 
+        /* --- BACKGROUND EFFECTS --- */
         #starfield {
             position: fixed;
             top: 0;
@@ -52,800 +55,966 @@
             from { transform: translateY(0px); }
             to { transform: translateY(-2000px); }
         }
-        
-        .laser-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 5;
-            overflow: hidden;
-        }
 
-        .laser {
-            position: absolute;
-            width: 200px;
-            height: 4px;
-            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.8));
-            border-radius: 5px;
-            animation: shoot-ltr 2s linear forwards;
-        }
-
-        @keyframes shoot-ltr {
-            0% { transform: translateX(-200px); opacity: 1; }
-            100% { transform: translateX(100vw); opacity: 0; }
-        }
-        
-        @keyframes shoot-rtl {
-            0% { transform: translateX(200px); opacity: 1; }
-            100% { transform: translateX(-100vw); opacity: 0; }
-        }
-
-        /* Game Container */
+        /* --- LAYOUT --- */
         .game-container {
-            max-width: 960px; /* Reduced by 20% from 1200px */
+            max-width: 1400px;
             margin: 0 auto;
             padding: 10px;
             position: relative;
             z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Game Progress Header */
+        /* --- HEADER & PROGRESS (NOW AT BOTTOM) --- */
         .game-progress {
-            background: rgba(29, 29, 74, 0.7);
-            backdrop-filter: blur(5px);
-            border-radius: 15px;
-            padding: 0.5rem 1.5rem;
-            margin-bottom: 0.5rem; /* Reduced margin */
-            border: 2px solid var(--primary-glow);
-            box-shadow: 0 0 15px var(--primary-glow);
-            text-align: center;
-        }
-
-        .progress-info {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px 20px 0 0; /* Rounded top corners */
+            padding: 0.5rem 2rem;
+            border-top: 2px solid var(--primary-glow);
+            box-shadow: 0 -5px 20px rgba(0, 229, 255, 0.3);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: nowrap;
+            margin-top: auto; /* Pushes to bottom */
+            height: 100px;
         }
 
-        .progress-item {
-            font-size: 1rem;
-            font-weight: bold;
-            text-shadow: 0 0 5px var(--primary-glow);
-        }
-        
-        .progress-item-center {
+        .header-team-score {
             text-align: center;
-        }
-
-        .header-score {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             color: var(--secondary-glow);
             text-shadow: 0 0 10px var(--secondary-glow);
         }
         
-        .header-score span {
-            display: block;
+        .header-team-score span {
             font-size: 0.9rem;
-            color: #E0E0E0;
-            margin-bottom: 4px;
+            color: #fff;
+            display: block;
+            margin-bottom: 5px;
         }
-        
-        /* Game Modes */
-        .game-modes {
+
+        .round-info {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* --- GAMEPLAY AREA --- */
+        .game-play {
+            display: none;
+            flex-grow: 1;
+            flex-direction: column;
+            justify-content: center; /* Centered vertically */
+            padding-bottom: 20px;
+            height: calc(100vh - 120px); /* Adjust for footer height */
+        }
+
+        .battle-arena {
             display: flex;
             justify-content: center;
+            gap: 2rem;
+            align-items: stretch;
+            height: 100%;
+        }
+
+        .versus-divider {
+            display: flex;
             align-items: center;
-            gap: 1.5rem;
-            margin: 5rem 0;
-            flex-wrap: wrap;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--secondary-glow);
+            text-shadow: 0 0 20px var(--secondary-glow);
+            width: 60px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.7; transform: scale(1); } }
+
+        /* --- PLAYER CARD --- */
+        .player-card {
+            flex: 1;
+            background: var(--glass-bg);
+            border: 2px solid var(--primary-glow);
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .player-card.active-turn {
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.3);
+            border-color: #fff;
+        }
+
+        /* Top Section: Question & Answers */
+        .question-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .target-word-container {
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .target-word {
+            font-size: clamp(1.5rem, 4vw, 3rem); /* Responsive sizing */
+            text-align: center;
+            color: #fff;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px var(--secondary-glow);
+            letter-spacing: 2px;
+            word-wrap: break-word;
+            white-space: normal;
+            line-height: 1.2;
+            width: 100%;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .answer-btn {
+            background: linear-gradient(90deg, rgba(0, 229, 255, 0.1), rgba(0, 229, 255, 0.2));
+            border: 1px solid var(--primary-glow);
+            color: white;
+            padding: 1.2rem;
+            font-size: 1.4rem;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s;
+            text-transform: capitalize;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .answer-btn:hover {
+            background: var(--primary-glow);
+            color: black;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .answer-btn.correct { background: #00ff00; color: black; border-color: #00ff00; box-shadow: 0 0 30px #00ff00; }
+        .answer-btn.incorrect { background: #ff0000; color: white; border-color: #ff0000; box-shadow: 0 0 30px #ff0000; }
+        .answer-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* Bottom Section: Player Info */
+        .player-info-footer {
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 1rem;
+            margin-top: auto;
+        }
+
+        .player-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .player-identity {
+            text-align: left;
+            flex: 1;
+        }
+
+        .player-score-area {
+            text-align: right;
+            min-width: 100px;
+        }
+
+        .player-name-display {
+            font-size: 1.2rem;
+            color: var(--primary-glow);
+            font-weight: bold;
+            margin-bottom: 0.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 250px;
+        }
+        
+        .english-name-display {
+            font-size: 0.9rem;
+            color: #00ff00; /* Light green for contrast */
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .player-stats {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .round-score {
+            font-size: 2.2rem;
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            line-height: 1;
+        }
+
+        /* Timer Bar within Player Card */
+        .local-timer-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .local-timer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #ffff00, #ff0000);
+            width: 100%;
+            transform-origin: left;
+            transition: width 0.1s linear;
+        }
+
+        /* --- MODES & SETUP --- */
+        .centered-menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 100%;
+            z-index: 50;
         }
 
         .mode-btn {
-            padding: 1.5rem 2.5rem;
-            font-size: 1.3rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, var(--space-mid), var(--space-light));
-            color: #FFF;
+            background: transparent;
             border: 2px solid var(--primary-glow);
-            border-radius: 10px;
+            color: var(--primary-glow);
+            padding: 1rem 3rem;
+            font-size: 1.5rem;
+            margin: 1rem;
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+            font-family: 'Orbitron', sans-serif;
+            transition: 0.3s;
+            text-shadow: 0 0 5px var(--primary-glow);
+            box-shadow: 0 0 10px var(--primary-glow) inset;
         }
 
         .mode-btn:hover {
-            transform: translateY(-5px) scale(1.05);
-            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
+            background: var(--primary-glow);
             color: var(--space-dark);
-            box-shadow: 0 0 25px var(--primary-glow), 0 0 15px var(--secondary-glow);
+            box-shadow: 0 0 30px var(--primary-glow);
         }
-        
-        /* Team Setup & Player Selection */
-        .team-setup, .player-selection {
+
+        /* --- CHAMPIONSHIP MODAL --- */
+        .championship-modal {
             display: none;
-            text-align: center;
-            background: rgba(13, 13, 43, 0.7);
-            backdrop-filter: blur(5px);
-            border-radius: 20px;
-            padding: 2rem;
-            border: 2px solid var(--primary-glow);
-        }
-        
-        .player-selection-area { display: flex; justify-content: center; gap: 2rem; margin: 2.5rem auto 1.5rem; }
-        .player-display { width: 300px; height: 150px; border: 3px solid var(--primary-glow); border-radius: 15px; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; box-shadow: 0 0 15px var(--primary-glow); }
-        .player-display-team-name { color: var(--secondary-glow); font-size: 1.2rem; margin-bottom: 1rem; }
-        .player-display-window { font-size: 1.5rem; font-weight: bold; animation: text-flicker 0.1s infinite alternate; }
-        @keyframes text-flicker { 0% { text-shadow: 0 0 5px #fff, 0 0 10px var(--primary-glow); } 100% { text-shadow: 0 0 10px #fff, 0 0 20px var(--primary-glow); } }
-
-        .teams-display { display: flex; justify-content: space-between; gap: 2rem; margin-top: 1rem; }
-        .team { flex: 1; background: var(--space-mid); border-radius: 15px; padding: 1.5rem; border: 2px solid var(--primary-glow); }
-        .team h3 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--secondary-glow); text-shadow: 0 0 10px var(--secondary-glow); }
-        .team-member { padding: 0.5rem; margin: 0.5rem 0; background: rgba(0, 229, 255, 0.1); border-radius: 10px; font-size: 1rem; }
-        
-        /* Game Play */
-        .game-play { display: none; position: relative; flex-direction: column;}
-        .game-area { display: flex; justify-content: space-between; align-items: stretch; gap: 1rem; }
-        .versus-indicator { font-size: 3rem; font-weight: bold; color: var(--secondary-glow); text-shadow: 0 0 15px var(--secondary-glow); animation: bonusPulse 1.5s ease-in-out infinite; display: flex; align-items: center; }
-        .team-game-area { flex: 1; display: flex; flex-direction: column; gap: 1rem; position: relative; }
-        
-        .team-score-display { background: rgba(29, 29, 74, 0.8); border-radius: 15px; padding: 0.5rem; border: 2px solid var(--primary-glow); text-align: center; }
-        .team-score-display .team-name { font-size: 1.2rem; font-weight: bold; }
-        .team-score-display .score-number { font-size: 2.2rem; color: var(--secondary-glow); text-shadow: 0 0 15px var(--secondary-glow); }
-
-        .player-area {
-            flex-grow: 1;
-            background: rgba(29, 29, 74, 0.8);
-            border-radius: 20px;
-            padding: 1rem;
-            border: 2px solid var(--primary-glow);
-            box-shadow: 0 0 10px var(--primary-glow);
-            text-align: center;
-            display: flex;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 2000;
             flex-direction: column;
-            justify-content: space-around; /* Adjusted for better spacing */
+            align-items: center;
+            justify-content: center;
         }
-
-        .player-name { font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem; text-shadow: 0 0 10px var(--primary-glow); min-height: 30px; }
         
-        .target-word-container { margin-bottom: 1rem; }
-        .target-word { font-size: 2.5rem; font-weight: 700; color: #FFF; text-shadow: 0 0 15px var(--secondary-glow); }
+        .trophy-icon { font-size: 5rem; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
 
-        .answer-buttons { display: grid; grid-template-columns: 1fr; gap: 0.5rem; }
-        .answer-btn { padding: 1rem; font-size: 1.3rem; font-weight: bold; background: linear-gradient(45deg, rgba(0, 229, 255, 0.25), rgba(0, 191, 165, 0.4)); color: #ffffff; border: 2px solid var(--primary-glow); border-radius: 10px; cursor: pointer; transition: all 0.3s ease; text-shadow: 0 0 3px rgba(0,0,0,0.5); }
-        .answer-btn:hover { background: linear-gradient(45deg, rgba(0, 229, 255, 0.5), rgba(0, 191, 165, 0.7)); transform: scale(1.05); }
-        .answer-btn.correct { background: linear-gradient(45deg, #2ecc71, #27ae60); color: #fff; animation: correctPulse 0.5s ease; }
-        .answer-btn.incorrect { background: linear-gradient(45deg, #e74c3c, #c0392b); color: #fff; animation: incorrectShake 0.5s ease; }
-        @keyframes correctPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
-        @keyframes incorrectShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
-        
-        .correct-answer-reveal { font-size: 1rem; color: var(--secondary-glow); margin-top: 0.5rem; font-weight: bold; text-shadow: 0 0 8px var(--secondary-glow); height: 25px; display: flex; align-items: center; justify-content: center; }
-        
-        .timer-container { margin-bottom: 0.5rem; text-align: center; }
-        .timer-display { font-size: 2.2rem; font-weight: bold; color: var(--secondary-glow); text-shadow: 0 0 20px var(--secondary-glow); }
-        .timer-bar { width: 100%; height: 10px; background: rgba(0,0,0,0.5); border-radius: 10px; overflow: hidden; border: 1px solid var(--primary-glow); }
-        .timer-progress { height: 100%; background: linear-gradient(90deg, var(--secondary-glow), var(--primary-glow)); transition: width 0.1s linear; border-radius: 10px; }
-
-        .stardust-particle, .splash-star {
-            position: absolute;
-            pointer-events: none;
-            z-index: 1000;
+        /* --- EFFECTS --- */
+        .particle { position: absolute; pointer-events: none; }
+        .correct-reveal-text {
+            height: 20px;
+            text-align: center;
+            color: #00ff00;
+            font-size: 0.9rem;
+            margin-top: 5px;
             opacity: 0;
+            transition: opacity 0.3s;
         }
-
-        .stardust-particle {
-            width: 8px;
-            height: 8px;
-            background: var(--secondary-glow);
-            border-radius: 50%;
-            animation: fly-to-score 1s ease-out forwards;
-            box-shadow: 0 0 8px var(--secondary-glow), 0 0 12px var(--primary-glow);
-        }
-
-        @keyframes fly-to-score {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--x-end), var(--y-end)) scale(0); opacity: 0; }
-        }
-        
-        /* New Effects */
-        .star-particle { position: absolute; color: #fff; font-size: 14px; animation: star-fly 1.5s linear forwards; pointer-events: none; z-index: 1001; }
-        @keyframes star-fly {
-            0% { transform: translate(0,0) scale(0.5); opacity: 1; }
-            100% { transform: translate(var(--dx), var(--dy)) scale(1.5); opacity: 0; }
-        }
-
-        .asteroid { position: absolute; background: #ff4d4d; border-radius: 50%; animation: asteroid-burst 1s ease-out forwards; pointer-events: none; z-index: 1001; }
-        @keyframes asteroid-burst {
-            0% { transform: translate(0,0) scale(0.5); opacity: 1; }
-            100% { transform: translate(var(--dx), var(--dy)) scale(1.2); opacity: 0; }
-        }
-
-        .rocket-pulse { animation: rocket-pulse 0.6s ease-out; }
-        @keyframes rocket-pulse {
-            0% { transform: scale(1); box-shadow: 0 0 5px var(--primary-glow); }
-            50% { transform: scale(1.15); box-shadow: 0 0 20px var(--primary-glow), 0 0 30px var(--primary-glow); }
-            100% { transform: scale(1); box-shadow: 0 0 5px var(--primary-glow); }
-        }
-        
-        .praise-word, .encouragement-phrase {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); font-size: 2.5rem; font-weight: bold;
-            z-index: 100; pointer-events: none; animation: praise-animation 1.5s ease-out forwards;
-        }
-        .encouragement-phrase { color: var(--primary-glow); text-shadow: 0 0 10px var(--primary-glow); }
-        @keyframes praise-animation { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; } 100% { transform: translate(-50%, -200%) scale(1.2); opacity: 0; } }
+        .correct-reveal-text.show { opacity: 1; }
 
     </style>
 </head>
 <body>
+
     <div id="starfield"></div>
-    <div class="laser-container"></div>
+
     <div class="game-container">
-        <!-- Header, Game Modes, etc. -->
-        <div class="game-progress" id="gameProgress" style="display: none;">
-            <div class="progress-info">
-                <div class="header-score">
-                    <span id="headerTeam1Name">Team 1</span>
-                    <div id="headerTeam1Score">0</div>
+        
+        <!-- MAIN MENU -->
+        <div id="mainMenu" class="centered-menu">
+            <h1 style="font-size: 4rem; margin-bottom: 2rem; color: var(--primary-glow); text-shadow: 0 0 20px var(--primary-glow);">SYNONYM GALAXY</h1>
+            <button class="mode-btn" onclick="startGame(10)">Grade 10</button>
+            <button class="mode-btn" onclick="startGame(11)">Grade 11</button>
+            <button class="mode-btn" onclick="startGame(12)">Grade 12</button>
+        </div>
+
+        <!-- TEAM SETUP (Hidden) -->
+        <div id="teamSetup" class="centered-menu" style="display:none;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 2rem; color: #fff;">GENERATING TEAMS...</h2>
+            <div style="display: flex; gap: 2rem; justify-content: center;">
+                <div style="background: rgba(0,0,0,0.5); padding: 2rem; border: 1px solid var(--primary-glow); border-radius: 10px;">
+                    <h3 id="setupTeam1Name" style="color: var(--primary-glow);">Team 1</h3>
+                    <div id="setupTeam1List" style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;"></div>
                 </div>
-                <div class="progress-item-center">
-                    <div class="progress-item">Round: <span id="currentRoundDisplay">1</span>/<span id="totalRoundsHeader"></span></div>
-                    <div class="progress-item">Card: <span id="currentCard">1</span>/10</div>
-                </div>
-                <div class="header-score">
-                    <span id="headerTeam2Name">Team 2</span>
-                    <div id="headerTeam2Score">0</div>
+                <div style="background: rgba(0,0,0,0.5); padding: 2rem; border: 1px solid var(--secondary-glow); border-radius: 10px;">
+                    <h3 id="setupTeam2Name" style="color: var(--secondary-glow);">Team 2</h3>
+                    <div id="setupTeam2List" style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;"></div>
                 </div>
             </div>
         </div>
 
-        <div class="game-modes" id="gameModes">
-            <button class="mode-btn" onclick="selectGradeAndStart(10)">Grade 10</button>
-            <button class="mode-btn" onclick="selectGradeAndStart(11)">Grade 11</button>
-            <button class="mode-btn" onclick="selectGradeAndStart(12)">Grade 12</button>
+        <!-- NEXT MATCHUP / SELECTION SCREEN -->
+        <div id="matchupScreen" class="centered-menu" style="display:none;">
+            <h2 style="font-size: 2rem; margin-bottom: 2rem;">NEXT BATTLE</h2>
+            <div style="display: flex; gap: 4rem; align-items: center; justify-content: center; margin-bottom: 2rem;">
+                <div style="text-align: center;">
+                    <div style="font-size: 1.2rem; color: var(--primary-glow);" id="matchupTeam1">Team 1</div>
+                    <div style="font-size: 2rem; font-weight: bold;" id="matchupPlayer1">Selecting...</div>
+                </div>
+                <div style="font-size: 3rem; color: #555;">VS</div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.2rem; color: var(--secondary-glow);" id="matchupTeam2">Team 2</div>
+                    <div style="font-size: 2rem; font-weight: bold;" id="matchupPlayer2">Selecting...</div>
+                </div>
+            </div>
+            <div id="countdown" style="font-size: 3rem; color: var(--primary-glow);">5</div>
         </div>
 
-        <div id="game-content" style="display: none;">
-            <div class="team-setup" id="teamSetup">
-                <h2 style="font-size: 2rem; margin-bottom: 1rem; text-shadow: 0 0 15px var(--primary-glow);">👥 Team Formation</h2>
-                <div class="teams-display">
-                    <div class="team"><h3 id="team1Name"></h3><div id="team1Members"></div></div>
-                    <div class="team"><h3 id="team2Name"></h3><div id="team2Members"></div></div>
-                </div>
-            </div>
-
-            <div class="player-selection" id="playerSelection">
-                <h2 style="font-size: 2rem; margin-bottom: 1rem; text-shadow: 0 0 15px var(--primary-glow);">🚀 PLAYER SELECTION 🚀</h2>
-                <div class="player-selection-area">
-                    <div class="player-display">
-                        <div class="player-display-team-name" id="display1TeamName"></div>
-                        <div class="player-display-window" id="player1Display">-- Standby --</div>
-                    </div>
-                     <div class="player-display">
-                        <div class="player-display-team-name" id="display2TeamName"></div>
-                        <div class="player-display-window" id="player2Display">-- Standby --</div>
-                    </div>
-                </div>
-                <div style="text-align: center; margin-top: 1rem; font-size: 1.2rem; color: var(--secondary-glow);">
-                    <div id="selectionCountdown">Round starts in <span id="countdownTimer">10</span>s...</div>
-                </div>
-            </div>
-
-            <div class="game-play" id="gamePlay">
-                <div class="timer-container">
-                    <div class="timer-display" id="timerDisplay">10</div>
-                    <div class="timer-bar"><div class="timer-progress" id="timerProgress"></div></div>
-                </div>
-                <div class="game-area">
-                    <div class="team-game-area" id="team1GameArea">
-                         <div class="team-score-display"><div class="team-name" id="gameTeam1Name">Team 1</div><div class="score-number" id="team1RoundScore">0</div></div>
-                         <div class="player-area">
-                            <div class="player-name" id="player1Name"></div>
-                            <div class="target-word-container">
-                                <div class="target-word" id="targetWord1">WORD</div>
-                            </div>
-                            <div class="answer-buttons" id="player1Buttons"></div>
-                            <div class="correct-answer-reveal" id="player1AnswerReveal"></div>
+        <!-- GAMEPLAY ARENA -->
+        <div id="gamePlay" class="game-play">
+            <div class="battle-arena">
+                <!-- Player 1 Card -->
+                <div class="player-card" id="cardP1">
+                    <div class="question-section">
+                        <div class="target-word-container">
+                             <div class="target-word" id="targetWord1">WORD</div>
                         </div>
+                        <div class="answers-grid" id="answers1">
+                            <!-- Buttons injected here -->
+                        </div>
+                        <div class="correct-reveal-text" id="reveal1">Answer</div>
                     </div>
-                     <div class="versus-indicator">VS</div>
-                    <div class="team-game-area" id="team2GameArea">
-                        <div class="team-score-display"><div class="team-name" id="gameTeam2Name">Team 2</div><div class="score-number" id="team2RoundScore">0</div></div>
-                         <div class="player-area">
-                            <div class="player-name" id="player2Name"></div>
-                             <div class="target-word-container">
-                                <div class="target-word" id="targetWord2">WORD</div>
+                    <div class="player-info-footer">
+                        <div class="player-details">
+                            <div class="player-identity">
+                                <div class="player-name-display" id="nameP1">Player Name</div>
+                                <div class="player-stats">Total Points: <span id="totalPointsP1">0</span></div>
                             </div>
-                            <div class="answer-buttons" id="player2Buttons"></div>
-                            <div class="correct-answer-reveal" id="player2AnswerReveal"></div>
+                            <div class="player-score-area">
+                                <div class="round-score" id="scoreP1">0</div>
+                                <div class="english-name-display" id="engNameP1">Name</div>
+                            </div>
+                        </div>
+                        <div class="local-timer-container">
+                            <div class="local-timer-bar" id="timerBar1"></div>
                         </div>
                     </div>
                 </div>
+
+                <div class="versus-divider">VS</div>
+
+                <!-- Player 2 Card -->
+                <div class="player-card" id="cardP2">
+                    <div class="question-section">
+                        <div class="target-word-container">
+                             <div class="target-word" id="targetWord2">WORD</div>
+                        </div>
+                        <div class="answers-grid" id="answers2">
+                            <!-- Buttons injected here -->
+                        </div>
+                        <div class="correct-reveal-text" id="reveal2">Answer</div>
+                    </div>
+                    <div class="player-info-footer">
+                        <div class="player-details">
+                            <div class="player-identity">
+                                <div class="player-name-display" id="nameP2">Player Name</div>
+                                <div class="player-stats">Total Points: <span id="totalPointsP2">0</span></div>
+                            </div>
+                            <div class="player-score-area">
+                                <div class="round-score" id="scoreP2">0</div>
+                                <div class="english-name-display" id="engNameP2">Name</div>
+                            </div>
+                        </div>
+                        <div class="local-timer-container">
+                            <div class="local-timer-bar" id="timerBar2"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        
+        <!-- HEADER (Moved to Bottom) -->
+        <div class="game-progress" id="gameHeader" style="display:none;">
+            <div class="header-team-score">
+                <span id="headerTeam1Name">Team Alpha</span>
+                <div id="headerTeam1Score">0</div>
+            </div>
+            <div class="round-info">
+                <div>ROUND <span id="currentRoundDisplay">1</span> / <span id="totalRoundsDisplay">5</span></div>
+                <div style="font-size: 0.9rem; color: #888;">Question <span id="currentQuestionNum">1</span>/10</div>
+            </div>
+            <div class="header-team-score">
+                <span id="headerTeam2Name">Team Beta</span>
+                <div id="headerTeam2Score">0</div>
+            </div>
+        </div>
+
     </div>
-    
+
+    <!-- CHAMPIONSHIP MODAL -->
+    <div id="championshipModal" class="championship-modal">
+        <div class="trophy-icon">🏆</div>
+        <h1 style="font-size: 4rem; color: gold; text-shadow: 0 0 20px gold; margin: 1rem;">CHAMPIONSHIP ROUND</h1>
+        <h2 style="font-size: 1.5rem; color: #fff; margin-bottom: 2rem;">The Top Players Face Off!</h2>
+        <div style="display: flex; gap: 3rem; margin-bottom: 3rem;">
+            <div style="text-align: center;">
+                <div style="font-size: 1.2rem; color: var(--primary-glow);">TEAM ALPHA CHAMPION</div>
+                <div style="font-size: 2.5rem; font-weight: bold;" id="champ1Name">Name</div>
+                <div style="color: gold;" id="champ1Score">0 pts</div>
+            </div>
+             <div style="text-align: center; font-size: 3rem; color: #555; display: flex; align-items:center;">VS</div>
+            <div style="text-align: center;">
+                <div style="font-size: 1.2rem; color: var(--secondary-glow);">TEAM BETA CHAMPION</div>
+                <div style="font-size: 2.5rem; font-weight: bold;" id="champ2Name">Name</div>
+                 <div style="color: gold;" id="champ2Score">0 pts</div>
+            </div>
+        </div>
+        <button class="mode-btn" onclick="startChampionshipMatch()">START FINAL BATTLE</button>
+    </div>
+
     <script>
-        // --- STARFIELD EFFECT ---
-        function createStars() {
-            const container = document.getElementById('starfield');
-            if (!container) return;
-            container.innerHTML = '';
-            for (let i = 0; i < 500; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                const size = Math.random() * 3 + 1;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.top = `${Math.random() * 2000}px`;
-                star.style.left = `${Math.random() * 100}%`;
-                const duration = Math.random() * 5 + 5;
-                star.style.animationDuration = `${duration}s`;
-                star.style.animationDelay = `${Math.random() * duration}s`;
-                container.appendChild(star);
+        // --- DATA ---
+        const grade10 = ["Dino", "Tracy", "Billie", "Jessie", "Von Tony", "Jim", "Andrew", "Mark", "Leo", "Apollo", "Jenny", "Tony", "Haowlin", "Lion", "Steven", "Mike"];
+        const grade11 = ["Grace", "Iris", "Jackie", "Max", "Emily", "Rhea", "Vicky"];
+        const grade12 = ["Anna", "Mia", "Kenn", "Max", "Sky", "Sheng", "Keying", "Zifan", "Sifei", "Jiaqi", "Zack", "Azure", "Joe"];
+        
+        // Dictionary Data Sorted by CEFR
+        const words = {
+            A1: [
+                { word: "happy", synonyms: ["joyful", "cheerful", "glad"] }, { word: "sad", synonyms: ["unhappy", "down", "upset"] },
+                { word: "big", synonyms: ["large", "huge", "tall"] }, { word: "small", synonyms: ["little", "tiny", "short"] },
+                { word: "fast", synonyms: ["quick", "rapid", "speedy"] }, { word: "slow", synonyms: ["unhurried", "leisurely", "late"] },
+                { word: "hot", synonyms: ["warm", "boiling", "sunny"] }, { word: "cold", synonyms: ["cool", "freezing", "chilly"] },
+                { word: "good", synonyms: ["nice", "fine", "great"] }, { word: "bad", synonyms: ["terrible", "awful", "evil"] },
+                { word: "run", synonyms: ["jog", "sprint", "race"] }, { word: "walk", synonyms: ["hike", "stroll", "march"] }
+            ],
+            A2: [
+                { word: "start", synonyms: ["begin", "open", "launch"] }, { word: "end", synonyms: ["finish", "stop", "close"] },
+                { word: "beautiful", synonyms: ["pretty", "lovely", "attractive"] }, { word: "ugly", synonyms: ["unattractive", "messy", "nasty"] },
+                { word: "rich", synonyms: ["wealthy", "expensive", "prosperous"] }, { word: "poor", synonyms: ["needy", "broke", "unfortunate"] },
+                { word: "give", synonyms: ["offer", "provide", "grant"] }, { word: "take", synonyms: ["get", "grab", "catch"] },
+                { word: "buy", synonyms: ["purchase", "pay for", "get"] }, { word: "sell", synonyms: ["trade", "exchange", "deal"] },
+                { word: "clever", synonyms: ["smart", "bright", "intelligent"] }, { word: "stupid", synonyms: ["dumb", "silly", "foolish"] }
+            ],
+            B1: [
+                { word: "difficult", synonyms: ["hard", "challenging", "tough"] }, { word: "easy", synonyms: ["simple", "effortless", "basic"] },
+                { word: "brave", synonyms: ["courageous", "heroic", "bold"] }, { word: "scared", synonyms: ["afraid", "frightened", "nervous"] },
+                { word: "create", synonyms: ["invent", "design", "produce"] }, { word: "destroy", synonyms: ["ruin", "wreck", "smash"] },
+                { word: "important", synonyms: ["essential", "crucial", "main"] }, { word: "boring", synonyms: ["dull", "uninteresting", "tiring"] },
+                { word: "calm", synonyms: ["relaxed", "peaceful", "quiet"] }, { word: "angry", synonyms: ["mad", "cross", "annoyed"] },
+                { word: "strange", synonyms: ["odd", "weird", "unusual"] }, { word: "common", synonyms: ["usual", "normal", "regular"] }
+            ],
+            B2: [
+                { word: "diligent", synonyms: ["hardworking", "studious", "active"] }, { word: "lazy", synonyms: ["inactive", "sluggish", "idle"] },
+                { word: "optimistic", synonyms: ["positive", "hopeful", "cheerful"] }, { word: "pessimistic", synonyms: ["negative", "gloomy", "hopeless"] },
+                { word: "arrogant", synonyms: ["proud", "vain", "haughty"] }, { word: "humble", synonyms: ["modest", "shy", "meek"] },
+                { word: "intricate", synonyms: ["complex", "complicated", "detailed"] }, { word: "simple", synonyms: ["plain", "easy", "basic"] },
+                { word: "genuine", synonyms: ["real", "authentic", "true"] }, { word: "fake", synonyms: ["false", "artificial", "imitation"] },
+                { word: "admit", synonyms: ["confess", "accept", "acknowledge"] }, { word: "deny", synonyms: ["refuse", "reject", "dispute"] }
+            ],
+            C1: [
+                { word: "ephemeral", synonyms: ["transient", "fleeting", "brief"] }, { word: "ubiquitous", synonyms: ["omnipresent", "pervasive", "universal"] },
+                { word: "pragmatic", synonyms: ["practical", "sensible", "realistic"] }, { word: "superfluous", synonyms: ["excessive", "redundant", "extra"] },
+                { word: "benevolent", synonyms: ["kind", "generous", "charitable"] }, { word: "malevolent", synonyms: ["wicked", "malicious", "hostile"] },
+                { word: "enigmatic", synonyms: ["mysterious", "puzzling", "cryptic"] }, { word: "articulate", synonyms: ["eloquent", "fluent", "clear"] },
+                { word: "mundane", synonyms: ["ordinary", "banal", "routine"] }, { word: "meticulous", synonyms: ["thorough", "precise", "exact"] },
+                { word: "esoteric", synonyms: ["obscure", "abstruse", "secret"] }, { word: "candid", synonyms: ["frank", "honest", "direct"] }
+            ]
+        };
+
+        const praisePhrases = ["Excellent!", "Stellar!", "Amazing!", "Perfect!", "Genius!", "Superb!"];
+        
+        // --- GAME STATE ---
+        let state = {
+            players: [],
+            team1: { name: "", players: [], score: 0 },
+            team2: { name: "", players: [], score: 0 },
+            playerStats: {}, // { "Name": { score: 0, team: 1/2 } }
+            rounds: [],
+            currentRoundIdx: 0,
+            currentQuestionIdx: 0,
+            currentPlayer1: null,
+            currentPlayer2: null,
+            timer: null,
+            isChampionship: false,
+            roundResolved: false // To prevent double triggers
+        };
+
+        // --- AUDIO ---
+        const synth = window.speechSynthesis;
+        let voices = [];
+        
+        function initVoices() {
+            voices = synth.getVoices();
+        }
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = initVoices;
+        }
+
+        // Helper to extract English name from "Chinese / English"
+        function getEnglishName(fullString) {
+            if (!fullString) return "";
+            if (fullString.includes('/')) {
+                // Return the part after the slash, trimmed
+                return fullString.split('/')[1].trim();
+            }
+            return fullString;
+        }
+
+        function speak(text, isName = false) {
+            if (synth.speaking) synth.cancel();
+            
+            // If it's a player name, parse it for English only
+            const textToSpeak = isName ? getEnglishName(text) : text;
+            
+            const utter = new SpeechSynthesisUtterance(textToSpeak);
+            utter.rate = 0.85; // Slowed down
+            
+            // Priority: Microsoft Andrew, Microsoft Emma, then generic English
+            const andrew = voices.find(v => v.name.includes("Microsoft Andrew Online (Natural)"));
+            const emma = voices.find(v => v.name.includes("Microsoft Emma Online (Natural)"));
+            const anyNatural = voices.find(v => v.name.includes("Natural") && v.lang.startsWith("en"));
+            
+            if (andrew) utter.voice = andrew;
+            else if (emma) utter.voice = emma;
+            else if (anyNatural) utter.voice = anyNatural;
+            
+            synth.speak(utter);
+        }
+
+        function playSound(type) {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(500, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.5);
+            } else {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
             }
         }
         
-        // --- PLAYER & WORD DATA ---
-        const grade10Players = ["冯奕尘 / Feng, Yichen", "黄若涵 / Huang, Ruohan", "李丰屹 / Li, Fengyi", "李鹏潞 / Li, Penglu", "梁锦天 / Ling, Jintian", "刘景扬 / Liu, Jingyang", "龙俊志 / Long, Junzhi", "马赫 / Ma, He", "聂溪康 / Nie, Xikang", "庞云蔚 / Pang, Yunwei", "曲家瑞 / Qu, Jiarui", "孙诗童 / Sun, Shitong", "Haowlin", "杨晴珺 / Yang, Qingjun", "张宸恺 / Zhang, Chenkai", "赵浩文 / Zhao, Haowen"];
-        const grade11Players = ["Grace", "Iris", "Jackie", "Max", "Emily", "Rhea", "Vicky"];
-        const grade12Players = ["安政聿 / An, Zhengyu", "蔡子墨 / Cai, Zimo", "刘镇榕 / Liu, Zhenrong", "马知行 / Ma, Zhixing", "邱天 / Qiu, Tian", "盛思语 / Sheng, Siyu", "唐可盈 / Tang, Keying", "田子凡 / Tian, Zifan", "谢斯飞 / Xie, Sifei", "杨加麒 / Yang, Jiaqi", "张程皓 / Zhang, Chenghao", "赵晨达鑫 / Zhao, Chendaxin", "周逸凡 / Zhou, Yifan"];
-        let playerNames = [];
-        const wordSet1 = [ { word: "happy", synonyms: ["joyful", "cheerful", "merry", "content"] }, { word: "sad", synonyms: ["unhappy", "sorrowful", "gloomy", "miserable"] }, { word: "big", synonyms: ["large", "huge", "enormous", "vast"] }, { word: "small", synonyms: ["little", "tiny", "diminutive", "compact"] }, { word: "fast", synonyms: ["quick", "rapid", "swift", "speedy"] }, { word: "slow", synonyms: ["leisurely", "unhurried", "gradual", "plodding"] }, { word: "good", synonyms: ["excellent", "fine", "wonderful", "pleasant"] }, { word: "bad", synonyms: ["awful", "terrible", "horrible", "nasty"] }, { word: "smart", synonyms: ["intelligent", "bright", "clever", "brilliant"] }, { word: "funny", synonyms: ["amusing", "hilarious", "comical", "witty"] } ];
-        const wordSet2 = [ { word: "run", synonyms: ["dash", "sprint", "bolt", "jog"] }, { word: "walk", synonyms: ["stroll", "saunter", "trek", "hike"] }, { word: "look", synonyms: ["gaze", "stare", "glance", "peer"] }, { word: "say", synonyms: ["speak", "state", "declare", "utter"] }, { word: "make", synonyms: ["create", "build", "construct", "produce"] }, { word: "break", synonyms: ["fracture", "shatter", "smash", "rupture"] }, { word: "take", synonyms: ["grab", "seize", "snatch", "acquire"] }, { word: "give", synonyms: ["provide", "offer", "donate", "bestow"] }, { word: "help", synonyms: ["assist", "aid", "support", "serve"] }, { word: "use", synonyms: ["utilize", "employ", "operate", "apply"] } ];
-        const wordSet3 = [ { word: "beautiful", synonyms: ["gorgeous", "stunning", "lovely", "attractive"] }, { word: "ugly", synonyms: ["hideous", "unattractive", "unsightly", "repulsive"] }, { word: "difficult", synonyms: ["hard", "challenging", "tough", "complex"] }, { word: "easy", synonyms: ["simple", "effortless", "straightforward", "uncomplicated"] }, { word: "important", synonyms: ["significant", "crucial", "vital", "essential"] }, { word: "interesting", synonyms: ["fascinating", "engaging", "intriguing", "captivating"] }, { word: "boring", synonyms: ["dull", "tedious", "monotonous", "uninteresting"] }, { word: "quiet", synonyms: ["silent", "peaceful", "calm", "hushed"] }, { word: "noisy", synonyms: ["loud", "rowdy", "boisterous", "clamorous"] }, { word: "rich", synonyms: ["wealthy", "affluent", "prosperous", "loaded"] } ];
-        const wordSet4 = [ { word: "open", synonyms: ["unlocked", "ajar", "unfastened", "accessible"] }, { word: "close", synonyms: ["shut", "seal", "fasten", "secure"] }, { word: "start", synonyms: ["begin", "commence", "initiate", "launch"] }, { word: "stop", synonyms: ["halt", "cease", "end", "finish"] }, { word: "buy", synonyms: ["purchase", "acquire", "obtain", "procure"] }, { word: "sell", synonyms: ["trade", "market", "vend", "peddle"] }, { word: "win", synonyms: ["triumph", "succeed", "prevail", "conquer"] }, { word: "lose", synonyms: ["fail", "fall short", "be defeated", "surrender"] }, { word: "love", synonyms: ["adore", "cherish", "treasure", "care for"] }, { word: "hate", synonyms: ["dislike", "detest", "loathe", "despise"] } ];
-        const wordSet5 = [ { word: "angry", synonyms: ["furious", "irate", "enraged", "livid"] }, { word: "scared", synonyms: ["afraid", "terrified", "frightened", "panicked"] }, { word: "brave", synonyms: ["courageous", "heroic", "valiant", "fearless"] }, { word: "calm", synonyms: ["serene", "tranquil", "peaceful", "composed"] }, { word: "eager", synonyms: ["keen", "excited", "enthusiastic", "avid"] }, { word: "tired", synonyms: ["exhausted", "weary", "fatigued", "drained"] }, { word: "surprised", synonyms: ["amazed", "astonished", "startled", "stunned"] }, { word: "proud", synonyms: ["arrogant", "haughty", "smug", "vain"] }, { word: "shy", synonyms: ["bashful", "timid", "reserved", "introverted"] }, { word: "honest", synonyms: ["truthful", "sincere", "candid", "forthright"] } ];
-        const wordSet6 = [ { word: "day", synonyms: ["daytime", "sunlight", "morning", "afternoon"] }, { word: "night", synonyms: ["evening", "darkness", "midnight", "bedtime"] }, { word: "friend", synonyms: ["companion", "buddy", "pal", "mate"] }, { word: "enemy", synonyms: ["foe", "opponent", "adversary", "rival"] }, { word: "teacher", synonyms: ["instructor", "educator", "mentor", "tutor"] }, { word: "student", synonyms: ["pupil", "learner", "trainee", "scholar"] }, { word: "family", synonyms: ["relatives", "kin", "household", "clan"] }, { word: "home", synonyms: ["house", "residence", "dwelling", "abode"] }, { word: "school", synonyms: ["academy", "institution", "campus", "college"] }, { word: "work", synonyms: ["labor", "job", "task", "duty"] } ];
-        
-        const praiseAudioPhrases = ["Great answer!", "Excellent!", "Correct!", "Well done!", "Perfect!", "That's right!", "Amazing!", "Fantastic!"];
-        const correctPhrases = ["Stellar work!", "You've got it!", "Absolutely brilliant!", "That's the one!", "Incredible!", "You're a genius!", "Keep it up!", "Outstanding!", "Perfectly done!", "You're on fire!"];
-        const incorrectPhrases = ["Great attempt!", "Not this time.", "Keep trying!", "Mistakes are proof that you are trying.", "That's not it, but I believe in you!", "So close!", "Don't worry, try again.", "That's a learning opportunity!", "Your persistence is inspiring.", "Even experts get it wrong sometimes."];
-        let gameState;
-        let preferredEnglishVoices = [];
-        let preferredChineseVoices = [];
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // --- SOUNDS ---
-        const correctSounds=[{seq:[{freq:1046,dur:.3}]},{seq:[{freq:784,dur:.15},{freq:1046,dur:.2}]},{seq:[{freq:523,dur:.1},{freq:659,dur:.1},{freq:784,dur:.15}]},{seq:[{freq:1200,type:"square",dur:.08}]},{seq:[{freq:440,dur:.1},{freq:554,dur:.1},{freq:659,dur:.15}]},{seq:[{freq:880,dur:.2}]},{seq:[{freq:659,dur:.2},{freq:987,dur:.25}]},{seq:[{freq:1568,dur:.05},{freq:2093,dur:.08}]},{seq:[{freq:500,type:"sawtooth",dur:.1},{freq:1e3,type:"sawtooth",dur:.15}]},{seq:[{freq:622,type:"triangle",dur:.15},{freq:830,type:"triangle",dur:.2}]},{seq:[{freq:1e3,dur:.05},{freq:1500,dur:.05},{freq:2e3,dur:.05}]},{seq:[{freq:1046,dur:.05,gap:.05},{freq:1046,dur:.2}]},{seq:[{freq:784,type:"sine",vol:.4,dur:.3}]},{seq:[{freq:523,dur:.4},{freq:659,dur:.4,gap:-.4},{freq:784,dur:.4,gap:-.4}]},{seq:[{freq:1318,dur:.3,vol:.3},{freq:1328,dur:.3,vol:.3,gap:-.3}]},{seq:[{freq:523,dur:.08},{freq:587,dur:.08},{freq:659,dur:.08},{freq:698,dur:.08},{freq:784,dur:.15}]},{seq:[{freq:784,dur:.1},{freq:659,dur:.1},{freq:523,dur:.2}]},{seq:[{freq:987,dur:.25}]},{seq:[{freq:1046,dur:.05,gap:.02},{freq:1318,dur:.05,gap:.02},{freq:1568,dur:.1}]},{seq:[{freq:493,dur:.2},{freq:523,dur:.3}]}];
-        const incorrectSounds=[{seq:[{freq:150,type:"square",dur:.4}]},{seq:[{freq:220,dur:.15,gap:.05},{freq:220,dur:.15}]},{seq:[{freq:440,dur:.1},{freq:330,dur:.1},{freq:220,dur:.3}]},{seq:[{freq:110,dur:.5}]},{seq:[{freq:440,type:"sawtooth",dur:.3},{freq:450,type:"sawtooth",dur:.3,gap:-.3}]},{seq:[{freq:100,type:"square",dur:.3}]},{seq:[{freq:523,dur:.2},{freq:261,dur:.3}]},{seq:[{freq:300,dur:.1}]},{seq:[{freq:130,dur:.6}]},{seq:[{freq:600,dur:.1},{freq:200,dur:.2}]},{seq:[{freq:180,dur:.08,gap:.04},{freq:180,dur:.08}]},{seq:[{freq:200,type:"triangle",dur:.4}]},{seq:[{freq:247,dur:.3},{freq:261,dur:.3,gap:-.3}]},{seq:[{freq:400,type:"square",dur:.1,gap:.05},{freq:200,type:"square",dur:.2}]},{seq:[{freq:300,dur:.05,gap:.05},{freq:300,dur:.05,gap:.05},{freq:300,dur:.05}]},{seq:[{freq:330,dur:.3},{freq:230,dur:.3,gap:-.3}]},{seq:[{freq:120,type:"sawtooth",dur:.4},{freq:122,type:"sawtooth",dur:.4,gap:-.4}]},{seq:[{freq:250,dur:.2}]},{seq:[{freq:196,dur:.25}]},{seq:[{freq:90,type:"sawtooth",dur:.5}]}];
-        function playSound(type){let e="correct"===type?correctSounds:incorrectSounds,t=e[Math.floor(Math.random()*e.length)],o=audioContext.currentTime;t.seq.forEach(e=>{e.gap&&e.gap>0&&(o+=e.gap);let t=audioContext.createOscillator(),n=audioContext.createGain();t.connect(n),n.connect(audioContext.destination),t.frequency.setValueAtTime(e.freq,o),t.type=e.type||"sine",n.gain.setValueAtTime(e.vol||.5,o),n.gain.exponentialRampToValueAtTime(.001,o+e.dur),t.start(o),t.stop(o+e.dur),e.gap&&e.gap>=0||(o+=e.dur)})}
-        
-        // --- TTS ---
-        function loadVoices() {
-            const voices = speechSynthesis.getVoices();
-            if (voices.length === 0) return; 
-
-            const wantedEnglish = ["Microsoft Ava Online (Natural) - English (United States)", "Microsoft Brian Online (Natural) - English (United Kingdom)", "Microsoft Emma Online (Natural) - English (United Kingdom)", "Microsoft Andrew Online (Natural) - English (United States)", "Microsoft William Online (Natural) - English (United States)"];
-            preferredEnglishVoices = voices.filter(v => wantedEnglish.includes(v.name));
-
-            const wantedChinese = ["Microsoft Xiaoxiao Online (Natural) - Chinese (Mainland)", "Microsoft Yunxi Online (Natural) - Chinese (Mainland)", "Microsoft Yunjian Online (Natural) - Chinese (Mainland)"];
-             preferredChineseVoices = voices.filter(v => wantedChinese.includes(v.name));
-        }
-        speechSynthesis.onvoiceschanged = loadVoices;
-        
-        function playEnglishAudio(text, onEnd = null) {
-            if ('speechSynthesis' in window && preferredEnglishVoices.length > 0) {
-                speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.voice = preferredEnglishVoices[Math.floor(Math.random() * preferredEnglishVoices.length)];
-                utterance.lang = 'en-US';
-                utterance.rate = 0.85;
-                if (typeof onEnd === 'function') utterance.onend = onEnd;
-                speechSynthesis.speak(utterance);
-            } else if (typeof onEnd === 'function') {
-                onEnd();
-            }
-        }
-
-        function playChineseAudio(text, onEnd = null) {
-            if ('speechSynthesis' in window && preferredChineseVoices.length > 0) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.voice = preferredChineseVoices[Math.floor(Math.random() * preferredChineseVoices.length)];
-                utterance.lang = 'zh-CN';
-                utterance.rate = 0.85;
-                 if (typeof onEnd === 'function') utterance.onend = onEnd;
-                speechSynthesis.speak(utterance);
-            } else if (typeof onEnd === 'function') {
-                onEnd();
-            }
-        }
-        
-        // --- CORE GAME LOGIC ---
-        function resetGameState() {
-            gameState = {
-                currentRound: 1, currentCard: 1, team1Score: 0, team2Score: 0,
-                team1Queue: [], team2Queue: [], roundScore1: 0, roundScore2: 0,
-                rounds: [], totalRoundsNeeded: 0, isRoundActive: false,
-                currentPlayer1: '', currentPlayer2: '', currentQuestion: null
-            };
-        }
-
-        function selectGradeAndStart(grade) {
-            if (grade === 10) playerNames = [...grade10Players];
-            if (grade === 11) playerNames = [...grade11Players];
-            if (grade === 12) playerNames = [...grade12Players];
-            startAutoChampionship();
-        }
-
-        function startAutoChampionship() {
-            resetGameState();
-            gameState.totalRoundsNeeded = Math.ceil(playerNames.length / 2);
+        // --- DIFFICULTY HELPER ---
+        function getDistractors(targetLevel, correctWordStr) {
+            let pool = [];
+            const levels = ['A1', 'A2', 'B1', 'B2', 'C1'];
+            let allowedLevels = [];
             
-            document.getElementById('gameModes').style.display = 'none';
-            document.getElementById('game-content').style.display = 'block';
-            document.getElementById('gameProgress').style.display = 'block';
-            document.getElementById('totalRoundsHeader').textContent = gameState.totalRoundsNeeded;
-
-            shuffleTeams();
-            buildAllRounds();
+            // Difficulty Logic for Distractors:
+            // A1 -> A1, A2
+            // A2 -> A1, A2, B1
+            // B1 -> A2, B1, B2
+            // B2 -> B1, B2, C1
+            // C1 -> B2, C1 (Hardest)
             
-            document.getElementById('headerTeam1Name').textContent = gameState.team1.name;
-            document.getElementById('headerTeam2Name').textContent = gameState.team2.name;
-            updateHeaderScores();
-
-            switchScreen('teamSetup');
-            setTimeout(() => {
-                selectPlayersForRound();
-            }, 5000);
-        }
-
-        function shuffleTeams() {
-            const academicTeams = ["The Void Voyagers 🚀", "The Quasar Questers ✨", "The Nebula Navigators 🌌", "The Celestial Challengers 🪐"];
-            const shuffledTeams = academicTeams.sort(() => .5 - Math.random());
-            gameState.team1 = { name: shuffledTeams[0], players: [] };
-            gameState.team2 = { name: shuffledTeams[1], players: [] };
+            if (targetLevel === 'A1') allowedLevels = ['A1', 'A2'];
+            else if (targetLevel === 'A2') allowedLevels = ['A1', 'A2', 'B1'];
+            else if (targetLevel === 'B1') allowedLevels = ['A2', 'B1', 'B2'];
+            else if (targetLevel === 'B2') allowedLevels = ['B1', 'B2', 'C1'];
+            else if (targetLevel === 'C1') allowedLevels = ['B2', 'C1'];
             
-            const shuffledPlayers = [...playerNames].sort(() => .5 - Math.random());
-            const mid = Math.ceil(shuffledPlayers.length / 2);
-            gameState.team1.players = shuffledPlayers.slice(0, mid);
-            gameState.team2.players = shuffledPlayers.slice(mid);
-            
-            document.getElementById('team1Name').innerHTML = gameState.team1.name;
-            document.getElementById('team2Name').innerHTML = gameState.team2.name;
-            document.getElementById('team1Members').innerHTML = gameState.team1.players.map(p => `<div class="team-member">${p}</div>`).join('');
-            document.getElementById('team2Members').innerHTML = gameState.team2.players.map(p => `<div class="team-member">${p}</div>`).join('');
-        }
-
-        function buildAllRounds() {
-            gameState.rounds = [];
-            const allWords = [wordSet1, wordSet2, wordSet3, wordSet4, wordSet5, wordSet6].flat();
-            let easy = [...wordSet1, ...wordSet2];
-            let medium = [...wordSet3, ...wordSet5];
-            let hard = [...wordSet4, ...wordSet6];
-
-            for (let i = 0; i < gameState.totalRoundsNeeded; i++) {
-                let roundQuestionsData = [];
-                // Replenish pools if needed
-                if (easy.length < 4) easy.push(...[...wordSet1, ...wordSet2].sort(()=> .5 - Math.random()));
-                if (medium.length < 3) medium.push(...[...wordSet3, ...wordSet5].sort(()=> .5 - Math.random()));
-                if (hard.length < 3) hard.push(...[...wordSet4, ...wordSet6].sort(()=> .5 - Math.random()));
-
-                const roundWordData = [
-                    ...easy.splice(0, 4),
-                    ...medium.splice(0, 3),
-                    ...hard.splice(0, 3)
-                ].sort(() => .5 - Math.random()); 
-
-                roundQuestionsData = roundWordData.map(wordData => {
-                    const correctAnswer = wordData.synonyms[Math.floor(Math.random() * wordData.synonyms.length)];
-                    let distractorPool = allWords
-                        .filter(item => item.word !== wordData.word)
-                        .flatMap(item => item.synonyms);
-                    distractorPool = [...new Set(distractorPool)];
-                    distractorPool.sort(() => 0.5 - Math.random());
-                    const distractors = distractorPool.slice(0, 2);
-                    return { word: wordData.word, answer: correctAnswer, distractors: distractors };
-                });
-                gameState.rounds.push(roundQuestionsData);
-            }
-        }
-        
-        function selectPlayersForRound() {
-            if (gameState.team1Queue.length === 0) gameState.team1Queue = [...gameState.team1.players].sort(() => .5 - Math.random());
-            if (gameState.team2Queue.length === 0) gameState.team2Queue = [...gameState.team2.players].sort(() => .5 - Math.random());
-            
-            gameState.currentPlayer1 = gameState.team1Queue.pop();
-            gameState.currentPlayer2 = gameState.team2Queue.pop();
-            
-            switchScreen('playerSelection');
-            createDataStreamSelection();
-        }
-
-        function createDataStreamSelection() {
-            document.getElementById('display1TeamName').textContent = gameState.team1.name;
-            document.getElementById('display2TeamName').textContent = gameState.team2.name;
-
-            const p1Display = document.getElementById('player1Display');
-            const p2Display = document.getElementById('player2Display');
-            
-            p1Display.style.animation = 'text-flicker 0.1s infinite alternate';
-            p2Display.style.animation = 'text-flicker 0.1s infinite alternate';
-            
-            startGameCountdown();
-
-            const animateSelection = (displayEl, players, finalPlayer) => {
-                let flickerInterval = setInterval(() => {
-                    displayEl.textContent = players[Math.floor(Math.random() * players.length)];
-                }, 75);
-
-                setTimeout(() => {
-                    clearInterval(flickerInterval);
-                    displayEl.textContent = finalPlayer;
-                    displayEl.style.animation = 'none'; // Stop flicker
-                }, 3000);
-            };
-
-            animateSelection(p1Display, gameState.team1.players, gameState.currentPlayer1);
-            animateSelection(p2Display, gameState.team2.players, gameState.currentPlayer2);
-            
-            setTimeout(announcePlayers, 3000);
-        }
-        
-        function announcePlayers() {
-            const p1Name = gameState.currentPlayer1.split('/')[0].trim();
-            const p2Name = gameState.currentPlayer2.split('/')[0].trim();
-
-            playChineseAudio(p1Name, () => {
-                playChineseAudio(p1Name, () => {
-                    playChineseAudio(p2Name, () => {
-                        playChineseAudio(p2Name);
-                    });
+            allowedLevels.forEach(lvl => {
+                 words[lvl].forEach(w => {
+                    if(w.word !== correctWordStr) {
+                        pool.push(...w.synonyms);
+                    }
                 });
             });
+            
+            // Shuffle and return 2 unique
+            return [...new Set(pool)].sort(() => 0.5 - Math.random()).slice(0, 2);
         }
-        
-        function startGameCountdown() {
-            let count = 10;
-            const timerEl = document.getElementById('countdownTimer');
-            timerEl.textContent = count;
-            document.getElementById('selectionCountdown').style.display = 'block';
+
+        // --- SETUP ---
+        function startGame(grade) {
+            let pool = [];
+            if (grade === 10) pool = [...grade10];
+            else if (grade === 11) pool = [...grade11];
+            else pool = [...grade12];
+
+            // Initialize State
+            state.players = pool.sort(() => 0.5 - Math.random());
+            state.playerStats = {};
+            state.players.forEach(p => state.playerStats[p] = { score: 0, team: 0 });
+
+            // Split Teams
+            const mid = Math.ceil(pool.length / 2);
+            state.team1.players = pool.slice(0, mid);
+            state.team2.players = pool.slice(mid);
+            state.team1.name = "The Void Voyagers";
+            state.team2.name = "The Nebula Navigators";
+            state.team1.players.forEach(p => state.playerStats[p].team = 1);
+            state.team2.players.forEach(p => state.playerStats[p].team = 2);
+
+            // Generate Rounds
+            const totalRounds = Math.max(state.team1.players.length, state.team2.players.length);
+            state.rounds = [];
+            
+            for(let i=0; i<totalRounds; i++) {
+                // Progressive Difficulty: 2 words from EACH level
+                let rA1 = [...words.A1].sort(() => 0.5 - Math.random()).slice(0, 2);
+                let rA2 = [...words.A2].sort(() => 0.5 - Math.random()).slice(0, 2);
+                let rB1 = [...words.B1].sort(() => 0.5 - Math.random()).slice(0, 2);
+                let rB2 = [...words.B2].sort(() => 0.5 - Math.random()).slice(0, 2);
+                let rC1 = [...words.C1].sort(() => 0.5 - Math.random()).slice(0, 2);
+                
+                let rawQuestions = [
+                    { data: rA1, level: 'A1' },
+                    { data: rA2, level: 'A2' },
+                    { data: rB1, level: 'B1' },
+                    { data: rB2, level: 'B2' },
+                    { data: rC1, level: 'C1' }
+                ];
+                
+                let roundQuestions = [];
+                
+                rawQuestions.forEach(grp => {
+                    grp.data.forEach(q => {
+                        const answer = q.synonyms[Math.floor(Math.random() * q.synonyms.length)];
+                        const distractors = getDistractors(grp.level, q.word);
+                        roundQuestions.push({ word: q.word, answer, distractors, level: grp.level });
+                    });
+                });
+
+                state.rounds.push(roundQuestions);
+            }
+
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('gameHeader').style.display = 'flex';
+            document.getElementById('headerTeam1Name').innerText = state.team1.name;
+            document.getElementById('headerTeam2Name').innerText = state.team2.name;
+            document.getElementById('totalRoundsDisplay').innerText = totalRounds;
+
+            document.getElementById('teamSetup').style.display = 'block';
+            document.getElementById('setupTeam1List').innerHTML = state.team1.players.map(p => `<div>${p}</div>`).join('');
+            document.getElementById('setupTeam2List').innerHTML = state.team2.players.map(p => `<div>${p}</div>`).join('');
+            
+            setTimeout(() => {
+                document.getElementById('teamSetup').style.display = 'none';
+                startRoundSequence();
+            }, 3000);
+        }
+
+        function startRoundSequence() {
+            if (state.currentRoundIdx >= state.rounds.length) {
+                checkChampionship();
+                return;
+            }
+
+            state.currentPlayer1 = state.team1.players[state.currentRoundIdx % state.team1.players.length];
+            state.currentPlayer2 = state.team2.players[state.currentRoundIdx % state.team2.players.length];
+
+            document.getElementById('gamePlay').style.display = 'none';
+            document.getElementById('matchupScreen').style.display = 'block';
+            document.getElementById('matchupPlayer1').innerText = state.currentPlayer1.split('/')[0];
+            document.getElementById('matchupPlayer2').innerText = state.currentPlayer2.split('/')[0];
+            document.getElementById('matchupTeam1').innerText = state.team1.name;
+            document.getElementById('matchupTeam2').innerText = state.team2.name;
+
+            let count = 5;
+            const cd = document.getElementById('countdown');
+            cd.innerText = count;
+            
+            speak(state.currentPlayer1, true); // True = isName
+            setTimeout(() => speak(state.currentPlayer2, true), 1500);
 
             const interval = setInterval(() => {
                 count--;
-                timerEl.textContent = count;
-                if (count <= 0) { 
+                cd.innerText = count;
+                if(count <= 0) {
                     clearInterval(interval);
-                    document.getElementById('selectionCountdown').style.display = 'none';
-                    start10CardRound();
+                    document.getElementById('matchupScreen').style.display = 'none';
+                    beginGameplay();
                 }
             }, 1000);
         }
-        
-        function start10CardRound() {
-            gameState.currentCard = 1;
-            gameState.roundScore1 = 0;
-            gameState.roundScore2 = 0;
-            updateHeaderScores();
-            switchScreen('gamePlay');
-            playNextCard();
-        }
 
-        function playNextCard() {
-             if (gameState.currentCard > 10) {
-                 gameState.currentRound++;
-                 if (gameState.currentRound > gameState.totalRoundsNeeded) {
-                     alert("GAME OVER!"); // Placeholder for end game screen
-                     return;
-                 }
-                 selectPlayersForRound();
-                 return;
-             }
-            setupQuestionForCard();
-            document.getElementById('currentCard').textContent = gameState.currentCard;
-            document.getElementById('currentRoundDisplay').textContent = gameState.currentRound;
-        }
-
-        function setupQuestionForCard() {
-            gameState.isRoundActive = true;
-            const questionData = gameState.rounds[gameState.currentRound-1][gameState.currentCard-1];
-            if (!questionData) return;
-            gameState.currentQuestion = questionData;
-            playEnglishAudio(questionData.word);
-
-            document.getElementById('player1Name').textContent = gameState.currentPlayer1;
-            document.getElementById('player2Name').textContent = gameState.currentPlayer2;
-            document.getElementById('targetWord1').textContent = questionData.word;
-            document.getElementById('targetWord2').textContent = questionData.word;
+        function beginGameplay() {
+            document.getElementById('gamePlay').style.display = 'flex';
+            state.currentQuestionIdx = 0;
+            document.getElementById('currentRoundDisplay').innerText = state.isChampionship ? "CHAMPIONSHIP" : state.currentRoundIdx + 1;
             
-            document.getElementById('player1AnswerReveal').textContent = '';
-            document.getElementById('player2AnswerReveal').textContent = '';
-            
-            setupAnswerButtons(1, questionData);
-            setupAnswerButtons(2, questionData);
-            startRoundTimer();
+            document.getElementById('scoreP1').innerText = "0";
+            document.getElementById('scoreP2').innerText = "0";
+            document.getElementById('nameP1').innerText = state.currentPlayer1.split('/')[0]; // Visual can still show Chinese
+            document.getElementById('engNameP1').innerText = getEnglishName(state.currentPlayer1);
+            document.getElementById('nameP2').innerText = state.currentPlayer2.split('/')[0];
+            document.getElementById('engNameP2').innerText = getEnglishName(state.currentPlayer2);
+
+            document.getElementById('totalPointsP1').innerText = state.playerStats[state.currentPlayer1].score;
+            document.getElementById('totalPointsP2').innerText = state.playerStats[state.currentPlayer2].score;
+
+            loadQuestion();
         }
 
-        function setupAnswerButtons(playerNum, questionData) {
-            const container = document.getElementById(`player${playerNum}Buttons`);
-            container.innerHTML = '';
-            let answers = [questionData.answer, ...questionData.distractors];
-            answers.sort(() => 0.5 - Math.random());
+        function loadQuestion() {
+            if (state.currentQuestionIdx >= 10) {
+                if(state.isChampionship) {
+                    endGame();
+                    return;
+                }
+                state.currentRoundIdx++;
+                startRoundSequence();
+                return;
+            }
 
-            answers.forEach(ans => {
+            state.roundResolved = false;
+
+            let qData;
+            if(state.isChampionship) {
+                // CHAMPIONSHIP LOGIC: 
+                // Always C1 Word.
+                // Distractors always from C1 pool (very hard).
+                const hQ = words.C1[Math.floor(Math.random() * words.C1.length)];
+                const answer = hQ.synonyms[Math.floor(Math.random() * hQ.synonyms.length)];
+                
+                // Get distractors ONLY from C1 (hardest possible)
+                let c1Pool = [];
+                words.C1.forEach(w => {
+                    if(w.word !== hQ.word) c1Pool.push(...w.synonyms);
+                });
+                const distractors = c1Pool.sort(()=>0.5-Math.random()).slice(0,2);
+                
+                qData = { word: hQ.word, answer, distractors };
+            } else {
+                qData = state.rounds[state.currentRoundIdx][state.currentQuestionIdx];
+            }
+
+            document.getElementById('currentQuestionNum').innerText = state.currentQuestionIdx + 1;
+
+            renderPlayerSide(1, qData);
+            renderPlayerSide(2, qData);
+
+            speak(qData.word);
+
+            document.getElementById('reveal1').classList.remove('show');
+            document.getElementById('reveal2').classList.remove('show');
+
+            startTimer();
+        }
+
+        function renderPlayerSide(pNum, qData) {
+            document.getElementById(`targetWord${pNum}`).innerText = qData.word;
+            document.getElementById(`reveal${pNum}`).innerText = `Answer: ${qData.answer}`;
+            
+            const btnContainer = document.getElementById(`answers${pNum}`);
+            btnContainer.innerHTML = '';
+            
+            let choices = [qData.answer, ...qData.distractors].sort(() => 0.5 - Math.random());
+            
+            choices.forEach(choice => {
                 const btn = document.createElement('button');
                 btn.className = 'answer-btn';
-                btn.textContent = ans;
-                btn.onclick = (event) => selectAnswer(playerNum, ans, event.target);
-                container.appendChild(btn);
+                // Upper case for championship round
+                btn.innerText = state.isChampionship ? choice.toUpperCase() : choice;
+                btn.onclick = (e) => handleAnswer(pNum, choice, qData.answer, e.target);
+                btnContainer.appendChild(btn);
             });
         }
-        
-        function selectAnswer(playerNum, selectedAns, buttonElement) {
-            if (!gameState.isRoundActive) return;
-            gameState.isRoundActive = false;
-            clearTimeout(gameState.roundTimer);
 
-            triggerRocketPulse(buttonElement);
-            const isCorrect = selectedAns === gameState.currentQuestion.answer;
+        function startTimer() {
+            let timeLeft = 100;
+            const bar1 = document.getElementById('timerBar1');
+            const bar2 = document.getElementById('timerBar2');
             
-            setTimeout(() => {
-                buttonElement.classList.add(isCorrect ? 'correct' : 'incorrect');
-                playSound(isCorrect ? 'correct' : 'incorrect');
-
-                if(isCorrect) {
-                    if(playerNum === 1) { gameState.team1Score++; gameState.roundScore1++; }
-                    else { gameState.team2Score++; gameState.roundScore2++; }
-                    createStardustEffect(playerNum);
-                    triggerFlyingStars(buttonElement);
-                    playEnglishAudio(praiseAudioPhrases[Math.floor(Math.random() * praiseAudioPhrases.length)]);
-                } else {
-                    if(playerNum === 1) { gameState.team2Score++; gameState.roundScore2++; }
-                    else { gameState.team1Score++; gameState.roundScore1++; }
-                    triggerAsteroidBurst(buttonElement);
-                }
-                updateHeaderScores();
-
-                revealCorrectAnswers();
-                setTimeout(() => {
-                    gameState.currentCard++;
-                    playNextCard();
-                }, 2500);
-            }, 600);
-        }
-
-        function revealCorrectAnswers() {
-            const correctAnswer = gameState.currentQuestion.answer;
-            document.getElementById('player1AnswerReveal').textContent = correctAnswer;
-            document.getElementById('player2AnswerReveal').textContent = correctAnswer;
-             for (let i = 1; i <= 2; i++) {
-                const buttons = document.getElementById(`player${i}Buttons`).children;
-                for (let btn of buttons) {
-                    btn.onclick = null; 
-                    if (btn.textContent === correctAnswer) {
-                        btn.classList.add('correct');
-                    }
-                }
-            }
-        }
-        
-        function updateHeaderScores() {
-             document.getElementById('headerTeam1Score').textContent = gameState.team1Score;
-             document.getElementById('headerTeam2Score').textContent = gameState.team2Score;
-             document.getElementById('team1RoundScore').textContent = gameState.roundScore1;
-             document.getElementById('team2RoundScore').textContent = gameState.roundScore2;
-        }
-
-        function startRoundTimer() {
-            clearTimeout(gameState.roundTimer);
-            let timeLeft = 10;
-            const timerDisp = document.getElementById('timerDisplay');
-            const timerProg = document.getElementById('timerProgress');
+            if (state.timer) clearInterval(state.timer);
             
-            timerDisp.textContent = timeLeft;
-            timerProg.style.width = '100%';
+            state.timer = setInterval(() => {
+                if (state.roundResolved) return; 
 
-            gameState.roundTimer = setInterval(() => {
-                timeLeft--;
-                timerDisp.textContent = timeLeft;
-                timerProg.style.width = `${(timeLeft / 10) * 100}%`;
-
+                timeLeft -= 1; 
+                bar1.style.width = timeLeft + "%";
+                bar2.style.width = timeLeft + "%";
+                
                 if (timeLeft <= 0) {
-                    clearInterval(gameState.roundTimer);
-                    gameState.isRoundActive = false;
-                    playSound('incorrect');
-                    revealCorrectAnswers();
-                    setTimeout(() => {
-                        gameState.currentCard++;
-                        playNextCard();
-                    }, 2500); 
+                    clearInterval(state.timer);
+                    resolveQuestion(false, 0); // No winner
                 }
-            }, 1000);
+            }, 100);
         }
 
-        function createStardustEffect(playerNum) {
-            const headerScoreEl = document.getElementById(`headerTeam${playerNum}Score`);
-            const playerArea = document.getElementById(`team${playerNum}GameArea`).querySelector('.player-area');
-            if (!headerScoreEl || !playerArea) return;
+        function handleAnswer(pNum, choice, correct, btn) {
+            if (state.roundResolved) return; // Prevent late clicks
 
-            const startRect = playerArea.getBoundingClientRect();
-            const endRect = headerScoreEl.getBoundingClientRect();
+            const isCorrect = choice === correct;
+            
+            if (isCorrect) {
+                // --- COMPETITIVE LOGIC: FIRST TO CORRECT WINS ---
+                state.roundResolved = true; // Lock round immediately
+                clearInterval(state.timer);
 
-            for (let i = 0; i < 20; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'stardust-particle';
+                btn.classList.add('correct');
+                playSound('correct');
+
+                // Award points
+                if (pNum === 1) {
+                    state.team1.score += 10;
+                    state.playerStats[state.currentPlayer1].score += 10;
+                    document.getElementById('scoreP1').innerText = parseInt(document.getElementById('scoreP1').innerText) + 10;
+                } else {
+                    state.team2.score += 10;
+                    state.playerStats[state.currentPlayer2].score += 10;
+                    document.getElementById('scoreP2').innerText = parseInt(document.getElementById('scoreP2').innerText) + 10;
+                }
                 
-                const startX = startRect.left + startRect.width / 2 + (Math.random() - 0.5) * startRect.width;
-                const startY = startRect.top + startRect.height / 2 + (Math.random() - 0.5) * startRect.height;
-                const endX = endRect.left + endRect.width / 2;
-                const endY = endRect.top + endRect.height / 2;
-
-                particle.style.left = `${startX}px`;
-                particle.style.top = `${startY}px`;
+                speak(praisePhrases[Math.floor(Math.random()*praisePhrases.length)]);
                 
-                particle.style.setProperty('--x-end', `${endX - startX}px`);
-                particle.style.setProperty('--y-end', `${endY - startY}px`);
-                particle.style.animationDelay = `${Math.random() * 0.3}s`;
+                // Show other player as wrong (visual feedback they lost the race)
+                const otherPNum = pNum === 1 ? 2 : 1;
+                disableButtons(otherPNum);
+                disableButtons(pNum);
 
-                document.body.appendChild(particle);
-                setTimeout(() => particle.remove(), 1300);
+                // Delay slightly then resolve
+                setTimeout(() => resolveQuestion(true, pNum), 500);
+
+            } else {
+                // Incorrect answer: Just disable this player, let other keep trying (unless timer runs out)
+                btn.classList.add('incorrect');
+                playSound('incorrect');
+                const btns = document.getElementById(`answers${pNum}`).children;
+                for(let b of btns) b.disabled = true;
+                
+                // If both are disabled (both got it wrong), end round
+                const p1Disabled = Array.from(document.getElementById('answers1').children).every(b => b.disabled);
+                const p2Disabled = Array.from(document.getElementById('answers2').children).every(b => b.disabled);
+
+                if (p1Disabled && p2Disabled) {
+                    clearInterval(state.timer);
+                    setTimeout(() => resolveQuestion(false, 0), 500);
+                }
             }
         }
-        
-        function triggerFlyingStars(element) {
-            const rect = element.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            for (let i = 0; i < 12; i++) {
+
+        function disableButtons(pNum) {
+            const btns = document.getElementById(`answers${pNum}`).children;
+            for(let b of btns) b.disabled = true;
+        }
+
+        function resolveQuestion(hasWinner, winnerNum) {
+            // Update Headers
+            document.getElementById('headerTeam1Score').innerText = state.team1.score;
+            document.getElementById('headerTeam2Score').innerText = state.team2.score;
+            
+            // Show Correct Answers
+            document.getElementById('reveal1').classList.add('show');
+            document.getElementById('reveal2').classList.add('show');
+
+            setTimeout(() => {
+                state.currentQuestionIdx++;
+                loadQuestion();
+            }, 2500); // Slightly longer pause to see result
+        }
+
+        // --- CHAMPIONSHIP LOGIC ---
+        function checkChampionship() {
+            if(state.isChampionship) return;
+
+            const t1Sorted = state.team1.players.sort((a,b) => state.playerStats[b].score - state.playerStats[a].score);
+            const t2Sorted = state.team2.players.sort((a,b) => state.playerStats[b].score - state.playerStats[a].score);
+
+            const champ1 = t1Sorted[0];
+            const champ2 = t2Sorted[0];
+
+            const modal = document.getElementById('championshipModal');
+            modal.style.display = 'flex';
+            
+            document.getElementById('champ1Name').innerText = champ1.split('/')[0];
+            document.getElementById('champ1Score').innerText = state.playerStats[champ1].score + " pts";
+            
+            document.getElementById('champ2Name').innerText = champ2.split('/')[0];
+            document.getElementById('champ2Score').innerText = state.playerStats[champ2].score + " pts";
+
+            state.currentPlayer1 = champ1;
+            state.currentPlayer2 = champ2;
+            state.isChampionship = true;
+            
+            // Announce Champions
+            speak("Championship Round", false);
+        }
+
+        function startChampionshipMatch() {
+            document.getElementById('championshipModal').style.display = 'none';
+            document.getElementById('gamePlay').style.display = 'flex';
+            state.currentQuestionIdx = 0;
+            document.getElementById('targetWord1').style.color = "gold";
+            document.getElementById('targetWord2').style.color = "gold";
+            beginGameplay();
+        }
+
+        function endGame() {
+            const winner = state.team1.score > state.team2.score ? state.team1.name : state.team2.name;
+            // Simple overlay for now
+            const modal = document.getElementById('championshipModal');
+            modal.innerHTML = `
+                <h1 style="font-size: 4rem; color: gold;">GAME OVER</h1>
+                <h2 style="font-size: 2rem; color: #fff;">${winner} WINS!</h2>
+                <button class="mode-btn" onclick="location.reload()">PLAY AGAIN</button>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        // --- STARFIELD ---
+        function createStars() {
+            const container = document.getElementById('starfield');
+            for (let i = 0; i < 200; i++) {
                 const star = document.createElement('div');
-                star.className = 'star-particle';
-                star.textContent = '✦';
-                const angle = Math.random() * 2 * Math.PI;
-                const distance = 80 + Math.random() * 50;
-                star.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
-                star.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
-                star.style.left = `${centerX}px`;
-                star.style.top = `${centerY}px`;
-                document.body.appendChild(star);
-                setTimeout(() => star.remove(), 1500);
+                star.className = 'star';
+                const size = Math.random() * 3;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                container.appendChild(star);
             }
         }
+        createStars();
 
-        function triggerAsteroidBurst(element) {
-            const rect = element.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            for (let i = 0; i < 10; i++) {
-                const rock = document.createElement('div');
-                rock.className = 'asteroid';
-                const size = 6 + Math.random() * 8;
-                rock.style.width = `${size}px`;
-                rock.style.height = `${size}px`;
-                const angle = Math.random() * 2 * Math.PI;
-                const distance = 60 + Math.random() * 40;
-                rock.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
-                rock.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
-                rock.style.left = `${centerX}px`;
-                rock.style.top = `${centerY}px`;
-                document.body.appendChild(rock);
-                setTimeout(() => rock.remove(), 1000);
-            }
-        }
-
-        function triggerRocketPulse(buttonEl) {
-            buttonEl.classList.add('rocket-pulse');
-            setTimeout(() => buttonEl.classList.remove('rocket-pulse'), 600);
-        }
-
-        function switchScreen(activeScreen) {
-            ['teamSetup', 'playerSelection', 'gamePlay', 'gameModes'].forEach(id => {
-                 const el = document.getElementById(id);
-                 if (el) {
-                    el.style.display = (id === activeScreen) ? 'block' : 'none';
-                    if(id === 'gamePlay' && activeScreen === 'gamePlay') el.style.display = 'flex';
-                 }
-            });
-        }
-
-        window.addEventListener('load', () => {
-            createStars();
-            loadVoices();
-            resetGameState();
-            switchScreen('gameModes');
-        });
     </script>
 </body>
 </html>
