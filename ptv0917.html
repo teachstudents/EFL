@@ -542,7 +542,7 @@
                     <div class="player-stats-block" id="team1GameArea">
                         <div class="player-name-display" id="player1Name"></div>
                         <div class="player-score-info">
-                            <span id="gameTeam1Name">Team 1</span>: <span class="score-val" id="team1RoundScore">0</span>
+                            <span id="gameTeam1Name">Team 1</span>: <span class="score-val" id="headerTeam1Score">0</span>
                         </div>
                     </div>
 
@@ -556,7 +556,7 @@
                     <div class="player-stats-block" id="team2GameArea">
                         <div class="player-name-display" id="player2Name"></div>
                         <div class="player-score-info">
-                            <span id="gameTeam2Name">Team 2</span>: <span class="score-val" id="team2RoundScore">0</span>
+                            <span id="gameTeam2Name">Team 2</span>: <span class="score-val" id="headerTeam2Score">0</span>
                         </div>
                     </div>
                 </div>
@@ -777,8 +777,6 @@
             shuffleTeams();
             buildAllRounds();
 
-            // We hide the old gameProgress header but update data for logic consistency
-            document.getElementById('gameProgress').style.display = 'none';
             updateHeaderScores();
 
             switchScreen('teamSetup');
@@ -904,15 +902,13 @@
             document.getElementById('gameTeam1Name').textContent = gameState.team1.name;
             document.getElementById('gameTeam2Name').textContent = gameState.team2.name;
 
-            document.getElementById('team1RoundScore').textContent = 0;
-            document.getElementById('team2RoundScore').textContent = 0;
-            
             // Reset Sentence Box
             document.getElementById('headerSentenceDisplay').textContent = "🔊 Listen carefully...";
 
             startGameEffects();
             switchScreen('gamePlay');
             updateGameProgress();
+            updateHeaderScores(); // Ensure total score is shown at start
             playNextCard();
         }
 
@@ -943,8 +939,10 @@
         }
         
         function updateHeaderScores() {
-            document.getElementById('headerTeam1Score').textContent = gameState.team1Score;
-            document.getElementById('headerTeam2Score').textContent = gameState.team2Score;
+            const team1El = document.getElementById('headerTeam1Score');
+            const team2El = document.getElementById('headerTeam2Score');
+            if(team1El) team1El.textContent = gameState.team1Score;
+            if(team2El) team2El.textContent = gameState.team2Score;
         }
 
         function setupQuestions() {
@@ -1017,8 +1015,6 @@
                 showEncouragement(playerNum);
             }
 
-            document.getElementById('team1RoundScore').textContent = gameState.roundScore1;
-            document.getElementById('team2RoundScore').textContent = gameState.roundScore2;
             updateHeaderScores();
 
             // End of round logic
@@ -1154,7 +1150,6 @@
             const winner = gameState.team1Score > gameState.team2Score ? gameState.team1.name : (gameState.team2Score > gameState.team1Score ? gameState.team2.name : 'Tie Game');
             const members = gameState.team1Score > gameState.team2Score ? gameState.team1.players : (gameState.team2Score > gameState.team1Score ? gameState.team2.players : [...gameState.team1.players, ...gameState.team2.players]);
             document.getElementById('game-content').style.display = 'none';
-            document.getElementById('gameProgress').style.display = 'none';
             document.getElementById('headerSentenceDisplay').style.display = 'none';
             showCertificate(winner, members);
             for (let i = 0; i < 100; i++) setTimeout(createFireworks, i * 50);
@@ -1231,7 +1226,6 @@
             // Don't reset everything, just go back to the menu to select a new grade
             // which will trigger a full reset via startAutoChampionship()
             document.getElementById('game-content').style.display = 'none';
-            document.getElementById('gameProgress').style.display = 'none';
             document.getElementById('phaseTransition').style.display = 'none';
             document.getElementById('gameModes').style.display = 'flex';
             speechSynthesis.cancel();
