@@ -90,44 +90,23 @@
             z-index: 10;
         }
 
-        /* Game Progress Header */
-        .game-progress {
-            background: rgba(15, 52, 96, 0.7);
+        /* Header Sentence Box */
+        .header-sentence-box {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #f9ed69;
             border-radius: 15px;
-            padding: 0.5rem 1.5rem;
-            margin-bottom: 1rem;
-            border: 2px solid #e94560;
-            text-align: center;
-        }
-
-        .progress-info {
+            min-height: 80px; /* Reserved space */
+            margin-bottom: 1.5rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            flex-wrap: nowrap;
-        }
-
-        .progress-item {
-            font-size: 1.1rem;
-            font-weight: bold;
-            text-shadow: 0 0 5px #e94560;
-        }
-        
-        .progress-item-center {
+            justify-content: center;
             text-align: center;
-        }
-
-        .header-score {
-            font-size: 1.4rem;
-            color: #f9ed69;
-            text-shadow: 0 0 10px #f9ed69;
-        }
-        
-        .header-score span {
-            display: block;
-            font-size: 1rem;
+            font-size: 1.6rem;
             color: #ecf0f1;
-            margin-bottom: 4px;
+            padding: 1rem;
+            text-shadow: 0 0 5px #f9ed69;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 100%;
         }
         
         /* Game Modes */
@@ -278,78 +257,129 @@
             border-bottom: 1px solid rgba(233, 69, 96, 0.3);
         }
 
-        /* Game Play */
+        /* Game Play - Redesigned Layout */
         .game-play { display: none; position: relative; }
-        .game-area { display: flex; justify-content: space-between; align-items: stretch; gap: 1rem; }
-
-        .versus-indicator {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #f9ed69;
-            text-shadow: 0 0 15px #f9ed69;
-            animation: bonusPulse 1.5s ease-in-out infinite;
+        
+        /* 1. MCQ Area */
+        .mcq-area-container {
             display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .team-mcq-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             align-items: center;
         }
 
-        .team-game-area { flex: 1; display: flex; flex-direction: column; gap: 1rem; position: relative; }
-        
-        .team-score-display {
-            background: rgba(15, 52, 96, 0.8);
-            border-radius: 15px;
-            padding: 0.5rem;
-            border: 2px solid #e94560;
-            text-align: center;
-        }
-
-        .team-score-display .team-name { font-size: 1.2rem; font-weight: bold; }
-        .team-score-display .score-number { font-size: 2.2rem; color: #f9ed69; text-shadow: 0 0 15px #f9ed69; }
-
-        .player-area {
-            flex-grow: 1;
-            background: rgba(15, 52, 96, 0.8);
-            border-radius: 20px;
-            padding: 1rem;
-            border: 2px solid #e94560;
-            text-align: center;
+        .answer-buttons { 
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            gap: 1.2rem; 
+            width: 100%;
         }
-
-        .player-name { 
-            font-size: 1.5rem; 
-            font-weight: bold; 
-            margin-bottom: 1.5rem; 
-            text-shadow: 0 0 10px #e94560;
-            min-height: 45px; 
-        }
-
-        .answer-buttons { display: grid; grid-template-columns: 1fr; gap: 0.8rem; margin-top: 0; }
+        
         .answer-btn {
-            padding: 1rem; font-size: 1.2rem; font-weight: bold;
-            background: linear-gradient(45deg, rgba(233, 69, 96, 0.4), rgba(255, 113, 138, 0.6));
-            color: #ffffff; /* Changed to white for clarity */
-            border: 2px solid #e94560; border-radius: 10px;
-            cursor: pointer; transition: all 0.3s ease;
-            text-shadow: 0 0 3px rgba(0,0,0,0.5); /* Added for better readability */
+            padding: 1.5rem 1rem; 
+            font-size: 1.4rem; 
+            font-weight: bold;
+            background: linear-gradient(90deg, rgba(233, 69, 96, 0.2), rgba(255, 113, 138, 0.3));
+            color: #ffffff;
+            border: 2px solid #e94560; 
+            border-radius: 15px;
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            text-shadow: 0 0 2px rgba(0,0,0,0.8);
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
-        .answer-btn:hover { background: linear-gradient(45deg, rgba(233, 69, 96, 0.7), rgba(255, 113, 138, 0.9)); transform: scale(1.05); }
-        .answer-btn.correct { background: linear-gradient(45deg, #2ecc71, #27ae60); color: #fff; animation: correctPulse 0.5s ease; }
-        .answer-btn.incorrect { background: linear-gradient(45deg, #e74c3c, #c0392b); color: #fff; animation: incorrectShake 0.5s ease; }
-        @keyframes correctPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
-        @keyframes incorrectShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        
+        .answer-btn:hover { 
+            background: linear-gradient(90deg, rgba(233, 69, 96, 0.8), rgba(255, 113, 138, 0.9)); 
+            transform: scale(1.02); 
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+        }
+        
+        .answer-btn.correct { background: linear-gradient(45deg, #2ecc71, #27ae60); color: #fff; animation: correctPulse 0.5s ease; border-color: #2ecc71; }
+        .answer-btn.incorrect { background: linear-gradient(45deg, #e74c3c, #c0392b); color: #fff; animation: incorrectShake 0.5s ease; border-color: #e74c3c; }
+        
+        /* 2. Stats Row (Players & Round Info) */
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 52, 96, 0.8);
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            border: 2px solid #e94560;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .player-stats-block {
+            flex: 1;
+            text-align: center;
+        }
+
+        .player-name-display {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 0.3rem;
+            text-shadow: 0 0 5px rgba(233, 69, 96, 0.8);
+        }
+
+        .player-score-info {
+            font-size: 1rem;
+            color: #ecf0f1;
+            opacity: 0.9;
+        }
+        
+        .score-val {
+            font-weight: bold;
+            color: #f9ed69;
+            font-size: 1.2rem;
+        }
+
+        /* Center Round Info */
+        .round-info-center {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #f9ed69;
+            padding: 0 2rem;
+            border-left: 2px solid rgba(233, 69, 96, 0.4);
+            border-right: 2px solid rgba(233, 69, 96, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 180px;
+        }
+
+        /* 3. Timer */
+        .timer-container { 
+            margin: 0; 
+            text-align: center;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .timer-display { font-size: 2rem; font-weight: bold; color: #f9ed69; text-shadow: 0 0 20px #f9ed69; margin-bottom: 0.2rem; }
+        .timer-bar { width: 100%; height: 15px; background: rgba(0,0,0,0.5); border-radius: 10px; overflow: hidden; border: 2px solid #e94560; }
+        .timer-progress { height: 100%; background: linear-gradient(45deg, #f9ed69, #f1c40f); transition: width 0.1s linear; border-radius: 10px; }
 
         .correct-answer-reveal {
             font-size: 1.1rem;
             color: #f9ed69;
-            margin-top: 1.5rem;
+            margin-top: 0.5rem;
             font-weight: bold;
             text-shadow: 0 0 8px #f9ed69;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            height: 25px;
+            text-align: center;
         }
 
         .praise-word, .point-badge {
@@ -390,36 +420,9 @@
             100% { transform: translate(var(--x-end), var(--y-end)) scale(0); opacity: 0; }
         }
 
-        /* Timer */
-        .timer-container { margin: 1rem 0; text-align: center; }
-        .timer-display { font-size: 2.5rem; font-weight: bold; color: #f9ed69; text-shadow: 0 0 20px #f9ed69; margin-bottom: 0.5rem; }
-        .timer-bar { width: 100%; height: 15px; background: rgba(0,0,0,0.5); border-radius: 10px; overflow: hidden; border: 2px solid #e94560; }
-        .timer-progress { height: 100%; background: linear-gradient(45deg, #f9ed69, #f1c40f); transition: width 0.1s linear; border-radius: 10px; }
+        @keyframes correctPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        @keyframes incorrectShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-        .bottom-sentence-reveal {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 800px;
-            background: rgba(15, 52, 96, 0.9);
-            border: 2px solid #f9ed69;
-            border-radius: 15px;
-            padding: 1rem;
-            font-size: 1.4rem;
-            text-align: center;
-            color: #ecf0f1;
-            z-index: 500;
-            text-shadow: 0 0 10px #f9ed69;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translate(-50%, 20px); }
-            to { opacity: 1; transform: translate(-50%, 0); }
-        }
 
         /* Fireworks */
         .fireworks-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; }
@@ -442,19 +445,16 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .game-area, .teams-display, .progress-info, .game-modes { flex-direction: column; }
+            .mcq-area-container, .stats-row { flex-direction: column; gap: 1rem; }
+            .round-info-center { border-left: none; border-right: none; border-top: 1px solid rgba(255,255,255,0.2); border-bottom: 1px solid rgba(255,255,255,0.2); padding: 0.5rem 0; margin: 0.5rem 0; }
             .mode-btn { padding: 1rem 2rem; font-size: 1.2rem; }
-            .answer-buttons { grid-template-columns: 1fr; }
-            .player-area { min-height: 250px; }
-            .bottom-sentence-reveal { font-size: 1rem; padding: 0.8rem; }
-            .progress-info { justify-content: center; gap: 0.5rem; }
-            .header-score { font-size: 1.2rem; }
         }
         
         @media (max-height: 700px) {
-            .player-area { padding: 0.5rem; min-height: 220px;}
             .mode-btn { margin: 2rem 0; }
             .game-container { padding: 5px;}
+            .header-sentence-box { min-height: 60px; font-size: 1.2rem; }
+            .answer-btn { padding: 1rem 0.5rem; font-size: 1.2rem; }
         }
 
         /* Phase Transition */
@@ -474,27 +474,9 @@
     <div class="audio-bg" id="audioBg"></div>
     <div class="fireworks-container" id="fireworksContainer"></div>
     <div class="phase-transition" id="phaseTransition"><div id="transitionText"></div></div>
-    <div class="bottom-sentence-reveal" id="bottomSentenceReveal"></div>
 
     <div class="game-container">
-        <!-- Game Progress (shown after start) -->
-        <div class="game-progress" id="gameProgress" style="display: none;">
-            <div class="progress-info">
-                <div class="header-score">
-                    <span id="headerTeam1Name">Team 1</span>
-                    <div id="headerTeam1Score">0</div>
-                </div>
-                <div class="progress-item-center">
-                    <div class="progress-item">Round: <span id="currentRoundDisplay">1</span>/<span id="totalRoundsHeader"></span></div>
-                    <div class="progress-item">Card: <span id="currentCard">1</span>/10</div>
-                </div>
-                <div class="header-score">
-                    <span id="headerTeam2Name">Team 2</span>
-                    <div id="headerTeam2Score">0</div>
-                </div>
-            </div>
-        </div>
-
+        
         <!-- Grade Selection (Start Screen) -->
         <div class="game-modes" id="gameModes">
             <button class="mode-btn" onclick="selectGradeAndStart(10)">Grade 10</button>
@@ -533,28 +515,58 @@
                 </div>
             </div>
 
-            <!-- Game Play -->
+            <!-- Game Play - New Hierarchical Layout -->
             <div class="game-play" id="gamePlay">
-                <div class="timer-container"><div class="timer-display" id="timerDisplay">10</div><div class="timer-bar"><div class="timer-progress" id="timerProgress"></div></div></div>
-                <div class="game-area">
-                    <div class="team-game-area" id="team1GameArea">
-                        <div class="team-score-display"><div class="team-name" id="gameTeam1Name">Team 1 Round</div><div class="score-number" id="team1RoundScore">0</div></div>
-                        <div class="player-area">
-                            <div class="player-name" id="player1Name"></div>
-                            <div class="answer-buttons" id="player1Buttons"></div>
-                            <div class="correct-answer-reveal" id="player1AnswerReveal"></div>
+                
+                <!-- 1. Sentence Display Area (Header) -->
+                <div id="headerSentenceDisplay" class="header-sentence-box"></div>
+
+                <!-- 2. MCQ Buttons Area (Top) -->
+                <div class="mcq-area-container">
+                    <!-- Team 1 MCQs -->
+                    <div class="team-mcq-column">
+                        <div class="answer-buttons" id="player1Buttons"></div>
+                        <div class="correct-answer-reveal" id="player1AnswerReveal"></div>
+                    </div>
+
+                    <!-- Team 2 MCQs -->
+                    <div class="team-mcq-column">
+                        <div class="answer-buttons" id="player2Buttons"></div>
+                        <div class="correct-answer-reveal" id="player2AnswerReveal"></div>
+                    </div>
+                </div>
+
+                <!-- 3. Players Names and Scores Row (Middle) -->
+                <div class="stats-row" id="statsRow">
+                    <!-- Team 1 Stats -->
+                    <div class="player-stats-block" id="team1GameArea">
+                        <div class="player-name-display" id="player1Name"></div>
+                        <div class="player-score-info">
+                            <span id="gameTeam1Name">Team 1</span>: <span class="score-val" id="team1RoundScore">0</span>
                         </div>
                     </div>
-                    <div class="versus-indicator">VS</div>
-                    <div class="team-game-area" id="team2GameArea">
-                        <div class="team-score-display"><div class="team-name" id="gameTeam2Name">Team 2 Round</div><div class="score-number" id="team2RoundScore">0</div></div>
-                         <div class="player-area">
-                            <div class="player-name" id="player2Name"></div>
-                            <div class="answer-buttons" id="player2Buttons"></div>
-                            <div class="correct-answer-reveal" id="player2AnswerReveal"></div>
+
+                    <!-- Round Info (Between Players) -->
+                    <div class="round-info-center">
+                        <div>Round <span id="currentRoundDisplay">1</span>/<span id="totalRoundsHeader"></span></div>
+                        <div>Card <span id="currentCard">1</span>/10</div>
+                    </div>
+
+                    <!-- Team 2 Stats -->
+                    <div class="player-stats-block" id="team2GameArea">
+                        <div class="player-name-display" id="player2Name"></div>
+                        <div class="player-score-info">
+                            <span id="gameTeam2Name">Team 2</span>: <span class="score-val" id="team2RoundScore">0</span>
                         </div>
                     </div>
                 </div>
+
+                <!-- 4. Progress Bar and Time (Bottom) -->
+                <div class="timer-container">
+                    <div class="timer-display" id="timerDisplay">10</div>
+                    <div class="timer-bar"><div class="timer-progress" id="timerProgress"></div></div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -759,21 +771,21 @@
 
             document.getElementById('gameModes').style.display = 'none';
             document.getElementById('game-content').style.display = 'block';
-            document.getElementById('gameProgress').style.display = 'block';
+            document.getElementById('headerSentenceDisplay').style.display = 'flex'; // Show header box
             document.getElementById('totalRoundsHeader').textContent = gameState.totalRoundsNeeded;
             
             shuffleTeams();
             buildAllRounds();
 
-            document.getElementById('headerTeam1Name').textContent = gameState.team1.name;
-            document.getElementById('headerTeam2Name').textContent = gameState.team2.name;
+            // We hide the old gameProgress header but update data for logic consistency
+            document.getElementById('gameProgress').style.display = 'none';
             updateHeaderScores();
 
             switchScreen('teamSetup');
             
             setTimeout(() => {
-                  showPhaseTransition('🎮 Starting Challenge!', 2000);
-                  setTimeout(() => startPlayingPhase(), 2000);
+                 showPhaseTransition('🎮 Starting Challenge!', 2000);
+                 setTimeout(() => startPlayingPhase(), 2000);
             }, TEAM_REVEAL_TIME); 
         }
 
@@ -883,8 +895,21 @@
             gameState.currentCard = 1;
             gameState.roundScore1 = 0;
             gameState.roundScore2 = 0;
+            
+            // Set Player Names in Game Area
+            document.getElementById('player1Name').textContent = gameState.currentPlayer1;
+            document.getElementById('player2Name').textContent = gameState.currentPlayer2;
+            
+            // Set Game Team Names
+            document.getElementById('gameTeam1Name').textContent = gameState.team1.name;
+            document.getElementById('gameTeam2Name').textContent = gameState.team2.name;
+
             document.getElementById('team1RoundScore').textContent = 0;
             document.getElementById('team2RoundScore').textContent = 0;
+            
+            // Reset Sentence Box
+            document.getElementById('headerSentenceDisplay').textContent = "🔊 Listen carefully...";
+
             startGameEffects();
             switchScreen('gamePlay');
             updateGameProgress();
@@ -934,6 +959,9 @@
             
             document.getElementById('player1AnswerReveal').textContent = '';
             document.getElementById('player2AnswerReveal').textContent = '';
+            
+            // Reset Sentence Box for new card
+            document.getElementById('headerSentenceDisplay').innerHTML = '<span style="opacity: 0.7; font-style: italic;">(Listening...)</span>';
 
             // Start timer immediately
             startRoundTimer();
@@ -967,6 +995,10 @@
             const question = gameState.currentQuestion;
             const isCorrect = selectedAns === question.correctAnswer;
             
+            // Show Sentence in Header for Feedback
+            const fullSentence = question.questionObject.sentence_template.replace('___', `<span style="color: #f9ed69; text-decoration: underline;">${question.correctAnswer}</span>`);
+            document.getElementById('headerSentenceDisplay').innerHTML = fullSentence;
+
             const btns = document.getElementById(`player${playerNum}Buttons`).children;
             for(let btn of btns){
                 if(btn.textContent === selectedAns) btn.classList.add(isCorrect ? 'correct' : 'incorrect');
@@ -990,12 +1022,9 @@
             updateHeaderScores();
 
             // End of round logic
-            document.getElementById('bottomSentenceReveal').style.display = 'none';
             const correctAnswer = gameState.currentQuestion.correctAnswer;
-            document.getElementById('player1AnswerReveal').textContent = correctAnswer;
-            document.getElementById('player2AnswerReveal').textContent = correctAnswer;
             revealCorrectAnswers();
-            setTimeout(nextCard, 2500);
+            setTimeout(nextCard, 3500); // Increased delay slightly to read sentence
         }
 
         function revealCorrectAnswers() {
@@ -1022,34 +1051,32 @@
             let timeLeft = 10;
             const timerDisp = document.getElementById('timerDisplay');
             const timerProg = document.getElementById('timerProgress');
-            const sentenceEl = document.getElementById('bottomSentenceReveal');
+            const sentenceEl = document.getElementById('headerSentenceDisplay'); // Use header box
             
             timerDisp.textContent = timeLeft;
             timerProg.style.width = '100%';
-            sentenceEl.style.display = 'none';
-
+            
             gameState.roundTimer = setInterval(() => {
                 timeLeft--;
                 timerDisp.textContent = timeLeft;
                 timerProg.style.width = `${(timeLeft / 10) * 100}%`;
 
                 if (timeLeft === 5) {
+                    // Show template hint
                     sentenceEl.innerHTML = gameState.currentQuestion.questionObject.sentence_template;
-                    sentenceEl.style.display = 'block';
                 }
 
                 if (timeLeft <= 0) {
                     clearInterval(gameState.roundTimer);
                     gameState.isRoundActive = false;
-                    sentenceEl.style.display = 'none';
                     playSound('incorrect');
                     
-                    const correctAnswer = gameState.currentQuestion.correctAnswer;
-                    document.getElementById('player1AnswerReveal').textContent = correctAnswer;
-                    document.getElementById('player2AnswerReveal').textContent = correctAnswer;
+                    // Show full answer on timeout
+                    const fullSentence = gameState.currentQuestion.questionObject.sentence_template.replace('___', `<span style="color: #f9ed69;">${gameState.currentQuestion.correctAnswer}</span>`);
+                    sentenceEl.innerHTML = fullSentence;
 
                     revealCorrectAnswers();
-                    setTimeout(nextCard, 2500); 
+                    setTimeout(nextCard, 3500); 
                 }
             }, 1000);
         }
@@ -1068,18 +1095,22 @@
 
         function createGlitterEffect(playerNum) {
             const container = document.getElementById(`team${playerNum}GameArea`);
-            const playerArea = container.querySelector('.player-area');
-            const scoreDisplay = container.querySelector('.team-score-display');
+            // Target the stats block specifically for coordinates
+            const playerArea = container; 
+            const scoreDisplay = container.querySelector('.score-val'); 
             if (!playerArea || !scoreDisplay) return;
 
             const startRect = playerArea.getBoundingClientRect();
             const endRect = scoreDisplay.getBoundingClientRect();
             const containerRect = container.getBoundingClientRect();
             
-            const startX = startRect.left + startRect.width / 2 - containerRect.left;
-            const startY = startRect.top + startRect.height / 2 - containerRect.top;
-            const endX = endRect.left + endRect.width / 2 - containerRect.left;
-            const endY = endRect.top + endRect.height / 2 - containerRect.top;
+            // Adjust coordinates relative to the specific container
+            const startX = startRect.width / 2;
+            const startY = startRect.height / 2;
+            
+            // This is a rough estimation since the score is inside the container
+            const endX = endRect.left + endRect.width / 2 - startRect.left;
+            const endY = endRect.top + endRect.height / 2 - startRect.top;
 
             for (let i = 0; i < 15; i++) {
                 const glitter = document.createElement('div');
@@ -1124,6 +1155,7 @@
             const members = gameState.team1Score > gameState.team2Score ? gameState.team1.players : (gameState.team2Score > gameState.team1Score ? gameState.team2.players : [...gameState.team1.players, ...gameState.team2.players]);
             document.getElementById('game-content').style.display = 'none';
             document.getElementById('gameProgress').style.display = 'none';
+            document.getElementById('headerSentenceDisplay').style.display = 'none';
             showCertificate(winner, members);
             for (let i = 0; i < 100; i++) setTimeout(createFireworks, i * 50);
         }
