@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trinity GESE 4 Interactive Classroom</title>
+    
+    <!-- Tailwind CSS (Styling) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM (Core Logic) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel (To understand JSX) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        /* Custom Animations */
+        @keyframes floatUp {
+            0% { transform: translateY(0px) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translateY(-150px) rotate(360deg) scale(1.2); opacity: 0; }
+        }
+        .animate-float-up {
+            animation: floatUp 1.5s ease-out forwards;
+        }
+        
+        /* Custom Scrollbar for cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback } = React;
+
+        // --- ICON COMPONENTS (Replaces Lucide Imports) ---
+        const Icon = ({ children, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
+        );
+        
+        const Play = ({ size=20, className }) => <Icon className={className}><polygon points="5 3 19 12 5 21 5 3"></polygon></Icon>;
+        const RotateCcw = ({ size=20, className }) => <Icon className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"></path><path d="M3 3v9h9"></path></Icon>;
+        const MessageSquare = ({ size=20, className }) => <Icon className={className}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></Icon>;
+        const BookOpen = ({ size=20, className }) => <Icon className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></Icon>;
+        const AlertCircle = ({ size=20, className }) => <Icon className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></Icon>;
+        const Star = ({ size=20, className }) => <Icon className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></Icon>;
+        const Trophy = ({ size=20, className }) => <Icon className={className}><path d="M8 21h8"></path><path d="M12 17v4"></path><path d="M7 4h10"></path><path d="M17 4v3a5 5 0 0 1-10 0V4"></path><path d="M7 4H5a2 2 0 0 0-2 2v2a3 3 0 0 0 3 3h1"></path><path d="M17 4h2a2 2 0 0 1 2 2v2a3 3 0 0 1-3 3h-1"></path></Icon>;
+
+        // --- APP DATA & LOGIC ---
+
+        const sampleTopics = {
+            // --- ORIGINAL SAMPLES ---
+            "volcano": {
+                title: "Volcano Experiment (火山实验)",
+                point1: "NOW: I like science. I do experiments at home sometimes.",
+                point2: "PAST: Last weekend I mixed vinegar and baking soda. It went out fast, but it was exciting.",
+                point3: "COMPARE: This experiment is better than my paper plane experiment because it is more exciting. The best part is the 'lava'.",
+                point4: "FUTURE: Next week I’m going to change the bottle and use more baking soda.",
+                question: "Do you like science experiments?",
+                vocab: ["vinegar (醋)", "baking soda (小苏打)", "eruption (爆发)", "lava (岩浆)", "messy (脏乱)", "exciting (刺激)"]
+            },
+            "rail": {
+                title: "High-Speed Rail Trip (高铁之旅)",
+                point1: "NOW: I like travelling by train. It’s comfortable and fast.",
+                point2: "PAST: Last month I went to another city by high-speed rail. I watched the view and ate snacks.",
+                point3: "COMPARE: The train is faster than the car, but the car is more flexible. The best part is arriving quickly.",
+                point4: "FUTURE: Next holiday I’m going to visit a museum and take more photos.",
+                question: "Do you like travelling by train or by car?",
+                vocab: ["comfortable (舒适)", "scenery (风景)", "fast (快)", "flexible (灵活)", "journey (旅程)", "ticket (车票)"]
+            },
+            "minecraft": {
+                title: "Minecraft Build (我的世界建筑)",
+                point1: "NOW: I play Minecraft once a week. I like building houses, but I don’t like losing items.",
+                point2: "PAST: Yesterday I built a tall tower. It looked great, but a creeper exploded near it.",
+                point3: "COMPARE: My new base is better than my old base because it is bigger and safer. The best room is my storage room.",
+                point4: "FUTURE: Next weekend I’m going to build a farm and a bridge.",
+                question: "What games do you like?",
+                vocab: ["creeper (苦力怕)", "explode (爆炸)", "tower (塔)", "safe (安全)", "survival (生存模式)", "creative (创造模式)"]
+            },
+            "spring": {
+                title: "Spring Festival Moment (春节时刻)",
+                point1: "NOW: Spring Festival is important. We usually have a big dinner.",
+                point2: "PAST: Last year I visited grandparents. We made dumplings, but I made one ugly dumpling.",
+                point3: "COMPARE: This year was better than last year because I had more time. The best part was family time.",
+                point4: "FUTURE: Next year I’m going to help more and learn a new dumpling shape.",
+                question: "What do you usually do for Spring Festival?",
+                vocab: ["dumplings (饺子)", "reunion (团圆)", "tradition (传统)", "fireworks (烟花)", "ugly (丑)", "shape (形状)"]
+            },
+            "zongzi": {
+                title: "Zongzi Taste Test (粽子测试)",
+                point1: "NOW: I like eating zongzi, but I don’t like very oily food.",
+                point2: "PAST: Last Dragon Boat Festival I tried two kinds. One was sweet and one was salty.",
+                point3: "COMPARE: Sweet zongzi is better than salty zongzi for me. The best flavour is red bean.",
+                point4: "FUTURE: Next time I’m going to try a new flavour and rate it.",
+                question: "Do you like sweet food or salty food?",
+                vocab: ["salty (咸)", "sweet (甜)", "sticky rice (糯米)", "bamboo leaf (竹叶)", "flavour (口味)", "rate (评分)"]
+            },
+            "magnet": {
+                title: "Magnet Challenge (磁铁挑战)",
+                point1: "NOW: I like testing things. I use a small magnet at home.",
+                point2: "PAST: Last week I tested coins, keys and plastic. Metal worked, but plastic didn’t.",
+                point3: "COMPARE: Keys are better than coins because they stick strongly. The best object was a paper clip.",
+                point4: "FUTURE: Next week I’m going to test more objects and make a simple list.",
+                question: "Have you ever played with magnets?",
+                vocab: ["attract (吸引)", "stick (吸附)", "metal (金属)", "plastic (塑料)", "strong (强)", "test (测试)"]
+            },
+            "club": {
+                title: "School Club Project (学校社团)",
+                point1: "NOW: I’m in a school club. We make small projects.",
+                point2: "PAST: Yesterday we built a simple model. It didn’t work at first, but we fixed it.",
+                point3: "COMPARE: Club time is better than normal class time because it is more hands-on. The best part is teamwork.",
+                point4: "FUTURE: Next month I’m going to learn a new skill and build something bigger.",
+                question: "Did you join a club when you were at school?",
+                vocab: ["hands-on (动手实践)", "teamwork (团队合作)", "model (模型)", "skill (技能)", "fix (修理)", "project (项目)"]
+            },
+            "mooncake": {
+                title: "Mooncake Ranking (月饼排名)",
+                point1: "NOW: I enjoy mooncakes, but I don’t like very sweet ones.",
+                point2: "PAST: Last year I tried three flavours. One was my favourite and one was too sweet.",
+                point3: "COMPARE: My favourite flavour is better than the others because it tastes smooth. The best is lotus seed.",
+                point4: "FUTURE: Next festival I’m going to try one new flavour and share it with my cousin.",
+                question: "What’s your favourite mooncake flavour?",
+                vocab: ["lotus seed (莲蓉)", "smooth (细腻)", "flavour (口味)", "ranking (排名)", "share (分享)", "traditional (传统的)"]
+            },
+
+            // --- SCIENCE / STEM ---
+            "s13": {
+                title: "Paper Bridge Challenge (纸桥挑战)",
+                point1: "NOW: I like building things. I make paper bridges at home.",
+                point2: "PAST: Last week I made one bridge, but it broke.",
+                point3: "COMPARE: Bridge A is stronger than Bridge B. The best design uses more folds.",
+                point4: "FUTURE: Next week I’m going to test it with more coins.",
+                question: "Do you like building things?",
+                vocab: ["engineer (工程师)", "stronger (更强)", "fold (折叠)", "support (支撑)", "collapse (倒塌)", "design (设计)"]
+            },
+            "s14": {
+                title: "Egg Drop Test (扔鸡蛋实验)",
+                point1: "NOW: I do simple science tests sometimes.",
+                point2: "PAST: Yesterday I dropped an egg. It didn’t break, but it was scary.",
+                point3: "COMPARE: Cotton is better than paper for protection. The best idea is a small box.",
+                point4: "FUTURE: I’m going to try a new design next time.",
+                question: "Have you ever done an egg drop test?",
+                vocab: ["gravity (重力)", "protection (保护)", "soft (软)", "crack (破裂)", "landing (着陆)", "material (材料)"]
+            },
+            "s15": {
+                title: "Water Filter Experiment (净水器实验)",
+                point1: "NOW: I’m interested in clean water and simple tools.",
+                point2: "PAST: Last month I made a filter. The water looked better, but it wasn’t perfect.",
+                point3: "COMPARE: Sand is better than paper for filtering. The best layer is cotton.",
+                point4: "FUTURE: I’m going to improve it and test again.",
+                question: "Do you think clean water is important?",
+                vocab: ["filter (过滤)", "clean (干净)", "layers (层)", "sand (沙子)", "cotton (棉花)", "dirty (脏)"]
+            },
+            "s16": {
+                title: "Ice Melting Test (融冰测试)",
+                point1: "NOW: I like simple experiments with ice.",
+                point2: "PAST: Last weekend I tested salt and sugar. Salt worked faster, but sugar was cleaner.",
+                point3: "COMPARE: Salt is better than sugar for melting ice.",
+                point4: "FUTURE: I’m going to test warm water next.",
+                question: "Which do you think is faster: salt or sugar?",
+                vocab: ["melt (融化)", "freeze (结冰)", "salt (盐)", "sugar (糖)", "temperature (温度)", "liquid (液体)"]
+            },
+            "s17": {
+                title: "Mini Space Project (太空小项目)",
+                point1: "NOW: I like space and planets.",
+                point2: "PAST: Last week I made planet balls. It was fun, but some were the wrong size.",
+                point3: "COMPARE: Jupiter is bigger than Earth. The biggest is Jupiter.",
+                point4: "FUTURE: I’m going to add rings for Saturn.",
+                question: "Do you like space?",
+                vocab: ["planets (行星)", "solar system (太阳系)", "size (大小)", "model (模型)", "orbit (轨道)", "stars (星星)"]
+            },
+            "s18": {
+                title: "Scratch Coding Game (Scratch编程)",
+                point1: "NOW: I like making small games on Scratch.",
+                point2: "PAST: Yesterday my game didn’t work, but I fixed it.",
+                point3: "COMPARE: Coding is more interesting than watching videos. The best part is winning the game.",
+                point4: "FUTURE: I’m going to add a new level next week.",
+                question: "Have you ever tried coding?",
+                vocab: ["code (代码)", "program (程序)", "debug (调试)", "level (关卡)", "character (角色)", "create (创造)"]
+            },
+            "s19": {
+                title: "Light-Up Card Circuit (发光卡片电路)",
+                point1: "NOW: I like electronics. I can make a light turn on.",
+                point2: "PAST: Last time the light didn’t work, but I changed the battery.",
+                point3: "COMPARE: A new battery is better than an old battery.",
+                point4: "FUTURE: I’m going to make two lights next time.",
+                question: "Do you like making things with electronics?",
+                vocab: ["circuit (电路)", "battery (电池)", "wire (导线)", "connect (连接)", "LED (发光二极管)", "power (电源)"]
+            },
+            "s20": {
+                title: "Plant Growth Test (植物生长)",
+                point1: "NOW: I grow a small plant at home.",
+                point2: "PAST: Last week the sunny plant grew faster, but it needed more water.",
+                point3: "COMPARE: Sun is better than shade for growth.",
+                point4: "FUTURE: I’m going to measure it every day next week.",
+                question: "Do you like growing plants?",
+                vocab: ["grow (生长)", "sunlight (阳光)", "shade (阴凉)", "water (水)", "measure (测量)", "leaves (叶子)"]
+            },
+            "s21": {
+                title: "Rubber Band Guitar (橡皮筋吉他)",
+                point1: "NOW: I can make different sounds with rubber bands.",
+                point2: "PAST: Yesterday I made a loud sound, but my little cousin didn’t like it.",
+                point3: "COMPARE: Thick bands sound lower than thin bands.",
+                point4: "FUTURE: I’m going to make a bigger one next time.",
+                question: "Do you like music?",
+                vocab: ["vibration (振动)", "sound (声音)", "pitch (音高)", "music (音乐)", "instrument (乐器)", "listen (听)"]
+            },
+            "s22": {
+                title: "Toy Car Ramp Race (玩具车坡道)",
+                point1: "NOW: I race toy cars at home sometimes.",
+                point2: "PAST: Last weekend my red car won, but it fell off the ramp.",
+                point3: "COMPARE: A heavier car is faster than a lighter car.",
+                point4: "FUTURE: I’m going to change the ramp height next.",
+                question: "Did you play with toy cars?",
+                vocab: ["speed (速度)", "ramp (坡道)", "gravity (重力)", "weight (重量)", "race (比赛)", "distance (距离)"]
+            },
+            "s23": {
+                title: "Weather Report Project (天气预报)",
+                point1: "NOW: I check the weather often.",
+                point2: "PAST: Last week it rained a lot, but one day was sunny.",
+                point3: "COMPARE: Summer is hotter than spring. The hottest is summer.",
+                point4: "FUTURE: I’m going to make a 7-day weather chart.",
+                question: "What’s the weather like today?",
+                vocab: ["forecast (预报)", "temperature (温度)", "rainy (下雨)", "sunny (晴朗)", "chart (图表)", "season (季节)"]
+            },
+            "s24": {
+                title: "Science Video Review (科普视频)",
+                point1: "NOW: I like science videos.",
+                point2: "PAST: Yesterday I watched a video about volcanoes, but I didn’t understand one part.",
+                point3: "COMPARE: This video is better than my old videos because it’s clearer.",
+                point4: "FUTURE: I’m going to watch a new video about space next.",
+                question: "Do you watch learning videos?",
+                vocab: ["learn (学习)", "watch (观看)", "understand (理解)", "explain (解释)", "clear (清晰)", "review (回顾)"]
+            },
+            "s25": {
+                title: "Recycling Challenge (垃圾分类)",
+                point1: "NOW: I sort rubbish at home sometimes.",
+                point2: "PAST: Last week I made a mistake, but I learned the rule.",
+                point3: "COMPARE: Plastic is easier to sort than batteries.",
+                point4: "FUTURE: I’m going to teach my family the rules.",
+                question: "Do you sort rubbish at home?",
+                vocab: ["recycle (回收)", "sort (分类)", "plastic (塑料)", "environment (环境)", "rule (规则)", "bin (垃圾桶)"]
+            },
+            "s26": {
+                title: "Math Detective Trick (数学侦探)",
+                point1: "NOW: I like math tricks and puzzles.",
+                point2: "PAST: Yesterday I showed my friend a trick. He was surprised, but he tried again.",
+                point3: "COMPARE: This trick is easier than my other tricks. The best part is the surprise.",
+                point4: "FUTURE: I’m going to learn a new trick next week.",
+                question: "Do you like puzzles?",
+                vocab: ["calculate (计算)", "trick (把戏)", "surprise (惊喜)", "number (数字)", "solve (解决)", "puzzle (谜题)"]
+            },
+            "s27": {
+                title: "Healthy Habits Exp. (健康习惯)",
+                point1: "NOW: I want more energy in the morning.",
+                point2: "PAST: Last week I slept earlier, but one day I slept late.",
+                point3: "COMPARE: 9 hours is better than 7 hours for me.",
+                point4: "FUTURE: I’m going to sleep at 10pm next week.",
+                question: "What time do you usually sleep?",
+                vocab: ["energy (能量)", "sleep (睡眠)", "routine (日常)", "health (健康)", "tired (累)", "improve (改善)"]
+            },
+
+            // --- CHINESE FESTIVALS ---
+            "f9": {
+                title: "Spring Festival Fireworks (春节烟花)",
+                point1: "NOW: Spring Festival is special for my family.",
+                point2: "PAST: Last year I watched fireworks. It was exciting, but it was noisy.",
+                point3: "COMPARE: This year was better than last year because we had more food.",
+                point4: "FUTURE: Next year I’m going to visit more relatives.",
+                question: "What do you like best about Spring Festival?",
+                vocab: ["fireworks (烟花)", "noisy (吵闹)", "celebrate (庆祝)", "exciting (刺激)", "relatives (亲戚)", "special (特别)"]
+            },
+            "f10": {
+                title: "Lantern Design (灯笼设计)",
+                point1: "NOW: I like lanterns and lights.",
+                point2: "PAST: Last Lantern Festival I made a lantern, but it was not strong.",
+                point3: "COMPARE: A round lantern is better than a square one.",
+                point4: "FUTURE: I’m going to design a new lantern next time.",
+                question: "Have you ever made a lantern?",
+                vocab: ["lantern (灯笼)", "design (设计)", "light (光)", "bright (明亮)", "shape (形状)", "create (创造)"]
+            },
+            "f11": {
+                title: "Dragon Boat Zongzi (端午粽子)",
+                point1: "NOW: I like zongzi, but I don’t like very oily food.",
+                point2: "PAST: Last time I tried two flavours. One was great, one was okay.",
+                point3: "COMPARE: Sweet is better than salty for me.",
+                point4: "FUTURE: I’m going to try a new flavour next time.",
+                question: "Sweet or salty — which do you like?",
+                vocab: ["flavour (口味)", "sticky rice (糯米)", "bamboo leaf (竹叶)", "sweet (甜)", "salty (咸)", "taste (尝)"]
+            },
+            "f12": {
+                title: "Mid-Autumn Moon Photo (中秋赏月)",
+                point1: "NOW: I enjoy looking at the moon.",
+                point2: "PAST: Last year I took a photo, but it was blurry.",
+                point3: "COMPARE: This mooncake is better than that one.",
+                point4: "FUTURE: I’m going to take a better photo next time.",
+                question: "Do you like mooncakes?",
+                vocab: ["moon (月亮)", "photo (照片)", "blurry (模糊)", "clear (清晰)", "admire (欣赏)", "bright (明亮)"]
+            },
+            "f13": {
+                title: "Qingming Spring Walk (清明踏青)",
+                point1: "NOW: In spring I like walking outside.",
+                point2: "PAST: Last Qingming I went for a walk. It was peaceful, but it was a little cold.",
+                point3: "COMPARE: Spring is better than winter for walking.",
+                point4: "FUTURE: Next time I’m going to fly a kite.",
+                question: "Do you like spring?",
+                vocab: ["nature (自然)", "peaceful (宁静)", "remember (纪念)", "walk (散步)", "fresh air (新鲜空气)", "green (绿色)"]
+            },
+            "f14": {
+                title: "National Day Mini Trip (国庆出游)",
+                point1: "NOW: I like short trips.",
+                point2: "PAST: Last National Day I went to a park. It was fun, but crowded.",
+                point3: "COMPARE: A museum is quieter than a theme park.",
+                point4: "FUTURE: Next holiday I’m going to visit the seaside.",
+                question: "Do you like travelling on holidays?",
+                vocab: ["trip (旅行)", "crowded (拥挤)", "quiet (安静)", "scenery (风景)", "celebrate (庆祝)", "holiday (假期)"]
+            },
+            "f15": {
+                title: "Winter Solstice Food (冬至美食)",
+                point1: "NOW: In winter I like warm food.",
+                point2: "PAST: Last winter solstice I ate dumplings. It was tasty, but too hot.",
+                point3: "COMPARE: Hotpot is better than ice cream in winter.",
+                point4: "FUTURE: Next time I’m going to try making soup.",
+                question: "What do you like eating in winter?",
+                vocab: ["warm (温暖)", "solstice (冬至)", "dumplings (饺子)", "hotpot (火锅)", "tradition (传统)", "cold (冷)"]
+            },
+            "f16": {
+                title: "Family Tradition (家庭传统)",
+                point1: "NOW: My family usually has a big dinner together.",
+                point2: "PAST: Last time we cooked fish, but it was spicy.",
+                point3: "COMPARE: This tradition is better than going out because it's relaxing.",
+                point4: "FUTURE: Next festival I’m going to help cook.",
+                question: "Does your family have traditions?",
+                vocab: ["tradition (传统)", "family (家庭)", "dinner (晚餐)", "together (在一起)", "custom (习俗)", "help (帮忙)"]
+            },
+
+            // --- TECH & LIFE 2025 ---
+            "t1": {
+                title: "QR Code Day (扫码生活)",
+                point1: "NOW: I use QR codes sometimes.",
+                point2: "PAST: Last time I used it at a shop, but my phone was slow.",
+                point3: "COMPARE: QR is faster than cash.",
+                point4: "FUTURE: I’m going to use it for the bus next week.",
+                question: "Do you use QR codes?",
+                vocab: ["scan (扫码)", "code (二维码)", "payment (支付)", "convenient (方便)", "phone (手机)", "cash (现金)"]
+            },
+            "t2": {
+                title: "Delivery Surprise (快递惊喜)",
+                point1: "NOW: We sometimes get deliveries.",
+                point2: "PAST: Last month I got a package. It was great, but the box was damaged.",
+                point3: "COMPARE: Delivery is easier than going out, but shops are faster sometimes.",
+                point4: "FUTURE: I’m going to order a book online.",
+                question: "Do you like deliveries?",
+                vocab: ["package (包裹)", "delivery (快递)", "online shopping (网购)", "order (下单)", "wait (等待)", "arrive (到达)"]
+            },
+            "t3": {
+                title: "Smartwatch Week (智能手表)",
+                point1: "NOW: I track steps sometimes.",
+                point2: "PAST: Yesterday I walked 5000 steps, but I was tired.",
+                point3: "COMPARE: This week is better than last week.",
+                point4: "FUTURE: I’m going to walk more next week.",
+                question: "Do you wear a watch?",
+                vocab: ["steps (步数)", "track (追踪)", "fitness (健身)", "healthy (健康)", "exercise (锻炼)", "walk (走路)"]
+            },
+            "t4": {
+                title: "Screen Time Plan (屏幕时间)",
+                point1: "NOW: I try to balance games and study.",
+                point2: "PAST: Last week I played too long, but I fixed my plan.",
+                point3: "COMPARE: One hour is better than three hours for me.",
+                point4: "FUTURE: I’m going to follow a new schedule next week.",
+                question: "How much screen time do you think is good?",
+                vocab: ["balance (平衡)", "limit (限制)", "schedule (计划表)", "healthy (健康)", "eyes (眼睛)", "focus (专注)"]
+            },
+            "t5": {
+                title: "Photo Project (摄影计划)",
+                point1: "NOW: I take photos sometimes.",
+                point2: "PAST: Last weekend I took a great photo, but one was blurry.",
+                point3: "COMPARE: Photo A is clearer than Photo B.",
+                point4: "FUTURE: I’m going to take photos in the park.",
+                question: "Do you like taking photos?",
+                vocab: ["camera (相机)", "focus (对焦)", "memory (回忆)", "capture (捕捉)", "clear (清晰)", "image (图像)"]
+            },
+            "t6": {
+                title: "High-Speed Rail Station (高铁站)",
+                point1: "NOW: I like travel systems and stations.",
+                point2: "PAST: Last trip I waited at the station, but it was crowded.",
+                point3: "COMPARE: High-speed rail is faster than normal train.",
+                point4: "FUTURE: I’m going to visit the station again.",
+                question: "Have you been on high-speed rail?",
+                vocab: ["station (车站)", "platform (站台)", "departure (出发)", "fast (快)", "modern (现代)", "travel (旅行)"]
+            },
+            "t7": {
+                title: "AI Study Helper (AI学习助手)",
+                point1: "NOW: I use an app to practice vocabulary.",
+                point2: "PAST: Yesterday it helped me, but one word was difficult.",
+                point3: "COMPARE: This is easier than only using a book.",
+                point4: "FUTURE: I’m going to practice for 10 minutes a day.",
+                question: "Do you use apps to learn English?",
+                vocab: ["app (应用)", "practice (练习)", "vocabulary (词汇)", "helper (助手)", "smart (智能)", "study (学习)"]
+            }
+        };
+
+        const conversationData = {
+            holidays: {
+            title: "Holidays",
+            icon: "✈️",
+            color: "bg-blue-100 border-blue-300",
+            questions: [
+                "Where do you usually go on holiday?",
+                "Where did you go on your last holiday?",
+                "What did you do there?",
+                "Where are you going to go for your next holiday?",
+                "Which is better: beach holidays or mountain holidays?",
+                "Do you prefer travelling by car or by plane?",
+                "Tell me about a holiday place you didn't like.",
+                "How often do you go on holiday?",
+                "What is the best thing about holidays?",
+                "Who do you usually travel with?"
+            ]
+            },
+            shopping: {
+            title: "Shopping",
+            icon: "🛍️",
+            color: "bg-pink-100 border-pink-300",
+            questions: [
+                "Do you like shopping? Why or why not?",
+                "Where do you usually go shopping?",
+                "What did you buy last weekend?",
+                "Is it better to shop online or in a shop?",
+                "What are you going to buy next?",
+                "Which is better: cheap things or expensive things?",
+                "How often do you go to the supermarket?",
+                "What do you never buy?",
+                "Tell me about something you bought recently.",
+                "Do you prefer shopping alone or with friends?"
+            ]
+            },
+            school: {
+            title: "School & Work",
+            icon: "📚",
+            color: "bg-yellow-100 border-yellow-300",
+            questions: [
+                "What subjects do you like?",
+                "What did you do at school yesterday?",
+                "What are you going to do at school tomorrow?",
+                "Which is easier: Math or English?",
+                "Tell me about your best teacher.",
+                "How much homework do you usually have?",
+                "Do you prefer studying in the morning or evening?",
+                "What job do you want to do in the future?",
+                "What time do you start school?",
+                "Which is better: primary school or middle school?"
+            ]
+            },
+            hobbies: {
+            title: "Hobbies & Sports",
+            icon: "⚽",
+            color: "bg-green-100 border-green-300",
+            questions: [
+                "What hobbies do you have?",
+                "How often do you play sports?",
+                "Did you play any sport last weekend?",
+                "Which is better: playing sports or video games?",
+                "What are you going to do after school today?",
+                "Do you prefer team sports or individual sports?",
+                "Tell me about a game you won or lost.",
+                "What is the most popular sport in your country?",
+                "Are you going to learn a new hobby soon?",
+                "What hobby do you think is boring?"
+            ]
+            },
+            food: {
+            title: "Food",
+            icon: "🍕",
+            color: "bg-red-100 border-red-300",
+            questions: [
+                "What do you usually eat for breakfast?",
+                "What did you eat yesterday?",
+                "What are you going to eat this weekend?",
+                "Which is better: rice or noodles?",
+                "Do you like sweet food or salty food?",
+                "Who cooks in your family?",
+                "Have you ever cooked something? What was it?",
+                "What is your favourite fruit?",
+                "How often do you eat snacks?",
+                "What food do you really dislike?"
+            ]
+            },
+            weekend: {
+            title: "Weekend & Seasons",
+            icon: "🌤️",
+            color: "bg-purple-100 border-purple-300",
+            questions: [
+                "What do you usually do at the weekend?",
+                "What did you do last weekend?",
+                "What are you going to do next weekend?",
+                "Which season do you like best? Why?",
+                "Which is better: summer or winter?",
+                "Do you prefer Saturdays or Sundays?",
+                "How often do you go to the park?",
+                "What do you do when it rains at the weekend?",
+                "Tell me about a fun weekend you remember.",
+                "Do you usually stay home or go out?"
+            ]
+            }
+        };
+
+        const mockExams = [
+            {
+            id: 1,
+            title: "Mock 1: Volcano Exp. (火山实验)",
+            topic: "My Volcano Experiment",
+            areas: ["Hobbies & Sports", "Food"],
+            vocab: ["vinegar (醋)", "baking soda (小苏打)", "lava (岩浆)", "experiment (实验)", "messy (脏乱)", "exciting (刺激)"],
+            script: [
+                { role: "E", text: "Hello! How are you today? Let's start with your topic." },
+                { role: "C", text: "My topic is my volcano experiment." },
+                { role: "E", text: "Great. Tell me about it." },
+                { role: "E", text: "What did you do last time?" },
+                { role: "E", text: "What was the best part?" },
+                { role: "E", text: "Is this experiment better than other experiments?" },
+                { role: "E", text: "What are you going to do next time?" },
+                { role: "Note", text: "WAIT: Student must ask: 'Do you like science experiments?'" },
+                { role: "E", text: "Let's talk about Hobbies. What hobbies do you like?" },
+                { role: "E", text: "How often do you play sports?" },
+                { role: "E", text: "Did you play last weekend?" },
+                { role: "E", text: "Now Food. What do you usually eat for breakfast?" },
+                { role: "E", text: "What did you eat yesterday?" },
+                { role: "E", text: "What are you going to eat this weekend?" }
+            ]
+            },
+            {
+            id: 2,
+            title: "Mock 2: Spring Festival (春节)",
+            topic: "Best Spring Festival Moment",
+            areas: ["Weekend & Seasons", "School & Work"],
+            vocab: ["dumplings (饺子)", "grandparents (祖父母)", "ugly (丑)", "tradition (传统)", "family time (家庭时光)"],
+            script: [
+                { role: "E", text: "What's your topic today?" },
+                { role: "C", text: "My topic is my best Spring Festival moment." },
+                { role: "E", text: "Tell me about it." },
+                { role: "E", text: "What did you do last Spring Festival?" },
+                { role: "E", text: "Which was better: making dumplings or eating them?" },
+                { role: "E", text: "What are you going to do next year?" },
+                { role: "Note", text: "WAIT: Student must ask: 'What do you usually do for Spring Festival?'" },
+                { role: "E", text: "Conversation 1: Weekend Activities. What do you usually do at weekends?" },
+                { role: "E", text: "What did you do last weekend?" },
+                { role: "E", text: "What are you going to do next weekend?" },
+                { role: "E", text: "Conversation 2: School. What subjects do you like at school?" },
+                { role: "E", text: "What did you do at school yesterday?" },
+                { role: "E", text: "Which is easier, math or English?" }
+            ]
+            },
+            {
+            id: 3,
+            title: "Mock 3: Magnet Challenge (磁铁)",
+            topic: "My Magnet Challenge",
+            areas: ["Shopping", "Food"],
+            vocab: ["test (测试)", "metal (金属)", "plastic (塑料)", "stick (吸附)", "coins (硬币)", "paper clip (回形针)"],
+            script: [
+                { role: "E", text: "Tell me your topic." },
+                { role: "C", text: "My topic is my magnet challenge." },
+                { role: "E", text: "What do you do in this challenge?" },
+                { role: "E", text: "What did you test last week?" },
+                { role: "E", text: "Which object was the best?" },
+                { role: "E", text: "What are you going to test next?" },
+                { role: "Note", text: "WAIT: Student must ask: 'Have you ever played with magnets?'" },
+                { role: "E", text: "Let's talk about Shopping. Where do you usually buy snacks?" },
+                { role: "E", text: "What did you buy last time?" },
+                { role: "E", text: "What are you going to buy next time?" },
+                { role: "E", text: "Now Food. What food do you like?" },
+                { role: "E", text: "What did you eat yesterday?" },
+                { role: "E", text: "Which is better, rice or noodles?" }
+            ]
+            },
+            {
+            id: 4,
+            title: "Mock 4: Mooncake Rank (月饼排名)",
+            topic: "My Mooncake Ranking",
+            areas: ["Holidays", "Weekend & Seasons"],
+            vocab: ["ranking (排名)", "flavour (口味)", "lotus seed (莲蓉)", "sweet (甜)", "share (分享)", "festival (节日)"],
+            script: [
+                { role: "E", text: "What's your topic?" },
+                { role: "C", text: "My topic is my mooncake ranking." },
+                { role: "E", text: "Tell me about your ranking." },
+                { role: "E", text: "What happened last year?" },
+                { role: "E", text: "Which flavour is the best?" },
+                { role: "E", text: "What are you going to do next festival?" },
+                { role: "Note", text: "WAIT: Student must ask: 'What's your favourite mooncake flavour?'" },
+                { role: "E", text: "Holidays. Where did you go on your last holiday?" },
+                { role: "E", text: "Which is better: travelling or staying at home?" },
+                { role: "E", text: "Where are you going to go next holiday?" },
+                { role: "E", text: "Weekend Activities. What do you usually do on weekends?" },
+                { role: "E", text: "What are you going to do next weekend?" }
+            ]
+            },
+            {
+            id: 5,
+            title: "Mock 5: Minecraft Build (我的世界)",
+            topic: "My Minecraft Build",
+            areas: ["School", "Hobbies"],
+            vocab: ["creeper (苦力怕)", "explode (爆炸)", "base (基地)", "safe (安全)", "survival (生存)", "creative (创造)"],
+            script: [
+                { role: "E", text: "Tell me about your topic." },
+                { role: "C", text: "My topic is my Minecraft build." },
+                { role: "E", text: "What happened when you played yesterday?" },
+                { role: "E", text: "Why is your new base better than your old base?" },
+                { role: "E", text: "What are you going to build next weekend?" },
+                { role: "Note", text: "WAIT: Student must ask: 'What games do you like?'" },
+                { role: "E", text: "School. What is your favourite subject?" },
+                { role: "E", text: "What did you do at school yesterday?" },
+                { role: "E", text: "What are you going to do tomorrow?" },
+                { role: "E", text: "Hobbies. How often do you play games?" },
+                { role: "E", text: "Which is better: sports or games?" },
+                { role: "E", text: "What did you do last weekend?" }
+            ]
+            },
+            {
+            id: 6,
+            title: "Mock 6: Zongzi Test (粽子测试)",
+            topic: "Zongzi Taste Test",
+            areas: ["Food", "Shopping"],
+            vocab: ["salty (咸)", "sweet (甜)", "sticky rice (糯米)", "bamboo (竹子)", "Dragon Boat (端午节)"],
+            script: [
+                { role: "E", text: "Please tell me your topic." },
+                { role: "C", text: "My topic is my zongzi taste test." },
+                { role: "E", text: "What did you try last Dragon Boat Festival?" },
+                { role: "E", text: "Which flavour is better: sweet or salty?" },
+                { role: "E", text: "What are you going to try next time?" },
+                { role: "Note", text: "WAIT: Student must ask: 'Do you like sweet or salty food?'" },
+                { role: "E", text: "Food. What do you usually eat for breakfast?" },
+                { role: "E", text: "What did you eat yesterday?" },
+                { role: "E", text: "Shopping. Where do you usually go shopping?" },
+                { role: "E", text: "What did you buy last time?" },
+                { role: "E", text: "What are you going to buy next?" }
+            ]
+            },
+            {
+            id: 7,
+            title: "Mock 7: High-Speed Rail (高铁)",
+            topic: "My High-Speed Rail Trip",
+            areas: ["Holidays", "School"],
+            vocab: ["comfortable (舒适)", "fast (快)", "scenery (风景)", "station (车站)", "flexible (灵活)"],
+            script: [
+                { role: "E", text: "What is your topic?" },
+                { role: "C", text: "My topic is my high-speed rail trip." },
+                { role: "E", text: "Tell me about your trip last month." },
+                { role: "E", text: "Compare the train and the car. Which is faster?" },
+                { role: "E", text: "Where are you going to go next holiday?" },
+                { role: "Note", text: "WAIT: Student must ask: 'Do you like travelling by train or car?'" },
+                { role: "E", text: "Holidays. Where did you go last holiday?" },
+                { role: "E", text: "What did you do there?" },
+                { role: "E", text: "School. What time do you start school?" },
+                { role: "E", text: "What did you do at school yesterday?" },
+                { role: "E", text: "Which is easier: English or Math?" }
+            ]
+            },
+            {
+            id: 8,
+            title: "Mock 8: School Club (学校社团)",
+            topic: "My School Club Project",
+            areas: ["School", "Weekend"],
+            vocab: ["project (项目)", "teamwork (团队合作)", "model (模型)", "skill (技能)", "hands-on (动手)"],
+            script: [
+                { role: "E", text: "Let's hear your topic." },
+                { role: "C", text: "My topic is my school club project." },
+                { role: "E", text: "What did you build yesterday?" },
+                { role: "E", text: "Why is club time better than normal class time?" },
+                { role: "E", text: "What are you going to build next month?" },
+                { role: "Note", text: "WAIT: Student must ask: 'Did you join a club at school?'" },
+                { role: "E", text: "School. What subjects do you like?" },
+                { role: "E", text: "What did you do at school yesterday?" },
+                { role: "E", text: "Weekend. What do you usually do at weekends?" },
+                { role: "E", text: "What are you going to do next weekend?" }
+            ]
+            }
+        ];
+
+        // --- MAIN APP COMPONENT ---
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [feedbackMessage, setFeedbackMessage] = useState(null);
+            const [score, setScore] = useState(0);
+            const [rewards, setRewards] = useState([]);
+
+            // Sound Generator
+            const playWinSound = useCallback(() => {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                
+                const ctx = new AudioContext();
+                const t = ctx.currentTime;
+                
+                // Arpeggio
+                [440, 554, 659, 880].forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    
+                    gain.gain.setValueAtTime(0.1, t + i * 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.05 + 0.5);
+                    
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(t + i * 0.05);
+                    osc.stop(t + i * 0.05 + 0.5);
+                });
+            }, []);
+
+            const triggerReward = () => {
+                setScore(s => s + 10);
+                playWinSound();
+                
+                // Add visual particles
+                const newRewards = Array.from({ length: 12 }).map((_, i) => ({
+                    id: Date.now() + i,
+                    x: 50 + (Math.random() * 40 - 20),
+                    y: 50 + (Math.random() * 40 - 20),
+                    emoji: ['🪙', '⭐', '✨', '🏆'][Math.floor(Math.random() * 4)],
+                    rotation: Math.random() * 360
+                }));
+                
+                setRewards(prev => [...prev, ...newRewards]);
+                
+                // Cleanup particles
+                setTimeout(() => {
+                    setRewards(prev => prev.filter(r => r.id < Date.now()));
+                }, 1500);
+            };
+
+            const triggerFeedback = (msg, duration = 3000) => {
+                setFeedbackMessage(msg);
+                setTimeout(() => setFeedbackMessage(null), duration);
+            };
+
+            // SUB-COMPONENTS
+            const ConversationTool = () => {
+                const [selectedArea, setSelectedArea] = useState(null);
+                const [currentQuestion, setCurrentQuestion] = useState(null);
+
+                const pickRandomQuestion = (areaKey) => {
+                    const qs = conversationData[areaKey].questions;
+                    const randomQ = qs[Math.floor(Math.random() * qs.length)];
+                    setCurrentQuestion(randomQ);
+                };
+
+                return (
+                    <div className="flex flex-col h-full overflow-hidden">
+                        <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <MessageSquare className="w-6 h-6 text-blue-600" />
+                        Conversation Phase (5 mins)
+                        </h2>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                        {Object.entries(conversationData).map(([key, data]) => (
+                            <button
+                            key={key}
+                            onClick={() => { setSelectedArea(key); pickRandomQuestion(key); }}
+                            className={`p-4 rounded-xl border-2 transition-all ${
+                                selectedArea === key 
+                                ? 'border-blue-600 shadow-lg scale-105' 
+                                : 'border-transparent hover:scale-105 opacity-80 hover:opacity-100'
+                            } ${data.color}`}
+                            >
+                            <div className="text-3xl mb-1">{data.icon}</div>
+                            <div className="font-bold text-gray-800 text-sm">{data.title}</div>
+                            </button>
+                        ))}
+                        </div>
+
+                        <div className="flex-grow bg-white rounded-2xl shadow-inner border-2 border-gray-100 p-6 flex flex-col items-center justify-center text-center relative">
+                        {selectedArea ? (
+                            <>
+                            <span className="absolute top-4 left-4 text-xs font-bold uppercase text-gray-400 tracking-wider">
+                                Current Subject: {conversationData[selectedArea].title}
+                            </span>
+                            <p className="text-2xl md:text-3xl font-medium text-gray-800 leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                "{currentQuestion}"
+                            </p>
+                            <div className="mt-8 flex gap-3">
+                                <button 
+                                onClick={() => pickRandomQuestion(selectedArea)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-bold shadow-md active:transform active:scale-95 transition-all flex items-center gap-2"
+                                >
+                                <RotateCcw className="w-4 h-4" /> Next Question
+                                </button>
+                            </div>
+                            </>
+                        ) : (
+                            <div className="text-gray-400 flex flex-col items-center">
+                            <Star className="w-12 h-12 mb-2 opacity-20" />
+                            <p>Select a subject area above to start.</p>
+                            </div>
+                        )}
+                        </div>
+                    </div>
+                );
+            };
+
+            const MockExamTool = () => {
+                const [selectedMock, setSelectedMock] = useState(null);
+                const [lineIndex, setLineIndex] = useState(0);
+
+                const handleNextLine = () => {
+                    if (selectedMock && lineIndex < selectedMock.script.length) {
+                    setLineIndex(prev => prev + 1);
+                    }
+                };
+
+                const resetMock = () => {
+                    setLineIndex(0);
+                };
+
+                return (
+                    <div className="h-full flex flex-col">
+                        {!selectedMock ? (
+                        <div className="grid grid-cols-1 gap-3 overflow-y-auto pr-2">
+                            <h2 className="text-xl font-bold text-gray-800 mb-2">Select a Mock Exam</h2>
+                            {mockExams.map(mock => (
+                            <button
+                                key={mock.id}
+                                onClick={() => setSelectedMock(mock)}
+                                className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all text-left group"
+                            >
+                                <div className="font-bold text-gray-800 group-hover:text-blue-600">{mock.title}</div>
+                                <div className="text-sm text-gray-500">Topic: {mock.topic}</div>
+                                <div className="flex gap-2 mt-2">
+                                {mock.areas.map(area => (
+                                    <span key={area} className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600 mr-2">{area}</span>
+                                ))}
+                                </div>
+                            </button>
+                            ))}
+                        </div>
+                        ) : (
+                        <div className="flex flex-col h-full">
+                            <div className="flex items-center justify-between mb-4 border-b pb-2">
+                            <div>
+                                <h3 className="font-bold text-lg">{selectedMock.title}</h3>
+                                <div className="text-xs text-gray-500">Examiner Script Mode</div>
+                            </div>
+                            <button 
+                                onClick={() => { setSelectedMock(null); setLineIndex(0); }}
+                                className="text-sm text-gray-500 hover:text-red-500 px-3 py-1 rounded hover:bg-red-50"
+                            >
+                                Exit Mock
+                            </button>
+                            </div>
+                            
+                            <div className="flex gap-4 h-full overflow-hidden">
+                                {/* Script Display */}
+                                <div className="flex-grow flex flex-col h-full overflow-hidden">
+                                    <div className="flex-grow overflow-y-auto bg-gray-50 rounded-xl p-4 mb-4 border border-gray-200 shadow-inner">
+                                    {selectedMock.script.slice(0, lineIndex + 1).map((line, idx) => (
+                                        <div 
+                                        key={idx} 
+                                        className={`mb-4 flex ${line.role === 'E' ? 'justify-start' : (line.role === 'Note' ? 'justify-center' : 'justify-end')}`}
+                                        >
+                                        <div className={`
+                                            max-w-[85%] rounded-2xl px-4 py-3 text-sm md:text-base shadow-sm
+                                            ${line.role === 'E' ? 'bg-white text-gray-800 border-l-4 border-blue-500' : ''}
+                                            ${line.role === 'C' ? 'bg-blue-100 text-blue-900 italic' : ''}
+                                            ${line.role === 'Note' ? 'bg-yellow-100 text-yellow-800 font-bold border-2 border-yellow-300 animate-pulse' : ''}
+                                        `}>
+                                            {line.role === 'E' && <span className="text-xs font-bold text-blue-500 block mb-1">Examiner</span>}
+                                            {line.text}
+                                        </div>
+                                        </div>
+                                    ))}
+                                    <div id="scroll-anchor"></div>
+                                    </div>
+
+                                    {/* Controls */}
+                                    <div className="grid grid-cols-2 gap-3 flex-shrink-0">
+                                    <button 
+                                        onClick={resetMock}
+                                        className="bg-gray-200 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-300"
+                                    >
+                                        Restart
+                                    </button>
+                                    <button 
+                                        onClick={handleNextLine}
+                                        disabled={lineIndex >= selectedMock.script.length - 1}
+                                        className="bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 shadow-lg disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2"
+                                    >
+                                        Next Line <Play className="w-4 h-4 fill-current" />
+                                    </button>
+                                    </div>
+                                </div>
+
+                                {/* Vocabulary Sidebar (Desktop) */}
+                                <div className="hidden lg:block w-48 bg-yellow-50 rounded-xl border border-yellow-100 p-4 overflow-y-auto">
+                                    <div className="flex items-center gap-2 mb-3 text-yellow-800 font-bold border-b border-yellow-200 pb-2">
+                                        <BookOpen size={16} /> Word Bank
+                                    </div>
+                                    <ul className="space-y-2">
+                                        {selectedMock.vocab.map((word, i) => (
+                                            <li key={i} className="bg-white px-2 py-1 rounded text-sm text-gray-700 shadow-sm border border-yellow-100">
+                                                {word}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        )}
+                    </div>
+                );
+            };
+
+            const TopicBuilder = () => {
+                const [topicData, setTopicData] = useState({
+                    title: "", point1: "", point2: "", point3: "", point4: "", question: ""
+                });
+
+                const loadTopic = (key) => {
+                    if(key === "") return;
+                    const t = sampleTopics[key];
+                    setTopicData({
+                        title: t.title,
+                        point1: t.point1,
+                        point2: t.point2,
+                        point3: t.point3,
+                        point4: t.point4,
+                        question: t.question
+                    });
+                };
+
+                return (
+                    <div className="h-full overflow-y-auto">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                <BookOpen className="w-6 h-6 text-purple-600" />
+                                Topic Planner
+                            </h2>
+                            <select 
+                                onChange={(e) => loadTopic(e.target.value)}
+                                className="bg-purple-600 text-white text-sm font-bold py-2 px-4 rounded-lg shadow-md border-none outline-none cursor-pointer max-w-[200px]"
+                            >
+                                <option value="">Load Topic...</option>
+                                <optgroup label="Original Samples">
+                                    <option value="volcano">Volcano Experiment</option>
+                                    <option value="rail">High-Speed Rail</option>
+                                    <option value="minecraft">Minecraft Build</option>
+                                    <option value="spring">Spring Festival</option>
+                                    <option value="zongzi">Zongzi Test</option>
+                                    <option value="magnet">Magnet Challenge</option>
+                                    <option value="club">School Club</option>
+                                    <option value="mooncake">Mooncake Ranking</option>
+                                </optgroup>
+                                <optgroup label="Science / STEM">
+                                    <option value="s13">S13: Paper Bridge</option>
+                                    <option value="s14">S14: Egg Drop</option>
+                                    <option value="s15">S15: Water Filter</option>
+                                    <option value="s16">S16: Ice Melting</option>
+                                    <option value="s17">S17: Mini Space Project</option>
+                                    <option value="s18">S18: Scratch Coding</option>
+                                    <option value="s19">S19: Light-Up Card</option>
+                                    <option value="s20">S20: Plant Growth</option>
+                                    <option value="s21">S21: Rubber Band Guitar</option>
+                                    <option value="s22">S22: Toy Car Ramp</option>
+                                    <option value="s23">S23: Weather Report</option>
+                                    <option value="s24">S24: Science Video Review</option>
+                                    <option value="s25">S25: Recycling Challenge</option>
+                                    <option value="s26">S26: Math Detective</option>
+                                    <option value="s27">S27: Healthy Habits</option>
+                                </optgroup>
+                                <optgroup label="Chinese Festivals">
+                                    <option value="f9">F9: Spring Festival Fireworks</option>
+                                    <option value="f10">F10: Lantern Design</option>
+                                    <option value="f11">F11: Dragon Boat Zongzi</option>
+                                    <option value="f12">F12: Mid-Autumn Moon Photo</option>
+                                    <option value="f13">F13: Qingming Spring Walk</option>
+                                    <option value="f14">F14: National Day Trip</option>
+                                    <option value="f15">F15: Winter Solstice Food</option>
+                                    <option value="f16">F16: Family Tradition</option>
+                                </optgroup>
+                                <optgroup label="Tech & Life 2025">
+                                    <option value="t1">T1: QR Code Day</option>
+                                    <option value="t2">T2: Delivery Surprise</option>
+                                    <option value="t3">T3: Smartwatch Week</option>
+                                    <option value="t4">T4: Screen Time Plan</option>
+                                    <option value="t5">T5: Photo Project</option>
+                                    <option value="t6">T6: High-Speed Rail Station</option>
+                                    <option value="t7">T7: AI Study Helper</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                            <div className="space-y-4">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold uppercase text-gray-500">My Topic Title</label>
+                                    <input 
+                                        readOnly value={topicData.title}
+                                        type="text" placeholder="Select a topic above..." 
+                                        className="w-full p-2 border rounded font-bold text-lg bg-gray-50" 
+                                    />
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="p-3 border rounded-lg bg-blue-50">
+                                        <label className="text-xs font-bold text-blue-600 mb-1 block">Point 1: The Present (Now)</label>
+                                        <textarea readOnly value={topicData.point1} className="w-full bg-white p-2 rounded text-sm resize-none h-24" placeholder="Select a topic..."></textarea>
+                                    </div>
+                                    <div className="p-3 border rounded-lg bg-green-50">
+                                        <label className="text-xs font-bold text-green-600 mb-1 block">Point 2: The Past</label>
+                                        <textarea readOnly value={topicData.point2} className="w-full bg-white p-2 rounded text-sm resize-none h-24" placeholder="Select a topic..."></textarea>
+                                    </div>
+                                    <div className="p-3 border rounded-lg bg-yellow-50">
+                                        <label className="text-xs font-bold text-yellow-600 mb-1 block">Point 3: Comparison</label>
+                                        <textarea readOnly value={topicData.point3} className="w-full bg-white p-2 rounded text-sm resize-none h-24" placeholder="Select a topic..."></textarea>
+                                    </div>
+                                    <div className="p-3 border rounded-lg bg-pink-50">
+                                        <label className="text-xs font-bold text-pink-600 mb-1 block">Point 4: Future Plans</label>
+                                        <textarea readOnly value={topicData.point4} className="w-full bg-white p-2 rounded text-sm resize-none h-24" placeholder="Select a topic..."></textarea>
+                                    </div>
+                                </div>
+
+                                <div className="p-4 bg-red-50 border border-red-100 rounded-lg flex items-center gap-3">
+                                    <AlertCircle className="text-red-500 w-6 h-6" />
+                                    <div className="flex-grow">
+                                        <label className="text-xs font-bold text-red-600 block">My Question for Examiner:</label>
+                                        <input readOnly value={topicData.question} type="text" placeholder="..." className="w-full p-2 mt-1 border rounded text-sm font-medium bg-white" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="bg-gray-100 min-h-screen font-sans text-gray-900 flex flex-col md:flex-row overflow-hidden relative">
+                    
+                    {/* VISUAL REWARDS LAYER (Floating Particles) */}
+                    {rewards.map(r => (
+                        <div key={r.id} className="animate-float-up absolute pointer-events-none z-50 text-4xl" style={{
+                            left: `${r.x}%`, 
+                            top: `${r.y}%`, 
+                        }}>
+                            {r.emoji}
+                        </div>
+                    ))}
+
+                    {/* Sidebar Navigation */}
+                    <nav className="bg-slate-800 text-white w-full md:w-20 lg:w-64 flex-shrink-0 flex md:flex-col justify-between p-2 md:p-4 shadow-xl z-20">
+                        <div className="flex md:flex-col gap-2 w-full overflow-x-auto md:overflow-visible items-center md:items-stretch">
+                            <div className="hidden md:block mb-6 px-2">
+                                <h1 className="font-bold text-xl tracking-tight text-blue-400">GESE 4<br/><span className="text-white text-sm font-normal">Teacher Deck</span></h1>
+                            </div>
+
+                            <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'dashboard' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
+                                <BookOpen size={20} /> <span className="md:hidden lg:inline font-medium">Topic Phase</span>
+                            </button>
+                            <button onClick={() => setActiveTab('conversation')} className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'conversation' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
+                                <MessageSquare size={20} /> <span className="md:hidden lg:inline font-medium">Conversation</span>
+                            </button>
+                            <button onClick={() => setActiveTab('mock')} className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'mock' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
+                                <Play size={20} /> <span className="md:hidden lg:inline font-medium">Mock Exam</span>
+                            </button>
+                        </div>
+
+                        {/* REWARD BUTTON */}
+                        <div className="hidden md:block mb-4">
+                            <div className="bg-slate-700 rounded-xl p-3 text-center mb-2">
+                                <div className="text-xs text-slate-400 font-bold uppercase">Total Score</div>
+                                <div className="text-2xl font-black text-yellow-400">{score}</div>
+                            </div>
+                            <button onClick={triggerReward} className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all flex items-center justify-center gap-2">
+                                <Trophy size={20} className="text-yellow-100" /> Award!
+                            </button>
+                        </div>
+                        
+                        {/* Quick Feedback Bar */}
+                        <div className="hidden md:flex flex-col gap-2 mt-auto pt-4 border-t border-slate-700">
+                            <div className="text-xs uppercase text-slate-500 font-bold px-2 mb-1">Visual Cues</div>
+                            <button onClick={() => triggerFeedback("Ask me a question! ❓")} className="bg-yellow-600 hover:bg-yellow-500 text-white text-sm font-bold py-2 px-3 rounded text-left">❓ Ask Question</button>
+                            <button onClick={() => triggerFeedback("Use Past Tense! ⏪")} className="bg-blue-900 hover:bg-blue-800 text-white text-sm font-bold py-2 px-3 rounded text-left">⏪ Past Tense</button>
+                            <button onClick={() => triggerFeedback("Going To... 🔮")} className="bg-purple-900 hover:bg-purple-800 text-white text-sm font-bold py-2 px-3 rounded text-left">🔮 Future</button>
+                            <button onClick={() => triggerFeedback("Extend: BUT... ➕")} className="bg-green-800 hover:bg-green-700 text-white text-sm font-bold py-2 px-3 rounded text-left">➕ Use BUT</button>
+                        </div>
+                    </nav>
+
+                    {/* Main Content Area */}
+                    <main className="flex-grow p-4 md:p-6 lg:p-8 h-[calc(100vh-80px)] md:h-screen overflow-hidden relative">
+                        
+                        {/* Mobile Header */}
+                        <div className="md:hidden mb-4 flex gap-2 overflow-x-auto pb-2 items-center">
+                            <button onClick={triggerReward} className="bg-yellow-500 text-white px-3 py-1 rounded-lg font-bold flex items-center gap-1 shadow-sm whitespace-nowrap"><Trophy size={14} /> {score}</button>
+                            <div className="w-[1px] h-6 bg-gray-300 mx-1"></div>
+                            <button onClick={() => triggerFeedback("❓ Question?")} className="bg-yellow-600 text-white px-3 py-1 rounded text-xs whitespace-nowrap">❓ Question?</button>
+                            <button onClick={() => triggerFeedback("⏪ Past")} className="bg-blue-800 text-white px-3 py-1 rounded text-xs whitespace-nowrap">⏪ Past</button>
+                            <button onClick={() => triggerFeedback("🔮 Future")} className="bg-purple-800 text-white px-3 py-1 rounded text-xs whitespace-nowrap">🔮 Future</button>
+                        </div>
+
+                        {/* Content Container */}
+                        <div className="bg-white rounded-2xl shadow-xl h-full overflow-hidden border border-gray-200">
+                            <div className="h-full p-4 md:p-8">
+                                {activeTab === 'dashboard' && <TopicBuilder />}
+                                {activeTab === 'conversation' && <ConversationTool />}
+                                {activeTab === 'mock' && <MockExamTool />}
+                            </div>
+                        </div>
+
+                        {/* Feedback Overlay */}
+                        {feedbackMessage && (
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 animate-in zoom-in duration-200 pointer-events-none">
+                                <div className="bg-gray-900/90 backdrop-blur-sm text-white px-8 py-6 rounded-2xl shadow-2xl flex items-center gap-4 border-2 border-white/20">
+                                    <span className="text-3xl md:text-5xl font-bold tracking-tight text-center whitespace-nowrap">{feedbackMessage}</span>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
