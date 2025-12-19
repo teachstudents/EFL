@@ -45,20 +45,22 @@
     <div id="root" class="h-full"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useCallback } = React;
+        const { useState, useEffect, useCallback, useRef } = React;
 
         // --- ICON COMPONENTS ---
         const Icon = ({ children, className }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
         );
         
-        const Play = ({ size=20, className }) => <Icon className={className}><polygon points="5 3 19 12 5 21 5 3"></polygon></Icon>;
-        const RotateCcw = ({ size=20, className }) => <Icon className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"></path><path d="M3 3v9h9"></path></Icon>;
-        const MessageSquare = ({ size=20, className }) => <Icon className={className}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></Icon>;
-        const BookOpen = ({ size=20, className }) => <Icon className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></Icon>;
-        const AlertCircle = ({ size=20, className }) => <Icon className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></Icon>;
-        const Star = ({ size=20, className }) => <Icon className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></Icon>;
-        const Trophy = ({ size=20, className }) => <Icon className={className}><path d="M8 21h8"></path><path d="M12 17v4"></path><path d="M7 4h10"></path><path d="M17 4v3a5 5 0 0 1-10 0V4"></path><path d="M7 4H5a2 2 0 0 0-2 2v2a3 3 0 0 0 3 3h1"></path><path d="M17 4h2a2 2 0 0 1 2 2v2a3 3 0 0 1-3 3h-1"></path></Icon>;
+        const Play = ({ className }) => <Icon className={className}><polygon points="5 3 19 12 5 21 5 3"></polygon></Icon>;
+        const RotateCcw = ({ className }) => <Icon className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"></path><path d="M3 3v9h9"></path></Icon>;
+        const MessageSquare = ({ className }) => <Icon className={className}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></Icon>;
+        const BookOpen = ({ className }) => <Icon className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></Icon>;
+        const AlertCircle = ({ className }) => <Icon className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></Icon>;
+        const Star = ({ className }) => <Icon className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></Icon>;
+        const Trophy = ({ className }) => <Icon className={className}><path d="M8 21h8"></path><path d="M12 17v4"></path><path d="M7 4h10"></path><path d="M17 4v3a5 5 0 0 1-10 0V4"></path><path d="M7 4H5a2 2 0 0 0-2 2v2a3 3 0 0 0 3 3h1"></path><path d="M17 4h2a2 2 0 0 1 2 2v2a3 3 0 0 1-3 3h-1"></path></Icon>;
+        const Clock = ({ className }) => <Icon className={className}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></Icon>;
+        const CheckSquare = ({ className }) => <Icon className={className}><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></Icon>;
 
         // --- APP DATA ---
 
@@ -257,9 +259,13 @@
         // --- MAIN APP COMPONENT ---
 
         const App = () => {
-            const [activeTab, setActiveTab] = useState('conversation'); // Default to Conversation for quick access
+            const [activeTab, setActiveTab] = useState('conversation'); 
             const [score, setScore] = useState(0);
             const [rewards, setRewards] = useState([]);
+            
+            // Timer State
+            const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
+            const [timerActive, setTimerActive] = useState(false);
 
             const playWinSound = useCallback(() => {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -280,8 +286,8 @@
                 });
             }, []);
 
-            const triggerReward = () => {
-                setScore(s => s + 10);
+            const triggerReward = (amount = 10) => {
+                setScore(s => s + amount);
                 playWinSound();
                 const newRewards = Array.from({ length: 12 }).map((_, i) => ({
                     id: Date.now() + i,
@@ -294,7 +300,81 @@
                 setTimeout(() => setRewards(prev => prev.filter(r => r.id < Date.now())), 1500);
             };
 
+            // Timer Logic
+            useEffect(() => {
+                let interval = null;
+                if (timerActive && timeLeft > 0) {
+                    interval = setInterval(() => {
+                        setTimeLeft(t => t - 1);
+                    }, 1000);
+                } else if (timeLeft === 0) {
+                    setTimerActive(false);
+                }
+                return () => clearInterval(interval);
+            }, [timerActive, timeLeft]);
+
+            const formatTime = (seconds) => {
+                const m = Math.floor(seconds / 60);
+                const s = seconds % 60;
+                return `${m}:${s < 10 ? '0' : ''}${s}`;
+            };
+
+            const toggleTimer = () => setTimerActive(!timerActive);
+            const resetTimer = () => { setTimerActive(false); setTimeLeft(300); };
+
             // SUB-COMPONENTS
+            const PhaseTimer = () => (
+                <div className={`flex items-center gap-2 px-3 py-1 rounded-lg border ${timeLeft < 30 ? 'bg-red-100 border-red-500 text-red-700 animate-pulse' : 'bg-white border-gray-200 text-gray-700'}`}>
+                    <Clock className="w-4 h-4" />
+                    <span className="font-mono font-bold text-lg w-12 text-center">{formatTime(timeLeft)}</span>
+                    <button onClick={toggleTimer} className="text-xs font-bold hover:text-blue-600">{timerActive ? 'PAUSE' : 'START'}</button>
+                    <button onClick={resetTimer} className="text-xs font-bold hover:text-red-600">RESET</button>
+                </div>
+            );
+
+            const GrammarChecklist = () => {
+                const [checkedItems, setCheckedItems] = useState({
+                    future: false,
+                    but: false,
+                    compare: false,
+                    past: false,
+                    question: false
+                });
+
+                const handleCheck = (key) => {
+                    if (!checkedItems[key]) {
+                        triggerReward(5); // +5 points for new check
+                        setCheckedItems(prev => ({ ...prev, [key]: true }));
+                    } else {
+                        setCheckedItems(prev => ({ ...prev, [key]: false }));
+                    }
+                };
+
+                return (
+                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 mt-2">
+                        <div className="text-xs font-bold text-blue-800 uppercase mb-2 flex items-center gap-1"><CheckSquare size={12}/> Grammar Check (+5 pts)</div>
+                        <div className="space-y-2">
+                            {[
+                                { k: 'future', label: 'Going to (Future)' },
+                                { k: 'but', label: 'Linker: "But"' },
+                                { k: 'compare', label: 'Comparative (-er)' },
+                                { k: 'past', label: 'Past Tense' },
+                                { k: 'question', label: 'Asked Question?' }
+                            ].map(item => (
+                                <button 
+                                    key={item.k}
+                                    onClick={() => handleCheck(item.k)}
+                                    className={`w-full text-left text-xs px-2 py-1 rounded flex items-center gap-2 transition-all ${checkedItems[item.k] ? 'bg-green-500 text-white line-through opacity-80' : 'bg-white text-gray-700 hover:bg-blue-100'}`}
+                                >
+                                    <div className={`w-3 h-3 rounded border ${checkedItems[item.k] ? 'bg-white border-white' : 'border-gray-400'}`}></div>
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                );
+            };
+
             const ConversationTool = () => {
                 const [selectedArea, setSelectedArea] = useState(null);
                 const [currentQuestion, setCurrentQuestion] = useState(null);
@@ -307,12 +387,14 @@
 
                 return (
                     <div className="flex flex-col h-full overflow-hidden">
-                        <h2 className="text-xl font-bold text-gray-800 mb-2 flex-shrink-0 flex items-center gap-2">
-                            <MessageSquare className="w-6 h-6 text-blue-600" />
-                            Conversation Phase (5 mins)
-                        </h2>
+                        <div className="flex justify-between items-center mb-2 flex-shrink-0">
+                            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                <MessageSquare className="w-6 h-6 text-blue-600" />
+                                Conversation (5 mins)
+                            </h2>
+                            <PhaseTimer />
+                        </div>
                         
-                        {/* Topic Grid (Scrollable) */}
                         <div className="flex-shrink-0 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 mb-3 max-h-[120px] overflow-y-auto">
                             {Object.entries(conversationData).map(([key, data]) => (
                                 <button
@@ -330,9 +412,7 @@
                             ))}
                         </div>
 
-                        {/* Split View: Question Left | Word Bank Right */}
                         <div className="flex-grow flex gap-4 overflow-hidden">
-                            {/* Left: Question Area */}
                             <div className="flex-grow bg-white rounded-xl shadow-inner border border-gray-200 p-6 flex flex-col items-start justify-center text-left relative transition-all">
                             {selectedArea ? (
                                 <>
@@ -359,7 +439,6 @@
                             )}
                             </div>
 
-                            {/* Right: Word Bank (Only shows if topic selected) */}
                             {selectedArea && (
                                 <div className="hidden md:block w-48 bg-yellow-50 rounded-xl border border-yellow-100 p-4 overflow-y-auto flex-shrink-0 animate-in fade-in slide-in-from-right-4">
                                     <div className="flex items-center gap-2 mb-3 text-yellow-800 font-bold border-b border-yellow-200 pb-2">
@@ -391,23 +470,31 @@
 
                 return (
                     <div className="h-full flex flex-col">
-                        {!selectedMock ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-2">
-                            {mockExams.map(mock => (
-                            <button
-                                key={mock.id}
-                                onClick={() => setSelectedMock(mock)}
-                                className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all text-left group h-full"
-                            >
-                                <div className="font-bold text-gray-800 group-hover:text-blue-600 text-sm">{mock.title}</div>
-                                <div className="text-xs text-gray-500 mt-1 line-clamp-1">{mock.topic}</div>
-                            </button>
-                            ))}
-                        </div>
+                         {!selectedMock ? (
+                             <div className="h-full flex flex-col">
+                                <div className="flex justify-between items-center mb-2 flex-shrink-0">
+                                    <h2 className="text-xl font-bold text-gray-800">Select Mock Exam</h2>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-2">
+                                    {mockExams.map(mock => (
+                                    <button
+                                        key={mock.id}
+                                        onClick={() => setSelectedMock(mock)}
+                                        className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all text-left group h-full"
+                                    >
+                                        <div className="font-bold text-gray-800 group-hover:text-blue-600 text-sm">{mock.title}</div>
+                                        <div className="text-xs text-gray-500 mt-1 line-clamp-1">{mock.topic}</div>
+                                    </button>
+                                    ))}
+                                </div>
+                            </div>
                         ) : (
                         <div className="flex flex-col h-full overflow-hidden">
                             <div className="flex items-center justify-between mb-2 border-b pb-2 flex-shrink-0">
-                                <h3 className="font-bold text-lg">{selectedMock.title}</h3>
+                                <div className="flex items-center gap-4">
+                                    <h3 className="font-bold text-lg">{selectedMock.title}</h3>
+                                    <PhaseTimer />
+                                </div>
                                 <button onClick={() => { setSelectedMock(null); setLineIndex(0); }} className="text-sm text-red-500 font-bold hover:bg-red-50 px-2 py-1 rounded">Exit</button>
                             </div>
                             
@@ -421,7 +508,6 @@
                                                 ${line.role === 'C' ? 'bg-blue-100 text-blue-900 italic' : ''}
                                                 ${line.role === 'Note' ? 'bg-yellow-100 text-yellow-800 font-bold border-2 border-yellow-300 animate-pulse text-center' : ''}
                                             `}>
-                                                {/* Removed explicit Examiner label as requested */}
                                                 {line.text}
                                             </div>
                                         </div>
@@ -435,13 +521,19 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div className="hidden lg:block w-48 bg-yellow-50 rounded-xl border border-yellow-100 p-4 overflow-y-auto flex-shrink-0">
-                                    <div className="flex items-center gap-2 mb-3 text-yellow-800 font-bold border-b border-yellow-200 pb-2"><BookOpen size={16} /> Word Bank</div>
-                                    <ul className="space-y-2">
-                                        {selectedMock.vocab.map((word, i) => (
-                                            <li key={i} className="bg-white px-2 py-1 rounded text-sm text-gray-700 shadow-sm border border-yellow-100">{word}</li>
-                                        ))}
-                                    </ul>
+                                <div className="hidden lg:flex flex-col w-48 gap-2 flex-shrink-0">
+                                    {/* WORD BANK */}
+                                    <div className="bg-yellow-50 rounded-xl border border-yellow-100 p-4 overflow-y-auto flex-grow h-1/2">
+                                        <div className="flex items-center gap-2 mb-3 text-yellow-800 font-bold border-b border-yellow-200 pb-2"><BookOpen size={16} /> Word Bank</div>
+                                        <ul className="space-y-2">
+                                            {selectedMock.vocab.map((word, i) => (
+                                                <li key={i} className="bg-white px-2 py-1 rounded text-sm text-gray-700 shadow-sm border border-yellow-100">{word}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    
+                                    {/* GRAMMAR CHECKLIST */}
+                                    <GrammarChecklist />
                                 </div>
                             </div>
                         </div>
@@ -451,44 +543,95 @@
             };
 
             const TopicBuilder = () => {
-                const [topicData, setTopicData] = useState({ title: "", point1: "", point2: "", point3: "", point4: "", question: "" });
+                const [topicData, setTopicData] = useState({ title: "", point1: "", point2: "", point3: "", point4: "", question: "", vocab: [] });
+                
                 const loadTopic = (key) => {
                     if(key === "") return;
                     const t = sampleTopics[key];
-                    setTopicData({ title: t.title, point1: t.point1, point2: t.point2, point3: t.point3, point4: t.point4, question: t.question });
+                    setTopicData({ 
+                        title: t.title, 
+                        point1: t.point1, 
+                        point2: t.point2, 
+                        point3: t.point3, 
+                        point4: t.point4, 
+                        question: t.question,
+                        vocab: t.vocab 
+                    });
                 };
 
                 return (
                     <div className="h-full overflow-hidden flex flex-col">
-                        <div className="flex justify-between items-center mb-4 flex-shrink-0">
+                        <div className="flex justify-between items-center mb-2 flex-shrink-0">
                             <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2"><BookOpen className="w-6 h-6 text-purple-600" /> Topic Planner</h2>
-                            <select onChange={(e) => loadTopic(e.target.value)} className="bg-purple-600 text-white text-sm font-bold py-2 px-4 rounded-lg shadow-md border-none outline-none cursor-pointer max-w-[200px]">
-                                <option value="">Load Topic...</option>
-                                <option value="volcano">Volcano Exp.</option>
-                                <option value="rail">High-Speed Rail</option>
-                                <option value="minecraft">Minecraft</option>
-                                <option value="spring">Spring Festival</option>
-                                <option value="zongzi">Zongzi</option>
-                                <option value="magnet">Magnet</option>
-                                <option value="club">School Club</option>
-                                <option value="mooncake">Mooncake</option>
-                            </select>
+                            <div className="flex gap-4 items-center">
+                                <PhaseTimer />
+                                <select onChange={(e) => loadTopic(e.target.value)} className="bg-purple-600 text-white text-xs font-bold py-1 px-3 rounded shadow-md border-none outline-none cursor-pointer max-w-[180px]">
+                                    <option value="">Load Topic...</option>
+                                    <option value="volcano">Volcano Exp.</option>
+                                    <option value="rail">High-Speed Rail</option>
+                                    <option value="minecraft">Minecraft</option>
+                                    <option value="spring">Spring Festival</option>
+                                    <option value="zongzi">Zongzi</option>
+                                    <option value="magnet">Magnet</option>
+                                    <option value="club">School Club</option>
+                                    <option value="mooncake">Mooncake</option>
+                                </select>
+                            </div>
                         </div>
-                        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 overflow-y-auto flex-grow">
-                            <div className="space-y-4">
+                        
+                        <div className="flex gap-4 h-full overflow-hidden">
+                            {/* Main Form Area */}
+                            <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-200 overflow-y-auto flex-grow flex flex-col gap-2">
                                 <div className="space-y-1">
-                                    <label className="text-xs font-bold uppercase text-gray-500">Topic Title</label>
-                                    <input readOnly value={topicData.title} type="text" className="w-full p-2 border rounded font-bold text-lg bg-gray-50" />
+                                    <label className="text-[10px] font-bold uppercase text-gray-500">Topic Title</label>
+                                    <input readOnly value={topicData.title} type="text" className="w-full p-1.5 border rounded font-bold text-base bg-gray-50" />
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <div className="p-2 border rounded bg-blue-50"><label className="text-xs font-bold text-blue-600 block">1. Present</label><textarea readOnly value={topicData.point1} className="w-full bg-white p-2 rounded text-sm resize-none h-20"></textarea></div>
-                                    <div className="p-2 border rounded bg-green-50"><label className="text-xs font-bold text-green-600 block">2. Past</label><textarea readOnly value={topicData.point2} className="w-full bg-white p-2 rounded text-sm resize-none h-20"></textarea></div>
-                                    <div className="p-2 border rounded bg-yellow-50"><label className="text-xs font-bold text-yellow-600 block">3. Compare</label><textarea readOnly value={topicData.point3} className="w-full bg-white p-2 rounded text-sm resize-none h-20"></textarea></div>
-                                    <div className="p-2 border rounded bg-pink-50"><label className="text-xs font-bold text-pink-600 block">4. Future</label><textarea readOnly value={topicData.point4} className="w-full bg-white p-2 rounded text-sm resize-none h-20"></textarea></div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 flex-grow">
+                                    <div className="p-1.5 border rounded bg-blue-50 flex flex-col">
+                                        <label className="text-[10px] font-bold text-blue-600 block mb-0.5">1. Present</label>
+                                        <textarea readOnly value={topicData.point1} className="w-full bg-white p-1.5 rounded text-xs resize-none flex-grow leading-tight"></textarea>
+                                    </div>
+                                    <div className="p-1.5 border rounded bg-green-50 flex flex-col">
+                                        <label className="text-[10px] font-bold text-green-600 block mb-0.5">2. Past</label>
+                                        <textarea readOnly value={topicData.point2} className="w-full bg-white p-1.5 rounded text-xs resize-none flex-grow leading-tight"></textarea>
+                                    </div>
+                                    <div className="p-1.5 border rounded bg-yellow-50 flex flex-col">
+                                        <label className="text-[10px] font-bold text-yellow-600 block mb-0.5">3. Compare</label>
+                                        <textarea readOnly value={topicData.point3} className="w-full bg-white p-1.5 rounded text-xs resize-none flex-grow leading-tight"></textarea>
+                                    </div>
+                                    <div className="p-1.5 border rounded bg-pink-50 flex flex-col">
+                                        <label className="text-[10px] font-bold text-pink-600 block mb-0.5">4. Future</label>
+                                        <textarea readOnly value={topicData.point4} className="w-full bg-white p-1.5 rounded text-xs resize-none flex-grow leading-tight"></textarea>
+                                    </div>
                                 </div>
-                                <div className="p-3 bg-red-50 border border-red-100 rounded flex items-center gap-3">
-                                    <AlertCircle className="text-red-500 w-5 h-5" />
-                                    <div className="flex-grow"><label className="text-xs font-bold text-red-600 block">Question for Examiner:</label><input readOnly value={topicData.question} type="text" className="w-full p-1 mt-1 border rounded text-sm font-medium bg-white" /></div>
+
+                                <div className="p-2 bg-red-50 border border-red-100 rounded flex items-center gap-2 flex-shrink-0">
+                                    <AlertCircle className="text-red-500 w-4 h-4" />
+                                    <div className="flex-grow">
+                                        <label className="text-[10px] font-bold text-red-600 block">Question for Examiner:</label>
+                                        <input readOnly value={topicData.question} type="text" className="w-full p-1 border rounded text-xs font-medium bg-white" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Word Bank Sidebar */}
+                            <div className="hidden lg:flex flex-col w-40 gap-2 flex-shrink-0">
+                                <div className="bg-purple-50 rounded-xl border border-purple-100 p-3 overflow-y-auto flex-grow">
+                                    <div className="flex items-center gap-2 mb-2 text-purple-800 font-bold border-b border-purple-200 pb-1 text-sm">
+                                        <BookOpen size={14} /> Word Bank
+                                    </div>
+                                    {topicData.vocab.length > 0 ? (
+                                        <ul className="space-y-1.5">
+                                            {topicData.vocab.map((word, i) => (
+                                                <li key={i} className="bg-white px-2 py-1 rounded text-xs text-gray-700 shadow-sm border border-purple-100 leading-tight">
+                                                    {word}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <div className="text-xs text-gray-400 text-center mt-4">Select a topic to see words</div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -497,44 +640,38 @@
             };
 
             return (
-                <div className="bg-gray-100 font-sans text-gray-900 flex flex-col md:flex-row h-full">
+                <div className="bg-gray-100 font-sans text-gray-900 h-screen flex flex-col overflow-hidden">
                     {rewards.map(r => (<div key={r.id} className="animate-float-up absolute pointer-events-none z-50 text-4xl" style={{ left: `${r.x}%`, top: `${r.y}%` }}>{r.emoji}</div>))}
 
-                    {/* Compact Sidebar */}
-                    <nav className="bg-slate-800 text-white w-full md:w-20 lg:w-48 flex-shrink-0 flex md:flex-col justify-between p-2 shadow-xl z-20">
-                        <div className="flex md:flex-col gap-2 w-full overflow-x-auto md:overflow-visible items-center md:items-stretch">
-                            <div className="hidden md:block mb-4 px-1 text-center md:text-left">
-                                <h1 className="font-bold text-lg tracking-tight text-blue-400 leading-tight">GESE 4<br/><span className="text-white text-xs font-normal">Classroom</span></h1>
-                            </div>
-                            <button onClick={() => setActiveTab('conversation')} className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${activeTab === 'conversation' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
-                                <MessageSquare size={18} /> <span className="md:hidden lg:inline text-sm font-medium">Talk</span>
+                    {/* Top Header */}
+                    <header className="bg-slate-800 text-white p-2 shadow-md flex items-center justify-between shrink-0 h-12 z-20">
+                        {/* Left: Nav Buttons */}
+                        <div className="flex gap-2">
+                            <button onClick={() => setActiveTab('conversation')} className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-bold transition-all ${activeTab === 'conversation' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
+                                <MessageSquare size={14} /> Talk
                             </button>
-                            <button onClick={() => setActiveTab('mock')} className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${activeTab === 'mock' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
-                                <Play size={18} /> <span className="md:hidden lg:inline text-sm font-medium">Mock</span>
+                            <button onClick={() => setActiveTab('mock')} className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-bold transition-all ${activeTab === 'mock' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
+                                <Play size={14} /> Mock
                             </button>
-                            <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${activeTab === 'dashboard' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
-                                <BookOpen size={18} /> <span className="md:hidden lg:inline text-sm font-medium">Topic</span>
+                            <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-bold transition-all ${activeTab === 'dashboard' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
+                                <BookOpen size={14} /> Topic
                             </button>
                         </div>
-                        <div className="hidden md:block mb-2">
-                            <div className="bg-slate-700 rounded-lg p-2 text-center mb-2">
-                                <div className="text-[10px] text-slate-400 font-bold uppercase">Score</div>
-                                <div className="text-xl font-black text-yellow-400">{score}</div>
+
+                        {/* Right: Score */}
+                        <div className="flex items-center gap-3">
+                            <div className="bg-slate-700 rounded px-2 py-1 flex items-center gap-2">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase">Score</span>
+                                <span className="text-sm font-black text-yellow-400">{score}</span>
                             </div>
-                            <button onClick={triggerReward} className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white font-bold py-2 rounded-lg shadow-lg active:scale-95 flex items-center justify-center gap-1 text-sm">
-                                <Trophy size={16} className="text-yellow-100" /> Award
+                            <button onClick={() => triggerReward(10)} className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white font-bold py-1 px-3 rounded shadow-lg active:scale-95 flex items-center gap-1 text-xs">
+                                <Trophy size={14} className="text-yellow-100" /> Award
                             </button>
                         </div>
-                    </nav>
+                    </header>
 
                     {/* Main Content */}
-                    <main className="flex-grow p-2 md:p-4 h-full overflow-hidden relative flex flex-col">
-                        {/* Mobile Header Score */}
-                        <div className="md:hidden mb-2 flex justify-between items-center bg-white p-2 rounded-lg shadow-sm">
-                            <span className="font-bold text-gray-500 text-sm">GESE 4</span>
-                            <button onClick={triggerReward} className="bg-yellow-500 text-white px-3 py-1 rounded-lg font-bold flex items-center gap-1 shadow-sm text-sm"><Trophy size={14} /> {score}</button>
-                        </div>
-
+                    <main className="flex-grow p-4 h-full overflow-hidden relative flex flex-col">
                         <div className="bg-white rounded-xl shadow-lg h-full overflow-hidden border border-gray-200 flex-grow">
                             <div className="h-full p-4">
                                 {activeTab === 'dashboard' && <TopicBuilder />}
