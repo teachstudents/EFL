@@ -278,7 +278,7 @@
             "spring": { title: "Spring Festival Moment (春节时刻)", point1: "NOW: Spring Festival is the most important festival. We usually have a big dinner with my family.", point2: "PAST: Last year I visited my grandparents in the countryside. We made dumplings together, but I made one ugly dumpling.", point3: "COMPARE: This year was better than last year because I had more free time. The best part was the family time.", point4: "FUTURE: Next year I’m going to help my mom more. I am going to learn a new dumpling shape.", question: "What do you usually do for Spring Festival?", vocab: ["dumplings (饺子)", "reunion (团圆)", "fireworks (烟花)", "ugly (丑)", "red envelope (红包)", "celebrate (庆祝)", "dinner (晚餐)", "family (家庭)", "visit (拜访)", "new clothes (新衣)", "lucky (幸运)", "happy (快乐)", "tradition (传统)"] },
             "zongzi": { title: "Zongzi Taste Test (粽子测试)", point1: "NOW: I really like eating zongzi. However, I don’t like very oily food.", point2: "PAST: Last Dragon Boat Festival I tried two kinds of zongzi. One was sweet and one was salty.", point3: "COMPARE: Sweet zongzi is better than salty zongzi for me. The best flavour is definitely red bean.", point4: "FUTURE: Next time I’m going to try a new flavour. I am going to rate it in my notebook.", question: "Sweet or salty?", vocab: ["salty (咸)", "sweet (甜)", "sticky rice (糯米)", "bamboo (竹)", "leaves (叶子)", "filling (馅料)", "taste (尝)", "dragon boat (端午)", "pork (猪肉)", "bean paste (豆沙)", "boil (煮)", "grandmother (祖母)", "make (制作)"] },
             "magnet": { title: "Magnet Challenge (磁铁挑战)", point1: "NOW: I like testing things at home. I use a small magnet to check different objects.", point2: "PAST: Last week I tested coins, keys and plastic. The metal worked, but the plastic didn’t.", point3: "COMPARE: Keys are better than coins for this test because they stick strongly. The best object was a paper clip.", point4: "FUTURE: Next week I’m going to test more objects in my room. I am going to make a simple list.", question: "Have you ever played with magnets?", vocab: ["attract (吸引)", "metal (金属)", "strong (强)", "test (测试)", "repel (排斥)", "force (力)", "north (北)", "south (南)", "coins (硬币)", "paper clip (回形针)", "plastic (塑料)", "stick (吸附)", "science (科学)"] },
-            "club": { title: "School Club Project (学校社团)", point1: "NOW: I’m in a school science club. We make small projects every Friday afternoon.", point2: "PAST: Yesterday we built a simple model car. It didn’t work at first, but we fixed it.", point3: "COMPARE: Club time is better than normal class time because it is more hands-on. The best part is the teamwork.", point4: "FUTURE: Next month Im going to learn a new skill. We are going to build something bigger.", question: "Did you join a club?", vocab: ["hands-on (动手)", "teamwork (团队)", "skill (技能)", "fix (修理)", "model (模型)", "project (项目)", "learn (学习)", "fun (有趣)", "join (加入)", "after school (放学后)", "science (科学)", "art (艺术)", "together (一起)"] },
+            "club": { title: "School Club Project (学校社团)", point1: "NOW: I’m in a school science club. We make small projects every Friday afternoon.", point2: "PAST: Yesterday we built a simple model car. It didn’t work at first, but we fixed it.", point3: "COMPARE: Club time is better than normal class time because it is more hands-on. The best part is the teamwork.", point4: "FUTURE: Next month I'm going to learn a new skill. We are going to build something bigger.", question: "Did you join a club?", vocab: ["hands-on (动手)", "teamwork (团队)", "skill (技能)", "fix (修理)", "model (模型)", "project (项目)", "learn (学习)", "fun (有趣)", "join (加入)", "after school (放学后)", "science (科学)", "art (艺术)", "together (一起)"] },
             "mooncake": { title: "Mooncake Ranking (月饼排名)", point1: "NOW: I enjoy eating mooncakes. I like the taste, but I don’t like very sweet ones.", point2: "PAST: Last year I tried three flavours of mooncakes. One was my favourite and one was too sweet.", point3: "COMPARE: My favourite flavour is better than the others because it tastes smooth. The best is lotus seed.", point4: "FUTURE: Next festival I’m going to try one new flavour. I am going to share it with my cousin.", question: "Favourite mooncake?", vocab: ["lotus seed (莲蓉)", "smooth (细腻)", "share (分享)", "traditional (传统)", "moon (月亮)", "mid-autumn (中秋)", "round (圆)", "sweet (甜)", "ranking (排名)", "flavour (口味)", "box (盒子)", "gift (礼物)", "family (家庭)", "eat (吃)", "tea (茶)"] }
         };
 
@@ -327,7 +327,7 @@
                                 onClick={() => handleCheck(item.k)}
                                 className={`w-full text-left text-xs px-2 py-1.5 rounded flex items-center gap-2 transition-all ${checkedItems[item.k] ? 'bg-green-500 text-white line-through opacity-80' : 'bg-white text-gray-700 hover:bg-blue-100'}`}
                             >
-                                <div className={`w-3 h-3 rounded border ${checkedItems[item.k] ? 'bg-white border-white' : 'border-gray-400'}`}></div>
+                                <div className={`w-2 h-2 rounded border ${checkedItems[item.k] ? 'bg-white border-white' : 'border-gray-400'}`}></div>
                                 {item.label}
                             </button>
                         ))}
@@ -386,13 +386,13 @@
                     <div className="flex-grow flex gap-4 overflow-hidden">
                         {/* 1. Grammar Column (Left) */}
                         {selectedArea && (
-                            <div className="w-64 bg-blue-50 rounded-xl border border-blue-100 p-4 overflow-y-auto flex-shrink-0 animate-in fade-in slide-in-from-left-4 hidden md:flex flex-col">
+                            <div className="w-80 bg-blue-50 rounded-xl border border-blue-100 p-4 overflow-y-auto flex-shrink-0 animate-in fade-in slide-in-from-left-4 hidden md:flex flex-col">
                                 <div className="flex items-center gap-2 mb-3 text-blue-800 font-bold border-b border-blue-200 pb-2">
                                     <CheckSquare size={16} /> Grammar
                                 </div>
                                 <ul className="space-y-2">
                                     {conversationData[selectedArea].grammar.map((rule, i) => (
-                                        <li key={i} className="bg-white px-2 py-1 rounded text-xs text-blue-900 shadow-sm border border-blue-100">
+                                        <li key={i} className="bg-white px-2 py-1 rounded text-sm text-blue-900 shadow-sm border border-blue-100">
                                             {rule}
                                         </li>
                                     ))}
@@ -421,13 +421,13 @@
 
                         {/* 3. Word Bank Column (Right) */}
                         {selectedArea && (
-                            <div className="w-64 bg-yellow-50 rounded-xl border border-yellow-100 p-4 overflow-y-auto flex-shrink-0 animate-in fade-in slide-in-from-right-4 hidden md:flex flex-col">
+                            <div className="w-80 bg-yellow-50 rounded-xl border border-yellow-100 p-4 overflow-y-auto flex-shrink-0 animate-in fade-in slide-in-from-right-4 hidden md:flex flex-col">
                                 <div className="flex items-center gap-2 mb-3 text-yellow-800 font-bold border-b border-yellow-200 pb-2">
                                     <BookOpen size={16} /> Word Bank
                                 </div>
                                 <ul className="space-y-2">
                                     {conversationData[selectedArea].vocab.map((word, i) => (
-                                        <li key={i} className="bg-white px-2 py-1 rounded text-xs text-gray-700 shadow-sm border border-yellow-100">
+                                        <li key={i} className="bg-white px-2 py-1 rounded text-sm text-gray-700 shadow-sm border border-yellow-100">
                                             {word}
                                         </li>
                                     ))}
@@ -504,16 +504,16 @@
                             </div>
                             <div className="hidden lg:flex gap-2 flex-shrink-0 h-full">
                                 {/* GRAMMAR CHECKLIST COLUMN */}
-                                <div className="w-40 h-full overflow-y-auto">
+                                <div className="w-80 h-full overflow-y-auto">
                                      <GrammarChecklist onReward={onReward} />
                                 </div>
 
                                 {/* WORD BANK COLUMN */}
-                                <div className="w-40 bg-yellow-50 rounded-xl border border-yellow-100 p-4 overflow-y-auto h-full">
+                                <div className="w-80 bg-yellow-50 rounded-xl border border-yellow-100 p-4 overflow-y-auto h-full">
                                     <div className="flex items-center gap-2 mb-3 text-yellow-800 font-bold border-b border-yellow-200 pb-2"><BookOpen size={16} /> Word Bank</div>
                                     <ul className="space-y-2">
                                         {selectedMock.vocab.map((word, i) => (
-                                            <li key={i} className="bg-white px-2 py-1 rounded text-sm text-gray-700 shadow-sm border border-yellow-100">{word}</li>
+                                            <li key={i} className="bg-white px-2 py-1 rounded text-base text-gray-700 shadow-sm border border-yellow-100">{word}</li>
                                         ))}
                                     </ul>
                                 </div>
@@ -566,34 +566,34 @@
                         {/* Main Form Area */}
                         <div className="bg-white p-0 rounded-lg shadow-sm border border-gray-200 overflow-y-auto flex-grow flex flex-col gap-px">
                             <div className="space-y-0.5 flex-shrink-0 p-1">
-                                <label className="text-[10px] font-bold uppercase text-gray-500">Topic Title</label>
-                                <input readOnly value={topicData.title} type="text" className="w-full p-0.5 border rounded font-bold text-sm bg-gray-50" />
+                                <label className="text-xs font-bold uppercase text-gray-500">Topic Title</label>
+                                <input readOnly value={topicData.title} type="text" className="w-full p-0.5 border rounded font-bold text-base bg-gray-50" />
                             </div>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-px flex-grow">
                                 <div className="p-0.5 border rounded bg-blue-50 flex flex-col h-full">
-                                    <label className="text-[10px] font-bold text-blue-600 block px-1">1. Present</label>
-                                    <textarea readOnly value={topicData.point1} className="w-full bg-white p-1 rounded text-sm resize-none flex-grow leading-tight border-0 focus:ring-0"></textarea>
+                                    <label className="text-xs font-bold text-blue-600 block px-1">1. Present</label>
+                                    <textarea readOnly value={topicData.point1} className="w-full bg-white p-1 rounded text-base resize-none flex-grow leading-tight border-0 focus:ring-0"></textarea>
                                 </div>
                                 <div className="p-0.5 border rounded bg-green-50 flex flex-col h-full">
-                                    <label className="text-[10px] font-bold text-green-600 block px-1">2. Past</label>
-                                    <textarea readOnly value={topicData.point2} className="w-full bg-white p-1 rounded text-sm resize-none flex-grow leading-tight border-0 focus:ring-0"></textarea>
+                                    <label className="text-xs font-bold text-green-600 block px-1">2. Past</label>
+                                    <textarea readOnly value={topicData.point2} className="w-full bg-white p-1 rounded text-base resize-none flex-grow leading-tight border-0 focus:ring-0"></textarea>
                                 </div>
                                 <div className="p-0.5 border rounded bg-yellow-50 flex flex-col h-full">
-                                    <label className="text-[10px] font-bold text-yellow-600 block px-1">3. Compare</label>
-                                    <textarea readOnly value={topicData.point3} className="w-full bg-white p-1 rounded text-sm resize-none flex-grow leading-tight border-0 focus:ring-0"></textarea>
+                                    <label className="text-xs font-bold text-yellow-600 block px-1">3. Compare</label>
+                                    <textarea readOnly value={topicData.point3} className="w-full bg-white p-1 rounded text-base resize-none flex-grow leading-tight border-0 focus:ring-0"></textarea>
                                 </div>
                                 <div className="p-0.5 border rounded bg-pink-50 flex flex-col h-full">
-                                    <label className="text-[10px] font-bold text-pink-600 block px-1">4. Future</label>
-                                    <textarea readOnly value={topicData.point4} className="w-full bg-white p-1 rounded text-sm resize-none flex-grow leading-tight border-0 focus:ring-0"></textarea>
+                                    <label className="text-xs font-bold text-pink-600 block px-1">4. Future</label>
+                                    <textarea readOnly value={topicData.point4} className="w-full bg-white p-1 rounded text-base resize-none flex-grow leading-tight border-0 focus:ring-0"></textarea>
                                 </div>
                             </div>
 
                             <div className="p-1 bg-red-50 border border-red-100 rounded flex items-center gap-2 flex-shrink-0">
                                 <AlertCircle className="text-red-500 w-4 h-4" />
                                 <div className="flex-grow">
-                                    <label className="text-[10px] font-bold text-red-600 block">Question for Examiner:</label>
-                                    <input readOnly value={topicData.question} type="text" className="w-full p-0.5 border rounded text-sm font-medium bg-white" />
+                                    <label className="text-xs font-bold text-red-600 block">Question for Examiner:</label>
+                                    <input readOnly value={topicData.question} type="text" className="w-full p-0.5 border rounded text-base font-medium bg-white" />
                                 </div>
                             </div>
                         </div>
@@ -601,25 +601,25 @@
                         {/* Word Bank Sidebar + Grammar */}
                         <div className="hidden lg:flex gap-2 flex-shrink-0 h-full overflow-hidden">
                             {/* Grammar Check Column */}
-                            <div className="w-40 h-full overflow-y-auto">
+                            <div className="w-80 h-full overflow-y-auto">
                                 <GrammarChecklist onReward={onReward} />
                             </div>
 
                             {/* Word Bank Column */}
-                            <div className="w-40 bg-purple-50 rounded-lg border border-purple-100 p-2 overflow-y-auto h-full">
+                            <div className="w-80 bg-purple-50 rounded-lg border border-purple-100 p-2 overflow-y-auto h-full">
                                 <div className="flex items-center gap-1 mb-1 text-purple-800 font-bold border-b border-purple-200 pb-1 text-xs">
                                     <BookOpen size={12} /> Word Bank
                                 </div>
                                 {topicData.vocab.length > 0 ? (
                                     <ul className="space-y-1">
                                         {topicData.vocab.map((word, i) => (
-                                            <li key={i} className="bg-white px-1.5 py-0.5 rounded text-[10px] text-gray-700 shadow-sm border border-purple-100 leading-tight">
+                                            <li key={i} className="bg-white px-1.5 py-0.5 rounded text-sm text-gray-700 shadow-sm border border-purple-100 leading-tight">
                                                 {word}
                                             </li>
                                         ))}
                                     </ul>
                                 ) : (
-                                    <div className="text-[10px] text-gray-400 text-center mt-2">Select topic...</div>
+                                    <div className="text-sm text-gray-400 text-center mt-2">Select topic...</div>
                                 )}
                             </div>
                         </div>
