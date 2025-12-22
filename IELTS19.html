@@ -460,37 +460,37 @@
       <!-- Bottom: Help & Progress -->
       <div class="help-grid">
         
-        <!-- LEFT: Starting & Stalling -->
+        <!-- LEFT: Stalling -> Starting -> Clarifying -->
         <div class="help-panel bg-purple-50 border-purple-100">
           <div class="help-header text-purple-600">
-            <span>🚀</span> Starting & Stalling
+            <span>🚀</span> Stalling, Start & Clarify
           </div>
           <div id="toolkit-left" class="tag-container">
-            <!-- Starting / Stalling Phrases -->
+            <!-- Stalling / Starting / Clarifying Phrases -->
           </div>
         </div>
 
-        <!-- MIDDLE: Starters + Opinion -->
+        <!-- MIDDLE: Opinion -> Starters -> Connecting -->
         <div class="help-panel">
           <div class="help-header text-blue-600">
-            <span>💡</span> Idea Starters & Opinions
+            <span>💡</span> Opinion & Ideas
           </div>
-          <div id="stems-container" class="tag-container"></div>
+          <div id="toolkit-middle-top" class="tag-container"></div> <!-- Opinion -->
           <div class="panel-separator"></div>
-          <div id="toolkit-middle" class="tag-container">
-             <!-- Opinions / Connecting -->
-          </div>
+          <div id="stems-container" class="tag-container"></div> <!-- Starters -->
+          <div class="panel-separator"></div>
+          <div id="toolkit-middle-bottom" class="tag-container"></div> <!-- Connecting -->
         </div>
 
-        <!-- RIGHT: Vocab + Clarifying -->
+        <!-- RIGHT: Vocab + Concluding -->
         <div class="help-panel">
           <div class="help-header text-green-600">
-            <span>📚</span> Vocab & Clarifying
+            <span>📚</span> Vocab & Concluding
           </div>
           <div id="words-container" class="tag-container"></div>
           <div class="panel-separator"></div>
           <div id="toolkit-right" class="tag-container">
-             <!-- Clarifying / Concluding -->
+             <!-- Concluding -->
           </div>
         </div>
 
@@ -510,16 +510,6 @@
 // REPLACED OLD TOOLKIT WITH STRUCTURED CATEGORIES
 const IELTS_TOOLKIT = [
   {
-    category: "Starting",
-    target: "left",
-    phrases: [
-      "Well, let me begin by saying...",
-      "To start off, I'd like to mention...",
-      "First and foremost, I believe that...",
-      "Actually, that's an interesting point..."
-    ]
-  },
-  {
     category: "Stalling",
     target: "left",
     phrases: [
@@ -531,8 +521,29 @@ const IELTS_TOOLKIT = [
     ]
   },
   {
+    category: "Starting",
+    target: "left",
+    phrases: [
+      "Well, let me begin by saying...",
+      "To start off, I'd like to mention...",
+      "First and foremost, I believe that...",
+      "Actually, that's an interesting point..."
+    ]
+  },
+  {
+    category: "Clarifying",
+    target: "left",
+    phrases: [
+      "I am not sure what you mean...",
+      "Could you be more specific?",
+      "Could you repeat the question, please?",
+      "I'm sorry, I didn't catch that.",
+      "Do you mean that...?"
+    ]
+  },
+  {
     category: "Opinion",
-    target: "middle",
+    target: "middle-top",
     phrases: [
       "In my opinion...",
       "If you ask me...",
@@ -544,7 +555,7 @@ const IELTS_TOOLKIT = [
   },
   {
     category: "Connecting",
-    target: "middle",
+    target: "middle-bottom",
     phrases: [
       "Building on that...",
       "Another aspect to consider is...",
@@ -552,17 +563,6 @@ const IELTS_TOOLKIT = [
       "From a broader perspective...",
       "Furthermore...",
       "On top of that..."
-    ]
-  },
-  {
-    category: "Clarifying",
-    target: "right",
-    phrases: [
-      "I am not sure what you mean...",
-      "Could you be more specific?",
-      "Could you repeat the question, please?",
-      "I'm sorry, I didn't catch that.",
-      "Do you mean that...?"
     ]
   },
   {
@@ -597,7 +597,7 @@ const STUDENTS = [
 
 const TIMING = { part1: 30, part2: 90, part3: 45 };
 
-// Merged Themes (Old + New PDF Content)
+// Merged Themes (Old + New PDF Content + Expanded Vocab)
 const THEMES = [
   // --- NEW PDF TOPICS (2026) ---
   {
@@ -605,75 +605,75 @@ const THEMES = [
     idiom: "Walk a mile in someone's shoes",
     part1: "Do you prefer comfortable shoes or good-looking shoes? How often do you buy them?",
     part1_stems: ["I tend to value durability over...", "I occasionally make an impulse buy...", "Finding the right fit is...", "I rarely purchase...", "I value comfort more than..."],
-    part1_words: ["durability", "aesthetics", "ergonomic", "blisters", "trendy", "retailer", "arch support", "impulse buy"],
+    part1_words: ["durability", "aesthetics", "ergonomic", "blisters", "trendy", "retailer", "arch support", "impulse buy", "cushioning", "synthetic", "leather", "high heels", "soles"],
     
     part2: "Describe a pair of shoes you really like. What are they? Where did you buy them? Why do you like them?",
     part2_stems: ["I want to talk about...", "I bought them at a specialized retailer...", "They are incredibly...", "I prefer them because..."],
-    part2_words: ["sneakers", "formal wear", "long-lasting", "stylish", "comfortable", "brand-name", "quality"],
+    part2_words: ["sneakers", "formal wear", "long-lasting", "stylish", "comfortable", "brand-name", "quality", "breathable", "waterproof", "versatile"],
     
     part3: "Why do some students care so much about wearing expensive shoe brands?",
     part3_stems: ["It's often about status...", "Peer pressure plays a role...", "They believe price equals quality...", "Consequently..."],
-    part3_words: ["status symbol", "materialism", "peer pressure", "consumer habits", "affordability", "trends"]
+    part3_words: ["status symbol", "materialism", "peer pressure", "consumer habits", "affordability", "trends", "overpriced", "logo", "advertising"]
   },
   {
     name: "2026: Plants & Gardening",
     idiom: "Green thumb (Good at gardening)",
     part1: "Do you keep plants at home? Did you grow any when you were young?",
     part1_stems: ["Back when I was younger, I used to...", "Nowadays I focus more on...", "I find it therapeutic to...", "I don't have a green thumb but..."],
-    part1_words: ["cultivate", "botanical", "air purification", "succulents", "maintenance", "therapeutic", "blossom", "sapling"],
+    part1_words: ["cultivate", "botanical", "air purification", "succulents", "maintenance", "therapeutic", "blossom", "sapling", "potted plant", "watering", "sunlight"],
     
     part2: "Describe a plant that is important in your country (or one you grew). What is it? Why is it important?",
     part2_stems: ["A plant that is culturally significant is...", "I once attempted to grow...", "It requires a lot of...", "It symbolizes..."],
-    part2_words: ["native species", "symbolism", "agriculture", "environment", "blooming", "fragrance", "nature"],
+    part2_words: ["native species", "symbolism", "agriculture", "environment", "blooming", "fragrance", "nature", "leaves", "roots", "growth"],
     
     part3: "Why is it important to have green spaces and plants in cities?",
     part3_stems: ["Ideally, cities should have...", "Plants help to...", "From an environmental perspective...", "It improves mental health by..."],
-    part3_words: ["urban jungle", "pollution", "relaxation", "ecosystem", "sustainable", "concrete jungle", "well-being"]
+    part3_words: ["urban jungle", "pollution", "relaxation", "ecosystem", "sustainable", "concrete jungle", "well-being", "oxygen", "photosynthesis", "shade"]
   },
   {
     name: "2026: Public Places",
     idiom: "Hustle and bustle (Busy activity)",
     part1: "Do you like visiting crowded places? Do you talk to strangers in public?",
     part1_stems: ["If I am in a bustling place...", "I usually wear headphones to...", "I prefer to create a sanctuary...", "I avoid the hustle and bustle by..."],
-    part1_words: ["bustling", "sanctuary", "etiquette", "invade privacy", "isolation", "communal spaces", "claustrophobic"],
+    part1_words: ["bustling", "sanctuary", "etiquette", "invade privacy", "isolation", "communal spaces", "claustrophobic", "strangers", "crowded", "noise"],
     
     part2: "Describe a public place you enjoy visiting to study or relax. Where is it? What do you do there?",
     part2_stems: ["My go-to spot is...", "It offers a sense of...", "I usually go there to...", "The atmosphere is..."],
-    part2_words: ["library", "public park", "atmosphere", "quietude", "concentration", "scenery", "public facility"],
+    part2_words: ["library", "public park", "atmosphere", "quietude", "concentration", "scenery", "public facility", "amenities", "accessible", "benches"],
     
     part3: "Is it rude to wear headphones when you are with friends in public?",
     part3_stems: ["It depends on...", "Generally speaking, it signals...", "If you are engaging with others...", "Social etiquette suggests..."],
-    part3_words: ["social norms", "disrespectful", "engagement", "communication", "interaction", "body language", "polite"]
+    part3_words: ["social norms", "disrespectful", "engagement", "communication", "interaction", "body language", "polite", "antisocial", "distracted", "rude"]
   },
   {
     name: "2026: Borrowing & Lending",
     idiom: "Neither a borrower nor a lender be",
     part1: "How do you feel when people don't return things they borrowed?",
     part1_stems: ["I generally feel annoyed when...", "Lending possessions can be awkward...", "I keep track of my things to...", "I might lend it if..."],
-    part1_words: ["possessions", "trustworthy", "friction", "awkward", "generosity", "sentimental value", "reliability"],
+    part1_words: ["possessions", "trustworthy", "friction", "awkward", "generosity", "sentimental value", "reliability", "permission", "damaged", "replacement"],
     
     part2: "Describe a time you borrowed something useful from someone. What was it? Why did you need it?",
     part2_stems: ["I vividly remember borrowing...", "I was in a pinch because...", "They were kind enough to...", "It saved me from..."],
-    part2_words: ["essential", "emergency", "grateful", "assistance", "return", "condition", "helpful"],
+    part2_words: ["essential", "emergency", "grateful", "assistance", "return", "condition", "helpful", "favor", "owe", "repay"],
     
     part3: "Is it better to borrow money from friends or from a bank?",
     part3_stems: ["Borrowing from friends can cause friction...", "A bank has a clear return policy...", "It risks the friendship if...", "Financially speaking..."],
-    part3_words: ["interest rate", "relationship", "debt", "formal agreement", "risk", "financial literacy"]
+    part3_words: ["interest rate", "relationship", "debt", "formal agreement", "risk", "financial literacy", "loan", "contract", "obligation"]
   },
   {
     name: "2026: Achievements",
     idiom: "Pass with flying colors",
     part1: "Do you often praise your friends when they do something well?",
     part1_stems: ["I always try to compliment...", "It gives them a sense of...", "I believe positive feedback is...", "I told my friend that..."],
-    part1_words: ["accomplishment", "recognition", "excel at", "proficiency", "compliment", "feedback", "validation"],
+    part1_words: ["accomplishment", "recognition", "excel at", "proficiency", "compliment", "feedback", "validation", "supportive", "encourage", "celebrate"],
     
     part2: "Describe an experience where you did something well (e.g. at school). What was it? How did you feel?",
     part2_stems: ["I remember a time when I mastered...", "I managed to excel at...", "It gave me a real sense of accomplishment...", "The teacher said that..."],
-    part2_words: ["achievement", "hard work", "dedication", "success", "proud", "effort", "outcome"],
+    part2_words: ["achievement", "hard work", "dedication", "success", "proud", "effort", "outcome", "milestone", "triumph", "goal"],
     
     part3: "Does praise help students learn better than criticism?",
     part3_stems: ["Positive reinforcement is...", "Criticism can be discouraging...", "Validation boosts confidence...", "On the other hand, constructive criticism..."],
-    part3_words: ["motivation", "self-esteem", "encouragement", "constructive", "improvement", "psychology"]
+    part3_words: ["motivation", "self-esteem", "encouragement", "constructive", "improvement", "psychology", "confidence", "inspiration", "growth"]
   },
   // --- ORIGINAL TOPICS ---
   {
@@ -681,39 +681,39 @@ const THEMES = [
     idiom: "Recharge one's batteries",
     part1: "What do you usually do on weekends to relax?",
     part1_stems: ["I tend to...", "My go-to activity is...", "I'm really into...", "Whenever I have a spare moment..."],
-    part1_words: ["unwind", "leisure", "passion", "recharge", "escapism", "downtime", "therapeutic"],
+    part1_words: ["unwind", "leisure", "passion", "recharge", "escapism", "downtime", "therapeutic", "pastime", "interest", "amateur"],
     part2: "Describe a hobby you really enjoy. What is it? When did you start? Why do you like it?",
     part2_stems: ["One hobby I'm passionate about is...", "I took it up when...", "It appeals to me because...", "What draws me to this is..."],
-    part2_words: ["creative outlet", "therapeutic", "challenging", "sense of achievement", "stimulating", "productivity"],
+    part2_words: ["creative outlet", "therapeutic", "challenging", "sense of achievement", "stimulating", "productivity", "collecting", "skill", "talent", "fun"],
     part3: "Why is it important for students to have hobbies outside of school?",
     part3_stems: ["Crucially...", "It fosters...", "Aside from academics...", "Striking a balance is key because..."],
-    part3_words: ["well-rounded", "mental well-being", "social skills", "balance", "burnout", "academic pressure"]
+    part3_words: ["well-rounded", "mental well-being", "social skills", "balance", "burnout", "academic pressure", "relief", "development", "variety"]
   },
   {
     name: "School Life",
     idiom: "Hit the books",
     part1: "Which subject do you find most interesting at school?",
     part1_stems: ["Without a doubt...", "I find ... fascinating because...", "I'm drawn to...", "I have a knack for..."],
-    part1_words: ["engaging", "curriculum", "concepts", "practical", "theory", "intellectually stimulating"],
+    part1_words: ["engaging", "curriculum", "concepts", "practical", "theory", "intellectually stimulating", "assignment", "lecture", "campus", "grades"],
     part2: "Describe your favorite teacher. Who are they? What do they teach? Why do you like them?",
     part2_stems: ["The teacher who stands out is...", "Their teaching style is...", "I admire them for...", "They have a unique way of..."],
-    part2_words: ["inspirational", "approachable", "knowledgeable", "engaging", "mentor", "role model", "supportive"],
+    part2_words: ["inspirational", "approachable", "knowledgeable", "engaging", "mentor", "role model", "supportive", "patience", "guidance", "strict"],
     part3: "Do you think homework is useful for students?",
     part3_stems: ["To some extent...", "Conversely...", "It reinforces...", "It's a contentious issue but..."],
-    part3_words: ["consolidation", "burden", "independent learning", "discipline", "time management", "workload"]
+    part3_words: ["consolidation", "burden", "independent learning", "discipline", "time management", "workload", "stress", "practice", "review"]
   },
   {
     name: "Technology",
     idiom: "Glued to the screen",
     part1: "Which app do you use the most on your phone?",
     part1_stems: ["I'm constantly on...", "I find myself scrolling...", "It's essential for...", "I'm glued to..."],
-    part1_words: ["interface", "connect", "content", "algorithm", "addictive", "user-friendly", "digital footprint"],
+    part1_words: ["interface", "connect", "content", "algorithm", "addictive", "user-friendly", "digital footprint", "notification", "platform", "software"],
     part2: "Describe a website or app that helps you learn. What is it? How do you use it? Why is it helpful?",
     part2_stems: ["An invaluable tool for me is...", "It features...", "It enhances my learning by...", "I rely on it for..."],
-    part2_words: ["resource", "interactive", "comprehensive", "accessible", "tutorial", "visual aid", "database"],
+    part2_words: ["resource", "interactive", "comprehensive", "accessible", "tutorial", "visual aid", "database", "wireless", "device", "online"],
     part3: "Do teenagers spend too much time on their phones?",
     part3_stems: ["It's a double-edged sword...", "Excessive screen time...", "The fear of missing out drives...", "It distracts us from..."],
-    part3_words: ["detrimental", "virtual interaction", "sedentary", "moderation", "cyberbullying", "attention span"]
+    part3_words: ["detrimental", "virtual interaction", "sedentary", "moderation", "cyberbullying", "attention span", "social media", "gaming", "distraction"]
   }
 ];
 
@@ -989,14 +989,16 @@ function runPart(partNumber) {
   
   // CLEAR ALL CONTAINERS FIRST
   document.getElementById('toolkit-left').innerHTML = '';
-  document.getElementById('toolkit-middle').innerHTML = '';
+  document.getElementById('toolkit-middle-top').innerHTML = '';
+  document.getElementById('toolkit-middle-bottom').innerHTML = '';
   document.getElementById('toolkit-right').innerHTML = '';
 
   // Render Distributed Toolkit with Rotation
   IELTS_TOOLKIT.forEach(cat => {
       let containerId;
       if (cat.target === 'left') containerId = 'toolkit-left';
-      else if (cat.target === 'middle') containerId = 'toolkit-middle';
+      else if (cat.target === 'middle-top') containerId = 'toolkit-middle-top';
+      else if (cat.target === 'middle-bottom') containerId = 'toolkit-middle-bottom';
       else containerId = 'toolkit-right';
 
       renderToolkitCategory(containerId, cat, partNumber);
