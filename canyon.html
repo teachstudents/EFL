@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grand Canyon Listening Game (Educational)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a202c; color: white; overflow: hidden; }
@@ -67,8 +68,9 @@
         .progress-fill { height: 100%; background: #ecc94b; width: 100%; transition: width 0.1s linear; }
 
         /* Teaching Phase Styling */
-        .teaching-overlay { position: absolute; inset: 0; background: #2d3748; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
-        .teach-text { font-size: 3rem; color: white; line-height: 1.4; animation: fadeIn 0.5s; }
+        .teaching-overlay { position: absolute; inset: 0; background: #2d3748; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: start; padding: 4rem 2rem; text-align: center; }
+        .teach-header-text { font-size: 2.5rem; color: #48bb78; font-weight: bold; margin-bottom: 3rem; text-transform: uppercase; letter-spacing: 2px; line-height: 1.1; max-width: 90%; }
+        .teach-text { font-size: 3.5rem; color: white; line-height: 1.3; animation: fadeIn 0.5s; max-width: 90%; font-weight: 600; margin-top: 2rem; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Setup/Roster Screens */
@@ -102,13 +104,14 @@
 
     <!-- GAMEPLAY: Teaching View -->
     <div id="view-teaching" class="teaching-overlay hidden">
-        <h2 id="teach-header" class="text-green-400 text-3xl font-bold mb-8 uppercase tracking-widest text-center"></h2>
+        <!-- Topic in Header area logic -->
+        <div id="teach-header" class="teach-header-text"></div>
         <div id="teach-sentence" class="teach-text"></div>
-        <div class="mt-8 text-gray-400" id="teach-counter"></div>
+        <div class="mt-auto text-gray-400 text-xl" id="teach-counter"></div>
     </div>
 
     <!-- GAMEPLAY: Selection View -->
-    <div id="view-selection" class="teaching-overlay hidden bg-indigo-900">
+    <div id="view-selection" class="teaching-overlay hidden bg-indigo-900 justify-center">
         <h2 class="text-4xl font-bold mb-12">Next Matchup</h2>
         <div class="flex items-center space-x-12 text-5xl font-bold">
             <div class="text-blue-400" id="sel-p1">Player 1</div>
@@ -198,7 +201,18 @@ function playTone(freq, type, duration) {
     osc.stop(audioCtx.currentTime + duration);
 }
 
-function sfxCorrect() { playTone(600, 'sine', 0.1); setTimeout(() => playTone(800, 'sine', 0.2), 100); }
+function sfxCorrect() { 
+    playTone(600, 'sine', 0.1); 
+    setTimeout(() => playTone(800, 'sine', 0.2), 100);
+    
+    // Confetti effect
+    confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+    });
+}
+
 function sfxWrong() { playTone(200, 'sawtooth', 0.3); }
 
 /* --- DATA --- */
@@ -212,10 +226,11 @@ const CONFIG = {
     resultPause: 2000 
 };
 
+// Updated ROSTERS with provided names
 const ROSTERS = {
     10: ["Dino", "Tracy", "Andrew", "Billie", "Von Tony", "Jim", "Apollo", "Mark", "Leo", "Mike", "Lion", "Tony", "Howlin", "Steven", "Billie"],
-    11: ["Iris", "Max", " Cathy", "Sandy", " Vicky", "Jim", "Jackie", "Jay", "Grace", "Emily", "Rhea"],
-    12: ["Anna", "Mia", "Kenn", "Max", "Sky", "SHENG ", “KEYING", "ZIFAN", "SIFEI", "JIAQI", "Zack", "Azure", "Joe Joe"]
+    11: ["Iris", "Max", "Cathy", "Sandy", "Vicky", "Jim", "Jackie", "Jay", "Grace", "Emily", "Rhea"],
+    12: ["Anna", "Mia", "Kenn", "Max", "Sky", "SHENG", "KEYING", "ZIFAN", "SIFEI", "JIAQI", "Zack", "Azure", "Joe Joe"]
 };
 
 // 56 Question Set (Educational Focus: Stakeholders)
