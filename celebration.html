@@ -25,6 +25,10 @@
             --primary-glow: var(--mg-gold);
             --secondary-glow: var(--cny-red);
             --accent-glow: var(--mg-green);
+            
+            /* New High Contrast Team Colors */
+            --team-one-color: #00FF00; /* Bright Green/Jade */
+            --team-two-color: #FFD700; /* Gold/Yellow */
         }
 
         * {
@@ -69,7 +73,7 @@
         .game-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 10px;
+            padding: 5px 10px; 
             position: relative;
             z-index: 10;
             height: 100vh;
@@ -89,15 +93,15 @@
             justify-content: space-between;
             align-items: center;
             margin-top: auto;
-            height: 80px;
+            height: 70px;
         }
 
         .header-team-score {
             text-align: center;
             font-size: 1.5rem;
-            color: var(--cny-red);
-            text-shadow: 0 0 5px var(--mg-gold);
-            background: rgba(0,0,0,0.3);
+            color: var(--team-two-color); /* Changed to Gold */
+            text-shadow: 0 0 5px #000;
+            background: rgba(0,0,0,0.5);
             padding: 5px 15px;
             border-radius: 10px;
             border: 1px solid var(--mg-gold);
@@ -105,7 +109,7 @@
         
         .header-team-score span {
             font-size: 0.9rem;
-            color: var(--mg-gold);
+            color: #fff;
             display: block;
             margin-bottom: 2px;
             font-weight: bold;
@@ -123,9 +127,51 @@
             display: none;
             flex-grow: 1;
             flex-direction: column;
+            justify-content: flex-start;
+            padding-top: 5px; 
+            padding-bottom: 5px;
+            height: calc(100vh - 80px);
+        }
+
+        /* NEW SHARED QUESTION BANNER */
+        .question-banner {
+            background: rgba(20, 0, 20, 0.6);
+            border: 2px solid var(--mg-gold);
+            border-radius: 15px;
+            padding: 0.3rem 1rem; 
+            margin-bottom: 0.5rem; 
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            padding-bottom: 10px;
-            height: calc(100vh - 100px);
+            min-height: 90px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+
+        .question-banner.visible {
+            opacity: 1;
+        }
+
+        .banner-main-text {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: clamp(1.8rem, 3.5vw, 3rem);
+            color: var(--mg-gold);
+            text-shadow: 2px 2px 0px #000, 0 0 15px var(--cny-red);
+            line-height: 1.1;
+            margin-bottom: 0.1rem;
+        }
+
+        .banner-sub-text {
+            font-family: 'Roboto', sans-serif;
+            font-size: clamp(1rem, 1.4vw, 1.6rem);
+            color: #fff;
+            font-style: italic;
+            text-shadow: 1px 1px 2px #000;
+            margin-top: 0;
+            line-height: 1.2;
         }
 
         .battle-arena {
@@ -134,6 +180,7 @@
             gap: 2rem;
             align-items: stretch;
             height: 100%;
+            max-height: 65vh; 
         }
 
         .versus-divider {
@@ -179,33 +226,12 @@
             flex-direction: column;
             justify-content: flex-start;
             margin-bottom: 0.5rem;
+            overflow-y: auto; 
         }
 
-        .target-word-container {
-            min-height: 80px; 
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            margin-bottom: 0.5rem; /* Reduced margin */
-            margin-top: -0.5rem;
-        }
-
-        .target-word {
-            font-family: 'Noto Sans SC', sans-serif;
-            font-size: clamp(2rem, 4.5vw, 4rem); 
-            text-align: center;
-            color: var(--mg-gold);
-            text-shadow: 2px 2px 0px #000, 0 0 15px var(--cny-red);
-            word-wrap: break-word;
-            white-space: normal;
-            line-height: 1.1;
-            width: 100%;
-            padding-top: 10px;
-        }
-
-        /* REVEAL TEXT: Moved between Target and Answers */
+        /* REVEAL TEXT */
         .correct-reveal-text {
-            height: 24px; /* Fixed height to reserve space */
+            height: 24px;
             text-align: center;
             color: var(--mg-green);
             font-weight: bold;
@@ -220,9 +246,10 @@
         .answers-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 0.8rem;
+            gap: 0.6rem;
             opacity: 1;
             transition: opacity 0.3s ease-in;
+            margin-top: 0.5rem;
         }
         
         .answers-hidden {
@@ -234,14 +261,14 @@
             background: linear-gradient(90deg, rgba(128, 0, 128, 0.4), rgba(0, 128, 0, 0.4)); /* Purple/Green gradient */
             border: 1px solid var(--mg-gold);
             color: white;
-            padding: 0.8rem;
+            padding: 0.8rem; 
             font-size: 1.1rem;
-            font-family: 'Roboto', sans-serif; /* Readable font for answers */
+            font-family: 'Roboto', sans-serif; 
             font-weight: bold;
             cursor: pointer;
             border-radius: 8px;
             transition: all 0.2s;
-            text-transform: capitalize;
+            text-transform: none; 
             position: relative;
             overflow: hidden;
         }
@@ -260,7 +287,7 @@
         /* Bottom Section: Player Info */
         .player-info-footer {
             border-top: 1px solid rgba(255,215,0,0.3);
-            padding-top: 0.8rem;
+            padding-top: 0.5rem;
             margin-top: auto;
         }
 
@@ -318,7 +345,7 @@
         /* Timer Bar within Player Card */
         .local-timer-container {
             width: 100%;
-            height: 8px;
+            height: 6px;
             background: rgba(0,0,0,0.5);
             border-radius: 4px;
             overflow: hidden;
@@ -470,11 +497,11 @@
             <h2 style="font-size: 2.5rem; margin-bottom: 2rem; color: #fff;">GATHERING TEAMS...</h2>
             <div style="display: flex; gap: 2rem; justify-content: center;">
                 <div style="background: rgba(74, 0, 0, 0.8); padding: 2rem; border: 2px solid var(--mg-gold); border-radius: 10px;">
-                    <h3 id="setupTeam1Name" style="color: var(--mg-gold);">Team 1</h3>
+                    <h3 id="setupTeam1Name" style="color: var(--team-one-color);">Team 1</h3>
                     <div id="setupTeam1List" style="margin-top: 1rem; font-size: 0.9rem; color: #fff;"></div>
                 </div>
                 <div style="background: rgba(46, 0, 62, 0.8); padding: 2rem; border: 2px solid var(--mg-green); border-radius: 10px;">
-                    <h3 id="setupTeam2Name" style="color: var(--mg-green);">Team 2</h3>
+                    <h3 id="setupTeam2Name" style="color: var(--team-two-color);">Team 2</h3>
                     <div id="setupTeam2List" style="margin-top: 1rem; font-size: 0.9rem; color: #fff;"></div>
                 </div>
             </div>
@@ -485,12 +512,12 @@
             <h2 style="font-size: 2rem; margin-bottom: 2rem; color: var(--mg-gold);">NEXT CELEBRATION BATTLE</h2>
             <div style="display: flex; gap: 4rem; align-items: center; justify-content: center; margin-bottom: 2rem;">
                 <div style="text-align: center;">
-                    <div style="font-size: 1.2rem; color: var(--cny-red);" id="matchupTeam1">Team 1</div>
+                    <div style="font-size: 1.2rem; color: var(--team-one-color);" id="matchupTeam1">Team 1</div>
                     <div style="font-size: 2rem; font-weight: bold; color: #fff;" id="matchupPlayer1">Selecting...</div>
                 </div>
                 <div style="font-size: 3rem; color: var(--mg-gold); font-family: 'Cinzel';">VS</div>
                 <div style="text-align: center;">
-                    <div style="font-size: 1.2rem; color: var(--mg-purple);" id="matchupTeam2">Team 2</div>
+                    <div style="font-size: 1.2rem; color: var(--team-two-color);" id="matchupTeam2">Team 2</div>
                     <div style="font-size: 2rem; font-weight: bold; color: #fff;" id="matchupPlayer2">Selecting...</div>
                 </div>
             </div>
@@ -499,14 +526,18 @@
 
         <!-- GAMEPLAY ARENA -->
         <div id="gamePlay" class="game-play">
+            
+            <!-- NEW SHARED HEADER FOR QUESTION -->
+            <div id="questionBanner" class="question-banner">
+                <div id="bannerMainText" class="banner-main-text">WORD</div>
+                <div id="bannerSubText" class="banner-sub-text">Sentence goes here</div>
+            </div>
+
             <div class="battle-arena">
                 <!-- Player 1 Card -->
                 <div class="player-card" id="cardP1">
                     <div class="question-section">
-                        <div class="target-word-container">
-                             <div class="target-word" id="targetWord1">WORD</div>
-                        </div>
-                        <!-- REVEAL moved here -->
+                        <!-- REVEAL -->
                         <div class="correct-reveal-text" id="reveal1">Answer</div>
                         <div class="answers-grid" id="answers1">
                             <!-- Buttons injected here -->
@@ -534,10 +565,7 @@
                 <!-- Player 2 Card -->
                 <div class="player-card" id="cardP2">
                     <div class="question-section">
-                        <div class="target-word-container">
-                             <div class="target-word" id="targetWord2">WORD</div>
-                        </div>
-                        <!-- REVEAL moved here -->
+                        <!-- REVEAL -->
                         <div class="correct-reveal-text" id="reveal2">Answer</div>
                         <div class="answers-grid" id="answers2">
                             <!-- Buttons injected here -->
@@ -564,17 +592,17 @@
         
         <!-- HEADER (Moved to Bottom) -->
         <div class="game-progress" id="gameHeader" style="display:none;">
-            <div class="header-team-score">
-                <span id="headerTeam1Name">Team Alpha</span>
-                <div id="headerTeam1Score">0</div>
+            <div class="header-team-score" style="border-color: var(--team-one-color);">
+                <span id="headerTeam1Name" style="color: var(--team-one-color);">Team Alpha</span>
+                <div id="headerTeam1Score" style="color: #fff;">0</div>
             </div>
             <div class="round-info">
                 <div>ROUND <span id="currentRoundDisplay">1</span> / <span id="totalRoundsDisplay">5</span></div>
                 <div style="font-size: 0.9rem; color: #ccc;">Word <span id="currentQuestionNum">1</span>/5</div>
             </div>
-            <div class="header-team-score">
-                <span id="headerTeam2Name">Team Beta</span>
-                <div id="headerTeam2Score">0</div>
+            <div class="header-team-score" style="border-color: var(--team-two-color);">
+                <span id="headerTeam2Name" style="color: var(--team-two-color);">Team Beta</span>
+                <div id="headerTeam2Score" style="color: #fff;">0</div>
             </div>
         </div>
 
@@ -591,7 +619,6 @@
         const grade11 = ["Grace", "Iris", "Jackie", "Max", "Emily", "Rhea", "Vicky"];
         const grade12 = ["Anna", "Mia", "Kenn", "Max", "Sky", "Sheng", "Keying", "Zifan", "Sifei", "Jiaqi", "Zack", "Azure", "Joe"];
         
-        // Comprehensive Vocabulary List (Deduped and Normalized)
         const vocabulary = [
             { cn: "彩珠", en: "beads", sentence: "She wore a necklace made of colorful ___." },
             { cn: "庆祝", en: "celebration", sentence: "The birthday party was a big ___." },
@@ -646,6 +673,7 @@
             timer: null,
             isChampionship: false,
             roundResolved: false,
+            inputLocked: false,
             showAnswersTimeout: null,
             selectedPool: [],
             vocabDeck: [] // Master deck to ensure no repeats
@@ -675,7 +703,6 @@
             
             let textToSpeak = isName ? getEnglishName(text) : text;
             
-            // --- UPDATED LOGIC FOR BLANK SILENCE ---
             if (!isName && textToSpeak.includes("___")) {
                 textToSpeak = textToSpeak.replace("___", "...");
             }
@@ -729,31 +756,25 @@
         
         function getDistractors(correctEnglishWord) {
             const pool = vocabulary.filter(v => v.en !== correctEnglishWord).map(v => v.en);
-            return pool.sort(() => 0.5 - Math.random()).slice(0, 4);
+            return pool.sort(() => 0.5 - Math.random()).slice(0, 3);
         }
 
-        // --- DECK SYSTEM (NO REPEATS) ---
         function getUniqueRoundVocab(count) {
             let selected = [];
-            // If deck is too small, refill it with full vocab (excluding what's already picked for this round if any)
             if (state.vocabDeck.length < count) {
-                // Refill deck
                 let freshDeck = [...vocabulary].sort(() => 0.5 - Math.random());
                 state.vocabDeck = [...state.vocabDeck, ...freshDeck];
             }
-            
             for (let i = 0; i < count; i++) {
                 if (state.vocabDeck.length > 0) {
                     selected.push(state.vocabDeck.pop());
                 } else {
-                    // Fallback if somehow empty
                     selected.push(vocabulary[Math.floor(Math.random() * vocabulary.length)]);
                 }
             }
             return selected;
         }
 
-        // --- PLAYER SELECTION ---
         let tempSelection = new Set();
         
         function initPlayerSelection(grade) {
@@ -762,7 +783,7 @@
             else if (grade === 11) pool = [...grade11];
             else pool = [...grade12];
             
-            tempSelection = new Set(pool); // Default all selected
+            tempSelection = new Set(pool); 
             
             const grid = document.getElementById('playerSelectionGrid');
             grid.innerHTML = '';
@@ -802,9 +823,7 @@
         function generateTeams(pool) {
             document.getElementById('playerSelection').style.display = 'none';
             
-            // Initialize Master Deck
             state.vocabDeck = [...vocabulary].sort(() => 0.5 - Math.random());
-            
             state.players = pool.sort(() => 0.5 - Math.random());
             state.playerStats = {};
             state.players.forEach(p => state.playerStats[p] = { score: 0, team: 0 });
@@ -823,9 +842,7 @@
 
             for(let i=0; i<totalRounds; i++) {
                 let roundQuestions = [];
-                // Use Deck Logic
                 let roundVocab = getUniqueRoundVocab(WORDS_PER_ROUND);
-                
                 roundVocab.forEach(item => {
                     const distractors = getDistractors(item.en);
                     roundQuestions.push({ 
@@ -905,20 +922,18 @@
         }
 
         function loadQuestion() {
-            // CHAMPIONSHIP LOGIC CHANGE: Run for 10 rounds (questions)
             const maxQs = state.isChampionship ? 10 : 5;
-            
             if (state.currentQuestionIdx >= maxQs) {
-                // Trigger End of Round Announcement
                 handleRoundEnd();
                 return;
             }
 
             state.roundResolved = false;
+            state.inputLocked = false;
 
             let qData;
             if(state.isChampionship) {
-                let roundVocab = getUniqueRoundVocab(1); // Use deck even for championship
+                let roundVocab = getUniqueRoundVocab(1); 
                 let item = roundVocab[0];
                 let distractors = getDistractors(item.en);
                 qData = { chinese: item.cn, answer: item.en, sentence: item.sentence, distractors: distractors };
@@ -927,6 +942,24 @@
             }
 
             document.getElementById('currentQuestionNum').innerText = state.currentQuestionIdx + 1;
+
+            const banner = document.getElementById('questionBanner');
+            const bannerMain = document.getElementById('bannerMainText');
+            const bannerSub = document.getElementById('bannerSubText');
+            
+            banner.classList.remove('visible');
+
+            const isListeningRound = state.isChampionship || (!state.isChampionship && state.currentRoundIdx === state.rounds.length - 1);
+
+            if (isListeningRound) {
+                bannerMain.innerText = qData.sentence;
+                bannerMain.style.fontSize = "clamp(1.5rem, 3vw, 2.5rem)"; 
+                bannerSub.innerText = ""; 
+            } else {
+                bannerMain.innerText = qData.chinese;
+                bannerMain.style.fontSize = ""; 
+                bannerSub.innerText = qData.sentence; 
+            }
 
             renderPlayerSide(1, qData);
             renderPlayerSide(2, qData);
@@ -941,6 +974,7 @@
             if (state.showAnswersTimeout) clearTimeout(state.showAnswersTimeout);
             state.showAnswersTimeout = setTimeout(() => {
                 if(!state.roundResolved) {
+                    banner.classList.add('visible');
                     document.getElementById('answers1').classList.remove('answers-hidden');
                     document.getElementById('answers2').classList.remove('answers-hidden');
                     startTimer();
@@ -948,7 +982,6 @@
             }, 3000);
         }
 
-        // --- NEW: Handle End of Round/Matchup Audio ---
         function handleRoundEnd() {
             const name1 = getEnglishName(state.currentPlayer1);
             const score1 = document.getElementById('scoreP1').innerText;
@@ -964,10 +997,8 @@
             else winnerText = "It is a tie!";
 
             const announcement = `Round Over. ${name1} has ${score1} points. ${name2} has ${score2} points. ${winnerText}`;
-            
-            speak(announcement, false, 'name'); // Use Emma
+            speak(announcement, false, 'name'); 
 
-            // Increased wait time to 9s to allow speech to finish
             setTimeout(() => {
                 if(state.isChampionship) {
                     endGame();
@@ -979,29 +1010,14 @@
         }
 
         function renderPlayerSide(pNum, qData) {
-            const targetEl = document.getElementById(`targetWord${pNum}`);
-            
-            const isLastRound = !state.isChampionship && (state.currentRoundIdx === state.rounds.length - 1);
-            
-            if (isLastRound || state.isChampionship) {
-                targetEl.innerText = "🎧 LISTEN";
-                targetEl.style.fontSize = "3rem";
-            } else {
-                targetEl.innerText = qData.chinese;
-                targetEl.style.fontSize = ""; 
-            }
-            
             document.getElementById(`reveal${pNum}`).innerText = `Answer: ${qData.answer}`;
-            
             const btnContainer = document.getElementById(`answers${pNum}`);
             btnContainer.innerHTML = '';
-            
             let choices = [qData.answer, ...qData.distractors].sort(() => 0.5 - Math.random());
-            
             choices.forEach(choice => {
                 const btn = document.createElement('button');
                 btn.className = 'answer-btn';
-                btn.innerText = state.isChampionship ? choice.toUpperCase() : choice;
+                btn.innerText = choice.toLowerCase(); // Force lowercase
                 btn.onclick = (e) => handleAnswer(pNum, choice, qData.answer, e.target);
                 btnContainer.appendChild(btn);
             });
@@ -1015,8 +1031,6 @@
             if (state.timer) clearInterval(state.timer);
             
             state.timer = setInterval(() => {
-                if (state.roundResolved) return; 
-
                 timeLeft -= 1; 
                 bar1.style.width = timeLeft + "%";
                 bar2.style.width = timeLeft + "%";
@@ -1029,14 +1043,12 @@
         }
 
         function handleAnswer(pNum, choice, correct, btn) {
-            if (state.roundResolved) return;
+            if (state.inputLocked) return;
 
             const isCorrect = choice === correct;
             
             if (isCorrect) {
-                state.roundResolved = true;
-                clearInterval(state.timer);
-
+                state.inputLocked = true;
                 btn.classList.add('correct');
                 playSound('correct');
 
@@ -1050,13 +1062,15 @@
                     document.getElementById('scoreP2').innerText = parseInt(document.getElementById('scoreP2').innerText) + 10;
                 }
                 
+                // Show Correct Answer Immediately (visual feedback)
+                document.getElementById('reveal1').classList.add('show');
+                document.getElementById('reveal2').classList.add('show');
+
                 speak(praisePhrases[Math.floor(Math.random()*praisePhrases.length)], false, 'sentence');
                 
                 const otherPNum = pNum === 1 ? 2 : 1;
                 disableButtons(otherPNum);
                 disableButtons(pNum);
-
-                setTimeout(() => resolveQuestion(true, pNum), 500);
 
             } else {
                 btn.classList.add('incorrect');
@@ -1066,11 +1080,6 @@
                 
                 const p1Disabled = Array.from(document.getElementById('answers1').children).every(b => b.disabled);
                 const p2Disabled = Array.from(document.getElementById('answers2').children).every(b => b.disabled);
-
-                if (p1Disabled && p2Disabled) {
-                    clearInterval(state.timer);
-                    setTimeout(() => resolveQuestion(false, 0), 500);
-                }
             }
         }
 
@@ -1104,47 +1113,46 @@
             const modal = document.getElementById('championshipModal');
             modal.style.display = 'flex';
             
-            // PRE-MATCHUP SCREEN
             modal.innerHTML = `
                 <div class="trophy-icon">🏆</div>
                 <h1 style="font-size: 4rem; color: var(--mg-gold); text-shadow: 0 0 20px var(--cny-red); margin: 1rem;">CHAMPIONSHIP</h1>
                 <h2 style="font-size: 1.5rem; color: #fff; margin-bottom: 2rem;">The Grand Finale!</h2>
                 <div style="display: flex; gap: 3rem; margin-bottom: 3rem;">
                     <div style="text-align: center;">
-                        <div style="font-size: 1.2rem; color: var(--cny-red);">RED TEAM CHAMPION</div>
+                        <div style="font-size: 1.2rem; color: var(--team-one-color);">GREEN TEAM CHAMPION</div>
                         <div style="font-size: 2.5rem; font-weight: bold; color: #fff;">${champ1.split('/')[0]}</div>
                         <div style="color: var(--mg-gold);">${state.playerStats[champ1].score} pts</div>
                     </div>
                      <div style="text-align: center; font-size: 3rem; color: #fff; display: flex; align-items:center;">VS</div>
                     <div style="text-align: center;">
-                        <div style="font-size: 1.2rem; color: var(--mg-green);">GREEN TEAM CHAMPION</div>
+                        <div style="font-size: 1.2rem; color: var(--team-two-color);">YELLOW TEAM CHAMPION</div>
                         <div style="font-size: 2.5rem; font-weight: bold; color: #fff;">${champ2.split('/')[0]}</div>
                          <div style="color: var(--mg-gold);">${state.playerStats[champ2].score} pts</div>
                     </div>
                 </div>
-                <button class="mode-btn" onclick="startChampionshipMatch()">START FINAL BATTLE (10 ROUNDS)</button>
+                <div style="font-size: 1.5rem; color: #ccc; animation: pulse 1s infinite;">STARTING IN 5 SECONDS...</div>
             `;
 
             state.currentPlayer1 = champ1;
             state.currentPlayer2 = champ2;
             state.isChampionship = true;
             
-            speak("Championship Round", false, 'name');
+            speak("Championship Round starting now.", false, 'name');
+
+            setTimeout(() => {
+                startChampionshipMatch();
+            }, 5000);
         }
 
         function startChampionshipMatch() {
             document.getElementById('championshipModal').style.display = 'none';
             document.getElementById('gamePlay').style.display = 'flex';
             state.currentQuestionIdx = 0;
-            document.getElementById('targetWord1').style.color = "var(--mg-gold)";
-            document.getElementById('targetWord2').style.color = "var(--mg-gold)";
             beginGameplay();
         }
 
         function endGame() {
             const winner = state.team1.score > state.team2.score ? state.team1.name : state.team2.name;
-            
-            // Build Scoreboard
             const allPlayers = [...state.players].sort((a, b) => state.playerStats[b].score - state.playerStats[a].score);
             let scoreRows = allPlayers.map(p => `
                 <tr>
@@ -1157,7 +1165,6 @@
             modal.innerHTML = `
                 <h1 style="font-size: 4rem; color: var(--mg-gold);">GAME OVER</h1>
                 <h2 style="font-size: 2rem; color: #fff; margin-bottom:1rem;">${winner} WINS!</h2>
-                
                 <h3 style="color:var(--mg-green); margin-top:10px;">FINAL SCOREBOARD</h3>
                 <table class="scoreboard-table">
                     <thead>
@@ -1167,7 +1174,6 @@
                         ${scoreRows}
                     </tbody>
                 </table>
-
                 <div style="margin-top: 20px;">
                     <button class="mode-btn" onclick="location.reload()">PLAY AGAIN</button>
                 </div>
@@ -1175,24 +1181,21 @@
             modal.style.display = 'flex';
         }
 
-        // --- FESTIVE CONFETTI ENGINE ---
         function createConfetti() {
             const container = document.getElementById('confetti-field');
-            const colors = ['#FFD700', '#D2042D', '#800080', '#008000']; // Gold, Red, Purple, Green
+            const colors = ['#FFD700', '#D2042D', '#800080', '#008000']; 
             
             for (let i = 0; i < 150; i++) {
                 const conf = document.createElement('div');
                 conf.className = 'confetti';
                 conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
                 
-                // Random positioning and sizing
                 const size = Math.random() * 8 + 5;
                 conf.style.width = size + 'px';
                 conf.style.height = size + 'px';
                 conf.style.left = Math.random() * 100 + '%';
                 
-                // Random delays and duration
-                conf.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                conf.style.animationDuration = (Math.random() * 8 + 6) + 's';
                 conf.style.animationDelay = (Math.random() * 5) + 's';
                 
                 container.appendChild(conf);
