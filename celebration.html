@@ -229,17 +229,18 @@
             overflow-y: auto; 
         }
 
-        /* REVEAL TEXT */
+        /* REVEAL TEXT: Bold Yellow, Lowercase */
         .correct-reveal-text {
             height: 24px;
             text-align: center;
-            color: var(--mg-green);
-            font-weight: bold;
-            font-size: 1.2rem;
+            color: var(--mg-gold); 
+            font-weight: 900;
+            font-size: 1.3rem;
             margin-bottom: 0.5rem;
             opacity: 0;
             transition: opacity 0.3s;
             text-shadow: 0 0 5px #000;
+            font-family: 'Roboto', sans-serif !important;
         }
         .correct-reveal-text.show { opacity: 1; }
 
@@ -263,12 +264,13 @@
             color: white;
             padding: 0.8rem; 
             font-size: 1.1rem;
-            font-family: 'Roboto', sans-serif; 
+            /* CRITICAL FIX: Explicitly use Roboto to avoid Cinzel's small-caps */
+            font-family: 'Roboto', 'Arial', sans-serif !important; 
             font-weight: bold;
             cursor: pointer;
             border-radius: 8px;
             transition: all 0.2s;
-            text-transform: none; 
+            text-transform: none; /* Respects capitalization in data */
             position: relative;
             overflow: hidden;
         }
@@ -280,7 +282,15 @@
             box-shadow: 0 0 15px var(--mg-gold);
         }
 
-        .answer-btn.correct { background: var(--mg-green); color: white; border-color: #fff; box-shadow: 0 0 30px var(--mg-green); }
+        /* CORRECT: Bold Yellow Background, Dark Text */
+        .answer-btn.correct { 
+            background: var(--mg-gold); 
+            color: #2e003e; /* Dark purple/black for contrast */
+            border-color: #fff; 
+            box-shadow: 0 0 30px var(--mg-gold); 
+            font-weight: 900;
+        }
+        
         .answer-btn.incorrect { background: var(--cny-red); color: white; border-color: #fff; box-shadow: 0 0 30px var(--cny-red); }
         .answer-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
@@ -1017,7 +1027,7 @@
             choices.forEach(choice => {
                 const btn = document.createElement('button');
                 btn.className = 'answer-btn';
-                btn.innerText = choice.toLowerCase(); // Force lowercase
+                btn.innerText = choice; // Use raw data, rely on CSS font for lowercase appearance
                 btn.onclick = (e) => handleAnswer(pNum, choice, qData.answer, e.target);
                 btnContainer.appendChild(btn);
             });
