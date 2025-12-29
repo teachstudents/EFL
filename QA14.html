@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Joel's Speaking Practice 14</title>
+    <title>QA14 Speaking Practice</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,23 +15,6 @@
             height: 100vh;
             overflow: hidden; /* Prevent body from scrolling */
             position: relative;
-        }
-        /* Snowfall effect */
-        .snowflake {
-            color: #fff;
-            font-size: 1em;
-            font-family: Arial, sans-serif;
-            text-shadow: 0 0 5px #000;
-            position: fixed;
-            top: -10%;
-            z-index: 0;
-            user-select: none;
-            animation: snowfall linear infinite;
-        }
-
-        @keyframes snowfall {
-            0% { transform: translateY(0) rotate(0deg); }
-            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
         }
         .timer-circle {
             stroke-dasharray: 283;
@@ -64,168 +47,219 @@
         audio::-webkit-media-controls-panel {
             padding: 5px;
         }
-        audio::-webkit-media-controls-play-button,
-        audio::-webkit-media-controls-timeline,
-        audio::-webkit-media-controls-current-time-display,
-        audio::-webkit-media-controls-time-remaining-display {
-            margin: 0 2px;
+        /* Improve scrolling on mobile */
+        .scroll-container {
+            scrollbar-width: thin;
+            scrollbar-color: #4f46e5 #e5e7eb;
         }
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #4f46e5;
-            animation: spin 1s ease-in-out infinite;
+        .scroll-container::-webkit-scrollbar {
+            width: 6px;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .scroll-container::-webkit-scrollbar-track {
+            background: #e5e7eb;
         }
-        /* Make sure app content is above the snow */
-        #app-container {
-            position: relative;
-            z-index: 10;
+        .scroll-container::-webkit-scrollbar-thumb {
+            background-color: #4f46e5;
+            border-radius: 20px;
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
+<body class="bg-gray-100 dark:bg-gradient-to-br dark:from-slate-900 dark:via-blue-900 dark:to-slate-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
     
-    <div id="snow-container"></div>
-
-    <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 fixed top-4 right-4 z-50">
-        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 10.607a1 1 0 010-1.414l.707-.707a1 1 0 111.414 1.414l-.707-.707a1 1 0 01-1.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707z"></path></svg>
-    </button>
-
-    <div id="app-container" class="w-full max-w-xl mx-auto text-center h-full">
+    <div id="app-container" class="w-full max-w-xl mx-auto text-center h-full relative z-10">
         
         <!-- Welcome Screen -->
-        <div id="welcome-screen" class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center">
+        <div id="welcome-screen" class="bg-white dark:bg-gray-800 dark:shadow-lg p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center">
             <div id="name-entry-container">
-                <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">Joel's Speaking Practice 13</h1>
-                <input type="text" id="name-input" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 text-center text-lg text-gray-900 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                <button id="start-with-name-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg text-xl shadow-md">Start</button>
-            </div>
-            <div id="topic-selection-container" class="hidden">
-                 <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">Hello, <span id="user-name-display"></span>!</h1>
-                 <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                     <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
-                     <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
-                     <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
-                 </div>
-                <div id="topic-selection" class="grid grid-cols-3 gap-4">
-                    <!-- Topic buttons will be injected here -->
+                <div class="mb-6">
+                    <i class="fas fa-microphone-lines text-5xl text-indigo-600 dark:text-indigo-400 mb-2"></i>
                 </div>
+                <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">QA14 Practice</h1>
+                <p class="mb-6 text-gray-600 dark:text-gray-400 text-sm">Enter your name to begin session QA14.</p>
+                <input type="text" id="name-input" placeholder="Your Name" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 text-center text-lg text-gray-900 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                <button id="start-with-name-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg text-xl shadow-md transition-transform active:scale-95">Start QA14</button>
+            </div>
+
+            <div id="topic-selection-container" class="hidden h-full flex flex-col">
+                 <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 flex-shrink-0">Hello, <span id="user-name-display"></span>!</h1>
+                 
+                 <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg flex-shrink-0 border border-gray-200 dark:border-gray-700">
+                      <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Speak until the timer runs out.</p>
+                      <p><i class="fas fa-lightbulb mr-2 text-yellow-500"></i>Use the sentence starters for help.</p>
+                      <p><i class="fas fa-download mr-2 text-blue-500"></i>Download your recording after speaking.</p>
+                 </div>
+                 
+                 <div class="flex-grow overflow-y-auto scroll-container pr-1">
+                    <div id="topic-selection" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">
+                        <!-- Topic buttons will be injected here -->
+                    </div>
+                 </div>
             </div>
         </div>
 
         <!-- Main Practice Screen -->
-        <div id="practice-screen" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg app-shell p-3 sm:p-4">
+        <div id="practice-screen" class="hidden bg-white dark:bg-gray-800 dark:shadow-lg rounded-2xl shadow-lg app-shell p-3 sm:p-4">
             <header class="flex-shrink-0">
-                <div class="flex justify-between items-center mb-1">
-                    <button id="back-to-topics-btn" class="text-indigo-500 hover:text-indigo-700"><i class="fas fa-arrow-left mr-2"></i>Topics</button>
+                <div class="flex justify-between items-center mb-2">
+                    <div class="w-1/3 text-left">
+                         <button id="back-to-topics-btn" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-1.5 px-3 rounded-lg shadow-sm transition-colors">
+                             <i class="fas fa-arrow-left mr-1"></i>Topics
+                         </button>
+                    </div>
+                    <div class="w-1/3 text-center">
+                         <button id="samples-btn" class="hidden text-xs sm:text-sm bg-amber-500 hover:bg-amber-600 text-white font-bold py-1.5 px-3 rounded-lg shadow-md transition-colors">
+                             <i class="fas fa-lightbulb mr-1"></i>Ideas
+                         </button>
+                    </div>
+                    <div class="w-1/3 text-right">
+                         <button id="next-btn" class="hidden text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 px-3 rounded-lg shadow-sm disabled:bg-indigo-400 dark:disabled:bg-indigo-800 disabled:cursor-not-allowed transition-colors">
+                             Next<i class="fas fa-arrow-right ml-1"></i>
+                         </button>
+                    </div>
                 </div>
+
                 <!-- Timer Display -->
                 <div class="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-2 flex-shrink-0">
                     <svg class="w-full h-full" viewBox="0 0 100 100">
-                        <circle class="text-gray-200 dark:text-gray-700" stroke-width="10" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
-                        <circle id="timer-progress" class="timer-circle text-indigo-500" stroke-width="10" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                        <circle class="text-gray-200 dark:text-gray-700" stroke-width="8" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                        <circle id="timer-progress" class="timer-circle text-indigo-500" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
                     </svg>
-                    <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-2xl font-bold"></div>
-                </div>
-                <p id="phase-indicator" class="font-semibold text-indigo-500 dark:text-indigo-400 mb-2 text-base flex-shrink-0"></p>
-
-                <!-- Question Display -->
-                <div id="question-container" class="min-h-[50px] flex items-center justify-center mb-2">
-                    <h2 id="question-text" class="text-base sm:text-lg font-semibold leading-relaxed text-left w-full"></h2>
+                    <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-2xl font-bold font-mono"></div>
+                    <button id="pause-resume-btn" class="hidden absolute bottom-0 right-0 w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm shadow-md z-20 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
+                        <i class="fas fa-pause"></i>
+                    </button>
                 </div>
                 
-                <div id="error-message-box" class="hidden text-red-500 bg-red-100 dark:bg-red-900/50 p-2 rounded-lg text-sm mb-2"></div>
+                <p id="phase-indicator" class="font-semibold text-indigo-600 dark:text-indigo-400 mb-1 text-sm uppercase tracking-wide flex-shrink-0"></p>
+
+                <!-- Question Display -->
+                <div id="question-container" class="min-h-[60px] flex items-center justify-center mb-2 bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-xl border border-indigo-100 dark:border-indigo-800">
+                    <h2 id="question-text" class="text-base sm:text-lg font-bold leading-snug text-center w-full text-gray-800 dark:text-gray-100"></h2>
+                </div>
+                
+                <div id="error-message-box" class="hidden text-red-500 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-2 rounded-lg text-xs mb-2"></div>
 
                 <!-- Recording Action Buttons -->
-                <div id="recording-actions-container" class="flex flex-col items-center justify-center mb-2">
+                <div id="recording-actions-container" class="flex flex-col items-center justify-center mb-1">
                     <!-- Initial Record Button -->
-                    <button id="record-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold w-14 h-14 rounded-full text-xl shadow-md transition-transform transform hover:scale-105 flex items-center justify-center">
+                    <button id="record-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold w-14 h-14 rounded-full text-xl shadow-lg shadow-red-500/30 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center">
                         <i class="fas fa-microphone"></i>
                     </button>
                     <!-- Stop Button -->
-                    <button id="stop-record-btn" class="hidden bg-gray-700 hover:bg-gray-800 text-white font-bold w-14 h-14 rounded-full text-xl shadow-md flex items-center justify-center">
+                    <button id="stop-record-btn" class="hidden bg-gray-800 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-bold w-14 h-14 rounded-full text-xl shadow-lg flex items-center justify-center transition-all active:scale-95">
                         <i class="fas fa-stop"></i>
                     </button>
+                    
                     <!-- Post-Recording Controls -->
-                    <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-2">
-                        <audio id="audio-player" controls class="w-full max-w-xs"></audio>
-                        <div class="flex items-center justify-center space-x-2 w-full max-w-xs">
-                             <button id="download-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-colors">
-                                 <i class="fas fa-download mr-1"></i>Download
-                             </button>
-                            <a href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ" target="_blank" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md">
-                                 <i class="fas fa-upload mr-1"></i>Upload
-                             </a>
+                    <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-1">
+                        <audio id="audio-player" controls class="w-full max-w-xs h-8"></audio>
+                        <div class="flex gap-2 w-full max-w-xs">
+                            <!-- Download button -->
+                            <button id="download-btn"
+                                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 rounded-lg text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                                 <i class="fas fa-download"></i> Save MP3
+                            </button>
+                            
+                            <!-- Upload/Share button (Example Link) -->
+                            <a id="upload-link"
+                               href="#" 
+                               onclick="alert('Please configure the upload link in the code!'); return false;"
+                               class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-3 rounded-lg text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                                 <i class="fas fa-cloud-upload-alt"></i> Upload
+                            </a>
                         </div>
                     </div>
                 </div>
-                 <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold mb-1">
-                     <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
-                     Recording...
+                 <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold text-xs animate-pulse">
+                      <div class="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                      Recording in progress...
                  </div>
             </header>
             
-            <main class="flex-grow flex flex-col overflow-y-auto min-h-0 space-y-2 pt-2">
+            <main class="flex-grow flex flex-col overflow-y-auto scroll-container min-h-0 space-y-3 pt-2 px-1">
                  <!-- Sentence Starters -->
-                <div id="starters-container" class="hidden text-left">
-                    <h3 class="text-sm font-bold mb-1 text-center">Sentence Starters</h3>
-                    <div id="starters-list" class="flex flex-wrap gap-2 justify-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">
+                <div id="starters-container" class="hidden text-left bg-white dark:bg-gray-700/30 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                    <h3 class="text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Sentence Starters</h3>
+                    <div id="starters-list" class="flex flex-wrap gap-2">
                         <!-- Buttons will be injected here -->
                     </div>
                 </div>
 
                 <!-- Word Bank -->
-                <div id="word-bank-container" class="hidden text-left">
-                    <h3 class="text-sm font-bold mb-1 text-center">Word Bank</h3>
-                    <div id="word-bank-list" class="flex flex-wrap gap-2 justify-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">
+                <div id="word-bank-container" class="hidden text-left bg-white dark:bg-gray-700/30 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                    <h3 class="text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Useful Vocabulary</h3>
+                    <div id="word-bank-list" class="flex flex-wrap gap-2">
                         <!-- Buttons will be injected here -->
                     </div>
                 </div>
 
                 <!-- Sample Answers Display -->
                 <div id="samples-container" class="hidden text-left">
-                    <h3 class="text-sm font-bold mb-1 text-center flex-shrink-0">Sample Responses</h3>
-                    <ul id="samples-list" class="space-y-2 list-disc list-inside bg-indigo-900/70 dark:bg-indigo-900/90 p-3 rounded-lg max-h-28 sm:max-h-32 overflow-y-auto">
-                    </ul>
+                    <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-3 rounded-xl">
+                        <h3 class="text-xs font-bold uppercase text-amber-600 dark:text-amber-500 mb-2 tracking-wider flex items-center">
+                            <i class="fas fa-star mr-1"></i> Sample Responses
+                        </h3>
+                        <ul id="samples-list" class="space-y-2 list-none text-sm text-gray-700 dark:text-gray-300">
+                        </ul>
+                    </div>
                 </div>
             </main>
-
-            <footer class="flex-shrink-0 mt-2">
-                <!-- Next Button -->
-                <div id="controls-container">
-                     <button id="next-btn" class="hidden w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg text-lg shadow-md">Next</button>
-                </div>
-            </footer>
         </div>
 
         <!-- Certificate Screen -->
-        <div id="certificate-screen" class="hidden bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center items-center">
-            <div id="certificate-to-download" class="w-full bg-gray-50 dark:bg-gray-700 p-8 rounded-lg border-4 border-yellow-400 dark:border-yellow-500 text-center">
-                <i class="fas fa-award text-6xl text-yellow-500 mb-4"></i>
-                <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Certificate of Completion</h1>
-                <p class="text-lg mt-2 text-gray-600 dark:text-gray-300">This certificate is awarded to</p>
-                <p id="certificate-name" class="text-4xl font-bold my-4 text-indigo-600 dark:text-indigo-400"></p>
-                <p class="text-lg mt-2 text-gray-600 dark:text-gray-300">for successfully completing all 9 speaking practice topics.</p>
-                <p class="text-sm mt-6 text-gray-500 dark:text-gray-400">Issued on: <span id="certificate-date"></span></p>
+        <div id="certificate-screen" class="hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg h-full flex flex-col justify-center items-center">
+            <div id="certificate-to-download" class="w-full bg-slate-50 dark:bg-slate-700 p-6 sm:p-10 rounded-xl border-4 border-double border-yellow-400 dark:border-yellow-500 text-center shadow-inner relative overflow-hidden">
+                <!-- Watermark -->
+                <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+                    <i class="fas fa-award text-9xl"></i>
+                </div>
+                
+                <div class="relative z-10">
+                    <i class="fas fa-crown text-5xl text-yellow-500 mb-4 drop-shadow-sm"></i>
+                    <h1 class="text-2xl sm:text-3xl font-serif font-bold text-gray-800 dark:text-white mb-2">Certificate of Excellence</h1>
+                    <div class="h-1 w-20 bg-yellow-500 mx-auto mb-4"></div>
+                    <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 uppercase tracking-widest mb-4">QA14 Presented To</p>
+                    
+                    <p id="certificate-name" class="text-3xl sm:text-5xl font-bold my-4 text-indigo-700 dark:text-indigo-300 font-serif italic"></p>
+                    
+                    <p class="text-base text-gray-600 dark:text-gray-300">For successfully completing the QA14 speaking practice.</p>
+                    <div class="mt-8 flex justify-center items-center gap-2 text-xs text-gray-400">
+                        <span>Date: <span id="certificate-date"></span></span>
+                        <span>•</span>
+                        <span>Verified</span>
+                    </div>
+                </div>
             </div>
-            <button id="download-certificate-btn" class="mt-6 w-full max-w-xs bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-xl shadow-md">
-                <i class="fas fa-download mr-2"></i>Download Certificate
+            <button id="download-certificate-btn" class="mt-8 w-full max-w-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg text-lg shadow-md transition-all active:scale-95 flex items-center justify-center">
+                <i class="fas fa-file-image mr-2"></i>Download Image
             </button>
-             <button id="back-to-main-menu-btn" class="mt-3 text-sm text-indigo-500 hover:underline">Back to Main Menu</button>
+             <button id="back-to-main-menu-btn" class="mt-4 text-sm text-gray-500 hover:text-indigo-500 transition-colors">Start New Session</button>
         </div>
 
     </div>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 fade-in">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 text-center max-w-sm w-full border border-gray-200 dark:border-gray-700">
+            <div class="mb-4 text-yellow-500 text-4xl">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h3 id="modal-title" class="text-xl font-bold mb-2 dark:text-white">End Session?</h3>
+            <p id="modal-message" class="text-gray-600 dark:text-gray-400 mb-6 text-sm">Returning to the topic list will clear your current progress.</p>
+            <div class="flex justify-center gap-3">
+                <button id="modal-cancel-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 transition-colors">Cancel</button>
+                <button id="modal-confirm-btn" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">End Session</button>
+            </div>
+        </div>
+    </div>
+
+
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- DATA: Questions and Sample Answers for Part 13 ---
+        
+        // ==========================================
+        //  QA14 DATA SECTION
+        // ==========================================
         const practiceData = {
             "Appointments": [
                 {
@@ -314,179 +348,70 @@
                         "Hi there. It's been a busy week, I'm glad it's finally Friday. I'm just on my way to the supermarket. See you later!"
                     ]
                 }
-            ],
-            "Transportation": [
-                {
-                    question: "Scenario: You are on a train and a ticket inspector (Kontrolleur) asks for your ticket. You realize you bought a ticket for the wrong zone. Explain the situation.",
-                    starters: ["Oh, I am so sorry, I think I made a mistake.", "I'm new here and I'm still confused by the ticket system.", "I believe I bought the wrong ticket by accident.", "Can I please buy the correct ticket from you?"],
-                    wordBank: ["my apologies", "an honest mistake", "wrong zone (falsche Zone)", "confusing", "new in Germany", "buy a new ticket", "didn't realize"],
-                    samples: [
-                        "I am so sorry, I think I made a mistake. I am a new student here and the zone system is still very confusing to me. I believe I accidentally bought a ticket for Zone A instead of Zone B.",
-                        "My apologies, I didn't realize this ticket was not valid for this train. It was an honest mistake. Is it possible for me to buy the correct ticket from you now?",
-                        "Oh no, I see this is the wrong ticket. I am very sorry. I just arrived in Germany a week ago and I'm still learning how public transport works."
-                    ]
-                },
-                {
-                    question: "Scenario: You are at a train station (Bahnhof) and the announcement is only in German. Ask a stranger what the announcement said.",
-                    starters: ["Excuse me, I'm sorry to bother you.", "My German is not very good yet.", "Could you please tell me what that announcement was about?", "Did they say the train is delayed?"],
-                    wordBank: ["announcement (Durchsage)", "delayed (verspätet)", "platform change (Gleiswechsel)", "canceled (fällt aus)", "I didn't understand", "could you please help me?"],
-                    samples: [
-                        "Excuse me, I'm sorry to bother you, but my German is not very good. Could you please tell me what that announcement said about the train to Munich?",
-                        "Pardon me, I didn't understand the announcement. Did they say the train is delayed or is there a platform change?",
-                        "Hello, could you please help me? I'm not sure what the announcement meant. Is the train to Frankfurt still leaving from platform 5?"
-                    ]
-                }
-            ],
-             "Cultural Exchange": [
-                {
-                    question: "Scenario: A German classmate says something about China that is not correct (a stereotype). How would you politely correct them?",
-                    starters: ["That's an interesting point. Actually, in my experience...", "I understand why you might think that, but...", "That's a common stereotype, but in reality...", "Can I share a different perspective with you?"],
-                    wordBank: ["stereotype", "actually", "in fact", "it depends on the region", "modern China is...", "it's more complex than that", "my experience is different"],
-                    samples: [
-                        "I can see why you might think that all Chinese food is the same, but actually, the food is very different in every province. For example, Sichuan food is very spicy, but Shanghai food is sweeter.",
-                        "That's a common stereotype, but in reality, not everyone in China is good at math! Just like any country, people have different strengths and weaknesses.",
-                        "I understand why you might think that. However, modern cities like Shanghai and Shenzhen are extremely high-tech, maybe even more so than some cities in Europe."
-                    ]
-                },
-                {
-                    question: "Scenario: A new German friend asks you to explain the Mid-Autumn Festival. Briefly describe it to them.",
-                    starters: ["The Mid-Autumn Festival is one of the most important holidays in China.", "It's a time for family reunion, similar to...", "The main tradition is to...", "We eat a special food called..."],
-                    wordBank: ["Mid-Autumn Festival (Mondfest)", "family reunion", "full moon", "togetherness", "mooncakes (Mondkuchen)", "lanterns", "gratitude", "harvest"],
-                    samples: [
-                        "The Mid-Autumn Festival is a bit like Thanksgiving in America. It's a time for families to get together for a big dinner and appreciate the full moon.",
-                        "The main tradition is to eat mooncakes, which are round pastries with different fillings. Their round shape symbolizes family togetherness and completeness.",
-                        "It's a beautiful festival. Besides eating, we also look at the full moon, which is supposed to be the brightest of the year, and children sometimes carry colorful lanterns."
-                    ]
-                }
-            ],
-            "Housing Issues": [
-                {
-                    question: "Scenario: The heating (Heizung) in your student dorm room is broken and it is very cold. Explain the problem to the building manager (Hausmeister).",
-                    starters: ["Hello, I'm calling from room...", "I'm having a problem with the heating in my room.", "The radiator doesn't seem to be working.", "My room is very cold, could you please..."],
-                    wordBank: ["heating (Heizung)", "radiator (Heizkörper)", "is broken", "not working", "very cold", "could you please take a look?", "as soon as possible", "building manager (Hausmeister)"],
-                    samples: [
-                        "Hello, my name is [Name] from room 402. I'm calling because the heating in my room is not working, and it has been very cold for the last two days.",
-                        "Good morning. I'm having a problem with the radiator in my apartment. It's not getting warm, even when I turn it all the way up. Could you please come and take a look when you have a chance?",
-                        "Hi, I live in room 315. The heating is broken. Is it possible for you to send someone to fix it today? It is very cold, and I cannot study properly."
-                    ]
-                },
-                {
-                    question: "Scenario: Your roommate in a shared apartment (WG) often leaves their dirty dishes in the sink. How would you politely ask them to be tidier?",
-                    starters: ["Hey, can we talk for a minute?", "I wanted to talk about something small regarding the kitchen.", "Would you mind trying to...?", "It would really help me if we could..."],
-                    wordBank: ["shared space (WG)", "dirty dishes", "in the sink", "keep the kitchen clean", "cleaning schedule", "teamwork", "would you mind", "it bothers me a little"],
-                    samples: [
-                        "Hey, do you have a second? I wanted to talk about the kitchen. I've noticed that dishes are often left in the sink for a long time, and it makes it hard to cook. Would you mind trying to wash them soon after you use them?",
-                        "Hi, can we chat about the kitchen? It would really help me out if we could both agree to keep the sink clear of dirty dishes. Maybe we can make a rule to wash them within 24 hours?",
-                        "I feel a bit awkward bringing this up, but the dirty dishes in the sink bother me. Since we share this space, could we try to keep it a bit tidier together?"
-                    ]
-                }
-            ],
-            "Part-Time Job": [
-                {
-                    question: "Scenario: You see a 'Help Wanted' (Aushilfe gesucht) sign in a local cafe. Go inside and ask the manager if the position is still available.",
-                    starters: ["Hello, I saw the sign in your window.", "Excuse me, are you still looking for help?", "I'm interested in the part-time position.", "Could you tell me more about the job?"],
-                    wordBank: ["Help Wanted (Aushilfe gesucht)", "part-time job", "still available", "student", "looking for work", "flexible hours", "experience", "CV (Lebenslauf)"],
-                    samples: [
-                        "Hello, I saw your 'Aushilfe gesucht' sign in the window. I am a student and I am looking for a part-time job. Is the position still available?",
-                        "Excuse me, I noticed you are looking for help. I have some experience working in a cafe in my hometown and I would be very interested. Who should I speak to about the job?",
-                        "Good afternoon. I'm interested in the part-time position you have advertised. I have my CV with me. Could you tell me what the working hours would be like?"
-                    ]
-                },
-                {
-                    question: "Scenario: In a job interview for a student job, the interviewer asks, 'Why should we hire you?'. What would you say?",
-                    starters: ["I believe you should hire me because I am...", "I am a very... person.", "Although I don't have much experience, I am...", "My skills in... would be very useful for this job."],
-                    wordBank: ["hard-working", "quick learner", "reliable", "friendly", "good with customers", "organized", "motivated", "team player", "eager to learn"],
-                    samples: [
-                        "I believe you should hire me because I am a very quick learner and I am highly motivated. I am confident I can learn all the tasks for this job very fast.",
-                        "Although I don't have a lot of professional experience, I am a very hard-working and reliable person. You can count on me to be on time and to do my job well.",
-                        "I am very friendly and I enjoy talking to people, so I think my communication skills would be very useful for a customer service role like this one."
-                    ]
-                }
-            ],
-            "Social Plans": [
-                {
-                    question: "Scenario: You have two invitations for the same night: one from a new German friend and one from your old friends from China. Explain your decision.",
-                    starters: ["That's a very difficult situation.", "I would have to choose between... and...", "I think I would probably choose to go with... because...", "It would be a tough choice, but my priority would be..."],
-                    wordBank: ["difficult choice", "old friends", "new friend", "integration", "feeling homesick", "make a good impression", "explain the situation", "reschedule"],
-                    samples: [
-                        "That's a tough choice. I think I would explain the situation to both friends and try to reschedule with one of them. For example, I could meet my new German friend for coffee the next day.",
-                        "I would probably choose to go with my new German friend, because making local connections and practicing my German is one of my main goals for being here.",
-                        "It would be a very difficult decision, but I might choose to spend the evening with my old friends from China, especially if I was feeling a bit homesick and needed the comfort of the familiar."
-                    ]
-                },
-                {
-                    question: "Scenario: A German friend invites you to go hiking on a day when the weather forecast is very bad. Politely express your concern and suggest an alternative plan.",
-                    starters: ["Thank you for the invitation! I'm a bit concerned about...", "I'd love to go hiking, but have you seen the weather forecast?", "Maybe we could... instead?", "How about we go hiking next weekend when the weather is better?"],
-                    wordBank: ["weather forecast (Wettervorhersage)", "heavy rain", "thunderstorm", "might be dangerous", "alternative plan", "go to a museum", "watch a movie", "play board games"],
-                    samples: [
-                        "Thanks for the invitation to go hiking! I just checked the weather forecast and it looks like there will be heavy rain. I'm a bit concerned it might not be safe. Could we maybe go to the cinema instead?",
-                        "I would love to go hiking with you, but I saw there's a warning for thunderstorms tomorrow. How about we play some board games at my place and we can go hiking next weekend when the weather is sunny?",
-                        "That's a great idea, but the forecast says it will be very cold and windy. Perhaps we could visit that new art museum we talked about, and save the hike for a nicer day?"
-                    ]
-                }
             ]
         };
-
+        // ==========================================
+        //  END OF QA14 DATA
+        // ==========================================
 
         // --- DOM Elements ---
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-        const welcomeScreen = document.getElementById('welcome-screen');
-        const practiceScreen = document.getElementById('practice-screen');
-        const nameEntryContainer = document.getElementById('name-entry-container');
-        const nameInput = document.getElementById('name-input');
-        const startWithNameBtn = document.getElementById('start-with-name-btn');
-        const topicSelectionContainer = document.getElementById('topic-selection-container');
-        const userNameDisplay = document.getElementById('user-name-display');
-        const topicSelection = document.getElementById('topic-selection');
-        const nextBtn = document.getElementById('next-btn');
-        const backToTopicsBtn = document.getElementById('back-to-topics-btn');
-        
-        const timerDisplay = document.getElementById('timer-display');
-        const timerProgress = document.getElementById('timer-progress');
-        const phaseIndicator = document.getElementById('phase-indicator');
-        
-        const questionContainer = document.getElementById('question-container');
-        const questionText = document.getElementById('question-text');
-        const samplesContainer = document.getElementById('samples-container');
-        const samplesList = document.getElementById('samples-list');
-        const startersContainer = document.getElementById('starters-container');
-        const startersList = document.getElementById('starters-list');
-        const wordBankContainer = document.getElementById('word-bank-container');
-        const wordBankList = document.getElementById('word-bank-list');
-        const errorMessagebox = document.getElementById('error-message-box');
-
-        const recordBtn = document.getElementById('record-btn');
-        const stopRecordBtn = document.getElementById('stop-record-btn');
-        const audioPlayer = document.getElementById('audio-player');
-        const recordingStatus = document.getElementById('recording-status');
-        const postRecordingActions = document.getElementById('post-recording-actions');
-        const downloadBtn = document.getElementById('download-btn');
-        
-        // Certificate UI
-        const certificateScreen = document.getElementById('certificate-screen');
-        const downloadCertificateBtn = document.getElementById('download-certificate-btn');
-        const backToMainMenuBtn = document.getElementById('back-to-main-menu-btn');
+        const ui = {
+            welcomeScreen: document.getElementById('welcome-screen'),
+            practiceScreen: document.getElementById('practice-screen'),
+            nameEntryContainer: document.getElementById('name-entry-container'),
+            nameInput: document.getElementById('name-input'),
+            startWithNameBtn: document.getElementById('start-with-name-btn'),
+            topicSelectionContainer: document.getElementById('topic-selection-container'),
+            userNameDisplay: document.getElementById('user-name-display'),
+            topicSelection: document.getElementById('topic-selection'),
+            nextBtn: document.getElementById('next-btn'),
+            backToTopicsBtn: document.getElementById('back-to-topics-btn'),
+            samplesBtn: document.getElementById('samples-btn'),
+            timerDisplay: document.getElementById('timer-display'),
+            timerProgress: document.getElementById('timer-progress'),
+            phaseIndicator: document.getElementById('phase-indicator'),
+            questionText: document.getElementById('question-text'),
+            samplesContainer: document.getElementById('samples-container'),
+            samplesList: document.getElementById('samples-list'),
+            startersContainer: document.getElementById('starters-container'),
+            startersList: document.getElementById('starters-list'),
+            wordBankContainer: document.getElementById('word-bank-container'),
+            wordBankList: document.getElementById('word-bank-list'),
+            errorMessagebox: document.getElementById('error-message-box'),
+            recordBtn: document.getElementById('record-btn'),
+            stopRecordBtn: document.getElementById('stop-record-btn'),
+            audioPlayer: document.getElementById('audio-player'),
+            recordingStatus: document.getElementById('recording-status'),
+            postRecordingActions: document.getElementById('post-recording-actions'),
+            downloadBtn: document.getElementById('download-btn'),
+            certificateScreen: document.getElementById('certificate-screen'),
+            downloadCertificateBtn: document.getElementById('download-certificate-btn'),
+            backToMainMenuBtn: document.getElementById('back-to-main-menu-btn'),
+            modal: document.getElementById('confirmation-modal'),
+            modalTitle: document.getElementById('modal-title'),
+            modalMessage: document.getElementById('modal-message'),
+            modalConfirmBtn: document.getElementById('modal-confirm-btn'),
+            modalCancelBtn: document.getElementById('modal-cancel-btn'),
+            pauseResumeBtn: document.getElementById('pause-resume-btn')
+        };
 
 
         // --- State Variables ---
         let userName = '';
         let currentQuestionIndex = 0;
-        let currentQuestions = [];
+        let masterQuestionList = [];
+        let currentQuestions = []; 
         let timerInterval;
+        let isTimerPaused = false;
         let mediaRecorder;
         let audioChunks = [];
         let recordedBlob = null;
         let completedTopics = {};
-        let speechRecognition;
-        let finalTranscript = '';
 
         const FULL_DASH_ARRAY = 283;
-        const DEFAULT_RESPONSE_TIME = 60;
-        const READ_TIME = 60;
+        const DEFAULT_RESPONSE_TIME = 60; // Default time since it wasn't specified in new data
 
-        // --- Text-to-Speech ---
+        // --- Text-to-Speech (Slowed down to 85%) ---
         const synth = window.speechSynthesis;
         let preferredVoice = null;
         let ttsInitialized = false;
@@ -502,23 +427,10 @@
                     const voices = synth.getVoices();
                     if (voices.length === 0) return;
                     
-                    const scoreVoice = (voice) => {
-                        let score = 0;
-                        const name = voice.name.toLowerCase();
-                        if (name.includes('natural')) score += 5;
-                        if (name.includes('brian') || name.includes('emma')) score += 4;
-                        if (name.includes('microsoft')) score += 3;
-                        if (name.includes('google')) score += 2;
-                        if (voice.localService) score += 1;
-                        return score;
-                    };
-
                     const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
-                    if (englishVoices.length > 0) {
-                        englishVoices.sort((a, b) => scoreVoice(b) - scoreVoice(a));
-                        preferredVoice = englishVoices[0];
-                    }
+                    const bestVoice = englishVoices.find(v => v.name.includes("Google") || v.name.includes("Microsoft") || v.name.includes("Natural"));
                     
+                    preferredVoice = bestVoice || englishVoices[0] || voices[0];
                     ttsInitialized = true;
                     resolve();
                 };
@@ -531,186 +443,195 @@
             });
         }
 
-        function speak(text, isFeedback = false) {
-            if (!ttsInitialized) return;
+        function speak(text) {
+            if (!ttsInitialized || !synth || !text) return;
+
             try {
                 if (synth.speaking) synth.cancel();
-                const utterThis = new SpeechSynthesisUtterance(text);
-                utterThis.onerror = (event) => console.error('SpeechSynthesisUtterance.onerror', event);
-                if (preferredVoice) utterThis.voice = preferredVoice;
-                utterThis.pitch = 1;  
-                utterThis.rate = 0.85; // Slow down speech as requested
-                synth.speak(utterThis);
+                
+                setTimeout(() => {
+                    const utterThis = new SpeechSynthesisUtterance(text);
+                    if (preferredVoice) utterThis.voice = preferredVoice;
+                    utterThis.pitch = 1;
+                    utterThis.rate = 0.85; // Slow down speech for secondary students
+                    synth.speak(utterThis);
+                }, 50); 
             } catch (e) {
-                console.error("Speech synthesis failed:", e);
+                console.error("TTS Error:", e);
             }
         }
 
-        // --- Local Storage ---
+        // --- Local Storage (Updated for QA14) ---
         function loadProgress() {
-            const savedCompletedTopics = localStorage.getItem('languagePracticeCompletedTopics');
+            const savedCompletedTopics = localStorage.getItem('QA14_CompletedTopics');
             if (savedCompletedTopics) {
                 try {
-                    const parsed = JSON.parse(savedCompletedTopics);
-                    // Basic validation to ensure it's an object
-                    if (typeof parsed === 'object' && parsed !== null) {
-                       completedTopics = parsed;
-                    } else {
-                        completedTopics = {};
-                    }
-                } catch (e) {
-                    console.error("Failed to parse saved progress:", e);
-                    completedTopics = {}; // Reset progress if data is corrupt
-                }
+                    completedTopics = JSON.parse(savedCompletedTopics) || {};
+                } catch (e) { completedTopics = {}; }
             }
-            const savedName = localStorage.getItem('languagePracticeUserName');
+            const savedName = localStorage.getItem('QA14_UserName');
             if (savedName) {
                  userName = savedName;
-                 nameInput.value = userName;
+                 ui.nameInput.value = userName;
             }
         }
 
         function saveProgress() {
-            localStorage.setItem('languagePracticeCompletedTopics', JSON.stringify(completedTopics));
-            if(userName) localStorage.setItem('languagePracticeUserName', userName);
+            localStorage.setItem('QA14_CompletedTopics', JSON.stringify(completedTopics));
+            if(userName) localStorage.setItem('QA14_UserName', userName);
         }
 
-        // --- UI Initialization ---
+        // --- UI Initialization & Data Setup ---
         function initializeTopics() {
-            topicSelection.innerHTML = '';
+            ui.topicSelection.innerHTML = '';
             for (const topic in practiceData) {
                 const button = document.createElement('button');
                 
                 let checkmark = '';
+                let bgClass = "bg-white dark:bg-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 border border-gray-200 dark:border-gray-600";
+                
                 if (completedTopics && completedTopics[topic]) {
-                    checkmark = `<i class="fas fa-check-circle text-green-500 ml-2"></i>`;
-                    button.className = "w-full bg-green-100 dark:bg-green-900/50 p-2 rounded-lg shadow-md hover:bg-green-200 dark:hover:bg-green-800/60 transition-colors flex items-center justify-center";
-                } else {
-                    button.className = "w-full bg-white dark:bg-gray-700 p-2 rounded-lg shadow-md hover:bg-indigo-100 dark:hover:bg-indigo-800 transition-all transform hover:scale-105 flex items-center justify-center";
+                    checkmark = `<i class="fas fa-check-circle ml-auto text-emerald-500 text-xl"></i>`;
+                    bgClass = "bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800";
                 }
 
-                button.innerHTML = `<span class="text-sm font-semibold">${topic}</span> ${checkmark}`;
+                button.className = `w-full text-left p-4 rounded-xl shadow-sm transition-all transform hover:scale-[1.02] flex items-center ${bgClass}`;
+                button.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mr-3 text-indigo-600 dark:text-indigo-400">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div>
+                            <span class="block font-bold text-gray-800 dark:text-white">${topic}</span>
+                        </div>
+                    </div>
+                    ${checkmark}
+                `;
+                
                 button.dataset.topic = topic;
                 button.addEventListener('click', () => startPractice(topic));
-                topicSelection.appendChild(button);
+                ui.topicSelection.appendChild(button);
+            }
+        }
+        
+        function createMasterList() {
+            masterQuestionList = [];
+            for (const topic in practiceData) {
+                practiceData[topic].forEach(question => {
+                    masterQuestionList.push({ ...question, topicName: topic });
+                });
             }
         }
 
         // --- Core App Logic ---
         function startPractice(topic) {
-            currentQuestions = practiceData[topic];
-            currentQuestions.topicName = topic;
-            currentQuestionIndex = 0;
-            welcomeScreen.classList.add('hidden');
-            practiceScreen.classList.remove('hidden');
-            certificateScreen.classList.add('hidden');
+            const startIndex = masterQuestionList.findIndex(q => q.topicName === topic);
+            currentQuestionIndex = (startIndex !== -1) ? startIndex : 0;
+            currentQuestions = masterQuestionList;
+            
+            ui.welcomeScreen.classList.add('hidden');
+            ui.practiceScreen.classList.remove('hidden');
+            ui.certificateScreen.classList.add('hidden');
+            ui.nextBtn.classList.remove('hidden');
+            ui.samplesBtn.classList.remove('hidden');
             showQuestion();
         }
 
         function showQuestion() {
+            // Track completion of previous topic
+            if (currentQuestionIndex > 0) {
+                const prevQuestion = currentQuestions[currentQuestionIndex - 1];
+                const currentQuestion = currentQuestions[currentQuestionIndex];
+                if (currentQuestion && prevQuestion.topicName !== currentQuestion.topicName) {
+                    if (!completedTopics[prevQuestion.topicName]) {
+                        completedTopics[prevQuestion.topicName] = true;
+                        saveProgress();
+                    }
+                }
+            }
+
+            // End of all questions
             if (currentQuestionIndex >= currentQuestions.length) {
-                phaseIndicator.textContent = "Topic Complete!";
-                questionText.textContent = "You've finished this topic. Well done!";
-                completedTopics[currentQuestions.topicName] = true;
-                saveProgress();
-                checkAllTopicsCompleted();
-                resetRecordingUI();
-                nextBtn.classList.add('hidden');
-                speak("You've completed this topic! Well done.");
+                if (currentQuestions.length > 0) {
+                    const lastTopicName = currentQuestions[currentQuestions.length - 1].topicName;
+                      if (!completedTopics[lastTopicName]) {
+                        completedTopics[lastTopicName] = true;
+                        saveProgress();
+                    }
+                }
+                showCertificate();
                 return;
             }
+
+            ui.nextBtn.disabled = true;
 
             const item = currentQuestions[currentQuestionIndex];
             resetUIForNewQuestion();
             
+            // Format question text
             let fullQuestion = (item.intro ? item.intro + " " : "") + item.question;
-            questionText.textContent = fullQuestion;
-            questionText.classList.add('fade-in');
-            setTimeout(() => questionText.classList.remove('fade-in'), 500);
+            ui.questionText.textContent = fullQuestion;
+            ui.questionText.classList.add('fade-in');
+            setTimeout(() => ui.questionText.classList.remove('fade-in'), 500);
 
             speak(fullQuestion);
             
-            // Populate Sentence Starters
+            // Populate Starters
             if (item.starters && item.starters.length > 0) {
-                startersList.innerHTML = '';
+                ui.startersList.innerHTML = '';
                 item.starters.forEach(starter => {
-                    const button = document.createElement('button');
-                    button.className = 'bg-indigo-500 text-white text-sm font-medium px-2.5 py-1 rounded-full dark:bg-indigo-600 dark:text-white cursor-default';
-                    button.textContent = starter;
-                    startersList.appendChild(button);
+                    const span = document.createElement('span');
+                    span.className = 'bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1.5 rounded-lg dark:bg-indigo-900 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800';
+                    span.textContent = starter;
+                    ui.startersList.appendChild(span);
                 });
-                startersContainer.classList.remove('hidden');
+                ui.startersContainer.classList.remove('hidden');
             }
 
             // Populate Word Bank
             if (item.wordBank && item.wordBank.length > 0) {
-                wordBankList.innerHTML = '';
+                ui.wordBankList.innerHTML = '';
                 item.wordBank.forEach(word => {
-                    const button = document.createElement('button');
-                    button.className = 'bg-green-500 text-white text-sm font-medium px-2.5 py-1 rounded-full dark:bg-green-600 dark:text-white cursor-default';
-                    button.textContent = word;
-                    wordBankList.appendChild(button);
+                    const span = document.createElement('span');
+                    span.className = 'bg-emerald-100 text-emerald-800 text-xs font-medium px-2.5 py-1.5 rounded-lg dark:bg-emerald-900 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+                    span.textContent = word;
+                    ui.wordBankList.appendChild(span);
                 });
-                wordBankContainer.classList.remove('hidden');
+                ui.wordBankContainer.classList.remove('hidden');
             }
 
-            const responseTime = item.timer || DEFAULT_RESPONSE_TIME;
-            phaseIndicator.textContent = `Prepare & Record (Question ${currentQuestionIndex + 1} of ${currentQuestions.length})`;
-            startTimer(responseTime, showSampleAnswersAndStartReadTimer);
-        }
-
-        function showSampleAnswersAndStartReadTimer() {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                stopRecording();
-            }
+            ui.phaseIndicator.textContent = `${item.topicName} • ${currentQuestionIndex + 1}/${currentQuestions.length}`;
             
-            phaseIndicator.textContent = "Review";
-            recordBtn.disabled = true;
-            recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
-
-            const item = currentQuestions[currentQuestionIndex];
-            if (item.samples && item.samples.length > 0) {
-                samplesList.innerHTML = '';
-                item.samples.forEach(sample => {
-                    const li = document.createElement('li');
-                    li.textContent = sample;
-                    // Changed to white text as requested
-                    li.className = 'text-white text-sm sm:text-base';
-                    samplesList.appendChild(li);
-                });
-                samplesContainer.classList.remove('hidden');
-            }
-
-
-            startTimer(READ_TIME, () => {
-                phaseIndicator.textContent = "Time's up!";
-                nextBtn.classList.remove('hidden');
+            const responseTime = item.timer || DEFAULT_RESPONSE_TIME;
+            startTimer(responseTime, () => {
+                if (mediaRecorder && mediaRecorder.state === 'recording') {
+                    stopRecording();
+                }
+                ui.recordBtn.disabled = true;
+                ui.recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                ui.pauseResumeBtn.classList.add('hidden');
+                ui.nextBtn.disabled = false;
+                
+                // Audio cue that time is up (optional)
+                const ding = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU'); // Placeholder
             });
         }
         
-        // --- Certificate Logic ---
-        function checkAllTopicsCompleted() {
-            const totalTopics = Object.keys(practiceData).length;
-            const completedCount = Object.keys(completedTopics).length;
-            if (completedCount === totalTopics) {
-                showCertificate();
-            }
-        }
-        
         function showCertificate() {
-            practiceScreen.classList.add('hidden');
-            welcomeScreen.classList.add('hidden');
-            certificateScreen.classList.remove('hidden');
+            ui.practiceScreen.classList.add('hidden');
+            ui.welcomeScreen.classList.add('hidden');
+            ui.certificateScreen.classList.remove('hidden');
             document.getElementById('certificate-name').textContent = userName;
             document.getElementById('certificate-date').textContent = new Date().toLocaleDateString();
+            speak(`Congratulations ${userName}. You have completed all the QA14 speaking topics!`);
         }
         
         function showErrorMessage(message) {
-            errorMessagebox.textContent = message;
-            errorMessagebox.classList.remove('hidden');
+            ui.errorMessagebox.textContent = message;
+            ui.errorMessagebox.classList.remove('hidden');
             setTimeout(() => {
-                errorMessagebox.classList.add('hidden');
-            }, 5000); // Hide after 5 seconds
+                ui.errorMessagebox.classList.add('hidden');
+            }, 5000);
         }
 
         // --- Recording & Transcription Logic ---
@@ -721,10 +642,9 @@
             }
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                
-                const isEdge = window.navigator.userAgent.includes("Edg");
+                const isMobileEdge = /Edg\/\d+.*Android/.test(navigator.userAgent);
                 let options = {};
-                if (!isEdge) {
+                if (!isMobileEdge) {
                     const mimeTypes = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/ogg'];
                     const supportedType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
                     if (supportedType) options.mimeType = supportedType;
@@ -732,11 +652,10 @@
                 
                 mediaRecorder = new MediaRecorder(stream, options);
                 mediaRecorder.start();
-                startTranscription();
 
-                recordBtn.classList.add('hidden');
-                stopRecordBtn.classList.remove('hidden');
-                recordingStatus.classList.remove('hidden');
+                ui.recordBtn.classList.add('hidden');
+                ui.stopRecordBtn.classList.remove('hidden');
+                ui.recordingStatus.classList.remove('hidden');
 
                 audioChunks = [];
                 mediaRecorder.addEventListener("dataavailable", event => {
@@ -746,15 +665,16 @@
                 mediaRecorder.addEventListener("stop", () => {
                     recordedBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
                     const audioUrl = URL.createObjectURL(recordedBlob);
-                    audioPlayer.src = audioUrl;
-                    postRecordingActions.classList.remove('hidden');
-                    recordingStatus.classList.add('hidden');
-                    stopRecordBtn.classList.add('hidden');
-                    recordBtn.classList.add('hidden');
+                    ui.audioPlayer.src = audioUrl;
+                    ui.postRecordingActions.classList.remove('hidden');
+                    ui.recordingStatus.classList.add('hidden');
+                    ui.stopRecordBtn.classList.add('hidden');
+                    ui.recordBtn.classList.add('hidden');
+                    ui.nextBtn.disabled = false;
                 });
             } catch (err) {
                 console.error("Error starting recording:", err);
-                showErrorMessage("Could not start audio recording. Please grant microphone permission.");
+                showErrorMessage("Microphone access denied. Please check your browser settings.");
             }
         }
 
@@ -762,41 +682,29 @@
             if (mediaRecorder) {
                 mediaRecorder.stop();
             }
-            if (speechRecognition) {
-                speechRecognition.stop();
-            }
         }
+        
+        // --- Confirmation Modal ---
+        function showConfirmationModal(title, message, onConfirm) {
+            ui.modalTitle.textContent = title;
+            ui.modalMessage.textContent = message;
+            ui.modal.classList.remove('hidden');
 
-        function startTranscription() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                console.warn("Speech recognition not supported.");
-                return;
-            }
-
-            speechRecognition = new SpeechRecognition();
-            speechRecognition.continuous = true;
-            speechRecognition.interimResults = true;
-            speechRecognition.lang = 'en-US';
-            finalTranscript = '';
-
-            speechRecognition.onresult = (event) => {
-                let interimTranscript = '';
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript;
-                    } else {
-                        interimTranscript += event.results[i][0].transcript;
-                    }
-                }
+            const confirmHandler = () => {
+                onConfirm();
+                hide();
             };
-            
-            speechRecognition.onerror = (event) => {
-                 console.error('Speech recognition error detected: ' + event.error);
-            }
 
-            speechRecognition.start();
+            const hide = () => {
+                ui.modal.classList.add('hidden');
+                ui.modalConfirmBtn.removeEventListener('click', confirmHandler);
+                ui.modalCancelBtn.removeEventListener('click', hide);
+            };
+
+            ui.modalConfirmBtn.addEventListener('click', confirmHandler);
+            ui.modalCancelBtn.addEventListener('click', hide);
         }
+
 
         // --- Timer Functions ---
         function startTimer(duration, onEndCallback) {
@@ -805,190 +713,208 @@
             updateTimerDisplay(timeLeft, duration);
 
             timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay(timeLeft, duration);
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    if(onEndCallback) onEndCallback();
+                if (!isTimerPaused) {
+                    timeLeft--;
+                    updateTimerDisplay(timeLeft, duration);
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        if(onEndCallback) onEndCallback();
+                    }
                 }
             }, 1000);
+        }
+
+        function togglePauseTimer() {
+            isTimerPaused = !isTimerPaused;
+            if (isTimerPaused) {
+                ui.pauseResumeBtn.innerHTML = '<i class="fas fa-play"></i>';
+                ui.pauseResumeBtn.classList.add('text-green-600');
+            } else {
+                ui.pauseResumeBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                ui.pauseResumeBtn.classList.remove('text-green-600');
+            }
         }
 
         function updateTimerDisplay(timeLeft, totalDuration) {
             const minutes = Math.floor(timeLeft / 60);
             let seconds = timeLeft % 60;
             if (seconds < 10) seconds = `0${seconds}`;
-            timerDisplay.textContent = `${minutes}:${seconds}`;
+            ui.timerDisplay.textContent = `${minutes}:${seconds}`;
             
             const fraction = timeLeft / totalDuration;
             const offset = fraction * FULL_DASH_ARRAY;
-            timerProgress.style.strokeDashoffset = FULL_DASH_ARRAY - offset;
+            ui.timerProgress.style.strokeDashoffset = FULL_DASH_ARRAY - offset;
+            
+            // Change color based on time left
+            if (timeLeft <= 10) {
+                ui.timerProgress.classList.add('text-red-500');
+                ui.timerProgress.classList.remove('text-indigo-500');
+            } else {
+                ui.timerProgress.classList.add('text-indigo-500');
+                ui.timerProgress.classList.remove('text-red-500');
+            }
         }
 
         // --- UI Helper Functions ---
         function resetUIForNewQuestion() {
-            samplesContainer.classList.add('hidden');
-            startersContainer.classList.add('hidden');
-            wordBankContainer.classList.add('hidden');
-            nextBtn.classList.add('hidden');
-            errorMessagebox.classList.add('hidden');
-            recordBtn.disabled = false;
-            recordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            ui.samplesContainer.classList.add('hidden');
+            ui.startersContainer.classList.add('hidden');
+            ui.wordBankContainer.classList.add('hidden');
+            ui.errorMessagebox.classList.add('hidden');
+            ui.recordBtn.disabled = false;
+            ui.recordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             resetRecordingUI();
+            
+            isTimerPaused = false;
+            ui.pauseResumeBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            ui.pauseResumeBtn.classList.remove('hidden', 'text-green-600');
+            ui.timerProgress.classList.add('text-indigo-500');
         }
 
         function resetRecordingUI() {
-            recordBtn.classList.remove('hidden');
-            stopRecordBtn.classList.add('hidden');
-            recordingStatus.classList.add('hidden');
-            postRecordingActions.classList.add('hidden');
-            audioPlayer.src = '';
+            ui.recordBtn.classList.remove('hidden');
+            ui.stopRecordBtn.classList.add('hidden');
+            ui.recordingStatus.classList.add('hidden');
+            ui.postRecordingActions.classList.add('hidden');
+            ui.audioPlayer.src = '';
             audioChunks = [];
             recordedBlob = null;
-            finalTranscript = '';
         }
-
-        // --- Theme Toggle Logic ---
-        const applyTheme = (theme) => {
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                themeToggleLightIcon.classList.remove('hidden');
-                themeToggleDarkIcon.classList.add('hidden');
-            } else {
-                document.documentElement.classList.remove('dark');
-                themeToggleDarkIcon.classList.remove('hidden');
-                themeToggleLightIcon.classList.add('hidden');
-            }
-        };
-        
-        // --- Snowfall Logic ---
-        function createSnow() {
-            const snowContainer = document.getElementById('snow-container');
-            const snowflakeCount = 50;
-            for (let i = 0; i < snowflakeCount; i++) {
-                let snowflake = document.createElement('div');
-                snowflake.innerHTML = '❄';
-                snowflake.classList.add('snowflake');
-                snowflake.style.left = Math.random() * 100 + 'vw';
-                snowflake.style.animationDuration = Math.random() * 5 + 5 + 's'; // 5-10 seconds
-                snowflake.style.animationDelay = Math.random() * 5 + 's';
-                snowflake.style.fontSize = Math.random() * 1.5 + 0.5 + 'em';
-                snowflake.style.opacity = Math.random();
-                snowContainer.appendChild(snowflake);
-            }
-        }
-
 
         // --- Event Listeners ---
-        startWithNameBtn.addEventListener('click', () => {
-            userName = nameInput.value.trim();
+        ui.startWithNameBtn.addEventListener('click', () => {
+            userName = ui.nameInput.value.trim();
             if (userName) {
                 saveProgress();
-                nameEntryContainer.classList.add('hidden');
-                userNameDisplay.textContent = userName;
-                topicSelectionContainer.classList.remove('hidden');
+                ui.nameEntryContainer.classList.add('hidden');
+                ui.userNameDisplay.textContent = userName;
+                ui.topicSelectionContainer.classList.remove('hidden');
+                initializeTopics();
             } else {
-                // Using a custom message box instead of alert()
-                const nameError = document.createElement('div');
-                nameError.textContent = "Please enter your name.";
-                nameError.className = "text-red-500 text-sm mt-2";
-                startWithNameBtn.insertAdjacentElement('afterend', nameError);
-                setTimeout(() => nameError.remove(), 2000);
+                ui.nameInput.classList.add('ring-2', 'ring-red-500');
+                setTimeout(() => ui.nameInput.classList.remove('ring-2', 'ring-red-500'), 1000);
             }
         });
 
-        recordBtn.addEventListener('click', startRecording);
-        stopRecordBtn.addEventListener('click', stopRecording);
+        ui.recordBtn.addEventListener('click', startRecording);
+        ui.stopRecordBtn.addEventListener('click', stopRecording);
+        ui.pauseResumeBtn.addEventListener('click', togglePauseTimer);
         
-        downloadCertificateBtn.addEventListener('click', () => {
-            const certificateNode = document.getElementById('certificate-to-download');
-            html2canvas(certificateNode, { scale: 2 }).then(canvas => {
-                const a = document.createElement('a');
-                a.href = canvas.toDataURL('image/png');
-                a.download = `Certificate_of_Completion_${userName.replace(/\s+/g, '_')}.png`;
-                a.click();
+        ui.downloadCertificateBtn.addEventListener('click', () => {
+          const certificateNode = document.getElementById('certificate-to-download');
+          // Simple detection for mobile devices where auto-download might be blocked
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          
+          html2canvas(certificateNode, { scale: 2 }).then(canvas => {
+            canvas.toBlob(blob => {
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `Certificate_${userName.replace(/\s+/g, '_')}.png`;
+              
+              if (isMobile) {
+                  // Open in new tab for mobile so they can long-press save
+                  const newWindow = window.open(url, '_blank');
+                  if (!newWindow) alert('Please allow popups to download the certificate.');
+              } else {
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+              }
+              setTimeout(() => URL.revokeObjectURL(url), 100);
             });
+          });
         });
 
-        backToMainMenuBtn.addEventListener('click', () => {
-            certificateScreen.classList.add('hidden');
-            welcomeScreen.classList.remove('hidden');
+        ui.backToMainMenuBtn.addEventListener('click', () => {
+            ui.certificateScreen.classList.add('hidden');
+            ui.welcomeScreen.classList.remove('hidden');
+            ui.nameEntryContainer.classList.add('hidden');
+            ui.topicSelectionContainer.classList.remove('hidden');
             initializeTopics();
         });
 
-        downloadBtn.addEventListener('click', () => {
+        ui.downloadBtn.addEventListener('click', () => {
             if (recordedBlob) {
-                const topicName = currentQuestions.topicName.replace(/\s+/g, '_');
+                const topicName = currentQuestions[currentQuestionIndex].topicName.replace(/\s+/g, '_');
                 const sanitizedUserName = userName.replace(/\s+/g, '_');
-                const fileName = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
+                const fileNameAudio = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.mp3`; // Naming it MP3 for compatibility though it is webm
+                const blobUrl = URL.createObjectURL(recordedBlob);
                 
                 const a = document.createElement('a');
                 a.style.display = 'none';
-                a.href = URL.createObjectURL(recordedBlob);
-                a.download = fileName;
+                a.href = blobUrl;
+                a.download = fileNameAudio;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-
+                
                 // Visual feedback
-                const originalText = downloadBtn.innerHTML;
-                downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
-                downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                downloadBtn.classList.add('bg-green-600');
+                const btnContent = ui.downloadBtn.innerHTML;
+                ui.downloadBtn.innerHTML = `<i class="fas fa-check"></i> Saved`;
+                ui.downloadBtn.classList.replace('bg-blue-600', 'bg-green-600');
                 setTimeout(() => {
-                    downloadBtn.innerHTML = originalText;
-                    downloadBtn.classList.remove('bg-green-600');
-                    downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                    ui.downloadBtn.innerHTML = btnContent;
+                    ui.downloadBtn.classList.replace('bg-green-600', 'bg-blue-600');
+                    URL.revokeObjectURL(blobUrl);
                 }, 2000);
             }
         });
 
-        nextBtn.addEventListener('click', () => {
+        ui.nextBtn.addEventListener('click', () => {
+            ui.nextBtn.disabled = true;
             currentQuestionIndex++;
             showQuestion();
         });
 
-        backToTopicsBtn.addEventListener('click', () => {
-            practiceScreen.classList.add('hidden');
-            welcomeScreen.classList.remove('hidden');
-            clearInterval(timerInterval);
-            initializeTopics();
-        });
-        
-        themeToggleBtn.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
-            applyTheme(isDark ? 'dark' : 'light');
+        ui.backToTopicsBtn.addEventListener('click', () => {
+            showConfirmationModal(
+                'Return to Topics?',
+                'Progress on the current topic will be lost.',
+                () => {
+                    ui.practiceScreen.classList.add('hidden');
+                    ui.welcomeScreen.classList.remove('hidden');
+                    clearInterval(timerInterval);
+                    if (synth && synth.speaking) synth.cancel();
+                    if (mediaRecorder && mediaRecorder.state === 'recording') stopRecording();
+                    initializeTopics();
+                }
+            );
         });
 
+        ui.samplesBtn.addEventListener('click', () => {
+            if (!ui.samplesContainer.classList.contains('hidden')) {
+                ui.samplesContainer.classList.add('hidden');
+                return;
+            }
+
+            const currentTopicName = masterQuestionList[currentQuestionIndex].topicName;
+            const item = currentQuestions[currentQuestionIndex];
+
+            ui.samplesList.innerHTML = ''; 
+            if (item.samples && item.samples.length > 0) {
+                item.samples.forEach(sample => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fas fa-quote-left text-amber-500 mr-2 text-xs"></i>${sample}`;
+                    li.className = 'mb-2 pb-2 border-b border-gray-100 dark:border-gray-700 last:border-0 last:mb-0 last:pb-0';
+                    ui.samplesList.appendChild(li);
+                });
+            } else {
+                 ui.samplesList.innerHTML = '<li>No sample answers available for this question.</li>';
+            }
+            ui.samplesContainer.classList.remove('hidden');
+        });
+        
         // --- Initial Load ---
         async function main() {
-            // Set initial theme
-            const savedTheme = localStorage.getItem('color-theme');
-            if (savedTheme) {
-                applyTheme(savedTheme);
-            } else {
-                // If no theme saved, use system preference
-                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    applyTheme('dark');
-                } else {
-                    applyTheme('light');
-                }
-            }
-            
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !SpeechRecognition) {
-                recordBtn.disabled = true;
-                recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                recordBtn.title = "Audio recording or recognition is not supported on this browser.";
-            }
-            if (!window.speechSynthesis) {
-                 console.warn("Text-to-speech is not supported on this browser.");
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+                ui.recordBtn.disabled = true;
+                ui.recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
             }
             
             await initializeTTS().catch(err => console.error(err));
             
-            createSnow();
+            createMasterList();
             loadProgress();
             initializeTopics();
         }
