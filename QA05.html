@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Joel's Speaking Practice 05</title>
+    <title>QA05 Speaking Practice</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -47,40 +47,53 @@
         audio::-webkit-media-controls-panel {
             padding: 5px;
         }
-        audio::-webkit-media-controls-play-button,
-        audio::-webkit-media-controls-timeline,
-        audio::-webkit-media-controls-current-time-display,
-        audio::-webkit-media-controls-time-remaining-display {
-            margin: 0 2px;
+        /* Improve scrolling on mobile */
+        .scroll-container {
+            scrollbar-width: thin;
+            scrollbar-color: #4f46e5 #e5e7eb;
         }
-        /* Make sure app content is above the background */
-        #app-container {
-            position: relative;
-            z-index: 10;
+        .scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scroll-container::-webkit-scrollbar-track {
+            background: #e5e7eb;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background-color: #4f46e5;
+            border-radius: 20px;
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gradient-to-br dark:from-gray-900 dark:via-indigo-900 dark:to-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
+<body class="bg-gray-100 dark:bg-gradient-to-br dark:from-slate-900 dark:via-blue-900 dark:to-slate-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
     
-    <div id="app-container" class="w-full max-w-xl mx-auto text-center h-full">
+    <div id="app-container" class="w-full max-w-xl mx-auto text-center h-full relative z-10">
         
         <!-- Welcome Screen -->
         <div id="welcome-screen" class="bg-white dark:bg-gray-800 dark:shadow-lg p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center">
             <div id="name-entry-container">
-                <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">Joel's Speaking Practice 05</h1>
-                <input type="text" id="name-input" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 text-center text-lg text-gray-900 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                <button id="start-with-name-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg text-xl shadow-md">Start</button>
-            </div>
-            <div id="topic-selection-container" class="hidden">
-                 <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">Hello, <span id="user-name-display"></span>!</h1>
-                 <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                         <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Try to speak until the time runs out. You can use the sentence starters and word bank for help.</p>
-                         <p><i class="fas fa-download mr-2 text-blue-500"></i>After recording, download your answer and upload it. If the upload doesn't work, save the downloaded files.</p>
-                         <p><i class="fas fa-award mr-2 text-yellow-500"></i>You must complete all 9 topics to get the Certificate of Completion as proof you finished the homework.</p>
-                 </div>
-                <div id="topic-selection" class="grid grid-cols-3 gap-4">
-                    <!-- Topic buttons will be injected here -->
+                <div class="mb-6">
+                    <i class="fas fa-microphone-lines text-5xl text-indigo-600 dark:text-indigo-400 mb-2"></i>
                 </div>
+                <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">QA05 Practice</h1>
+                <p class="mb-6 text-gray-600 dark:text-gray-400 text-sm">Enter your name to begin session QA05.</p>
+                <input type="text" id="name-input" placeholder="Your Name" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 text-center text-lg text-gray-900 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                <button id="start-with-name-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg text-xl shadow-md transition-transform active:scale-95">Start QA05</button>
+            </div>
+
+            <div id="topic-selection-container" class="hidden h-full flex flex-col">
+                 <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 flex-shrink-0">Hello, <span id="user-name-display"></span>!</h1>
+                 
+                 <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg flex-shrink-0 border border-gray-200 dark:border-gray-700">
+                      <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Speak until the timer runs out.</p>
+                      <p><i class="fas fa-lightbulb mr-2 text-yellow-500"></i>Use the sentence starters for help.</p>
+                      <p><i class="fas fa-download mr-2 text-blue-500"></i>Download your recording after speaking.</p>
+                 </div>
+                 
+                 <div class="flex-grow overflow-y-auto scroll-container pr-1">
+                    <div id="topic-selection" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">
+                        <!-- Topic buttons will be injected here -->
+                    </div>
+                 </div>
             </div>
         </div>
 
@@ -89,127 +102,153 @@
             <header class="flex-shrink-0">
                 <div class="flex justify-between items-center mb-2">
                     <div class="w-1/3 text-left">
-                         <button id="back-to-topics-btn" class="text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-1 px-3 rounded-lg shadow-sm">
-                            <i class="fas fa-arrow-left mr-2"></i>Topics
-                        </button>
+                         <button id="back-to-topics-btn" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-1.5 px-3 rounded-lg shadow-sm transition-colors">
+                             <i class="fas fa-arrow-left mr-1"></i>Topics
+                         </button>
                     </div>
                     <div class="w-1/3 text-center">
-                         <button id="samples-btn" class="hidden text-sm bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg shadow-md">
-                             <i class="fas fa-comment-dots mr-1"></i>Sample Answers
+                         <button id="samples-btn" class="hidden text-xs sm:text-sm bg-amber-500 hover:bg-amber-600 text-white font-bold py-1.5 px-3 rounded-lg shadow-md transition-colors">
+                             <i class="fas fa-lightbulb mr-1"></i>Ideas
                          </button>
                     </div>
                     <div class="w-1/3 text-right">
-                         <button id="next-btn" class="hidden text-sm bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 rounded-lg shadow-sm disabled:bg-indigo-400 dark:disabled:bg-indigo-800 disabled:cursor-not-allowed">
-                            Next<i class="fas fa-arrow-right ml-2"></i>
-                        </button>
+                         <button id="next-btn" class="hidden text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 px-3 rounded-lg shadow-sm disabled:bg-indigo-400 dark:disabled:bg-indigo-800 disabled:cursor-not-allowed transition-colors">
+                             Next<i class="fas fa-arrow-right ml-1"></i>
+                         </button>
                     </div>
                 </div>
+
                 <!-- Timer Display -->
                 <div class="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-2 flex-shrink-0">
                     <svg class="w-full h-full" viewBox="0 0 100 100">
-                        <circle class="text-gray-200 dark:text-gray-700" stroke-width="10" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
-                        <circle id="timer-progress" class="timer-circle text-indigo-500" stroke-width="10" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                        <circle class="text-gray-200 dark:text-gray-700" stroke-width="8" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                        <circle id="timer-progress" class="timer-circle text-indigo-500" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
                     </svg>
-                    <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-2xl font-bold"></div>
-                </div>
-                <p id="phase-indicator" class="font-semibold text-indigo-500 dark:text-indigo-400 mb-2 text-base flex-shrink-0"></p>
-
-                <!-- Question Display -->
-                <div id="question-container" class="min-h-[50px] flex items-center justify-center mb-2">
-                    <h2 id="question-text" class="text-base sm:text-lg font-semibold leading-relaxed text-left w-full"></h2>
+                    <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-2xl font-bold font-mono"></div>
+                    <button id="pause-resume-btn" class="hidden absolute bottom-0 right-0 w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm shadow-md z-20 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
+                        <i class="fas fa-pause"></i>
+                    </button>
                 </div>
                 
-                <div id="error-message-box" class="hidden text-red-500 bg-red-100 dark:bg-red-900/50 p-2 rounded-lg text-sm mb-2"></div>
+                <p id="phase-indicator" class="font-semibold text-indigo-600 dark:text-indigo-400 mb-1 text-sm uppercase tracking-wide flex-shrink-0"></p>
+
+                <!-- Question Display -->
+                <div id="question-container" class="min-h-[60px] flex items-center justify-center mb-2 bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-xl border border-indigo-100 dark:border-indigo-800">
+                    <h2 id="question-text" class="text-base sm:text-lg font-bold leading-snug text-center w-full text-gray-800 dark:text-gray-100"></h2>
+                </div>
+                
+                <div id="error-message-box" class="hidden text-red-500 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-2 rounded-lg text-xs mb-2"></div>
 
                 <!-- Recording Action Buttons -->
-                <div id="recording-actions-container" class="flex flex-col items-center justify-center mb-2">
+                <div id="recording-actions-container" class="flex flex-col items-center justify-center mb-1">
                     <!-- Initial Record Button -->
-                    <button id="record-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold w-14 h-14 rounded-full text-xl shadow-md transition-transform transform hover:scale-105 flex items-center justify-center">
+                    <button id="record-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold w-14 h-14 rounded-full text-xl shadow-lg shadow-red-500/30 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center">
                         <i class="fas fa-microphone"></i>
                     </button>
                     <!-- Stop Button -->
-                    <button id="stop-record-btn" class="hidden bg-gray-700 hover:bg-gray-800 text-white font-bold w-14 h-14 rounded-full text-xl shadow-md flex items-center justify-center">
+                    <button id="stop-record-btn" class="hidden bg-gray-800 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-bold w-14 h-14 rounded-full text-xl shadow-lg flex items-center justify-center transition-all active:scale-95">
                         <i class="fas fa-stop"></i>
                     </button>
+                    
                     <!-- Post-Recording Controls -->
-                    <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-2">
-                        <audio id="audio-player" controls class="w-full max-w-xs"></audio>
-                        <div class="flex flex-col gap-3 w-full max-w-xs">
-                            <!-- Smart Download button -->
+                    <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-1">
+                        <audio id="audio-player" controls class="w-full max-w-xs h-8"></audio>
+                        <div class="flex gap-2 w-full max-w-xs">
+                            <!-- Download button -->
                             <button id="download-btn"
-                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-blue-500/50 focus:ring-2 focus:ring-blue-400 focus:outline-none active:scale-95 flex items-center justify-center">
-                                <i class="fas fa-download mr-1"></i>Download Recording
+                                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 rounded-lg text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                                 <i class="fas fa-download"></i> Save MP3
                             </button>
                             
-                            <!-- Upload button -->
-                            <a id="sharepoint-upload-link"
-                               href="https://xichengacademy-my.sharepoint.com/:f:/g/personal/joelmitchell_xichengacademy_cn/EjxMFg8-baNEo5uuWUBc4EoBzn1DVWJ1Ym_NFx6hPlJ0dQ"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-md transition-all duration-200 ease-in-out hover:shadow-lg hover:shadow-green-500/50 focus:ring-2 focus:ring-green-400 focus:outline-none active:scale-95 flex items-center justify-center">
-                                <i class="fas fa-upload mr-1"></i>Upload to Folder
+                            <!-- Upload/Share button (Example Link) -->
+                            <a id="upload-link"
+                               href="#" 
+                               onclick="alert('Please configure the upload link in the code!'); return false;"
+                               class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-3 rounded-lg text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                                 <i class="fas fa-cloud-upload-alt"></i> Upload
                             </a>
                         </div>
                     </div>
                 </div>
-                 <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold mb-1">
-                     <div class="w-2 h-2 bg-red-500 rounded-full mr-2 recording-indicator"></div>
-                     Recording...
+                 <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold text-xs animate-pulse">
+                      <div class="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                      Recording in progress...
                  </div>
             </header>
             
-            <main class="flex-grow flex flex-col overflow-y-auto min-h-0 space-y-2 pt-2">
+            <main class="flex-grow flex flex-col overflow-y-auto scroll-container min-h-0 space-y-3 pt-2 px-1">
                  <!-- Sentence Starters -->
-                <div id="starters-container" class="hidden text-left">
-                    <h3 class="text-sm font-bold mb-1 text-center">Sentence Starters</h3>
-                    <div id="starters-list" class="flex flex-wrap gap-2 justify-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">
+                <div id="starters-container" class="hidden text-left bg-white dark:bg-gray-700/30 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                    <h3 class="text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Sentence Starters</h3>
+                    <div id="starters-list" class="flex flex-wrap gap-2">
                         <!-- Buttons will be injected here -->
                     </div>
                 </div>
 
                 <!-- Word Bank -->
-                <div id="word-bank-container" class="hidden text-left">
-                    <h3 class="text-sm font-bold mb-1 text-center">Word Bank</h3>
-                    <div id="word-bank-list" class="flex flex-wrap gap-2 justify-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">
+                <div id="word-bank-container" class="hidden text-left bg-white dark:bg-gray-700/30 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                    <h3 class="text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Useful Vocabulary</h3>
+                    <div id="word-bank-list" class="flex flex-wrap gap-2">
                         <!-- Buttons will be injected here -->
                     </div>
                 </div>
 
                 <!-- Sample Answers Display -->
                 <div id="samples-container" class="hidden text-left">
-                    <h3 class="text-sm font-bold mb-1 text-center flex-shrink-0">Sample Responses</h3>
-                    <ul id="samples-list" class="space-y-2 list-inside bg-indigo-900/70 dark:bg-indigo-900/90 p-3 rounded-lg max-h-28 sm:max-h-32 overflow-y-auto">
-                    </ul>
+                    <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-3 rounded-xl">
+                        <h3 class="text-xs font-bold uppercase text-amber-600 dark:text-amber-500 mb-2 tracking-wider flex items-center">
+                            <i class="fas fa-star mr-1"></i> Sample Responses
+                        </h3>
+                        <ul id="samples-list" class="space-y-2 list-none text-sm text-gray-700 dark:text-gray-300">
+                        </ul>
+                    </div>
                 </div>
             </main>
         </div>
 
         <!-- Certificate Screen -->
-        <div id="certificate-screen" class="hidden bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center items-center">
-            <div id="certificate-to-download" class="w-full bg-gray-50 dark:bg-gray-700 p-8 rounded-lg border-4 border-yellow-400 dark:border-yellow-500 text-center">
-                <i class="fas fa-award text-6xl text-yellow-500 mb-4"></i>
-                <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Certificate of Completion</h1>
-                <p class="text-lg mt-2 text-gray-600 dark:text-gray-300">This certificate is awarded to</p>
-                <p id="certificate-name" class="text-4xl font-bold my-4 text-indigo-600 dark:text-indigo-400"></p>
-                <p class="text-lg mt-2 text-gray-600 dark:text-gray-300">for successfully completing all 9 speaking practice topics.</p>
-                <p class="text-sm mt-6 text-gray-500 dark:text-gray-400">Issued on: <span id="certificate-date"></span></p>
+        <div id="certificate-screen" class="hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg h-full flex flex-col justify-center items-center">
+            <div id="certificate-to-download" class="w-full bg-slate-50 dark:bg-slate-700 p-6 sm:p-10 rounded-xl border-4 border-double border-yellow-400 dark:border-yellow-500 text-center shadow-inner relative overflow-hidden">
+                <!-- Watermark -->
+                <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+                    <i class="fas fa-award text-9xl"></i>
+                </div>
+                
+                <div class="relative z-10">
+                    <i class="fas fa-crown text-5xl text-yellow-500 mb-4 drop-shadow-sm"></i>
+                    <h1 class="text-2xl sm:text-3xl font-serif font-bold text-gray-800 dark:text-white mb-2">Certificate of Excellence</h1>
+                    <div class="h-1 w-20 bg-yellow-500 mx-auto mb-4"></div>
+                    <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 uppercase tracking-widest mb-4">QA05 Presented To</p>
+                    
+                    <p id="certificate-name" class="text-3xl sm:text-5xl font-bold my-4 text-indigo-700 dark:text-indigo-300 font-serif italic"></p>
+                    
+                    <p class="text-base text-gray-600 dark:text-gray-300">For successfully completing the QA05 speaking practice.</p>
+                    <div class="mt-8 flex justify-center items-center gap-2 text-xs text-gray-400">
+                        <span>Date: <span id="certificate-date"></span></span>
+                        <span>•</span>
+                        <span>Verified</span>
+                    </div>
+                </div>
             </div>
-            <button id="download-certificate-btn" class="mt-6 w-full max-w-xs bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-xl shadow-md">
-                <i class="fas fa-download mr-2"></i>Download Certificate
+            <button id="download-certificate-btn" class="mt-8 w-full max-w-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg text-lg shadow-md transition-all active:scale-95 flex items-center justify-center">
+                <i class="fas fa-file-image mr-2"></i>Download Image
             </button>
-             <button id="back-to-main-menu-btn" class="mt-3 text-sm text-indigo-500 hover:underline">Back to Main Menu</button>
+             <button id="back-to-main-menu-btn" class="mt-4 text-sm text-gray-500 hover:text-indigo-500 transition-colors">Start New Session</button>
         </div>
 
     </div>
 
     <!-- Confirmation Modal -->
-    <div id="confirmation-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 text-center max-w-sm w-full">
-            <h3 id="modal-title" class="text-lg font-bold mb-4">Are you sure?</h3>
-            <p id="modal-message" class="text-gray-600 dark:text-gray-400 mb-6">Returning to the topic list will stop your current practice.</p>
-            <div class="flex justify-center gap-4">
-                <button id="modal-confirm-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg">Yes</button>
-                <button id="modal-cancel-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white">Cancel</button>
+    <div id="confirmation-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 fade-in">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 text-center max-w-sm w-full border border-gray-200 dark:border-gray-700">
+            <div class="mb-4 text-yellow-500 text-4xl">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h3 id="modal-title" class="text-xl font-bold mb-2 dark:text-white">End Session?</h3>
+            <p id="modal-message" class="text-gray-600 dark:text-gray-400 mb-6 text-sm">Returning to the topic list will clear your current progress.</p>
+            <div class="flex justify-center gap-3">
+                <button id="modal-cancel-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 transition-colors">Cancel</button>
+                <button id="modal-confirm-btn" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">End Session</button>
             </div>
         </div>
     </div>
@@ -217,7 +256,10 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- DATA: Questions and Sample Answers for Part 05 ---
+        
+        // ==========================================
+        //  QA05 DATA SECTION
+        // ==========================================
         const practiceData = {
             "Study Habits": [
                 { 
@@ -228,7 +270,7 @@
                         "My best method is to create summary notes after each chapter. Writing things down in my own words helps me to process and remember the information much better.",
                         "I find that doing as many practice tests as possible is the most effective way for me to study. It helps me understand the format of the questions and manage my time during the actual exam.",
                         "I like to use the 'spaced repetition' method with flashcards. Reviewing the material over several days, instead of cramming at the last minute, really helps it stick in my long-term memory."
-                    ] 
+                    ]
                 },
                 { 
                     question: "Do you prefer studying alone or in a group? What are the pros and cons of each?", 
@@ -238,7 +280,7 @@
                         "I prefer studying alone because I can concentrate better without any distractions and go at my own pace without feeling rushed or slowed down by others.",
                         "The good thing about studying in a group is that we can motivate each other and explain difficult concepts to one another. If I don't understand something, a friend can often explain it in a new way.",
                         "While group study can be good for sharing ideas, it can also be very distracting. For deep focus and memorization, I find studying alone to be much more effective."
-                    ] 
+                    ]
                 }
             ],
             "Social Media Trends": [
@@ -248,9 +290,9 @@
                     wordBank: ["viral challenge", "dance trend", "influencers", "memes", "creative videos", "educational content", "time-wasting", "peer pressure", "harmless fun"], 
                     samples: [
                         "A recent trend I've seen is people sharing short videos of their daily study routines. I think it's positive because it can motivate other students to be more organized and disciplined.",
-                        "I've seen many dance challenges on Douyin. I think they are mostly harmless fun and a creative way for people to express themselves, but they can also be very time-consuming.",
+                        "I've seen many dance challenges on social media. I think they are mostly harmless fun and a creative way for people to express themselves, but they can also be very time-consuming.",
                         "In my opinion, some viral challenges can be negative because they can encourage risky or dangerous behavior just for the sake of getting views and likes."
-                    ] 
+                    ]
                 },
                 { 
                     question: "How much influence do social media stars or 'influencers' have on young people today? Is this a good thing?", 
@@ -260,7 +302,7 @@
                         "Influencers have a huge impact, especially on fashion and what products to buy. This can be a good thing if they are honest, but it's bad if they promote low-quality products just for money.",
                         "It can be a good thing when influencers use their platform to raise awareness about important social issues or encourage positive habits like reading or exercising.",
                         "The danger is that many influencers show a perfect and unrealistic lifestyle, which can make young people feel insecure or unhappy with their own lives."
-                    ] 
+                    ]
                 }
             ],
             "Environmental Action": [
@@ -272,7 +314,7 @@
                         "Our school could install separate bins for plastic, paper, and general waste to encourage everyone to recycle more effectively.",
                         "I think it would be effective to have a campaign to save electricity, with posters reminding students and teachers to turn off lights and computers when they leave a room.",
                         "One idea is to reduce the use of single-use plastic in the cafeteria, for example, by encouraging students to bring their own reusable water bottles and containers."
-                    ] 
+                    ]
                 },
                 { 
                     question: "Do you feel that the actions of one person can make a real difference in protecting the environment? Why or why not?", 
@@ -282,7 +324,7 @@
                         "Yes, I believe one person's actions are important. If one person starts recycling, they can influence their family and friends to do the same, creating a ripple effect.",
                         "It might seem like a small thing, but if millions of people decide to use less plastic, then companies will be forced to change their packaging. That is the power of collective action.",
                         "While individual actions are good, I think the biggest problems are caused by large corporations. Therefore, we need stronger government policies to make real, large-scale change."
-                    ] 
+                    ]
                 }
             ],
             "Movies & TV Shows": [
@@ -294,7 +336,7 @@
                         "My favorite movie is 'The Wandering Earth'. I love it because the special effects are amazing, and it's a very exciting and patriotic science fiction story.",
                         "I really enjoy the TV show 'The Longest Day in Chang'an'. The plot is full of suspense and twists, and it gives a beautiful and detailed look at ancient Chinese culture.",
                         "I love the movie 'Forrest Gump'. The story is so heartwarming and inspiring, and the main character is very lovable. It always makes me feel optimistic."
-                    ] 
+                    ]
                 },
                 { 
                     question: "Do you prefer watching movies at home or in the cinema? What are the advantages of each?", 
@@ -304,7 +346,7 @@
                         "I prefer watching movies at home because it's more comfortable and I can pause the movie if I need to take a break. Also, the snacks are much cheaper!",
                         "For big action or science fiction movies, the cinema is definitely better. The huge screen and powerful sound system create a much more immersive experience.",
                         "The atmosphere in a cinema is special. Watching a movie with an audience that laughs or gasps at the same moments makes the experience more fun and memorable."
-                    ] 
+                    ]
                 }
             ],
             "Healthy Lifestyles": [
@@ -316,7 +358,7 @@
                         "It's very difficult because of the amount of homework we have. I try to squeeze in some exercise by playing basketball with friends on the weekend.",
                         "My strategy is to create a strict schedule for myself. I set a specific time to stop studying each night to make sure I get at least seven hours of sleep.",
                         "To balance everything, I have to be very efficient with my time. I try to finish my homework at school so that I have some free time in the evening to relax or do some light exercise."
-                    ] 
+                    ]
                 },
                 { 
                     question: "What is your favorite healthy food or snack that is also delicious?", 
@@ -326,98 +368,13 @@
                         "My favorite healthy snack is a handful of almonds or walnuts. They are crunchy and satisfying, and they give me energy to keep studying.",
                         "I really like eating yogurt with fresh fruits like strawberries or blueberries. It's sweet, so it feels like a treat, but it's also very healthy.",
                         "A delicious and healthy snack I enjoy is cherry tomatoes. They are sweet, juicy, and much better for you than eating a bag of chips."
-                    ] 
-                }
-            ],
-             "Learning English": [
-                { 
-                    question: "What is the most difficult part of learning English for you (e.g., grammar, pronunciation, vocabulary)?", 
-                    starters: ["For me, the hardest part is...", "I always struggle with...", "I find... challenging because...", "Memorizing... is difficult for me."], 
-                    wordBank: ["pronunciation", "verb tenses", "memorizing vocabulary", "listening comprehension", "speaking fluently", "confidence", "practice", "grammar rules"], 
-                    samples: [
-                        "For me, the hardest part is pronunciation. Some sounds in English, like 'th', don't exist in Chinese, so it's very difficult to get them right.",
-                        "I always struggle with memorizing vocabulary. There are so many words, and I often forget them if I don't use them regularly.",
-                        "I find listening comprehension challenging, especially when people speak fast or with different accents. It's hard to catch every word."
-                    ] 
-                },
-                { 
-                    question: "Besides school classes, what is a fun way you like to practice or improve your English?", 
-                    starters: ["A fun way I practice is by...", "I enjoy improving my English through...", "To make it more interesting, I...", "I like to..."], 
-                    wordBank: ["watching American TV shows", "listening to English songs", "reading novels", "playing online games", "language learning apps", "with subtitles", "lyrics"], 
-                    samples: [
-                        "A fun way I practice is by watching American TV shows with English subtitles. It helps me with my listening skills and I learn a lot of casual, everyday phrases.",
-                        "I enjoy listening to English songs and trying to look up and understand the lyrics. It's a great way to learn new vocabulary and idioms.",
-                        "I like to play online video games where I can communicate with players from other countries. It forces me to practice speaking and thinking in English in real-time."
-                    ] 
-                }
-            ],
-            "School Rules": [
-                { 
-                    question: "What is your opinion on wearing school uniforms? Do you think they are a good idea?", 
-                    starters: ["I think school uniforms are a good idea because...", "In my opinion, uniforms are not a good idea because...", "On one hand, they create a sense of...", "On the other hand, they limit..."], 
-                    wordBank: ["equality", "school identity", "limits self-expression", "convenient", "not fashionable", "discipline", "reduces pressure", "sense of belonging"], 
-                    samples: [
-                        "I think school uniforms are a good idea because they promote equality. No one has to worry about having the most fashionable or expensive clothes, so there's less pressure.",
-                        "In my opinion, uniforms are not a good idea because they limit our ability to express our individuality. Clothes are a way to show your personality.",
-                        "They are very convenient for my parents because they don't have to think about what I should wear to school every day, but I find the style very boring."
-                    ] 
-                },
-                { 
-                    question: "If you could change one rule at our school, what would it be and why?", 
-                    starters: ["The rule I would change is...", "I would change it because I believe...", "If we changed this rule, it would improve...", "I don't think the rule about... is fair."], 
-                    wordBank: ["phone policy", "homework load", "break times", "hairstyle rules", "more freedom", "student well-being", "trust students", "modernize"], 
-                    samples: [
-                        "The rule I would change is the strict policy on mobile phones. I believe we should be allowed to use them during breaks to contact parents or look up information.",
-                        "I would change the rule about the length of our lunch break. It's too short, and a longer break would give us more time to relax and recharge before afternoon classes.",
-                        "If I could, I would adjust the amount of homework we get over the holidays. I think holidays should be a real break for students to rest and pursue their hobbies."
-                    ] 
-                }
-            ],
-            "Artificial Intelligence": [
-                { 
-                    question: "How do you think Artificial Intelligence (AI) will change jobs in the future? Are you worried or excited?", 
-                    starters: ["I think AI will change jobs by automating...", "I'm excited about the new possibilities, like...", "I'm a bit worried that AI might...", "It will create new types of jobs that..."], 
-                    wordBank: ["automation", "new jobs", "increase efficiency", "human creativity", "job losses", "new skills", "problem-solving", "data analysis", "collaboration"], 
-                    samples: [
-                        "I think AI will automate many repetitive tasks, which will free up humans to focus on more creative and strategic work. So I am quite excited about it.",
-                        "I'm a bit worried that AI might replace many jobs, leading to unemployment. People will need to learn new skills to work alongside AI.",
-                        "I believe AI will not just take jobs, but also create new jobs that we can't even imagine yet, especially in fields like AI ethics and data science."
-                    ] 
-                },
-                { 
-                    question: "What is one way AI could be used to help students learn better in school?", 
-                    starters: ["AI could help students by creating...", "One useful application of AI in education is...", "Imagine an AI tutor that could...", "It could make learning more..."], 
-                    wordBank: ["personalized learning paths", "instant feedback", "AI tutors", "virtual science experiments", "language practice bots", "adaptive quizzes", "engaging"], 
-                    samples: [
-                        "AI could create personalized learning paths for every student. If you are struggling with a topic, the AI could provide extra exercises, and if you are ahead, it could give you more advanced material.",
-                        "Imagine an AI tutor that is available 24/7. It could answer your homework questions at any time and explain difficult concepts in different ways until you understand.",
-                        "AI could be used for language practice. You could have a conversation with an AI bot that would correct your pronunciation and grammar in real-time, which would be very helpful."
-                    ] 
-                }
-            ],
-            "Personal Goals": [
-                 { 
-                    question: "What is one skill you would like to learn in the next year (not school-related)?", 
-                    starters: ["In the next year, I really want to learn how to...", "A personal goal of mine is to get better at...", "I'd love to master the skill of...", "I'm planning to take up..."], 
-                    wordBank: ["cook a few dishes", "play the ukulele", "basic coding", "photography", "skateboarding", "personal interest", "new challenge", "fun skill"], 
-                    samples: [
-                        "In the next year, I want to learn how to cook a few of my favorite dishes. It's an important life skill, and I want to be able to make them for my family.",
-                        "A personal goal of mine is to learn some basic coding in Python. I think it's a very useful skill for the future, no matter what career I choose.",
-                        "I would love to get better at photography. I want to learn how to take really nice photos of landscapes and people, not just simple snapshots with my phone."
-                    ] 
-                },
-                { 
-                    question: "Describe something you are proud of accomplishing. It can be big or small.", 
-                    starters: ["I was really proud when I...", "Something I accomplished that made me proud was...", "It might seem small, but I was proud when...", "A moment of personal pride for me was..."], 
-                    wordBank: ["won a competition", "helped a friend", "finished a difficult project", "learned a new song", "overcame a fear", "hard work", "dedication", "achievement"], 
-                    samples: [
-                        "I was really proud when I finished a very difficult physics project last semester. I spent weeks on it, and getting a good grade after all that hard work felt amazing.",
-                        "It might seem small, but I was proud of myself for finally learning a difficult song on the piano. It took months of practice, and it was a great feeling to be able to play it perfectly.",
-                        "Something I accomplished that made me proud was when I helped a junior student who was having trouble with their schoolwork. It felt good to be able to use my knowledge to help someone else."
-                    ] 
+                    ]
                 }
             ]
         };
+        // ==========================================
+        //  END OF QA05 DATA
+        // ==========================================
 
         // --- DOM Elements ---
         const ui = {
@@ -456,7 +413,8 @@
             modalTitle: document.getElementById('modal-title'),
             modalMessage: document.getElementById('modal-message'),
             modalConfirmBtn: document.getElementById('modal-confirm-btn'),
-            modalCancelBtn: document.getElementById('modal-cancel-btn')
+            modalCancelBtn: document.getElementById('modal-cancel-btn'),
+            pauseResumeBtn: document.getElementById('pause-resume-btn')
         };
 
 
@@ -466,15 +424,16 @@
         let masterQuestionList = [];
         let currentQuestions = []; 
         let timerInterval;
+        let isTimerPaused = false;
         let mediaRecorder;
         let audioChunks = [];
         let recordedBlob = null;
         let completedTopics = {};
 
         const FULL_DASH_ARRAY = 283;
-        const DEFAULT_RESPONSE_TIME = 60;
+        const DEFAULT_RESPONSE_TIME = 60; // Default time since it wasn't specified in new data
 
-        // --- Text-to-Speech ---
+        // --- Text-to-Speech (Slowed down to 85%) ---
         const synth = window.speechSynthesis;
         let preferredVoice = null;
         let ttsInitialized = false;
@@ -490,23 +449,10 @@
                     const voices = synth.getVoices();
                     if (voices.length === 0) return;
                     
-                    const scoreVoice = (voice) => {
-                        let score = 0;
-                        const name = voice.name.toLowerCase();
-                        if (name.includes('natural')) score += 5;
-                        if (name.includes('brian') || name.includes('emma')) score += 4;
-                        if (name.includes('microsoft')) score += 3;
-                        if (name.includes('google')) score += 2;
-                        if (voice.localService) score += 1;
-                        return score;
-                    };
-
                     const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
-                    if (englishVoices.length > 0) {
-                        englishVoices.sort((a, b) => scoreVoice(b) - scoreVoice(a));
-                        preferredVoice = englishVoices[0];
-                    }
+                    const bestVoice = englishVoices.find(v => v.name.includes("Google") || v.name.includes("Microsoft") || v.name.includes("Natural"));
                     
+                    preferredVoice = bestVoice || englishVoices[0] || voices[0];
                     ttsInitialized = true;
                     resolve();
                 };
@@ -520,50 +466,32 @@
         }
 
         function speak(text) {
-            if (!ttsInitialized || !synth || !text) {
-                console.warn("TTS not ready or text is empty.");
-                return;
-            }
+            if (!ttsInitialized || !synth || !text) return;
 
             try {
-                if (synth.speaking) {
-                    synth.cancel();
-                }
+                if (synth.speaking) synth.cancel();
+                
                 setTimeout(() => {
                     const utterThis = new SpeechSynthesisUtterance(text);
-                    utterThis.onerror = (event) => {
-                        console.error(`SpeechSynthesisUtterance.onerror: ${event.error}`, { text: text });
-                    };
-                    if (preferredVoice) {
-                        utterThis.voice = preferredVoice;
-                    }
+                    if (preferredVoice) utterThis.voice = preferredVoice;
                     utterThis.pitch = 1;
-                    utterThis.rate = 0.85;
+                    utterThis.rate = 0.85; // Slow down speech for secondary students
                     synth.speak(utterThis);
-                }, 100); 
-
+                }, 50); 
             } catch (e) {
-                console.error("Speech synthesis 'speak' function threw an exception:", e);
+                console.error("TTS Error:", e);
             }
         }
 
-        // --- Local Storage ---
+        // --- Local Storage (Updated for QA05) ---
         function loadProgress() {
-            const savedCompletedTopics = localStorage.getItem('languagePracticeCompletedTopics05');
+            const savedCompletedTopics = localStorage.getItem('QA05_CompletedTopics');
             if (savedCompletedTopics) {
                 try {
-                    const parsed = JSON.parse(savedCompletedTopics);
-                    if (typeof parsed === 'object' && parsed !== null) {
-                        completedTopics = parsed;
-                    } else {
-                         completedTopics = {};
-                    }
-                } catch (e) {
-                    console.error("Failed to parse saved progress:", e);
-                    completedTopics = {};
-                }
+                    completedTopics = JSON.parse(savedCompletedTopics) || {};
+                } catch (e) { completedTopics = {}; }
             }
-            const savedName = localStorage.getItem('languagePracticeUserName05');
+            const savedName = localStorage.getItem('QA05_UserName');
             if (savedName) {
                  userName = savedName;
                  ui.nameInput.value = userName;
@@ -571,8 +499,8 @@
         }
 
         function saveProgress() {
-            localStorage.setItem('languagePracticeCompletedTopics05', JSON.stringify(completedTopics));
-            if(userName) localStorage.setItem('languagePracticeUserName05', userName);
+            localStorage.setItem('QA05_CompletedTopics', JSON.stringify(completedTopics));
+            if(userName) localStorage.setItem('QA05_UserName', userName);
         }
 
         // --- UI Initialization & Data Setup ---
@@ -582,14 +510,27 @@
                 const button = document.createElement('button');
                 
                 let checkmark = '';
+                let bgClass = "bg-white dark:bg-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 border border-gray-200 dark:border-gray-600";
+                
                 if (completedTopics && completedTopics[topic]) {
-                    checkmark = `<i class="fas fa-check-circle ml-2 text-blue-500"></i>`;
-                    button.className = "w-full bg-green-100 dark:bg-green-900/50 p-2 rounded-lg shadow-md hover:bg-green-200 dark:hover:bg-green-800/60 transition-colors flex items-center justify-center";
-                } else {
-                    button.className = "w-full bg-white dark:bg-gray-700 p-2 rounded-lg shadow-md hover:bg-indigo-100 dark:hover:bg-indigo-800 transition-all transform hover:scale-105 flex items-center justify-center";
+                    checkmark = `<i class="fas fa-check-circle ml-auto text-emerald-500 text-xl"></i>`;
+                    bgClass = "bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800";
                 }
 
-                button.innerHTML = `<span class="text-sm font-semibold">${topic}</span> ${checkmark}`;
+                button.className = `w-full text-left p-4 rounded-xl shadow-sm transition-all transform hover:scale-[1.02] flex items-center ${bgClass}`;
+                button.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mr-3 text-indigo-600 dark:text-indigo-400">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div>
+                            <span class="block font-bold text-gray-800 dark:text-white">${topic}</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">${practiceData[topic].length} Questions</span>
+                        </div>
+                    </div>
+                    ${checkmark}
+                `;
+                
                 button.dataset.topic = topic;
                 button.addEventListener('click', () => startPractice(topic));
                 ui.topicSelection.appendChild(button);
@@ -620,6 +561,7 @@
         }
 
         function showQuestion() {
+            // Track completion of previous topic
             if (currentQuestionIndex > 0) {
                 const prevQuestion = currentQuestions[currentQuestionIndex - 1];
                 const currentQuestion = currentQuestions[currentQuestionIndex];
@@ -631,19 +573,15 @@
                 }
             }
 
+            // End of all questions
             if (currentQuestionIndex >= currentQuestions.length) {
                 if (currentQuestions.length > 0) {
                     const lastTopicName = currentQuestions[currentQuestions.length - 1].topicName;
-                     if (!completedTopics[lastTopicName]) {
+                      if (!completedTopics[lastTopicName]) {
                         completedTopics[lastTopicName] = true;
                         saveProgress();
                     }
                 }
-                ui.phaseIndicator.textContent = "All topics complete!";
-                ui.questionText.textContent = "You've finished everything. Fantastic work!";
-                speak("You've finished everything. Fantastic work!");
-                ui.nextBtn.classList.add('hidden');
-                ui.samplesBtn.classList.add('hidden');
                 showCertificate();
                 return;
             }
@@ -653,6 +591,7 @@
             const item = currentQuestions[currentQuestionIndex];
             resetUIForNewQuestion();
             
+            // Format question text
             let fullQuestion = (item.intro ? item.intro + " " : "") + item.question;
             ui.questionText.textContent = fullQuestion;
             ui.questionText.classList.add('fade-in');
@@ -660,39 +599,44 @@
 
             speak(fullQuestion);
             
+            // Populate Starters
             if (item.starters && item.starters.length > 0) {
                 ui.startersList.innerHTML = '';
                 item.starters.forEach(starter => {
-                    const button = document.createElement('button');
-                    button.className = 'bg-indigo-500 text-white text-sm font-medium px-2.5 py-1 rounded-full dark:bg-indigo-600 dark:text-white cursor-default';
-                    button.textContent = starter;
-                    ui.startersList.appendChild(button);
+                    const span = document.createElement('span');
+                    span.className = 'bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1.5 rounded-lg dark:bg-indigo-900 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800';
+                    span.textContent = starter;
+                    ui.startersList.appendChild(span);
                 });
                 ui.startersContainer.classList.remove('hidden');
             }
 
+            // Populate Word Bank
             if (item.wordBank && item.wordBank.length > 0) {
                 ui.wordBankList.innerHTML = '';
                 item.wordBank.forEach(word => {
-                    const button = document.createElement('button');
-                    button.className = 'bg-green-500 text-white text-sm font-medium px-2.5 py-1 rounded-full dark:bg-green-600 dark:text-white cursor-default';
-                    button.textContent = word;
-                    ui.wordBankList.appendChild(button);
+                    const span = document.createElement('span');
+                    span.className = 'bg-emerald-100 text-emerald-800 text-xs font-medium px-2.5 py-1.5 rounded-lg dark:bg-emerald-900 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+                    span.textContent = word;
+                    ui.wordBankList.appendChild(span);
                 });
                 ui.wordBankContainer.classList.remove('hidden');
             }
 
-            ui.phaseIndicator.textContent = `${item.topicName} (Question ${currentQuestionIndex + 1} of ${currentQuestions.length})`;
+            ui.phaseIndicator.textContent = `${item.topicName} • ${currentQuestionIndex + 1}/${currentQuestions.length}`;
             
             const responseTime = item.timer || DEFAULT_RESPONSE_TIME;
             startTimer(responseTime, () => {
                 if (mediaRecorder && mediaRecorder.state === 'recording') {
                     stopRecording();
                 }
-                ui.phaseIndicator.textContent = "Time's up! Click Next to continue.";
                 ui.recordBtn.disabled = true;
                 ui.recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                ui.pauseResumeBtn.classList.add('hidden');
                 ui.nextBtn.disabled = false;
+                
+                // Audio cue that time is up (optional)
+                const ding = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU'); // Placeholder
             });
         }
         
@@ -702,6 +646,7 @@
             ui.certificateScreen.classList.remove('hidden');
             document.getElementById('certificate-name').textContent = userName;
             document.getElementById('certificate-date').textContent = new Date().toLocaleDateString();
+            speak(`Congratulations ${userName}. You have completed all the QA05 speaking topics!`);
         }
         
         function showErrorMessage(message) {
@@ -752,7 +697,7 @@
                 });
             } catch (err) {
                 console.error("Error starting recording:", err);
-                showErrorMessage("Could not start audio recording. Please grant microphone permission.");
+                showErrorMessage("Microphone access denied. Please check your browser settings.");
             }
         }
 
@@ -791,13 +736,26 @@
             updateTimerDisplay(timeLeft, duration);
 
             timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay(timeLeft, duration);
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    if(onEndCallback) onEndCallback();
+                if (!isTimerPaused) {
+                    timeLeft--;
+                    updateTimerDisplay(timeLeft, duration);
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        if(onEndCallback) onEndCallback();
+                    }
                 }
             }, 1000);
+        }
+
+        function togglePauseTimer() {
+            isTimerPaused = !isTimerPaused;
+            if (isTimerPaused) {
+                ui.pauseResumeBtn.innerHTML = '<i class="fas fa-play"></i>';
+                ui.pauseResumeBtn.classList.add('text-green-600');
+            } else {
+                ui.pauseResumeBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                ui.pauseResumeBtn.classList.remove('text-green-600');
+            }
         }
 
         function updateTimerDisplay(timeLeft, totalDuration) {
@@ -809,6 +767,15 @@
             const fraction = timeLeft / totalDuration;
             const offset = fraction * FULL_DASH_ARRAY;
             ui.timerProgress.style.strokeDashoffset = FULL_DASH_ARRAY - offset;
+            
+            // Change color based on time left
+            if (timeLeft <= 10) {
+                ui.timerProgress.classList.add('text-red-500');
+                ui.timerProgress.classList.remove('text-indigo-500');
+            } else {
+                ui.timerProgress.classList.add('text-indigo-500');
+                ui.timerProgress.classList.remove('text-red-500');
+            }
         }
 
         // --- UI Helper Functions ---
@@ -820,6 +787,11 @@
             ui.recordBtn.disabled = false;
             ui.recordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             resetRecordingUI();
+            
+            isTimerPaused = false;
+            ui.pauseResumeBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            ui.pauseResumeBtn.classList.remove('hidden', 'text-green-600');
+            ui.timerProgress.classList.add('text-indigo-500');
         }
 
         function resetRecordingUI() {
@@ -840,37 +812,39 @@
                 ui.nameEntryContainer.classList.add('hidden');
                 ui.userNameDisplay.textContent = userName;
                 ui.topicSelectionContainer.classList.remove('hidden');
+                initializeTopics();
             } else {
-                const nameError = document.createElement('div');
-                nameError.textContent = "Please enter your name.";
-                nameError.className = "text-red-500 text-sm mt-2";
-                ui.startWithNameBtn.insertAdjacentElement('afterend', nameError);
-                setTimeout(() => nameError.remove(), 2000);
+                ui.nameInput.classList.add('ring-2', 'ring-red-500');
+                setTimeout(() => ui.nameInput.classList.remove('ring-2', 'ring-red-500'), 1000);
             }
         });
 
         ui.recordBtn.addEventListener('click', startRecording);
         ui.stopRecordBtn.addEventListener('click', stopRecording);
+        ui.pauseResumeBtn.addEventListener('click', togglePauseTimer);
         
         ui.downloadCertificateBtn.addEventListener('click', () => {
           const certificateNode = document.getElementById('certificate-to-download');
-          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-          const newTab = isIOS ? window.open() : null;
-
+          // Simple detection for mobile devices where auto-download might be blocked
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          
           html2canvas(certificateNode, { scale: 2 }).then(canvas => {
             canvas.toBlob(blob => {
               const url = URL.createObjectURL(blob);
-              if (isIOS && newTab) {
-                newTab.location = url;
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `Certificate_${userName.replace(/\s+/g, '_')}.png`;
+              
+              if (isMobile) {
+                  // Open in new tab for mobile so they can long-press save
+                  const newWindow = window.open(url, '_blank');
+                  if (!newWindow) alert('Please allow popups to download the certificate.');
               } else {
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Certificate_of_Completion_05_${userName.replace(/\s+/g, '_')}.png`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
               }
-              URL.revokeObjectURL(url);
+              setTimeout(() => URL.revokeObjectURL(url), 100);
             });
           });
         });
@@ -878,6 +852,8 @@
         ui.backToMainMenuBtn.addEventListener('click', () => {
             ui.certificateScreen.classList.add('hidden');
             ui.welcomeScreen.classList.remove('hidden');
+            ui.nameEntryContainer.classList.add('hidden');
+            ui.topicSelectionContainer.classList.remove('hidden');
             initializeTopics();
         });
 
@@ -885,7 +861,7 @@
             if (recordedBlob) {
                 const topicName = currentQuestions[currentQuestionIndex].topicName.replace(/\s+/g, '_');
                 const sanitizedUserName = userName.replace(/\s+/g, '_');
-                const fileNameAudio = `P5_${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.webm`;
+                const fileNameAudio = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.mp3`; // Naming it MP3 for compatibility though it is webm
                 const blobUrl = URL.createObjectURL(recordedBlob);
                 
                 const a = document.createElement('a');
@@ -895,16 +871,15 @@
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                URL.revokeObjectURL(blobUrl);
-
-                const originalText = ui.downloadBtn.innerHTML;
-                ui.downloadBtn.innerHTML = `<i class="fas fa-check mr-1"></i>Downloaded!`;
-                ui.downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                ui.downloadBtn.classList.add('bg-green-600');
+                
+                // Visual feedback
+                const btnContent = ui.downloadBtn.innerHTML;
+                ui.downloadBtn.innerHTML = `<i class="fas fa-check"></i> Saved`;
+                ui.downloadBtn.classList.replace('bg-blue-600', 'bg-green-600');
                 setTimeout(() => {
-                    ui.downloadBtn.innerHTML = originalText;
-                    ui.downloadBtn.classList.remove('bg-green-600');
-                    ui.downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                    ui.downloadBtn.innerHTML = btnContent;
+                    ui.downloadBtn.classList.replace('bg-green-600', 'bg-blue-600');
+                    URL.revokeObjectURL(blobUrl);
                 }, 2000);
             }
         });
@@ -918,7 +893,7 @@
         ui.backToTopicsBtn.addEventListener('click', () => {
             showConfirmationModal(
                 'Return to Topics?',
-                'Are you sure? This will stop your current practice session and any recording will be lost.',
+                'Progress on the current topic will be lost.',
                 () => {
                     ui.practiceScreen.classList.add('hidden');
                     ui.welcomeScreen.classList.remove('hidden');
@@ -937,24 +912,19 @@
             }
 
             const currentTopicName = masterQuestionList[currentQuestionIndex].topicName;
-            const questionsForCurrentTopic = practiceData[currentTopicName];
+            const item = currentQuestions[currentQuestionIndex];
 
             ui.samplesList.innerHTML = ''; 
-            questionsForCurrentTopic.forEach((questionItem, index) => {
-                const questionHeader = document.createElement('h4');
-                questionHeader.textContent = `Q${index + 1}: ${questionItem.question}`;
-                questionHeader.className = 'font-bold text-white text-sm mt-2 first:mt-0';
-                ui.samplesList.appendChild(questionHeader);
-
-                if (questionItem.samples && questionItem.samples.length > 0) {
-                    questionItem.samples.forEach(sample => {
-                        const li = document.createElement('li');
-                        li.textContent = `\u2022 ${sample}`;
-                        li.className = 'text-white text-sm sm:text-base ml-2';
-                        ui.samplesList.appendChild(li);
-                    });
-                }
-            });
+            if (item.samples && item.samples.length > 0) {
+                item.samples.forEach(sample => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fas fa-quote-left text-amber-500 mr-2 text-xs"></i>${sample}`;
+                    li.className = 'mb-2 pb-2 border-b border-gray-100 dark:border-gray-700 last:border-0 last:mb-0 last:pb-0';
+                    ui.samplesList.appendChild(li);
+                });
+            } else {
+                 ui.samplesList.innerHTML = '<li>No sample answers available for this question.</li>';
+            }
             ui.samplesContainer.classList.remove('hidden');
         });
         
@@ -963,10 +933,6 @@
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
                 ui.recordBtn.disabled = true;
                 ui.recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                ui.recordBtn.title = "Audio recording is not supported on this browser.";
-            }
-            if (!window.speechSynthesis) {
-                 console.warn("Text-to-speech is not supported on this browser.");
             }
             
             await initializeTTS().catch(err => console.error(err));
@@ -977,14 +943,6 @@
         }
         
         main();
-
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        if (isIOS) {
-            const sharepointLink = document.getElementById('sharepoint-upload-link');
-            if (sharepointLink) {
-                sharepointLink.removeAttribute('target');
-            }
-        }
     });
     </script>
 </body>
