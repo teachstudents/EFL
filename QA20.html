@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>QA20 Speaking Practice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden; /* Prevent body from scrolling */
+            position: relative;
+        }
+        .timer-circle {
+            stroke-dasharray: 283;
+            stroke-dashoffset: 0;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 1s linear;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .recording-indicator {
+            animation: pulse 1.5s infinite;
+        }
+        .app-shell {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-height: 100vh;
+        }
+        audio::-webkit-media-controls-panel {
+            padding: 5px;
+        }
+        /* Improve scrolling on mobile */
+        .scroll-container {
+            scrollbar-width: thin;
+            scrollbar-color: #4f46e5 #e5e7eb;
+        }
+        .scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scroll-container::-webkit-scrollbar-track {
+            background: #e5e7eb;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background-color: #4f46e5;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gradient-to-br dark:from-slate-900 dark:via-blue-900 dark:to-slate-900 text-gray-800 dark:text-gray-200 flex items-center justify-center p-2 sm:p-4">
+    
+    <div id="app-container" class="w-full max-w-xl mx-auto text-center h-full relative z-10">
+        
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="bg-white dark:bg-gray-800 dark:shadow-lg p-6 sm:p-8 rounded-2xl shadow-lg h-full flex flex-col justify-center">
+            <div id="name-entry-container">
+                <div class="mb-6">
+                    <i class="fas fa-microphone-lines text-5xl text-indigo-600 dark:text-indigo-400 mb-2"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">QA20 Practice</h1>
+                <p class="mb-6 text-gray-600 dark:text-gray-400 text-sm">Enter your name to begin session QA20.</p>
+                <input type="text" id="name-input" placeholder="Your Name" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 text-center text-lg text-gray-900 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                <button id="start-with-name-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg text-xl shadow-md transition-transform active:scale-95">Start QA20</button>
+            </div>
+
+            <div id="topic-selection-container" class="hidden h-full flex flex-col">
+                 <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 flex-shrink-0">Hello, <span id="user-name-display"></span>!</h1>
+                 
+                 <div id="instructions" class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-left space-y-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg flex-shrink-0 border border-gray-200 dark:border-gray-700">
+                      <p><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Speak until the timer runs out.</p>
+                      <p><i class="fas fa-lightbulb mr-2 text-yellow-500"></i>Use the sentence starters for help.</p>
+                      <p><i class="fas fa-download mr-2 text-blue-500"></i>Download your recording after speaking.</p>
+                 </div>
+                 
+                 <div class="flex-grow overflow-y-auto scroll-container pr-1">
+                    <div id="topic-selection" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">
+                        <!-- Topic buttons will be injected here -->
+                    </div>
+                 </div>
+            </div>
+        </div>
+
+        <!-- Main Practice Screen -->
+        <div id="practice-screen" class="hidden bg-white dark:bg-gray-800 dark:shadow-lg rounded-2xl shadow-lg app-shell p-3 sm:p-4">
+            <header class="flex-shrink-0">
+                <div class="flex justify-between items-center mb-2">
+                    <div class="w-1/3 text-left">
+                         <button id="back-to-topics-btn" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-1.5 px-3 rounded-lg shadow-sm transition-colors">
+                             <i class="fas fa-arrow-left mr-1"></i>Topics
+                         </button>
+                    </div>
+                    <div class="w-1/3 text-center">
+                         <button id="samples-btn" class="hidden text-xs sm:text-sm bg-amber-500 hover:bg-amber-600 text-white font-bold py-1.5 px-3 rounded-lg shadow-md transition-colors">
+                             <i class="fas fa-lightbulb mr-1"></i>Ideas
+                         </button>
+                    </div>
+                    <div class="w-1/3 text-right">
+                         <button id="next-btn" class="hidden text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 px-3 rounded-lg shadow-sm disabled:bg-indigo-400 dark:disabled:bg-indigo-800 disabled:cursor-not-allowed transition-colors">
+                             Next<i class="fas fa-arrow-right ml-1"></i>
+                         </button>
+                    </div>
+                </div>
+
+                <!-- Timer Display -->
+                <div class="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-2 flex-shrink-0">
+                    <svg class="w-full h-full" viewBox="0 0 100 100">
+                        <circle class="text-gray-200 dark:text-gray-700" stroke-width="8" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                        <circle id="timer-progress" class="timer-circle text-indigo-500" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                    </svg>
+                    <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-2xl font-bold font-mono"></div>
+                    <button id="pause-resume-btn" class="hidden absolute bottom-0 right-0 w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm shadow-md z-20 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
+                        <i class="fas fa-pause"></i>
+                    </button>
+                </div>
+                
+                <p id="phase-indicator" class="font-semibold text-indigo-600 dark:text-indigo-400 mb-1 text-sm uppercase tracking-wide flex-shrink-0"></p>
+
+                <!-- Question Display -->
+                <div id="question-container" class="min-h-[60px] flex items-center justify-center mb-2 bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-xl border border-indigo-100 dark:border-indigo-800">
+                    <h2 id="question-text" class="text-base sm:text-lg font-bold leading-snug text-center w-full text-gray-800 dark:text-gray-100"></h2>
+                </div>
+                
+                <div id="error-message-box" class="hidden text-red-500 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-2 rounded-lg text-xs mb-2"></div>
+
+                <!-- Recording Action Buttons -->
+                <div id="recording-actions-container" class="flex flex-col items-center justify-center mb-1">
+                    <!-- Initial Record Button -->
+                    <button id="record-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold w-14 h-14 rounded-full text-xl shadow-lg shadow-red-500/30 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <!-- Stop Button -->
+                    <button id="stop-record-btn" class="hidden bg-gray-800 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-bold w-14 h-14 rounded-full text-xl shadow-lg flex items-center justify-center transition-all active:scale-95">
+                        <i class="fas fa-stop"></i>
+                    </button>
+                    
+                    <!-- Post-Recording Controls -->
+                    <div id="post-recording-actions" class="hidden w-full flex-col items-center justify-center space-y-2 mt-1">
+                        <audio id="audio-player" controls class="w-full max-w-xs h-8"></audio>
+                        <div class="flex gap-2 w-full max-w-xs">
+                            <!-- Download button -->
+                            <button id="download-btn"
+                                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 rounded-lg text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                                 <i class="fas fa-download"></i> Save MP3
+                            </button>
+                            
+                            <!-- Upload/Share button (Example Link) -->
+                            <a id="upload-link"
+                               href="#" 
+                               onclick="alert('Please configure the upload link in the code!'); return false;"
+                               class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-3 rounded-lg text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                                 <i class="fas fa-cloud-upload-alt"></i> Upload
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                 <div id="recording-status" class="hidden items-center justify-center text-red-500 font-semibold text-xs animate-pulse">
+                      <div class="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                      Recording in progress...
+                 </div>
+            </header>
+            
+            <main class="flex-grow flex flex-col overflow-y-auto scroll-container min-h-0 space-y-3 pt-2 px-1">
+                 <!-- Sentence Starters -->
+                <div id="starters-container" class="hidden text-left bg-white dark:bg-gray-700/30 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                    <h3 class="text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Sentence Starters</h3>
+                    <div id="starters-list" class="flex flex-wrap gap-2">
+                        <!-- Buttons will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Word Bank -->
+                <div id="word-bank-container" class="hidden text-left bg-white dark:bg-gray-700/30 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                    <h3 class="text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Useful Vocabulary</h3>
+                    <div id="word-bank-list" class="flex flex-wrap gap-2">
+                        <!-- Buttons will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Sample Answers Display -->
+                <div id="samples-container" class="hidden text-left">
+                    <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-3 rounded-xl">
+                        <h3 class="text-xs font-bold uppercase text-amber-600 dark:text-amber-500 mb-2 tracking-wider flex items-center">
+                            <i class="fas fa-star mr-1"></i> Sample Responses
+                        </h3>
+                        <ul id="samples-list" class="space-y-2 list-none text-sm text-gray-700 dark:text-gray-300">
+                        </ul>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Certificate Screen -->
+        <div id="certificate-screen" class="hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg h-full flex flex-col justify-center items-center">
+            <div id="certificate-to-download" class="w-full bg-slate-50 dark:bg-slate-700 p-6 sm:p-10 rounded-xl border-4 border-double border-yellow-400 dark:border-yellow-500 text-center shadow-inner relative overflow-hidden">
+                <!-- Watermark -->
+                <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+                    <i class="fas fa-award text-9xl"></i>
+                </div>
+                
+                <div class="relative z-10">
+                    <i class="fas fa-crown text-5xl text-yellow-500 mb-4 drop-shadow-sm"></i>
+                    <h1 class="text-2xl sm:text-3xl font-serif font-bold text-gray-800 dark:text-white mb-2">Certificate of Excellence</h1>
+                    <div class="h-1 w-20 bg-yellow-500 mx-auto mb-4"></div>
+                    <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 uppercase tracking-widest mb-4">QA20 Presented To</p>
+                    
+                    <p id="certificate-name" class="text-3xl sm:text-5xl font-bold my-4 text-indigo-700 dark:text-indigo-300 font-serif italic"></p>
+                    
+                    <p class="text-base text-gray-600 dark:text-gray-300">For successfully completing the QA20 speaking practice.</p>
+                    <div class="mt-8 flex justify-center items-center gap-2 text-xs text-gray-400">
+                        <span>Date: <span id="certificate-date"></span></span>
+                        <span>•</span>
+                        <span>Verified</span>
+                    </div>
+                </div>
+            </div>
+            <button id="download-certificate-btn" class="mt-8 w-full max-w-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg text-lg shadow-md transition-all active:scale-95 flex items-center justify-center">
+                <i class="fas fa-file-image mr-2"></i>Download Image
+            </button>
+             <button id="back-to-main-menu-btn" class="mt-4 text-sm text-gray-500 hover:text-indigo-500 transition-colors">Start New Session</button>
+        </div>
+
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 fade-in">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 text-center max-w-sm w-full border border-gray-200 dark:border-gray-700">
+            <div class="mb-4 text-yellow-500 text-4xl">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h3 id="modal-title" class="text-xl font-bold mb-2 dark:text-white">End Session?</h3>
+            <p id="modal-message" class="text-gray-600 dark:text-gray-400 mb-6 text-sm">Returning to the topic list will clear your current progress.</p>
+            <div class="flex justify-center gap-3">
+                <button id="modal-cancel-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 transition-colors">Cancel</button>
+                <button id="modal-confirm-btn" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">End Session</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // ==========================================
+        //  QA20 DATA SECTION
+        // ==========================================
+        const practiceData = {
+            "Personal Growth": [
+                {
+                    question: "What is one thing you have learned about yourself in the last year?",
+                    starters: ["In the last year, I've learned that I am...", "I discovered that I really enjoy...", "Something I realized about myself is...", "I've become better at..."],
+                    wordBank: ["more resilient", "more independent", "enjoy challenges", "patient", "organized", "handle stress", "self-awareness", "new hobby"],
+                    samples: [
+                        "I've learned that I am more resilient than I thought. When I faced a very difficult exam, I studied hard and didn't give up, and I managed to do well.",
+                        "I discovered that I really enjoy working in a team. I used to prefer working alone, but this year I had a great experience with a group project.",
+                        "Something I realized about myself is that I am a very visual learner. Making mind maps and drawing diagrams really helps me to understand complex topics."
+                    ]
+                },
+                {
+                    question: "Describe a challenge you have overcome and what you learned from it.",
+                    starters: ["A challenge I overcame was...", "It was difficult, but I learned that...", "One time, I had to..., and from that I learned...", "Overcoming... taught me..."],
+                    wordBank: ["a difficult subject", "a disagreement with a friend", "public speaking", "time management", "perseverance", "communication", "preparation", "ask for help"],
+                    samples: [
+                        "A challenge I overcame was my fear of public speaking. I had to give a presentation, and I practiced many times. I learned that preparation is the key to building confidence.",
+                        "I had a big disagreement with a close friend. It was difficult, but we talked it through honestly, and I learned that good communication can solve most problems.",
+                        "Learning how to manage my time effectively at the beginning of high school was a challenge. It taught me the importance of making a schedule and prioritizing my tasks."
+                    ]
+                }
+            ],
+            "Technology's Impact": [
+                 {
+                    question: "In your opinion, has the internet had a more positive or negative effect on education?",
+                    starters: ["Overall, I believe the effect has been more... because...", "While there are negative aspects, like..., I think the positives...", "The internet has revolutionized education by...", "However, a significant problem is..."],
+                    wordBank: ["positive", "negative", "access to information", "online resources", "distraction", "misinformation", "flexible learning", "collaboration"],
+                    samples: [
+                        "Overall, I believe the effect has been overwhelmingly positive. The internet gives students access to an incredible amount of information and learning resources from all over the world.",
+                        "While there are negative aspects, like the potential for distraction, I think the positives outweigh them. For example, online tools make it easier for students to collaborate on projects.",
+                        "A significant problem is the risk of misinformation. It's very easy to find incorrect information online, so it has become more important to learn how to evaluate sources."
+                    ]
+                },
+                {
+                    question: "If you could invent a new app, what problem would it solve?",
+                    starters: ["My app would solve the problem of...", "I would create an app that helps people...", "The purpose of my app would be to...", "It would be called... and it would..."],
+                    wordBank: ["reduce food waste", "learn a new skill", "manage mental health", "find study partners", "connect people", "simplify a task", "innovative solution"],
+                    samples: [
+                        "I would create an app that helps reduce food waste. It would connect people who have extra food from their garden or a party with others in their neighborhood who need it.",
+                        "My app would help high school students manage their study schedules and homework deadlines. It would have a smart calendar that helps you plan and avoid last-minute stress.",
+                        "I would invent an app that helps you identify any plant or insect just by taking a picture of it. It would be a great tool for learning more about nature."
+                    ]
+                }
+            ],
+            "Cultural Values": [
+                {
+                    question: "What is one value that is very important in your culture? (e.g., respect for elders, importance of family)",
+                    starters: ["In Chinese culture, ... is extremely important.", "A value that is central to our society is...", "We are taught from a young age about the importance of...", "One example of this value in action is..."],
+                    wordBank: ["respect for elders", "importance of family", "collective good", "modesty", "perseverance", "harmony", "filial piety", "tradition"],
+                    samples: [
+                        "In Chinese culture, respect for elders is a very important value. For example, in our family, we always serve our grandparents food and tea first during meals.",
+                        "The importance of family is a central value. It is very common for multiple generations to live together or nearby, and family members have a strong sense of responsibility for one another.",
+                        "Another important value is the focus on the collective good. People are often encouraged to think about what is best for the group, the community, or the country, not just for themselves."
+                    ]
+                },
+                {
+                    question: "How do you think this value might be similar to or different from values in Germany?",
+                    starters: ["I think this value might be different because...", "It could be similar in the way that...", "In Germany, I've heard there is more emphasis on...", "Perhaps the concept of... is similar."],
+                    wordBank: ["individualism", "independence", "directness", "family ties", "community", "privacy", "formal respect", "different emphasis"],
+                    samples: [
+                        "I think the strong emphasis on family might be a bit different, because I've heard that in Germany, young people are encouraged to be very independent from a younger age.",
+                        "I think the respect for elders is similar, but maybe shown in a different way. In Germany, the respect might be more formal, whereas in China it is deeply integrated into daily family life.",
+                        "I believe the German value of community and the Chinese value of the collective good are similar, as both cultures understand the importance of working together for society."
+                    ]
+                }
+            ],
+            "Communication": [
+                {
+                    question: "Do you prefer communicating with friends by texting, calling, or meeting in person?",
+                    starters: ["I definitely prefer... because...", "For quick questions, I like..., but for a real conversation...", "Meeting in person is always the best, since...", "It depends on the situation, for example..."],
+                    wordBank: ["texting is convenient", "calling is more personal", "face-to-face is best", "misunderstandings", "body language", "quick and easy", "deep conversation"],
+                    samples: [
+                        "For a deep conversation, meeting in person is always the best because you can see the other person's expressions and body language, which prevents misunderstandings.",
+                        "I prefer texting for most things because it's quick and convenient, and you can reply whenever you have time, so you don't interrupt the other person.",
+                        "I think calling is a good balance. It's more personal than texting because you can hear the person's tone of voice, but it's easier to arrange than meeting in person."
+                    ]
+                },
+                {
+                    question: "Describe a time when you had a miscommunication with someone. What happened?",
+                    starters: ["I remember one time when...", "There was a misunderstanding with my... about...", "We had a miscommunication because...", "In the end, we solved it by..."],
+                    wordBank: ["misunderstanding", "miscommunication", "unclear text", "wrong assumption", "clarified", "talked it out", "apologized", "different interpretations"],
+                    samples: [
+                        "I remember one time my friend and I planned to meet, but we went to two different subway station exits because the instructions in the text message were not clear.",
+                        "There was a misunderstanding in a group project because one member thought someone else was supposed to do a certain part. We solved it by having a meeting to clarify everyone's roles.",
+                        "I once made a joke in a text message that my friend took seriously. Because they couldn't hear my tone, they thought I was angry. I had to call them to explain it was just a joke."
+                    ]
+                }
+            ],
+            "Problem Solving": [
+                {
+                    question: "When you face a difficult problem, what is the first thing you usually do?",
+                    starters: ["The first thing I do is...", "When I face a problem, I try to...", "My first step is usually to...", "I don't panic; instead, I..."],
+                    wordBank: ["break it down", "stay calm", "gather information", "ask for help", "analyze the situation", "smaller steps", "understand the problem", "think logically"],
+                    samples: [
+                        "The first thing I do is try not to panic. I take a deep breath and try to understand the problem clearly before I do anything else.",
+                        "My first step is usually to break the problem down into smaller, more manageable parts. This makes it feel less overwhelming.",
+                        "When I face a difficult academic problem, the first thing I do is review my notes and the textbook to see if I can find any relevant information to help me."
+                    ]
+                },
+                {
+                    question: "Do you think it is a sign of weakness to ask for help when you don't know how to do something?",
+                    starters: ["No, I don't think it's a weakness at all, because...", "On the contrary, I think it's a sign of...", "Some people might think so, but I believe...", "Asking for help is actually a... thing to do."],
+                    wordBank: ["sign of strength", "smart", "efficient", "willingness to learn", "collaboration", "no one knows everything", "resourceful", "brave"],
+                    samples: [
+                        "No, I think it is a sign of strength and self-awareness. It shows that you know your own limits and you are willing to learn from others.",
+                        "On the contrary, I think it is a smart and efficient way to solve a problem. It can save you a lot of time and frustration compared to struggling by yourself.",
+                        "Some people might feel embarrassed to ask for help, but I believe it's important. No one knows everything, and learning from others is how we grow."
+                    ]
+                }
+            ]
+        };
+        // ==========================================
+        //  END OF QA20 DATA
+        // ==========================================
+
+        // --- DOM Elements ---
+        const ui = {
+            welcomeScreen: document.getElementById('welcome-screen'),
+            practiceScreen: document.getElementById('practice-screen'),
+            nameEntryContainer: document.getElementById('name-entry-container'),
+            nameInput: document.getElementById('name-input'),
+            startWithNameBtn: document.getElementById('start-with-name-btn'),
+            topicSelectionContainer: document.getElementById('topic-selection-container'),
+            userNameDisplay: document.getElementById('user-name-display'),
+            topicSelection: document.getElementById('topic-selection'),
+            nextBtn: document.getElementById('next-btn'),
+            backToTopicsBtn: document.getElementById('back-to-topics-btn'),
+            samplesBtn: document.getElementById('samples-btn'),
+            timerDisplay: document.getElementById('timer-display'),
+            timerProgress: document.getElementById('timer-progress'),
+            phaseIndicator: document.getElementById('phase-indicator'),
+            questionText: document.getElementById('question-text'),
+            samplesContainer: document.getElementById('samples-container'),
+            samplesList: document.getElementById('samples-list'),
+            startersContainer: document.getElementById('starters-container'),
+            startersList: document.getElementById('starters-list'),
+            wordBankContainer: document.getElementById('word-bank-container'),
+            wordBankList: document.getElementById('word-bank-list'),
+            errorMessagebox: document.getElementById('error-message-box'),
+            recordBtn: document.getElementById('record-btn'),
+            stopRecordBtn: document.getElementById('stop-record-btn'),
+            audioPlayer: document.getElementById('audio-player'),
+            recordingStatus: document.getElementById('recording-status'),
+            postRecordingActions: document.getElementById('post-recording-actions'),
+            downloadBtn: document.getElementById('download-btn'),
+            certificateScreen: document.getElementById('certificate-screen'),
+            downloadCertificateBtn: document.getElementById('download-certificate-btn'),
+            backToMainMenuBtn: document.getElementById('back-to-main-menu-btn'),
+            modal: document.getElementById('confirmation-modal'),
+            modalTitle: document.getElementById('modal-title'),
+            modalMessage: document.getElementById('modal-message'),
+            modalConfirmBtn: document.getElementById('modal-confirm-btn'),
+            modalCancelBtn: document.getElementById('modal-cancel-btn'),
+            pauseResumeBtn: document.getElementById('pause-resume-btn')
+        };
+
+
+        // --- State Variables ---
+        let userName = '';
+        let currentQuestionIndex = 0;
+        let masterQuestionList = [];
+        let currentQuestions = []; 
+        let timerInterval;
+        let isTimerPaused = false;
+        let mediaRecorder;
+        let audioChunks = [];
+        let recordedBlob = null;
+        let completedTopics = {};
+
+        const FULL_DASH_ARRAY = 283;
+        const DEFAULT_RESPONSE_TIME = 60; // Default time since it wasn't specified in new data
+
+        // --- Text-to-Speech (Slowed down to 85%) ---
+        const synth = window.speechSynthesis;
+        let preferredVoice = null;
+        let ttsInitialized = false;
+
+        function initializeTTS() {
+            return new Promise((resolve) => {
+                if (!synth) {
+                    ttsInitialized = true;
+                    return resolve();
+                }
+
+                const setBestVoice = () => {
+                    const voices = synth.getVoices();
+                    if (voices.length === 0) return;
+                    
+                    const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+                    const bestVoice = englishVoices.find(v => v.name.includes("Google") || v.name.includes("Microsoft") || v.name.includes("Natural"));
+                    
+                    preferredVoice = bestVoice || englishVoices[0] || voices[0];
+                    ttsInitialized = true;
+                    resolve();
+                };
+
+                if (synth.getVoices().length > 0) {
+                    setBestVoice();
+                } else {
+                    synth.onvoiceschanged = setBestVoice;
+                }
+            });
+        }
+
+        function speak(text) {
+            if (!ttsInitialized || !synth || !text) return;
+
+            try {
+                if (synth.speaking) synth.cancel();
+                
+                setTimeout(() => {
+                    const utterThis = new SpeechSynthesisUtterance(text);
+                    if (preferredVoice) utterThis.voice = preferredVoice;
+                    utterThis.pitch = 1;
+                    utterThis.rate = 0.85; // Slow down speech for secondary students
+                    synth.speak(utterThis);
+                }, 50); 
+            } catch (e) {
+                console.error("TTS Error:", e);
+            }
+        }
+
+        // --- Local Storage (Updated for QA20) ---
+        function loadProgress() {
+            const savedCompletedTopics = localStorage.getItem('QA20_CompletedTopics');
+            if (savedCompletedTopics) {
+                try {
+                    completedTopics = JSON.parse(savedCompletedTopics) || {};
+                } catch (e) { completedTopics = {}; }
+            }
+            const savedName = localStorage.getItem('QA20_UserName');
+            if (savedName) {
+                 userName = savedName;
+                 ui.nameInput.value = userName;
+            }
+        }
+
+        function saveProgress() {
+            localStorage.setItem('QA20_CompletedTopics', JSON.stringify(completedTopics));
+            if(userName) localStorage.setItem('QA20_UserName', userName);
+        }
+
+        // --- UI Initialization & Data Setup ---
+        function initializeTopics() {
+            ui.topicSelection.innerHTML = '';
+            for (const topic in practiceData) {
+                const button = document.createElement('button');
+                
+                let checkmark = '';
+                let bgClass = "bg-white dark:bg-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 border border-gray-200 dark:border-gray-600";
+                
+                if (completedTopics && completedTopics[topic]) {
+                    checkmark = `<i class="fas fa-check-circle ml-auto text-emerald-500 text-xl"></i>`;
+                    bgClass = "bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800";
+                }
+
+                button.className = `w-full text-left p-4 rounded-xl shadow-sm transition-all transform hover:scale-[1.02] flex items-center ${bgClass}`;
+                button.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mr-3 text-indigo-600 dark:text-indigo-400">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div>
+                            <span class="block font-bold text-gray-800 dark:text-white">${topic}</span>
+                        </div>
+                    </div>
+                    ${checkmark}
+                `;
+                
+                button.dataset.topic = topic;
+                button.addEventListener('click', () => startPractice(topic));
+                ui.topicSelection.appendChild(button);
+            }
+        }
+        
+        function createMasterList() {
+            masterQuestionList = [];
+            for (const topic in practiceData) {
+                practiceData[topic].forEach(question => {
+                    masterQuestionList.push({ ...question, topicName: topic });
+                });
+            }
+        }
+
+        // --- Core App Logic ---
+        function startPractice(topic) {
+            const startIndex = masterQuestionList.findIndex(q => q.topicName === topic);
+            currentQuestionIndex = (startIndex !== -1) ? startIndex : 0;
+            currentQuestions = masterQuestionList;
+            
+            ui.welcomeScreen.classList.add('hidden');
+            ui.practiceScreen.classList.remove('hidden');
+            ui.certificateScreen.classList.add('hidden');
+            ui.nextBtn.classList.remove('hidden');
+            ui.samplesBtn.classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            // Track completion of previous topic
+            if (currentQuestionIndex > 0) {
+                const prevQuestion = currentQuestions[currentQuestionIndex - 1];
+                const currentQuestion = currentQuestions[currentQuestionIndex];
+                if (currentQuestion && prevQuestion.topicName !== currentQuestion.topicName) {
+                    if (!completedTopics[prevQuestion.topicName]) {
+                        completedTopics[prevQuestion.topicName] = true;
+                        saveProgress();
+                    }
+                }
+            }
+
+            // End of all questions
+            if (currentQuestionIndex >= currentQuestions.length) {
+                if (currentQuestions.length > 0) {
+                    const lastTopicName = currentQuestions[currentQuestions.length - 1].topicName;
+                      if (!completedTopics[lastTopicName]) {
+                        completedTopics[lastTopicName] = true;
+                        saveProgress();
+                    }
+                }
+                showCertificate();
+                return;
+            }
+
+            ui.nextBtn.disabled = true;
+
+            const item = currentQuestions[currentQuestionIndex];
+            resetUIForNewQuestion();
+            
+            // Format question text
+            let fullQuestion = (item.intro ? item.intro + " " : "") + item.question;
+            ui.questionText.textContent = fullQuestion;
+            ui.questionText.classList.add('fade-in');
+            setTimeout(() => ui.questionText.classList.remove('fade-in'), 500);
+
+            speak(fullQuestion);
+            
+            // Populate Starters
+            if (item.starters && item.starters.length > 0) {
+                ui.startersList.innerHTML = '';
+                item.starters.forEach(starter => {
+                    const span = document.createElement('span');
+                    span.className = 'bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1.5 rounded-lg dark:bg-indigo-900 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800';
+                    span.textContent = starter;
+                    ui.startersList.appendChild(span);
+                });
+                ui.startersContainer.classList.remove('hidden');
+            }
+
+            // Populate Word Bank
+            if (item.wordBank && item.wordBank.length > 0) {
+                ui.wordBankList.innerHTML = '';
+                item.wordBank.forEach(word => {
+                    const span = document.createElement('span');
+                    span.className = 'bg-emerald-100 text-emerald-800 text-xs font-medium px-2.5 py-1.5 rounded-lg dark:bg-emerald-900 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+                    span.textContent = word;
+                    ui.wordBankList.appendChild(span);
+                });
+                ui.wordBankContainer.classList.remove('hidden');
+            }
+
+            ui.phaseIndicator.textContent = `${item.topicName} • ${currentQuestionIndex + 1}/${currentQuestions.length}`;
+            
+            const responseTime = item.timer || DEFAULT_RESPONSE_TIME;
+            startTimer(responseTime, () => {
+                if (mediaRecorder && mediaRecorder.state === 'recording') {
+                    stopRecording();
+                }
+                ui.recordBtn.disabled = true;
+                ui.recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                ui.pauseResumeBtn.classList.add('hidden');
+                ui.nextBtn.disabled = false;
+                
+                // Audio cue that time is up (optional)
+                const ding = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU'); // Placeholder
+            });
+        }
+        
+        function showCertificate() {
+            ui.practiceScreen.classList.add('hidden');
+            ui.welcomeScreen.classList.add('hidden');
+            ui.certificateScreen.classList.remove('hidden');
+            document.getElementById('certificate-name').textContent = userName;
+            document.getElementById('certificate-date').textContent = new Date().toLocaleDateString();
+            speak(`Congratulations ${userName}. You have completed all the QA20 speaking topics!`);
+        }
+        
+        function showErrorMessage(message) {
+            ui.errorMessagebox.textContent = message;
+            ui.errorMessagebox.classList.remove('hidden');
+            setTimeout(() => {
+                ui.errorMessagebox.classList.add('hidden');
+            }, 5000);
+        }
+
+        // --- Recording & Transcription Logic ---
+        async function startRecording() {
+            if (!window.MediaRecorder) {
+                showErrorMessage("Audio recording is not supported on this browser.");
+                return;
+            }
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const isMobileEdge = /Edg\/\d+.*Android/.test(navigator.userAgent);
+                let options = {};
+                if (!isMobileEdge) {
+                    const mimeTypes = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/ogg'];
+                    const supportedType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
+                    if (supportedType) options.mimeType = supportedType;
+                }
+                
+                mediaRecorder = new MediaRecorder(stream, options);
+                mediaRecorder.start();
+
+                ui.recordBtn.classList.add('hidden');
+                ui.stopRecordBtn.classList.remove('hidden');
+                ui.recordingStatus.classList.remove('hidden');
+
+                audioChunks = [];
+                mediaRecorder.addEventListener("dataavailable", event => {
+                    audioChunks.push(event.data);
+                });
+
+                mediaRecorder.addEventListener("stop", () => {
+                    recordedBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(recordedBlob);
+                    ui.audioPlayer.src = audioUrl;
+                    ui.postRecordingActions.classList.remove('hidden');
+                    ui.recordingStatus.classList.add('hidden');
+                    ui.stopRecordBtn.classList.add('hidden');
+                    ui.recordBtn.classList.add('hidden');
+                    ui.nextBtn.disabled = false;
+                });
+            } catch (err) {
+                console.error("Error starting recording:", err);
+                showErrorMessage("Microphone access denied. Please check your browser settings.");
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder) {
+                mediaRecorder.stop();
+            }
+        }
+        
+        // --- Confirmation Modal ---
+        function showConfirmationModal(title, message, onConfirm) {
+            ui.modalTitle.textContent = title;
+            ui.modalMessage.textContent = message;
+            ui.modal.classList.remove('hidden');
+
+            const confirmHandler = () => {
+                onConfirm();
+                hide();
+            };
+
+            const hide = () => {
+                ui.modal.classList.add('hidden');
+                ui.modalConfirmBtn.removeEventListener('click', confirmHandler);
+                ui.modalCancelBtn.removeEventListener('click', hide);
+            };
+
+            ui.modalConfirmBtn.addEventListener('click', confirmHandler);
+            ui.modalCancelBtn.addEventListener('click', hide);
+        }
+
+
+        // --- Timer Functions ---
+        function startTimer(duration, onEndCallback) {
+            let timeLeft = duration;
+            clearInterval(timerInterval);
+            updateTimerDisplay(timeLeft, duration);
+
+            timerInterval = setInterval(() => {
+                if (!isTimerPaused) {
+                    timeLeft--;
+                    updateTimerDisplay(timeLeft, duration);
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        if(onEndCallback) onEndCallback();
+                    }
+                }
+            }, 1000);
+        }
+
+        function togglePauseTimer() {
+            isTimerPaused = !isTimerPaused;
+            if (isTimerPaused) {
+                ui.pauseResumeBtn.innerHTML = '<i class="fas fa-play"></i>';
+                ui.pauseResumeBtn.classList.add('text-green-600');
+            } else {
+                ui.pauseResumeBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                ui.pauseResumeBtn.classList.remove('text-green-600');
+            }
+        }
+
+        function updateTimerDisplay(timeLeft, totalDuration) {
+            const minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            if (seconds < 10) seconds = `0${seconds}`;
+            ui.timerDisplay.textContent = `${minutes}:${seconds}`;
+            
+            const fraction = timeLeft / totalDuration;
+            const offset = fraction * FULL_DASH_ARRAY;
+            ui.timerProgress.style.strokeDashoffset = FULL_DASH_ARRAY - offset;
+            
+            // Change color based on time left
+            if (timeLeft <= 10) {
+                ui.timerProgress.classList.add('text-red-500');
+                ui.timerProgress.classList.remove('text-indigo-500');
+            } else {
+                ui.timerProgress.classList.add('text-indigo-500');
+                ui.timerProgress.classList.remove('text-red-500');
+            }
+        }
+
+        // --- UI Helper Functions ---
+        function resetUIForNewQuestion() {
+            ui.samplesContainer.classList.add('hidden');
+            ui.startersContainer.classList.add('hidden');
+            ui.wordBankContainer.classList.add('hidden');
+            ui.errorMessagebox.classList.add('hidden');
+            ui.recordBtn.disabled = false;
+            ui.recordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            resetRecordingUI();
+            
+            isTimerPaused = false;
+            ui.pauseResumeBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            ui.pauseResumeBtn.classList.remove('hidden', 'text-green-600');
+            ui.timerProgress.classList.add('text-indigo-500');
+        }
+
+        function resetRecordingUI() {
+            ui.recordBtn.classList.remove('hidden');
+            ui.stopRecordBtn.classList.add('hidden');
+            ui.recordingStatus.classList.add('hidden');
+            ui.postRecordingActions.classList.add('hidden');
+            ui.audioPlayer.src = '';
+            audioChunks = [];
+            recordedBlob = null;
+        }
+
+        // --- Event Listeners ---
+        ui.startWithNameBtn.addEventListener('click', () => {
+            userName = ui.nameInput.value.trim();
+            if (userName) {
+                saveProgress();
+                ui.nameEntryContainer.classList.add('hidden');
+                ui.userNameDisplay.textContent = userName;
+                ui.topicSelectionContainer.classList.remove('hidden');
+                initializeTopics();
+            } else {
+                ui.nameInput.classList.add('ring-2', 'ring-red-500');
+                setTimeout(() => ui.nameInput.classList.remove('ring-2', 'ring-red-500'), 1000);
+            }
+        });
+
+        ui.recordBtn.addEventListener('click', startRecording);
+        ui.stopRecordBtn.addEventListener('click', stopRecording);
+        ui.pauseResumeBtn.addEventListener('click', togglePauseTimer);
+        
+        ui.downloadCertificateBtn.addEventListener('click', () => {
+          const certificateNode = document.getElementById('certificate-to-download');
+          // Simple detection for mobile devices where auto-download might be blocked
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          
+          html2canvas(certificateNode, { scale: 2 }).then(canvas => {
+            canvas.toBlob(blob => {
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `Certificate_${userName.replace(/\s+/g, '_')}.png`;
+              
+              if (isMobile) {
+                  // Open in new tab for mobile so they can long-press save
+                  const newWindow = window.open(url, '_blank');
+                  if (!newWindow) alert('Please allow popups to download the certificate.');
+              } else {
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+              }
+              setTimeout(() => URL.revokeObjectURL(url), 100);
+            });
+          });
+        });
+
+        ui.backToMainMenuBtn.addEventListener('click', () => {
+            ui.certificateScreen.classList.add('hidden');
+            ui.welcomeScreen.classList.remove('hidden');
+            ui.nameEntryContainer.classList.add('hidden');
+            ui.topicSelectionContainer.classList.remove('hidden');
+            initializeTopics();
+        });
+
+        ui.downloadBtn.addEventListener('click', () => {
+            if (recordedBlob) {
+                const topicName = currentQuestions[currentQuestionIndex].topicName.replace(/\s+/g, '_');
+                const sanitizedUserName = userName.replace(/\s+/g, '_');
+                const fileNameAudio = `${sanitizedUserName}_${topicName}_Q${currentQuestionIndex + 1}.mp3`; // Naming it MP3 for compatibility though it is webm
+                const blobUrl = URL.createObjectURL(recordedBlob);
+                
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = blobUrl;
+                a.download = fileNameAudio;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                // Visual feedback
+                const btnContent = ui.downloadBtn.innerHTML;
+                ui.downloadBtn.innerHTML = `<i class="fas fa-check"></i> Saved`;
+                ui.downloadBtn.classList.replace('bg-blue-600', 'bg-green-600');
+                setTimeout(() => {
+                    ui.downloadBtn.innerHTML = btnContent;
+                    ui.downloadBtn.classList.replace('bg-green-600', 'bg-blue-600');
+                    URL.revokeObjectURL(blobUrl);
+                }, 2000);
+            }
+        });
+
+        ui.nextBtn.addEventListener('click', () => {
+            ui.nextBtn.disabled = true;
+            currentQuestionIndex++;
+            showQuestion();
+        });
+
+        ui.backToTopicsBtn.addEventListener('click', () => {
+            showConfirmationModal(
+                'Return to Topics?',
+                'Progress on the current topic will be lost.',
+                () => {
+                    ui.practiceScreen.classList.add('hidden');
+                    ui.welcomeScreen.classList.remove('hidden');
+                    clearInterval(timerInterval);
+                    if (synth && synth.speaking) synth.cancel();
+                    if (mediaRecorder && mediaRecorder.state === 'recording') stopRecording();
+                    initializeTopics();
+                }
+            );
+        });
+
+        ui.samplesBtn.addEventListener('click', () => {
+            if (!ui.samplesContainer.classList.contains('hidden')) {
+                ui.samplesContainer.classList.add('hidden');
+                return;
+            }
+
+            const currentTopicName = masterQuestionList[currentQuestionIndex].topicName;
+            const item = currentQuestions[currentQuestionIndex];
+
+            ui.samplesList.innerHTML = ''; 
+            if (item.samples && item.samples.length > 0) {
+                item.samples.forEach(sample => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fas fa-quote-left text-amber-500 mr-2 text-xs"></i>${sample}`;
+                    li.className = 'mb-2 pb-2 border-b border-gray-100 dark:border-gray-700 last:border-0 last:mb-0 last:pb-0';
+                    ui.samplesList.appendChild(li);
+                });
+            } else {
+                 ui.samplesList.innerHTML = '<li>No sample answers available for this question.</li>';
+            }
+            ui.samplesContainer.classList.remove('hidden');
+        });
+        
+        // --- Initial Load ---
+        async function main() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+                ui.recordBtn.disabled = true;
+                ui.recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            
+            await initializeTTS().catch(err => console.error(err));
+            
+            createMasterList();
+            loadProgress();
+            initializeTopics();
+        }
+        
+        main();
+    });
+    </script>
+</body>
+</html>
