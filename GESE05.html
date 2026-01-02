@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trinity GESE 5 Interactive Classroom</title>
+    
+    <!-- Tailwind CSS (Styling) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM (Core Logic) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel (To understand JSX) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        /* Custom Animations */
+        @keyframes floatUp {
+            0% { transform: translateY(0px) scale(0.5); opacity: 0; }
+            10% { opacity: 1; transform: translateY(-10px) scale(1.2); }
+            100% { transform: translateY(-100px) scale(1); opacity: 0; }
+        }
+        .animate-float-up {
+            animation: floatUp 2s ease-out forwards;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Custom Scrollbar for cleaner look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 overflow-hidden h-screen">
+    <div id="root" class="h-full"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useRef } = React;
+
+        // --- ICON COMPONENTS ---
+        const Icon = ({ children, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
+        );
+        
+        const Play = ({ className }) => <Icon className={className}><polygon points="5 3 19 12 5 21 5 3"></polygon></Icon>;
+        const RotateCcw = ({ className }) => <Icon className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"></path><path d="M3 3v9h9"></path></Icon>;
+        const MessageSquare = ({ className }) => <Icon className={className}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></Icon>;
+        const BookOpen = ({ className }) => <Icon className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></Icon>;
+        const AlertCircle = ({ className }) => <Icon className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></Icon>;
+        const Star = ({ className }) => <Icon className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></Icon>;
+        const Trophy = ({ className }) => <Icon className={className}><path d="M8 21h8"></path><path d="M12 17v4"></path><path d="M7 4h10"></path><path d="M17 4v3a5 5 0 0 1-10 0V4"></path><path d="M7 4H5a2 2 0 0 0-2 2v2a3 3 0 0 0 3 3h1"></path><path d="M17 4h2a2 2 0 0 1 2 2v2a3 3 0 0 1-3 3h-1"></path></Icon>;
+        const Clock = ({ className }) => <Icon className={className}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></Icon>;
+        const CheckSquare = ({ className }) => <Icon className={className}><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></Icon>;
+        const Lightbulb = ({ className }) => <Icon className={className}><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.9.27-1.48.27-2.06a5.5 5.5 0 0 0-9.68-2.67c-.6.94-1.2 2.67-1.2 4.73 0 1.25.4 2 1.25 2H15.09z"></path></Icon>;
+        const Check = ({ className }) => <Icon className={className}><polyline points="20 6 9 17 4 12"></polyline></Icon>;
+
+        // --- APP DATA ---
+
+        const conversationData = {
+            festivals: {
+                title: "Festivals (节日)",
+                icon: "🏮",
+                color: "bg-red-100 border-red-300",
+                vocab: [
+                    "tradition (传统)", "celebrate (庆祝)", "custom (习俗)", "fireworks (烟花)", 
+                    "reunion (团圆)", "relative (亲戚)", "public holiday (法定假日)", "parade (游行)", 
+                    "decorate (装饰)", "atmosphere (气氛)", "lantern (灯笼)", "gift (礼物)", 
+                    "ceremony (仪式)", "costume (服装)", "invite (邀请)", "preparation (准备)",
+                    "special meal (大餐)", "pray (祈祷)", "annual (每年的)", "festival (节日)",
+                    "memorable (难忘的)", "noisy (吵闹的)", "crowded (拥挤的)", "excited (兴奋)"
+                ],
+                grammar: ["Pres Perf: Have you ever seen...?", "Future: I'm going to...", "Reason: because/so", "Duration: for 3 days", "Pref: I prefer X to Y", "Adj: It was amazing"],
+                tips: [
+                    "Describe a festival using Present Perfect (e.g., 'I have celebrated this since I was born').",
+                    "Use 'because' to explain importance (e.g., 'It's important because we meet family').",
+                    "Talk about future plans using 'going to'.",
+                    "Use adjectives like 'colourful', 'traditional', 'noisy' to describe the atmosphere."
+                ],
+                questions: [
+                    "What is the most important festival in your country?",
+                    "How do you usually celebrate this festival?",
+                    "Have you ever spent a festival in another city?",
+                    "What are you going to do for the next big festival?",
+                    "Do you prefer traditional festivals or modern festivals?",
+                    "Which festival food do you like the most?",
+                    "Why are festivals important to people?",
+                    "Tell me about a festival you didn't enjoy.",
+                    "How long does the celebration usually last?",
+                    "Who do you usually spend the festival with?",
+                    "Have you ever worn a traditional costume?",
+                    "What is the best gift you have received during a festival?"
+                ]
+            },
+            transport: {
+                title: "Transport (交通)",
+                icon: "🚆",
+                color: "bg-blue-100 border-blue-300",
+                vocab: [
+                    "vehicle (车辆)", "passenger (乘客)", "journey (旅程)", "traffic jam (堵车)", 
+                    "convenient (方便)", "delay (延误)", "crowded (拥挤)", "environment (环境)", 
+                    "public transport (公共交通)", "flight (航班)", "bicycle (自行车)", "platform (站台)", 
+                    "arrive (到达)", "depart (出发)", "ticket (票)", "expensive (贵)",
+                    "comfortable (舒适)", "pollute (污染)", "subway (地铁)", "driver (司机)",
+                    "safe (安全)", "dangerous (危险)", "timetable (时刻表)", "station (车站)"
+                ],
+                grammar: ["Pref: prefer trains to cars", "Duration: It takes...", "Comp: faster than", "Reason: because it is...", "Pres Perf: Have you ever flown?", "Cond: If I take the bus..."],
+                tips: [
+                    "Use 'prefer X to Y' (e.g., 'I prefer taking the subway to taking the bus').",
+                    "Use 'It takes [time]' to talk about duration (e.g., 'It takes 20 minutes to get to school').",
+                    "Compare different ways of travelling (cheap/expensive, fast/slow).",
+                    "Mention environmental reasons (e.g., 'Bikes are better because they don't pollute')."
+                ],
+                questions: [
+                    "How do you usually come to school?",
+                    "How long does it take you to get here?",
+                    "Do you prefer travelling by train or by plane?",
+                    "Have you ever travelled on a high-speed train?",
+                    "What is the best way to travel around your city?",
+                    "Have you ever had a bad journey?",
+                    "Do you think cars are good for the city?",
+                    "Is public transport cheap or expensive in your city?",
+                    "Have you ever ridden a bicycle to school?",
+                    "What are you going to do if you miss the bus?",
+                    "Why do some people prefer driving cars?",
+                    "Tell me about a long journey you have made."
+                ]
+            },
+            occasions: {
+                title: "Occasions (特别场合)",
+                icon: "🎂",
+                color: "bg-pink-100 border-pink-300",
+                vocab: [
+                    "birthday (生日)", "wedding (婚礼)", "invitation (邀请)", "guest (客人)", 
+                    "surprise (惊喜)", "party (聚会)", "celebrate (庆祝)", "memory (记忆)", 
+                    "present (礼物)", "cake (蛋糕)", "dress up (打扮)", "host (主人)", 
+                    "candle (蜡烛)", "speech (演讲)", "graduate (毕业)", "anniversary (周年)",
+                    "event (活动)", "organize (组织)", "balloon (气球)", "card (卡片)",
+                    "fun (有趣)", "unforgettable (难忘)", "music (音乐)", "dance (跳舞)"
+                ],
+                grammar: ["Pres Perf: Have you been to...?", "Past: Last month I went...", "Future: I will...", "Quant: a lot of people", "Prep: at the party", "Adj: The party was..."],
+                tips: [
+                    "Talk about a specific past event (e.g., 'Last week I went to my cousin's wedding').",
+                    "Use 'Have you ever...?' for life experiences.",
+                    "Describe the atmosphere: exciting, boring, noisy, fun.",
+                    "Mention what you wore or what you ate."
+                ],
+                questions: [
+                    "When is your birthday?",
+                    "How do you usually celebrate your birthday?",
+                    "Have you ever been to a wedding?",
+                    "Tell me about a party you went to recently.",
+                    "What is the best present you have ever received?",
+                    "Are you going to organize a party soon?",
+                    "Do you prefer big parties or small dinners?",
+                    "Have you ever given someone a surprise?",
+                    "What special clothes do people wear at weddings?",
+                    "How many people did you invite to your last party?",
+                    "What food do you usually have at parties?",
+                    "Have you ever forgotten someone's birthday?"
+                ]
+            },
+            entertainment: {
+                title: "Entertainment (娱乐)",
+                icon: "🎬",
+                color: "bg-purple-100 border-purple-300",
+                vocab: [
+                    "cinema (电影院)", "audience (观众)", "performance (表演)", "comedy (喜剧)", 
+                    "horror (恐怖片)", "actor (演员)", "stream (流媒体)", "video game (电子游戏)", 
+                    "club (俱乐部)", "channel (频道)", "series (连续剧)", "entertaining (有娱乐性的)", 
+                    "ticket (票)", "review (评论)", "popcorn (爆米花)", "screen (屏幕)",
+                    "animation (动画)", "character (角色)", "story (故事)", "exciting (刺激)",
+                    "scary (可怕)", "funny (好笑)", "recommend (推荐)", "watch (观看)"
+                ],
+                grammar: ["Pref: prefer watching...", "Pres Perf: Have you seen...?", "Duration: for 2 hours", "Reason: because it's funny", "Gerund: I enjoy playing...", "Comp: better than"],
+                tips: [
+                    "Use 'prefer doing' (e.g., 'I prefer watching movies at home').",
+                    "Talk about recent experiences using Present Perfect + just/recently.",
+                    "Give reasons why you like a show/game (exciting, relaxing).",
+                    "Recommend something: 'You should watch it because...'"
+                ],
+                questions: [
+                    "Do you prefer watching films at home or in the cinema?",
+                    "What kind of TV programmes do you like?",
+                    "Have you seen any good films recently?",
+                    "How much time do you spend playing video games?",
+                    "Have you ever been to a theme park?",
+                    "What are you going to watch on TV tonight?",
+                    "Is watching TV good for students?",
+                    "Who is your favourite actor/actress?",
+                    "Have you ever watched a movie in English?",
+                    "Do you like watching sports on TV?",
+                    "What is the funniest movie you have ever seen?",
+                    "Do you prefer comedy or horror movies?"
+                ]
+            },
+            music: {
+                title: "Music (音乐)",
+                icon: "🎵",
+                color: "bg-yellow-100 border-yellow-300",
+                vocab: [
+                    "concert (音乐会)", "instrument (乐器)", "lyrics (歌词)", "melody (旋律)", 
+                    "band (乐队)", "genre (流派)", "pop (流行)", "classical (古典)", 
+                    "live music (现场音乐)", "download (下载)", "playlist (播放列表)", "singer (歌手)", 
+                    "rhythm (节奏)", "practice (练习)", "listen (听)", "loud (大声)",
+                    "headphones (耳机)", "rock (摇滚)", "piano (钢琴)", "guitar (吉他)",
+                    "drum (鼓)", "talent (天赋)", "popular (流行)", "relaxing (放松)"
+                ],
+                grammar: ["Duration: for 5 years", "Pres Perf: I have played...", "Pref: prefer pop to rock", "Future: I'm going to learn...", "Cause: It makes me feel...", "Gerund: I love listening..."],
+                tips: [
+                    "Use 'I have played [instrument] for [time]' to show duration.",
+                    "Use 'prefer X to Y' for music types.",
+                    "Talk about how music makes you feel (happy, energetic, relaxed).",
+                    "Mention where and when you listen to music."
+                ],
+                questions: [
+                    "What kind of music do you like?",
+                    "Can you play a musical instrument?",
+                    "How long have you played it?",
+                    "Have you ever been to a live concert?",
+                    "Who is your favourite singer?",
+                    "Do you prefer listening to music alone or with friends?",
+                    "Why do you think people like music?",
+                    "Have you ever downloaded music from the internet?",
+                    "What song makes you feel happy?",
+                    "Are you going to learn a new instrument in the future?",
+                    "Do you listen to music while you study?",
+                    "Is music a popular subject in your school?"
+                ]
+            },
+            recent: {
+                title: "Recent Exp. (近期经历)",
+                icon: "📅",
+                color: "bg-green-100 border-green-300",
+                vocab: [
+                    "recently (最近)", "experience (经历)", "memorable (难忘的)", "happen (发生)", 
+                    "visit (拜访)", "trip (旅行)", "last week (上周)", "yesterday (昨天)", 
+                    "weekend (周末)", "interesting (有趣的)", "boring (无聊的)", "busy (忙碌的)", 
+                    "relaxing (放松的)", "news (新闻)", "museum (博物馆)", "park (公园)",
+                    "restaurant (餐厅)", "meet (见面)", "buy (买)", "read (读)",
+                    "finish (完成)", "start (开始)", "exam (考试)", "holiday (假期)"
+                ],
+                grammar: ["Pres Perf: I have just...", "Past: I went...", "Conn: although/but", "Reason: so I was tired", "Time: last night/week", "Adj: It was surprising"],
+                tips: [
+                    "Combine Present Perfect (recent indefinite) and Past Simple (specific time).",
+                    "Example: 'I have just finished my exams. Last Friday I celebrated.'",
+                    "Use connectors like 'so', 'because', 'although'.",
+                    "Focus on the feeling/result of the experience."
+                ],
+                questions: [
+                    "Tell me about something interesting you did recently.",
+                    "Have you been anywhere nice lately?",
+                    "What did you do last weekend?",
+                    "Have you read any good books recently?",
+                    "Tell me about a recent meal you enjoyed.",
+                    "What has made you happy recently?",
+                    "Have you met anyone new recently?",
+                    "Have you bought anything nice recently?",
+                    "Have you been busy at school recently?",
+                    "Tell me about a movie you watched recently.",
+                    "Have you had any exams recently?",
+                    "What is the most memorable thing that happened this month?"
+                ]
+            },
+            holidays: {
+                title: "Holidays (假期)",
+                icon: "🏖️",
+                color: "bg-teal-100 border-teal-300",
+                vocab: [
+                    "beach (海滩)", "mountain (山)", "hotel (酒店)", "souvenir (纪念品)", 
+                    "relax (放松)", "sightseeing (观光)", "passport (护照)", "luggage (行李)", 
+                    "trip (旅行)", "tourist (游客)", "scenery (风景)", "photos (照片)", 
+                    "foreign (外国的)", "camping (露营)", "activity (活动)", "museum (博物馆)", 
+                    "guide (导游)", "view (景色)", "explore (探索)", "book (预订)", 
+                    "flight (航班)", "airport (机场)", "suitcase (手提箱)", "map (地图)"
+                ],
+                grammar: ["Pres Perf: Have you ever been...?", "Future: I'm going to...", "Dur: for 2 weeks", "Pref: prefer beach to city", "Cond: If I go to...", "Adj: It was peaceful"],
+                tips: [
+                    "Use Present Perfect for general experience ('I have been to Japan').",
+                    "Use Past Simple for specific details ('I went there last year').",
+                    "Talk about duration ('We stayed for 5 days').",
+                    "Use 'prefer' to compare different holiday types."
+                ],
+                questions: [
+                    "Where is the best place you have ever visited?",
+                    "Do you prefer summer holidays or winter holidays?",
+                    "Have you ever been camping?",
+                    "Where are you going to go for your next holiday?",
+                    "Who do you usually travel with?",
+                    "Tell me about a holiday you didn't enjoy.",
+                    "Have you ever lost your luggage?",
+                    "Do you prefer staying in hotels or camping?",
+                    "What do you usually pack in your suitcase?",
+                    "Have you visited any interesting museums recently?",
+                    "What is the most beautiful scenery you have seen?",
+                    "Do you like to buy souvenirs?"
+                ]
+            },
+            projects: {
+                title: "School & Projects (学校项目)",
+                icon: "🔬",
+                color: "bg-orange-100 border-orange-300",
+                vocab: [
+                    "experiment (实验)", "project (项目)", "science (科学)", "teamwork (团队)", 
+                    "presentation (展示)", "research (研究)", "model (模型)", "result (结果)", 
+                    "success (成功)", "fail (失败)", "learn (学习)", "subject (科目)", 
+                    "hard (难)", "easy (容易)", "creative (有创意的)", "build (建造)", 
+                    "solve (解决)", "idea (主意)", "test (测试)", "report (报告)", 
+                    "term (学期)", "grade (成绩)", "teacher (老师)", "lab (实验室)"
+                ],
+                grammar: ["Pres Perf: I have finished...", "Dur: for 2 weeks", "Reason: because it works", "Comp: harder than", "Fut: I will present...", "Seq: First, then..."],
+                tips: [
+                    "Describe a recent project using sequence words (First, then, finally).",
+                    "Use Present Perfect for completion ('I have just finished...').",
+                    "Compare subjects ('Science is more interesting than Math').",
+                    "Talk about process and teamwork."
+                ],
+                questions: [
+                    "Have you done any interesting school projects recently?",
+                    "Do you prefer working alone or in a team?",
+                    "What is your favourite subject at school?",
+                    "Have you ever won a competition?",
+                    "Tell me about a science experiment you have done.",
+                    "How long have you studied English?",
+                    "Are you going to learn anything new next term?",
+                    "Do you think homework is useful?",
+                    "What was the most difficult project you have ever done?",
+                    "Have you ever made a model?",
+                    "Do you prefer Science or Art projects?",
+                    "What project are you going to do next?"
+                ]
+            }
+        };
+
+        const mockExams = [
+            { 
+                id: 1, 
+                title: "Mock 1: My Favourite Festival", 
+                topic: "The Mid-Autumn Festival", 
+                areas: ["Entertainment", "Recent Experiences"], 
+                vocab: ["mooncake (月饼)", "family reunion (家庭团聚)", "full moon (满月)", "lantern (灯笼)", "admire (欣赏)", "tradition (传统)", "legend (传说)", "delicious (美味)", "celebrate (庆祝)", "autumn (秋天)", "share (分享)", "garden (花园)", "tea (茶)", "round (圆)", "symbol (象征)"], 
+                script: [ 
+                    { role: "E", text: "Good morning. Please sit down. What is your topic?" }, 
+                    { role: "C", text: "My topic is the Mid-Autumn Festival." }, 
+                    { role: "E", text: "I see. Why do you like this festival?" }, 
+                    { role: "C", text: "I like it because I can eat delicious mooncakes and see my family." },
+                    { role: "E", text: "How long have you celebrated this festival?" }, 
+                    { role: "E", text: "What did you do last year for this festival?" }, 
+                    { role: "E", text: "Which do you prefer: Mid-Autumn Festival or Spring Festival?" }, 
+                    { role: "Note", text: "WAIT: Student must ask: 'What festivals do you like?'" }, 
+                    { role: "E", text: "Let's talk about Entertainment. Do you prefer watching films at home or at the cinema?" }, 
+                    { role: "E", text: "Have you seen any good films recently?" }, 
+                    { role: "E", text: "Now, Recent Experiences. Tell me about something you did last weekend." }, 
+                    { role: "E", text: "Have you been anywhere interesting recently?" } 
+                ] 
+            },
+            { 
+                id: 2, 
+                title: "Mock 2: Public Transport", 
+                topic: "Transport in My City", 
+                areas: ["Festivals", "Music"], 
+                vocab: ["subway (地铁)", "convenient (方便)", "crowded (拥挤)", "traffic (交通)", "rush hour (高峰期)", "cheap (便宜)", "environment (环境)", "fast (快)", "station (车站)", "line (线路)", "ticket (车票)", "clean (干净)", "modern (现代)", "passenger (乘客)", "drive (驾驶)"], 
+                script: [ 
+                    { role: "E", text: "Hello. What are we going to talk about?" }, 
+                    { role: "C", text: "I'm going to talk about transport in my city." }, 
+                    { role: "E", text: "Great. What is the best way to travel in your city?" }, 
+                    { role: "E", text: "How long have you used the subway?" }, 
+                    { role: "E", text: "Do you prefer the bus or the subway? Why?" }, 
+                    { role: "E", text: "Have you ever had a problem on the bus?" }, 
+                    { role: "Note", text: "WAIT: Student must ask: 'How do you come to work?'" }, 
+                    { role: "E", text: "Let's move to Festivals. What is the most important festival in your country?" }, 
+                    { role: "E", text: "How do you usually celebrate it?" }, 
+                    { role: "E", text: "Now Music. Can you play a musical instrument?" }, 
+                    { role: "E", text: "What kind of music do you prefer?" } 
+                ] 
+            },
+            { 
+                id: 3, 
+                title: "Mock 3: A Special Birthday", 
+                topic: "My 10th Birthday Party", 
+                areas: ["Transport", "Entertainment"], 
+                vocab: ["party (聚会)", "invite (邀请)", "cake (蛋糕)", "games (游戏)", "memorable (难忘)", "gift (礼物)", "friends (朋友)", "happy (快乐)", "restaurant (餐厅)", "surprise (惊喜)", "candle (蜡烛)", "blow out (吹灭)", "sing (唱)", "wish (愿望)", "balloon (气球)"], 
+                script: [ 
+                    { role: "E", text: "What is your topic sheet about?" }, 
+                    { role: "C", text: "It's about my 10th birthday party." }, 
+                    { role: "E", text: "Why was this birthday special?" }, 
+                    { role: "E", text: "Who did you invite to the party?" }, 
+                    { role: "E", text: "Have you had a big party since then?" }, 
+                    { role: "E", text: "What are you going to do for your next birthday?" }, 
+                    { role: "Note", text: "WAIT: Student must ask: 'When is your birthday?'" }, 
+                    { role: "E", text: "Transport. How long does it take you to get to school?" }, 
+                    { role: "E", text: "Have you ever travelled by plane?" }, 
+                    { role: "E", text: "Entertainment. What TV programmes do you like?" }, 
+                    { role: "E", text: "Do you prefer comedy or action movies?" } 
+                ] 
+            },
+            { 
+                id: 4, 
+                title: "Mock 4: Learning Guitar", 
+                topic: "My Hobby: The Guitar", 
+                areas: ["Special Occasions", "Recent Experiences"], 
+                vocab: ["guitar (吉他)", "practice (练习)", "song (歌曲)", "hard (难)", "fingers (手指)", "perform (表演)", "band (乐队)", "sound (声音)", "teacher (老师)", "music (音乐)", "chord (和弦)", "play (弹奏)", "instrument (乐器)", "rock (摇滚)", "classical (古典)"], 
+                script: [ 
+                    { role: "E", text: "Please tell me your topic." }, 
+                    { role: "C", text: "My topic is my hobby, playing the guitar." }, 
+                    { role: "E", text: "Nice. How long have you played the guitar?" }, 
+                    { role: "E", text: "Have you ever played in a concert?" }, 
+                    { role: "E", text: "Do you prefer playing alone or with others?" }, 
+                    { role: "E", text: "What are you going to play next?" }, 
+                    { role: "Note", text: "WAIT: Student must ask: 'Do you play any instruments?'" }, 
+                    { role: "E", text: "Special Occasions. Have you been to a wedding recently?" }, 
+                    { role: "E", text: "What did you wear?" }, 
+                    { role: "E", text: "Recent Experiences. Tell me about something interesting you did recently." }, 
+                    { role: "E", text: "Have you seen any friends lately?" } 
+                ] 
+            },
+            { 
+                id: 5, 
+                title: "Mock 5: A Cinema Trip", 
+                topic: "Going to the Cinema", 
+                areas: ["Music", "Festivals"], 
+                vocab: ["movie (电影)", "popcorn (爆米花)", "screen (屏幕)", "3D glasses (3D眼镜)", "exciting (刺激)", "ticket (票)", "expensive (贵)", "seat (座位)", "action (动作)", "enjoy (享受)", "cinema (电影院)", "review (影评)", "actor (演员)", "sound (音效)", "watch (观看)"], 
+                script: [ 
+                    { role: "E", text: "What topic have you prepared?" }, 
+                    { role: "C", text: "I have prepared the topic: Going to the Cinema." }, 
+                    { role: "E", text: "Do you prefer the cinema to watching TV?" }, 
+                    { role: "C", text: "I prefer the cinema because the screen is bigger." },
+                    { role: "E", text: "Have you seen a good film recently?" }, 
+                    { role: "E", text: "How often do you go to the cinema?" }, 
+                    { role: "Note", text: "WAIT: Student must ask: 'What kind of films do you like?'" }, 
+                    { role: "E", text: "Let's talk about Music. Who is your favourite singer?" }, 
+                    { role: "E", text: "Have you ever been to a concert?" }, 
+                    { role: "E", text: "Festivals. What are you going to do for the next festival?" }, 
+                    { role: "E", text: "Do you like fireworks?" } 
+                ] 
+            },
+            { 
+                id: 6, 
+                title: "Mock 6: Recent Holiday", 
+                topic: "My Trip to Beijing", 
+                areas: ["Transport", "Special Occasions"], 
+                vocab: ["Great Wall (长城)", "flight (航班)", "museum (博物馆)", "history (历史)", "walking (走路)", "tired (累)", "photos (照片)", "souvenir (纪念品)", "hotel (酒店)", "duck (烤鸭)", "capital (首都)", "palace (宫殿)", "tourist (游客)", "busy (忙碌)", "scenery (风景)"], 
+                script: [ 
+                    { role: "E", text: "Hello. What is your topic?" }, 
+                    { role: "C", text: "My topic is my trip to Beijing." }, 
+                    { role: "E", text: "When did you go there?" }, 
+                    { role: "E", text: "Have you been to Beijing before?" }, 
+                    { role: "E", text: "How did you travel there?" }, 
+                    { role: "E", text: "Which did you prefer: the food or the sights?" }, 
+                    { role: "Note", text: "WAIT: Student must ask: 'Have you ever been to Beijing?'" }, 
+                    { role: "E", text: "Transport. Is traffic a problem in your city?" }, 
+                    { role: "E", text: "Do you prefer buses or cars?" }, 
+                    { role: "E", text: "Special Occasions. How do you celebrate your birthday?" }, 
+                    { role: "E", text: "Have you ever had a surprise party?" } 
+                ] 
+            },
+            { 
+                id: 7, 
+                title: "Mock 7: Computer Games", 
+                topic: "My Favourite Game", 
+                areas: ["Music", "Recent Experiences"], 
+                vocab: ["online (在线)", "level (关卡)", "team (队伍)", "win (赢)", "graphics (画质)", "fun (有趣)", "chat (聊天)", "weekend (周末)", "skill (技巧)", "strategy (策略)", "player (玩家)", "character (角色)", "download (下载)", "connect (连接)", "screen (屏幕)"], 
+                script: [ 
+                    { role: "E", text: "Let's start. What is your topic?" }, 
+                    { role: "C", text: "My topic is my favourite computer game." }, 
+                    { role: "E", text: "How long have you played this game?" }, 
+                    { role: "E", text: "Why do you like it?" }, 
+                    { role: "E", text: "Do you prefer playing games or doing sports?" }, 
+                    { role: "E", text: "What new game are you going to buy?" }, 
+                    { role: "Note", text: "WAIT: Student must ask: 'Do you play video games?'" }, 
+                    { role: "E", text: "Music. Do you like listening to music while you study?" }, 
+                    { role: "E", text: "What kind of music is popular in your country?" }, 
+                    { role: "E", text: "Recent Experiences. What did you do yesterday?" }, 
+                    { role: "E", text: "Have you learnt anything new recently?" } 
+                ] 
+            },
+            { 
+                id: 8, 
+                title: "Mock 8: A Family Wedding", 
+                topic: "My Cousin's Wedding", 
+                areas: ["Entertainment", "Festivals"], 
+                vocab: ["bride (新娘)", "groom (新郎)", "ceremony (仪式)", "hotel (酒店)", "beautiful (美丽)", "happy (快乐)", "dance (跳舞)", "food (食物)", "family (家庭)", "suit (西装)", "ring (戒指)", "promise (承诺)", "cake (蛋糕)", "photographer (摄影师)", "guest (客人)"], 
+                script: [ 
+                    { role: "E", text: "Good afternoon. What is your topic?" }, 
+                    { role: "C", text: "My topic is my cousin's wedding." }, 
+                    { role: "E", text: "When was the wedding?" }, 
+                    { role: "E", text: "Have you ever been to a wedding before this one?" }, 
+                    { role: "E", text: "What did you do at the wedding?" }, 
+                    { role: "E", text: "Did you enjoy it?" }, 
+                    { role: "Note", text: "WAIT: Student must ask: 'Do you like weddings?'" }, 
+                    { role: "E", text: "Entertainment. Do you like watching TV?" }, 
+                    { role: "E", text: "What is your favourite programme?" }, 
+                    { role: "E", text: "Festivals. What do you usually do for Spring Festival?" }, 
+                    { role: "E", text: "Do you eat special food?" } 
+                ] 
+            }
+        ];
+
+        const sampleTopics = {
+            "volcano": { 
+                title: "My Science Project", 
+                point1: "NOW: I really enjoy science class because it is very practical. I have been interested in doing experiments since I was in primary school.", 
+                point2: "PAST: Last week, I made a volcano model using clay and paint. When I poured the vinegar in, it erupted messily all over the table!", 
+                point3: "COMPARE: This experiment is much more exciting than reading textbooks because I can see the reaction happen instantly.", 
+                point4: "FUTURE: Next term, I'm going to build a solar car for the school competition. I think it will be difficult, but I am going to try my best.", 
+                question: "Do you like doing science experiments?", 
+                vocab: ["vinegar (醋)", "baking soda (小苏打)", "eruption (爆发)", "lava (岩浆)", "messy (脏乱)", "exciting (刺激)", "science (科学)", "experiment (实验)", "reaction (反应)", "goggles (护目镜)", "pour (倒)", "bubble (气泡)", "clean up (清理)"] 
+            },
+            "rail": { 
+                title: "A Special Trip", 
+                point1: "NOW: I love travelling by train because it is very relaxing. I have travelled by high-speed rail many times with my parents.", 
+                point2: "PAST: Last month, I went to Shanghai to visit my aunt. The journey only took 4 hours and I watched a movie on my tablet.", 
+                point3: "COMPARE: The train is much faster and more comfortable than the bus. Also, you can walk around on the train, which is better.", 
+                point4: "FUTURE: I'm going to visit Beijing next summer by train. I am going to take a lot of photos of the scenery on the way.", 
+                question: "Do you prefer travelling by train or by plane?", 
+                vocab: ["comfortable (舒适)", "scenery (风景)", "fast (快)", "ticket (车票)", "station (车站)", "seat (座位)", "modern (现代)", "trip (旅行)", "expensive (贵)", "convenient (方便)", "arrive (到达)", "leave (离开)", "passenger (乘客)"] 
+            },
+            "minecraft": { 
+                title: "My Favourite Hobby", 
+                point1: "NOW: My favourite hobby is playing Minecraft on the weekend. I have played this game since I was 10 years old, so I am quite good at it.", 
+                point2: "PAST: Yesterday, I built a huge medieval castle with my friend online. It took us three hours, but we were very proud of it.", 
+                point3: "COMPARE: Playing creative mode is better than survival mode because I can build anything I want without dying.", 
+                point4: "FUTURE: I'm going to start a new world next weekend. I plan to build an underwater city, which will be very challenging.", 
+                question: "Do you play any computer games?", 
+                vocab: ["creeper (苦力怕)", "tower (塔)", "survival (生存)", "creative (创造)", "blocks (方块)", "build (建造)", "zombies (僵尸)", "design (设计)", "night (夜晚)", "diamond (钻石)", "tools (工具)", "house (房子)", "fun (有趣)"] 
+            },
+            "spring": { 
+                title: "Spring Festival", 
+                point1: "NOW: Spring Festival is the most important holiday for my family. We have celebrated it in my hometown every year since I was born.", 
+                point2: "PAST: Last year, we had a huge reunion dinner with all my relatives. After dinner, we went outside and watched the beautiful fireworks.", 
+                point3: "COMPARE: I prefer Spring Festival to National Day because the atmosphere is livelier and the food is more delicious.", 
+                point4: "FUTURE: Next year, I'm going to learn how to make dumplings with my grandmother. I am also going to save my red envelope money.", 
+                question: "How do you usually celebrate festivals?", 
+                vocab: ["dumplings (饺子)", "reunion (团圆)", "fireworks (烟花)", "ugly (丑)", "red envelope (红包)", "celebrate (庆祝)", "dinner (晚餐)", "family (家庭)", "visit (拜访)", "new clothes (新衣)", "lucky (幸运)", "happy (快乐)", "tradition (传统)"] 
+            },
+            "zongzi": { 
+                title: "Dragon Boat Festival", 
+                point1: "NOW: I really love the Dragon Boat Festival traditions. I have eaten Zongzi every year, and my favourite flavour is sweet red bean.", 
+                point2: "PAST: Last year, I watched a dragon boat race on TV with my dad. The teams paddled very fast and it was very exciting.", 
+                point3: "COMPARE: I think sweet Zongzi is tastier than salty Zongzi because I have a sweet tooth. Salty ones are too oily for me.", 
+                point4: "FUTURE: Next festival, I'm going to try to make Zongzi myself. I am going to buy the bamboo leaves and sticky rice tomorrow.", 
+                question: "Have you ever seen a dragon boat race?", 
+                vocab: ["salty (咸)", "sweet (甜)", "sticky rice (糯米)", "bamboo (竹)", "leaves (叶子)", "filling (馅料)", "taste (尝)", "dragon boat (端午)", "pork (猪肉)", "bean paste (豆沙)", "boil (煮)", "grandmother (祖母)", "make (制作)"] 
+            },
+            "magnet": { 
+                title: "A Science Lesson", 
+                point1: "NOW: We are learning about physics in school. I have just learned about how magnets have a north pole and a south pole.", 
+                point2: "PAST: Yesterday, we tested different materials in the lab. We found that the magnet attracted the iron nails but not the copper coins.", 
+                point3: "COMPARE: The horseshoe magnet is much stronger than the bar magnet. It can pick up more paperclips at one time.", 
+                point4: "FUTURE: We are going to make a simple compass next week. I am going to bring a needle and a bowl of water to class.", 
+                question: "Do you like learning about magnets?", 
+                vocab: ["attract (吸引)", "metal (金属)", "strong (强)", "test (测试)", "repel (排斥)", "force (力)", "north (北)", "south (南)", "coins (硬币)", "paper clip (回形针)", "plastic (塑料)", "stick (吸附)", "science (科学)"] 
+            },
+            "club": { 
+                title: "School Football Club", 
+                point1: "NOW: I am an active member of the school football club. I have been in the team for 6 months and we practice twice a week.", 
+                point2: "PAST: Last week, we played a match against another school. We won 2-1, and I was so happy that I cheered loudly.", 
+                point3: "COMPARE: Playing football is more exciting than just watching it on TV because you can exercise and make friends.", 
+                point4: "FUTURE: We are going to have a training camp next summer holiday. I am going to buy a new pair of football boots for it.", 
+                question: "Have you ever joined a school club?", 
+                vocab: ["hands-on (动手)", "teamwork (团队)", "skill (技能)", "fix (修理)", "model (模型)", "project (项目)", "learn (学习)", "fun (有趣)", "join (加入)", "after school (放学后)", "science (科学)", "art (艺术)", "together (一起)"] 
+            },
+            "mooncake": { 
+                title: "Mid-Autumn Festival", 
+                point1: "NOW: I enjoy the Mid-Autumn Festival very much. I have always liked looking at the full moon because it is so bright and round.", 
+                point2: "PAST: Last year, we sat in the garden, ate mooncakes, and drank tea. My grandfather told us stories about the moon.", 
+                point3: "COMPARE: I prefer lotus seed mooncakes to nut mooncakes because they are softer. Nut mooncakes are a bit too hard for me.", 
+                point4: "FUTURE: Next year, I'm going to buy a colourful lantern. I am also going to send mooncakes to my friends as gifts.", 
+                question: "What is your favourite mooncake flavour?", 
+                vocab: ["lotus seed (莲蓉)", "smooth (细腻)", "share (分享)", "traditional (传统)", "moon (月亮)", "mid-autumn (中秋)", "round (圆)", "sweet (甜)", "ranking (排名)", "flavour (口味)", "box (盒子)", "gift (礼物)", "family (家庭)", "eat (吃)", "tea (茶)"] 
+            }
+        };
+
+        // --- COMPONENTS DEFINED OUTSIDE APP (To fix resetting issue) ---
+
+        const PhaseTimer = ({ timeLeft, timerActive, toggleTimer, resetTimer, formatTime }) => (
+            <div className={`flex items-center gap-2 px-3 py-1 rounded-lg border ${timeLeft < 30 ? 'bg-red-100 border-red-500 text-red-700 animate-pulse' : 'bg-white border-gray-200 text-gray-700'}`}>
+                <Clock className="w-4 h-4" />
+                <span className="font-mono font-bold text-lg w-12 text-center">{formatTime(timeLeft)}</span>
+                <button onClick={toggleTimer} className="text-xs font-bold hover:text-blue-600">{timerActive ? 'PAUSE' : 'START'}</button>
+                <button onClick={resetTimer} className="text-xs font-bold hover:text-red-600">RESET</button>
+            </div>
+        );
+
+        const GrammarChecklist = ({ onReward }) => {
+            const [checkedItems, setCheckedItems] = useState({
+                future: false,
+                but: false,
+                compare: false,
+                past: false,
+                question: false,
+                perfect: false,
+                duration: false,
+                prefer: false
+            });
+
+            const handleCheck = (key) => {
+                if (!checkedItems[key]) {
+                    onReward(5); 
+                    setCheckedItems(prev => ({ ...prev, [key]: true }));
+                } else {
+                    setCheckedItems(prev => ({ ...prev, [key]: false }));
+                }
+            };
+
+            return (
+                <div className="bg-blue-50 p-2 rounded-lg border border-blue-100 flex-shrink-0 h-full overflow-y-auto">
+                    <div className="text-xs font-bold text-blue-800 uppercase mb-2 flex items-center gap-1"><CheckSquare size={14}/> GESE 5 Check (+5)</div>
+                    <div className="space-y-1">
+                        {[
+                            { k: 'past', label: 'Past Simple (did/went)' },
+                            { k: 'future', label: 'Future (Going to/Will)' },
+                            { k: 'perfect', label: 'Pres. Perfect (Have you...)' },
+                            { k: 'duration', label: 'Duration (For/Since)' },
+                            { k: 'prefer', label: 'Preference (Prefer X to Y)' },
+                            { k: 'compare', label: 'Comparative (Better than)' },
+                            { k: 'but', label: 'Connectives (Because/So)' },
+                            { k: 'question', label: 'Ask Question?' }
+                        ].map(item => (
+                            <button 
+                                key={item.k}
+                                onClick={() => handleCheck(item.k)}
+                                className={`w-full text-left text-xs px-2 py-2 rounded flex items-center justify-between gap-2 transition-all duration-200 border ${
+                                    checkedItems[item.k] 
+                                    ? 'bg-green-100 text-green-800 border-green-300 font-bold shadow-sm animate-pop' 
+                                    : 'bg-white text-gray-700 border-transparent hover:bg-blue-100'
+                                }`}
+                            >
+                                <span className="flex items-center gap-2">
+                                    <div className={`w-3 h-3 rounded-full border flex items-center justify-center transition-colors ${
+                                        checkedItems[item.k] ? 'bg-green-500 border-green-500' : 'border-gray-400'
+                                    }`}>
+                                        {checkedItems[item.k] && <Check className="w-2 h-2 text-white" />}
+                                    </div>
+                                    {item.label}
+                                </span>
+                                {checkedItems[item.k] && <span className="text-[10px] text-green-600 font-extrabold">+5</span>}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const ConversationTool = ({ timerProps }) => {
+            const [selectedArea, setSelectedArea] = useState(null);
+            const [currentQuestion, setCurrentQuestion] = useState(null);
+
+            const pickRandomQuestion = (areaKey) => {
+                const qs = conversationData[areaKey].questions;
+                const randomQ = qs[Math.floor(Math.random() * qs.length)];
+                setCurrentQuestion(randomQ);
+            };
+
+            return (
+                <div className="flex flex-col h-full overflow-hidden">
+                    <div className="flex justify-between items-center mb-2 flex-shrink-0">
+                        <div className="flex items-center gap-4">
+                            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                <MessageSquare className="w-6 h-6 text-blue-600" />
+                                Conversation (5 mins)
+                            </h2>
+                            {selectedArea && (
+                                <button 
+                                    onClick={() => pickRandomQuestion(selectedArea)}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg font-bold shadow-sm active:transform active:scale-95 transition-all flex items-center gap-2 text-xs"
+                                >
+                                    <RotateCcw className="w-3 h-3" /> Next Question
+                                </button>
+                            )}
+                        </div>
+                        <PhaseTimer {...timerProps} />
+                    </div>
+                    
+                    <div className="flex-shrink-0 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 mb-3">
+                        {Object.entries(conversationData).map(([key, data]) => (
+                            <button
+                            key={key}
+                            onClick={() => { setSelectedArea(key); pickRandomQuestion(key); }}
+                            className={`p-2 rounded-lg border-2 transition-all flex flex-col items-center text-center ${
+                                selectedArea === key 
+                                ? 'border-blue-600 shadow-md bg-white' 
+                                : 'border-transparent opacity-80 hover:opacity-100 hover:bg-white/50'
+                            } ${data.color}`}
+                            >
+                            <div className="text-xl">{data.icon}</div>
+                            <div className="font-bold text-gray-800 text-[10px] leading-tight mt-1">{data.title}</div>
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="flex-grow flex gap-4 overflow-hidden">
+                        {/* 1. Grammar Column (Left) - ENHANCED */}
+                        {selectedArea && (
+                            <div className="w-80 bg-blue-50 rounded-xl border border-blue-100 p-4 overflow-y-auto flex-shrink-0 animate-in fade-in slide-in-from-left-4 hidden md:flex flex-col">
+                                <div className="flex items-center gap-2 mb-2 text-blue-800 font-bold border-b border-blue-200 pb-2">
+                                    <CheckSquare size={16} /> Key Structures
+                                </div>
+                                <ul className="space-y-2 mb-4">
+                                    {conversationData[selectedArea].grammar.map((rule, i) => (
+                                        <li key={i} className="bg-white px-2 py-1 rounded text-sm text-blue-900 shadow-sm border border-blue-100">
+                                            {rule}
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                {/* NEW: Tips Section */}
+                                <div className="flex items-center gap-2 mb-2 mt-2 text-blue-800 font-bold border-b border-blue-200 pb-2">
+                                    <Lightbulb size={16} /> Pro Tips
+                                </div>
+                                <ul className="space-y-2">
+                                    {conversationData[selectedArea].tips.map((tip, i) => (
+                                        <li key={i} className="bg-yellow-50 px-2 py-2 rounded text-xs text-blue-900 border border-yellow-200 flex gap-2">
+                                            <span className="text-yellow-600 font-bold flex-shrink-0 mt-0.5">★</span> 
+                                            <span className="leading-tight">{tip}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {/* 2. Question Area (Center) */}
+                        <div className="flex-1 bg-white rounded-xl shadow-inner border border-gray-200 p-6 flex flex-col items-start justify-center text-left relative transition-all">
+                        {selectedArea ? (
+                            <>
+                            <span className="absolute top-4 left-4 text-xs font-bold uppercase text-gray-400 tracking-wider">
+                                Current Subject: {conversationData[selectedArea].title}
+                            </span>
+                            <p className="text-2xl md:text-3xl font-medium text-gray-800 leading-relaxed animate-in fade-in slide-in-from-top-4 duration-500">
+                                "{currentQuestion}"
+                            </p>
+                            </>
+                        ) : (
+                            <div className="w-full text-center text-gray-400 flex flex-col items-center">
+                            <Star className="w-12 h-12 mb-2 opacity-20" />
+                            <p>Select a topic above to start.</p>
+                            </div>
+                        )}
+                        </div>
+
+                        {/* 3. Word Bank Column (Right) */}
+                        {selectedArea && (
+                            <div className="w-80 bg-yellow-50 rounded-xl border border-yellow-100 p-4 overflow-y-auto flex-shrink-0 animate-in fade-in slide-in-from-right-4 hidden md:flex flex-col">
+                                <div className="flex items-center gap-2 mb-3 text-yellow-800 font-bold border-b border-yellow-200 pb-2">
+                                    <BookOpen size={16} /> Word Bank
+                                </div>
+                                <ul className="space-y-2">
+                                    {conversationData[selectedArea].vocab.map((word, i) => (
+                                        <li key={i} className="bg-white px-2 py-1 rounded text-sm text-gray-700 shadow-sm border border-yellow-100">
+                                            {word}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const MockExamTool = ({ timerProps, onReward }) => {
+            const [selectedMock, setSelectedMock] = useState(null);
+            const [lineIndex, setLineIndex] = useState(0);
+
+            const handleNextLine = () => {
+                if (selectedMock && lineIndex < selectedMock.script.length) {
+                    setLineIndex(prev => prev + 1);
+                }
+            };
+
+            return (
+                <div className="h-full flex flex-col">
+                        {!selectedMock ? (
+                            <div className="h-full flex flex-col">
+                            <div className="flex justify-between items-center mb-2 flex-shrink-0">
+                                <h2 className="text-xl font-bold text-gray-800">Select Mock Exam</h2>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-2">
+                                {mockExams.map(mock => (
+                                <button
+                                    key={mock.id}
+                                    onClick={() => setSelectedMock(mock)}
+                                    className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all text-left group h-full"
+                                >
+                                    <div className="font-bold text-gray-800 group-hover:text-blue-600 text-sm">{mock.title}</div>
+                                    <div className="text-xs text-gray-500 mt-1 line-clamp-1">{mock.topic}</div>
+                                </button>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                    <div className="flex flex-col h-full overflow-hidden">
+                        <div className="flex items-center justify-between mb-2 border-b pb-2 flex-shrink-0">
+                            <div className="flex items-center gap-4">
+                                <h3 className="font-bold text-lg">{selectedMock.title}</h3>
+                                <PhaseTimer {...timerProps} />
+                            </div>
+                            <button onClick={() => { setSelectedMock(null); setLineIndex(0); }} className="text-sm text-red-500 font-bold hover:bg-red-50 px-2 py-1 rounded">Exit</button>
+                        </div>
+                        
+                        <div className="flex gap-4 h-full overflow-hidden">
+                            <div className="flex-grow flex flex-col h-full overflow-hidden">
+                                <div className="flex-grow overflow-y-auto bg-gray-50 rounded-xl p-4 mb-4 border border-gray-200 shadow-inner">
+                                {selectedMock.script.slice(0, lineIndex + 1).map((line, idx) => (
+                                    <div key={idx} className={`mb-3 flex ${line.role === 'E' ? 'justify-start' : (line.role === 'Note' ? 'justify-center' : 'justify-end')}`}>
+                                        <div className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm md:text-base shadow-sm
+                                            ${line.role === 'E' ? 'bg-white text-gray-800 border-l-4 border-blue-500' : ''}
+                                            ${line.role === 'C' ? 'bg-blue-100 text-blue-900 italic' : ''}
+                                            ${line.role === 'Note' ? 'bg-yellow-100 text-yellow-800 font-bold border-2 border-yellow-300 animate-pulse text-center' : ''}
+                                        `}>
+                                            {line.text}
+                                        </div>
+                                    </div>
+                                ))}
+                                <div id="scroll-anchor"></div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3 flex-shrink-0">
+                                    <button onClick={() => setLineIndex(0)} className="bg-gray-200 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-300">Restart</button>
+                                    <button onClick={handleNextLine} disabled={lineIndex >= selectedMock.script.length - 1} className="bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 shadow-lg disabled:opacity-50 flex items-center justify-center gap-2">
+                                        Next Line <Play className="w-4 h-4 fill-current" />
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="hidden lg:flex gap-2 flex-shrink-0 h-full">
+                                {/* GRAMMAR CHECKLIST COLUMN */}
+                                <div className="w-80 h-full overflow-y-auto">
+                                     <GrammarChecklist onReward={onReward} />
+                                </div>
+
+                                {/* WORD BANK COLUMN */}
+                                <div className="w-80 bg-yellow-50 rounded-xl border border-yellow-100 p-4 overflow-y-auto h-full">
+                                    <div className="flex items-center gap-2 mb-3 text-yellow-800 font-bold border-b border-yellow-200 pb-2"><BookOpen size={16} /> Word Bank</div>
+                                    <ul className="space-y-2">
+                                        {selectedMock.vocab.map((word, i) => (
+                                            <li key={i} className="bg-white px-2 py-1 rounded text-base text-gray-700 shadow-sm border border-yellow-100">{word}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    )}
+                </div>
+            );
+        };
+
+        const TopicBuilder = ({ timerProps, onReward }) => {
+            const [topicData, setTopicData] = useState({ title: "", point1: "", point2: "", point3: "", point4: "", question: "", vocab: [] });
+            
+            const loadTopic = (key) => {
+                if(key === "") return;
+                const t = sampleTopics[key];
+                setTopicData({ 
+                    title: t.title, 
+                    point1: t.point1, 
+                    point2: t.point2, 
+                    point3: t.point3, 
+                    point4: t.point4, 
+                    question: t.question,
+                    vocab: t.vocab 
+                });
+            };
+
+            return (
+                <div className="h-full overflow-hidden flex flex-col">
+                    <div className="flex justify-between items-center mb-1 flex-shrink-0">
+                        <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2"><BookOpen className="w-5 h-5 text-purple-600" /> Topic Planner</h2>
+                        <div className="flex gap-2 items-center">
+                            <PhaseTimer {...timerProps} />
+                            <select onChange={(e) => loadTopic(e.target.value)} className="bg-purple-600 text-white text-xs font-bold py-1 px-2 rounded shadow-md border-none outline-none cursor-pointer max-w-[150px]">
+                                <option value="">Load Topic...</option>
+                                <option value="volcano">Science Project</option>
+                                <option value="rail">Special Trip</option>
+                                <option value="minecraft">My Hobby</option>
+                                <option value="spring">Spring Festival</option>
+                                <option value="zongzi">Dragon Boat</option>
+                                <option value="magnet">Science Lesson</option>
+                                <option value="club">School Club</option>
+                                <option value="mooncake">Mid-Autumn</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div className="flex gap-2 h-full overflow-hidden">
+                        {/* Main Form Area */}
+                        <div className="bg-white p-0 rounded-lg shadow-sm border border-gray-200 overflow-y-auto flex-grow flex flex-col gap-px">
+                            <div className="space-y-0.5 flex-shrink-0 p-1">
+                                <label className="text-xs font-bold uppercase text-gray-500">Topic Title</label>
+                                <input readOnly value={topicData.title} type="text" className="w-full p-0.5 border rounded font-bold text-base bg-gray-50" />
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-px flex-grow">
+                                <div className="p-0.5 border rounded bg-blue-50 flex flex-col h-full">
+                                    <label className="text-xs font-bold text-blue-600 block px-1">1. Present</label>
+                                    <textarea readOnly value={topicData.point1} className="w-full bg-white p-1 rounded text-base resize-none flex-grow leading-tight border-0 focus:ring-0"></textarea>
+                                </div>
+                                <div className="p-0.5 border rounded bg-green-50 flex flex-col h-full">
+                                    <label className="text-xs font-bold text-green-600 block px-1">2. Past</label>
+                                    <textarea readOnly value={topicData.point2} className="w-full bg-white p-1 rounded text-base resize-none flex-grow leading-tight border-0 focus:ring-0"></textarea>
+                                </div>
+                                <div className="p-0.5 border rounded bg-yellow-50 flex flex-col h-full">
+                                    <label className="text-xs font-bold text-yellow-600 block px-1">3. Compare</label>
+                                    <textarea readOnly value={topicData.point3} className="w-full bg-white p-1 rounded text-base resize-none flex-grow leading-tight border-0 focus:ring-0"></textarea>
+                                </div>
+                                <div className="p-0.5 border rounded bg-pink-50 flex flex-col h-full">
+                                    <label className="text-xs font-bold text-pink-600 block px-1">4. Future</label>
+                                    <textarea readOnly value={topicData.point4} className="w-full bg-white p-1 rounded text-base resize-none flex-grow leading-tight border-0 focus:ring-0"></textarea>
+                                </div>
+                            </div>
+
+                            <div className="p-1 bg-red-50 border border-red-100 rounded flex items-center gap-2 flex-shrink-0">
+                                <AlertCircle className="text-red-500 w-4 h-4" />
+                                <div className="flex-grow">
+                                    <label className="text-xs font-bold text-red-600 block">Question for Examiner:</label>
+                                    <input readOnly value={topicData.question} type="text" className="w-full p-0.5 border rounded text-base font-medium bg-white" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Word Bank Sidebar + Grammar */}
+                        <div className="hidden lg:flex gap-2 flex-shrink-0 h-full overflow-hidden">
+                            {/* Grammar Check Column */}
+                            <div className="w-80 h-full overflow-y-auto">
+                                <GrammarChecklist onReward={onReward} />
+                            </div>
+
+                            {/* Word Bank Column */}
+                            <div className="w-80 bg-purple-50 rounded-lg border border-purple-100 p-2 overflow-y-auto h-full">
+                                <div className="flex items-center gap-1 mb-1 text-purple-800 font-bold border-b border-purple-200 pb-1 text-xs">
+                                    <BookOpen size={12} /> Word Bank
+                                </div>
+                                {topicData.vocab.length > 0 ? (
+                                    <ul className="space-y-1">
+                                        {topicData.vocab.map((word, i) => (
+                                            <li key={i} className="bg-white px-1.5 py-0.5 rounded text-sm text-gray-700 shadow-sm border border-purple-100 leading-tight">
+                                                {word}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <div className="text-sm text-gray-400 text-center mt-2">Select topic...</div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- MAIN APP COMPONENT ---
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('conversation'); 
+            const [score, setScore] = useState(0);
+            const [rewards, setRewards] = useState([]);
+            
+            // Timer State
+            const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
+            const [timerActive, setTimerActive] = useState(false);
+
+            const playWinSound = useCallback(() => {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                const t = ctx.currentTime;
+                [440, 554, 659, 880].forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.1, t + i * 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.05 + 0.5);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(t + i * 0.05);
+                    osc.stop(t + i * 0.05 + 0.5);
+                });
+            }, []);
+
+            const triggerReward = useCallback((amount = 10) => {
+                setScore(s => s + amount);
+                playWinSound();
+                // DEBUGGED: Use simple random IDs to avoid key collision
+                const newRewards = Array.from({ length: 8 }).map(() => ({
+                    id: Math.random().toString(36).substr(2, 9),
+                    x: 30 + Math.random() * 40, // More centered
+                    y: 40 + Math.random() * 30,
+                    emoji: ['🪙', '⭐', '✨', '🏆', '🎉'][Math.floor(Math.random() * 5)],
+                    scale: 0.5 + Math.random()
+                }));
+                
+                setRewards(prev => [...prev, ...newRewards]);
+                
+                // Cleanup specific rewards after animation
+                setTimeout(() => {
+                    const idsToRemove = newRewards.map(r => r.id);
+                    setRewards(prev => prev.filter(r => !idsToRemove.includes(r.id)));
+                }, 2000);
+            }, [playWinSound]);
+
+            // Timer Logic
+            useEffect(() => {
+                let interval = null;
+                if (timerActive && timeLeft > 0) {
+                    interval = setInterval(() => {
+                        setTimeLeft(t => t - 1);
+                    }, 1000);
+                } else if (timeLeft === 0) {
+                    setTimerActive(false);
+                }
+                return () => clearInterval(interval);
+            }, [timerActive, timeLeft]);
+
+            const formatTime = (seconds) => {
+                const m = Math.floor(seconds / 60);
+                const s = seconds % 60;
+                return `${m}:${s < 10 ? '0' : ''}${s}`;
+            };
+
+            const toggleTimer = () => setTimerActive(!timerActive);
+            const resetTimer = () => { setTimerActive(false); setTimeLeft(300); };
+
+            const timerProps = { timeLeft, timerActive, toggleTimer, resetTimer, formatTime };
+
+            return (
+                <div className="bg-gray-100 font-sans text-gray-900 h-screen flex flex-col overflow-hidden relative">
+                    {/* Reward Container - pointer events none to allow clicking through */}
+                    <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
+                        {rewards.map(r => (
+                            <div 
+                                key={r.id} 
+                                className="animate-float-up absolute text-4xl" 
+                                style={{ 
+                                    left: `${r.x}%`, 
+                                    top: `${r.y}%`,
+                                    transform: `scale(${r.scale})` 
+                                }}
+                            >
+                                {r.emoji}
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Top Header */}
+                    <header className="bg-slate-800 text-white p-2 shadow-md flex items-center justify-between shrink-0 h-12 z-20">
+                        {/* Left: Nav Buttons */}
+                        <div className="flex gap-2">
+                            <button onClick={() => setActiveTab('conversation')} className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-bold transition-all ${activeTab === 'conversation' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
+                                <MessageSquare size={14} /> Talk
+                            </button>
+                            <button onClick={() => setActiveTab('mock')} className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-bold transition-all ${activeTab === 'mock' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
+                                <Play size={14} /> Mock
+                            </button>
+                            <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-bold transition-all ${activeTab === 'dashboard' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
+                                <BookOpen size={14} /> Topic
+                            </button>
+                        </div>
+
+                        {/* Right: Score */}
+                        <div className="flex items-center gap-3">
+                            <div className="bg-slate-700 rounded px-2 py-1 flex items-center gap-2">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase">Score</span>
+                                <span className="text-sm font-black text-yellow-400">{score}</span>
+                            </div>
+                            <button onClick={() => triggerReward(10)} className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white font-bold py-1 px-3 rounded shadow-lg active:scale-95 flex items-center gap-1 text-xs">
+                                <Trophy size={14} className="text-yellow-100" /> Award
+                            </button>
+                        </div>
+                    </header>
+
+                    {/* Main Content */}
+                    <main className="flex-grow p-4 h-full overflow-hidden relative flex flex-col z-10">
+                        <div className="bg-white rounded-xl shadow-lg h-full overflow-hidden border border-gray-200 flex-grow">
+                            <div className="h-full p-4">
+                                {activeTab === 'dashboard' && <TopicBuilder timerProps={timerProps} onReward={triggerReward} />}
+                                {activeTab === 'conversation' && <ConversationTool timerProps={timerProps} />}
+                                {activeTab === 'mock' && <MockExamTool timerProps={timerProps} onReward={triggerReward} />}
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
