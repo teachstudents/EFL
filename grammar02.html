@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compound Sentence Builder - And, But, Or, So</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Comic Neue', cursive;
+            touch-action: manipulation; /* Improves touch response */
+        }
+        .chinese-text {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .word-tile {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .word-tile:active {
+            transform: scale(0.95);
+        }
+        .conj-tile {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .conj-tile:active {
+            transform: scale(0.95);
+        }
+        .drop-zone {
+            min-height: 80px;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        /* Custom Scrollbar for the word bank */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-orange-50 h-screen flex flex-col overflow-hidden">
+
+    <!-- APP HEADER -->
+    <header class="bg-orange-600 text-white p-3 shadow-lg flex justify-between items-center z-10">
+        <div class="flex items-center gap-2">
+            <i class="fas fa-link text-yellow-300 text-2xl"></i>
+            <h1 class="text-xl font-bold hidden md:block">Compound Sentence Builder</h1>
+        </div>
+        <div class="flex items-center gap-4 text-sm md:text-base font-bold">
+            <div id="player-display" class="hidden bg-orange-700 px-3 py-1 rounded-full">
+                <i class="fas fa-user mr-2"></i><span id="player-name-span">Player</span>
+            </div>
+            <div class="bg-yellow-400 text-orange-900 px-3 py-1 rounded-full shadow">
+                <i class="fas fa-star mr-1"></i> Score: <span id="score-display">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow relative w-full max-w-6xl mx-auto p-2 md:p-4 flex flex-col justify-center">
+
+        <!-- SCREEN: START -->
+        <div id="start-screen" class="bg-white rounded-3xl shadow-2xl p-8 text-center border-4 border-orange-200">
+            <h1 class="text-4xl font-bold text-orange-600 mb-2 floating">And, But, Or, So Game</h1>
+            <p class="text-gray-500 mb-6 text-xl">Join the two sentences together!</p>
+            
+            <div class="mb-8">
+                <label class="block text-gray-700 text-lg font-bold mb-2">Enter Your Name:</label>
+                <input type="text" id="username-input" class="shadow appearance-none border-2 border-orange-300 rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-orange-500 text-center text-xl" placeholder="Student Name">
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <button onclick="showRules()" class="bg-yellow-400 hover:bg-yellow-500 text-orange-900 font-bold py-3 px-6 rounded-xl shadow-lg transform transition hover:-translate-y-1 text-xl">
+                    <i class="fas fa-book-open mr-2"></i> Start Game / Rules
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN: RULES -->
+        <div id="rules-screen" class="hidden bg-white rounded-3xl shadow-2xl p-6 border-4 border-yellow-200 overflow-y-auto max-h-[80vh]">
+            <h2 class="text-3xl font-bold text-orange-600 mb-4 text-center">Compound Sentences</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <!-- Rule 1 -->
+                <div class="bg-blue-50 p-4 rounded-xl border-2 border-blue-200">
+                    <h3 class="font-bold text-xl text-blue-600 mb-2">The Pattern</h3>
+                    <p class="text-gray-700 mb-2">Use a <b>comma</b> before the connecting word.</p>
+                    <div class="bg-white p-2 rounded border border-blue-100 text-center font-mono text-sm md:text-base mb-2">
+                        [Sentence 1] <span class="text-red-500 font-bold">,</span> [word] [Sentence 2] <span class="text-red-500 font-bold">.</span>
+                    </div>
+                    <p class="chinese-text text-gray-500 text-sm">规则：在连接词（and, but, so, or）前面加上逗号。</p>
+                </div>
+
+                <!-- Rule 2 -->
+                <div class="bg-green-50 p-4 rounded-xl border-2 border-green-200">
+                    <h3 class="font-bold text-xl text-green-600 mb-2">Connecting Words</h3>
+                    <ul class="text-left text-gray-700 space-y-1 text-sm md:text-base">
+                        <li><b>and</b> = addition (和)</li>
+                        <li><b>but</b> = contrast (但是)</li>
+                        <li><b>so</b> = result (所以)</li>
+                        <li><b>or</b> = choice (或者)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg text-2xl animate-pulse">
+                Let's Play! <i class="fas fa-play ml-2"></i>
+            </button>
+        </div>
+
+        <!-- SCREEN: GAMEPLAY -->
+        <div id="game-screen" class="hidden flex flex-col h-full">
+            
+            <!-- Top Info -->
+            <div class="flex justify-between items-end px-2 mb-2">
+                <span class="text-orange-500 font-bold text-lg" id="topic-label">Topic: Sports</span>
+                <span class="text-gray-400 text-sm" id="progress-label">1/50</span>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-4 h-full">
+                
+                <!-- LEFT COLUMN: Conjunction Bank -->
+                <div class="md:w-1/4 flex flex-col order-2 md:order-1">
+                    <div class="bg-blue-100 rounded-2xl p-3 shadow-inner h-full flex flex-col items-center">
+                         <h3 class="text-blue-800 font-bold mb-3 text-center uppercase text-sm md:text-base"><i class="fas fa-link mr-1"></i> Joining Words</h3>
+                         <div id="conj-bank" class="flex flex-row md:flex-col flex-wrap gap-3 w-full justify-center">
+                             <!-- Conjunction tiles generated here -->
+                         </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Workspace -->
+                <div class="md:w-3/4 flex flex-col order-1 md:order-2">
+                    <!-- Question Card -->
+                    <div class="bg-white rounded-2xl shadow-lg p-4 mb-3 border-l-8 border-orange-500">
+                        <div class="flex flex-col gap-2 text-gray-600 text-xl md:text-3xl ml-2 font-medium">
+                            <span id="simple-1" class="flex items-center"><i class="fas fa-circle text-xs text-orange-300 mr-3"></i>I like to run.</span>
+                            <span id="simple-2" class="flex items-center"><i class="fas fa-circle text-xs text-orange-300 mr-3"></i>It is healthy.</span>
+                        </div>
+                    </div>
+
+                    <!-- Answer Drop Zone -->
+                    <div class="flex-grow bg-white rounded-2xl shadow-inner border-2 border-dashed border-gray-300 p-4 mb-3 relative flex flex-col">
+                        <span class="absolute top-2 left-2 text-xs text-gray-400 uppercase tracking-wide font-bold">Build Sentence Here (Don't forget the comma!)</span>
+                        <div id="answer-area" class="drop-zone flex flex-wrap gap-3 content-start pt-6 min-h-[100px] w-full items-center">
+                            <!-- Words go here -->
+                        </div>
+                    </div>
+
+                    <!-- Word Bank (Clauses & Punctuation) -->
+                    <div class="bg-orange-100 rounded-2xl p-3 shadow-inner">
+                        <div id="word-bank" class="flex flex-wrap gap-2 justify-center">
+                            <!-- Word tiles generated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timer Bar -->
+            <div class="w-full bg-gray-200 rounded-full h-4 mt-2 overflow-hidden shadow-inner">
+                <div id="timer-bar" class="bg-gradient-to-r from-green-400 to-green-600 h-4 rounded-full transition-all duration-1000 ease-linear" style="width: 100%"></div>
+            </div>
+            
+        </div>
+
+    </main>
+
+    <!-- FEEDBACK OVERLAY (Modal) -->
+    <div id="feedback-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 max-w-lg w-full text-center relative animate-bounce-in">
+            
+            <div id="feedback-icon" class="text-6xl mb-4"></div>
+            
+            <h2 id="feedback-title" class="text-3xl font-bold mb-2"></h2>
+            
+            <!-- Correct Answer Display -->
+            <div class="bg-orange-50 rounded-xl p-4 mb-4 border border-orange-100">
+                <p id="feedback-english" class="text-3xl md:text-4xl font-bold text-orange-900 mb-2 leading-tight"></p>
+                <div class="h-px bg-orange-200 w-full my-3"></div>
+                <p id="feedback-chinese" class="chinese-text text-2xl text-orange-600 font-medium"></p>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex justify-center gap-4 items-center">
+                <button onclick="playAudioFeedback()" class="bg-blue-500 hover:bg-blue-600 text-white rounded-full p-3 shadow-lg w-12 h-12 flex items-center justify-center transition hover:scale-110">
+                    <i class="fas fa-volume-up text-lg"></i>
+                </button>
+                <button onclick="nextQuestion()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-xl shadow-lg text-lg flex items-center transition hover:scale-105">
+                    Next <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIO ELEMENTS (Hidden) -->
+    <audio id="sfx-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="sfx-wrong" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3"></audio>
+
+<script>
+    /**
+     * GAME CONFIGURATION & STATE
+     */
+    const TOTAL_TIME = 30; // 30 seconds for compound sentences
+    let state = {
+        score: 0,
+        currentQuestion: 0,
+        timer: TOTAL_TIME,
+        timerInterval: null,
+        playerName: "",
+        approvedVoices: [], 
+        allVoices: []
+    };
+
+    // 50 Questions (10 Topics x 5 Questions)
+    const questionsDB = [
+        // Topic 1: Sports
+        { t: "Sports", c1: "I like soccer", c2: "I don't like tennis", conj: "but", ch: "我喜欢足球，但是我不喜欢网球。" },
+        { t: "Sports", c1: "He runs fast", c2: "he wins the race", conj: "so", ch: "他跑得快，所以他赢了比赛。" },
+        { t: "Sports", c1: "We can swim", c2: "we can play basketball", conj: "or", ch: "我们可以游泳，或者我们可以打篮球。" },
+        { t: "Sports", c1: "She trains hard", c2: "she is very strong", conj: "and", ch: "她训练刻苦，而且她很强壮。" },
+        { t: "Sports", c1: "It is raining", c2: "we cannot play outside", conj: "so", ch: "下雨了，所以我们不能在外面玩。" },
+
+        // Topic 2: Pets
+        { t: "Pets", c1: "I have a dog", c2: "I have a cat", conj: "and", ch: "我有一只狗，而且我有一只猫。" },
+        { t: "Pets", c1: "The cat is cute", c2: "it scratches the sofa", conj: "but", ch: "猫很可爱，但是它抓沙发。" },
+        { t: "Pets", c1: "You can feed the fish", c2: "you can walk the dog", conj: "or", ch: "你可以喂鱼，或者你可以遛狗。" },
+        { t: "Pets", c1: "My dog is hungry", c2: "I give him food", conj: "so", ch: "我的狗饿了，所以我给它食物。" },
+        { t: "Pets", c1: "Hamsters are small", c2: "they run on wheels", conj: "and", ch: "仓鼠很小，而且它们在轮子上跑。" },
+
+        // Topic 3: Food
+        { t: "Food", c1: "I want pizza", c2: "Mom cooked soup", conj: "but", ch: "我想要披萨，但是妈妈煮了汤。" },
+        { t: "Food", c1: "The apple is red", c2: "it is very sweet", conj: "and", ch: "苹果是红的，而且它很甜。" },
+        { t: "Food", c1: "I am thirsty", c2: "I drink water", conj: "so", ch: "我渴了，所以我喝水。" },
+        { t: "Food", c1: "We can eat cake", c2: "we can eat ice cream", conj: "or", ch: "我们可以吃蛋糕，或者我们可以吃冰淇淋。" },
+        { t: "Food", c1: "He likes spicy food", c2: "he adds chili oil", conj: "so", ch: "他喜欢辣的食物，所以他加辣椒油。" },
+
+        // Topic 4: Friends
+        { t: "Friends", c1: "Tom is my friend", c2: "he is very kind", conj: "and", ch: "汤姆是我的朋友，而且他很善良。" },
+        { t: "Friends", c1: "I called him", c2: "he did not answer", conj: "but", ch: "我给他打电话，但是他没有接。" },
+        { t: "Friends", c1: "We can watch a movie", c2: "we can play games", conj: "or", ch: "我们可以看电影，或者我们可以玩游戏。" },
+        { t: "Friends", c1: "She told a joke", c2: "everyone laughed", conj: "so", ch: "她讲了一个笑话，所以大家都笑了。" },
+        { t: "Friends", c1: "He is shy", c2: "he is very smart", conj: "but", ch: "他很害羞，但是他很聪明。" },
+
+        // Topic 5: Travel
+        { t: "Travel", c1: "We went to Japan", c2: "we ate sushi", conj: "and", ch: "我们去了日本，而且我们吃了寿司。" },
+        { t: "Travel", c1: "The car broke down", c2: "we were late", conj: "so", ch: "车坏了，所以我们迟到了。" },
+        { t: "Travel", c1: "You can take a bus", c2: "you can take a train", conj: "or", ch: "你可以坐公交车，或者你可以坐火车。" },
+        { t: "Travel", c1: "The beach is beautiful", c2: "the water is cold", conj: "but", ch: "海滩很美，但是水很冷。" },
+        { t: "Travel", c1: "I packed my bag", c2: "I forgot my camera", conj: "but", ch: "我打包了行李，但是我忘了相机。" },
+
+        // Topic 6: Family
+        { t: "Family", c1: "Dad is working", c2: "he is tired", conj: "and", ch: "爸爸在工作，而且他累了。" },
+        { t: "Family", c1: "My sister is young", c2: "she is tall", conj: "but", ch: "我妹妹很小，但是她很高。" },
+        { t: "Family", c1: "We can visit Grandma", c2: "we can stay home", conj: "or", ch: "我们可以去看奶奶，或者我们可以呆在家里。" },
+        { t: "Family", c1: "The baby cried", c2: "Mom hugged him", conj: "so", ch: "宝宝哭了，所以妈妈抱了他。" },
+        { t: "Family", c1: "I love my family", c2: "they love me", conj: "and", ch: "我爱我的家人，而且他们也爱我。" },
+
+        // Topic 7: Books
+        { t: "Books", c1: "I like this book", c2: "it is too long", conj: "but", ch: "我喜欢这本书，但是它太长了。" },
+        { t: "Books", c1: "He reads every day", c2: "he learns a lot", conj: "so", ch: "他每天读书，所以他学到了很多。" },
+        { t: "Books", c1: "You can read fiction", c2: "you can read history", conj: "or", ch: "你可以读小说，或者你可以读历史。" },
+        { t: "Books", c1: "The story is sad", c2: "I cried", conj: "so", ch: "故事很悲伤，所以我哭了。" },
+        { t: "Books", c1: "She went to the library", c2: "she borrowed a book", conj: "and", ch: "她去了图书馆，而且她借了一本书。" },
+
+        // Topic 8: School
+        { t: "School", c1: "I studied hard", c2: "I got an A", conj: "so", ch: "我努力学习，所以我得了个A。" },
+        { t: "School", c1: "Math is difficult", c2: "it is useful", conj: "but", ch: "数学很难，但是它很有用。" },
+        { t: "School", c1: "We have art class", c2: "we have music class", conj: "and", ch: "我们有美术课，而且我们有音乐课。" },
+        { t: "School", c1: "You can use a pen", c2: "you can use a pencil", conj: "or", ch: "你可以用钢笔，或者你可以用铅笔。" },
+        { t: "School", c1: "The bell rang", c2: "we went outside", conj: "so", ch: "铃响了，所以我们出去了。" },
+
+        // Topic 9: Hobbies
+        { t: "Hobbies", c1: "I like painting", c2: "I am creative", conj: "and", ch: "我喜欢画画，而且我很有创造力。" },
+        { t: "Hobbies", c1: "He plays piano", c2: "he doesn't practice", conj: "but", ch: "他弹钢琴，但是他不练习。" },
+        { t: "Hobbies", c1: "We can dance", c2: "we can sing", conj: "or", ch: "我们可以跳舞，或者我们可以唱歌。" },
+        { t: "Hobbies", c1: "She loves games", c2: "she plays every day", conj: "so", ch: "她喜欢游戏，所以她每天都玩。" },
+        { t: "Hobbies", c1: "I collect stamps", c2: "I have many albums", conj: "and", ch: "我收集邮票，而且我有很多集邮册。" },
+
+        // Topic 10: Nature
+        { t: "Nature", c1: "The sun is hot", c2: "we wear hats", conj: "so", ch: "太阳很热，所以我们戴帽子。" },
+        { t: "Nature", c1: "It is winter", c2: "there is no snow", conj: "but", ch: "是冬天，但是没有雪。" },
+        { t: "Nature", c1: "Trees have leaves", c2: "flowers have petals", conj: "and", ch: "树有叶子，而且花有花瓣。" },
+        { t: "Nature", c1: "We can hike", c2: "we can camp", conj: "or", ch: "我们可以徒步，或者我们可以露营。" },
+        { t: "Nature", c1: "The river is deep", c2: "it is dangerous", conj: "so", ch: "河很深，所以它很危险。" }
+    ];
+
+    /**
+     * INITIALIZATION
+     */
+    window.onload = function() {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+            loadVoices();
+        }
+    };
+
+    function loadVoices() {
+        state.allVoices = window.speechSynthesis.getVoices();
+        const targetNames = ["Ava", "Brian", "Andrew", "Emma"];
+        
+        state.approvedVoices = state.allVoices.filter(v => 
+            targetNames.some(name => v.name.includes(name))
+        );
+        
+        if (state.approvedVoices.length === 0) {
+            state.approvedVoices = state.allVoices.filter(v => v.lang === 'en-US');
+        }
+        
+        if (state.approvedVoices.length === 0) {
+            state.approvedVoices = state.allVoices; 
+        }
+    }
+
+    /**
+     * NAVIGATION FUNCTIONS
+     */
+    function showRules() {
+        const name = document.getElementById('username-input').value.trim();
+        if(!name) {
+            alert("Please enter your name!");
+            return;
+        }
+        state.playerName = name;
+        document.getElementById('player-name-span').innerText = name;
+        document.getElementById('player-display').classList.remove('hidden');
+        
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('rules-screen').classList.remove('hidden');
+    }
+
+    function startGame() {
+        document.getElementById('rules-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        
+        state.currentQuestion = 0;
+        state.score = 0;
+        updateScore();
+        
+        loadQuestion();
+    }
+
+    /**
+     * GAME LOOP LOGIC
+     */
+    function loadQuestion() {
+        window.speechSynthesis.cancel();
+        
+        if (state.currentQuestion >= questionsDB.length) {
+            endGame();
+            return;
+        }
+
+        const qData = questionsDB[state.currentQuestion];
+        
+        // Helper to ensure sentences display correctly at the top
+        const formatForDisplay = (str) => {
+            const trimmed = str.trim();
+            return trimmed.charAt(0).toUpperCase() + trimmed.slice(1) + ".";
+        };
+
+        document.getElementById('topic-label').innerText = `Topic: ${qData.t}`;
+        document.getElementById('progress-label').innerText = `${state.currentQuestion + 1}/${questionsDB.length}`;
+        
+        document.getElementById('simple-1').innerHTML = `<i class="fas fa-circle text-xs text-orange-300 mr-3"></i>${formatForDisplay(qData.c1)}`;
+        document.getElementById('simple-2').innerHTML = `<i class="fas fa-circle text-xs text-orange-300 mr-3"></i>${formatForDisplay(qData.c2)}`;
+        
+        // 1. Setup Word Bank (Sentences and Punctuation ONLY)
+        let c2TileText = qData.c2.trim();
+        const firstWord = c2TileText.split(' ')[0];
+        if (firstWord !== "I" && !isProperNoun(firstWord)) {
+             c2TileText = c2TileText.charAt(0).toLowerCase() + c2TileText.slice(1);
+        }
+
+        let c1TileText = qData.c1.trim();
+        c1TileText = c1TileText.charAt(0).toUpperCase() + c1TileText.slice(1);
+
+        const words = [c1TileText, c2TileText, ",", "."];
+        // Note: No conjunction in bottom bank
+        words.sort(() => Math.random() - 0.5);
+
+        const wordBank = document.getElementById('word-bank');
+        const answerArea = document.getElementById('answer-area');
+        
+        wordBank.innerHTML = '';
+        answerArea.innerHTML = '';
+
+        words.forEach(word => {
+            const tile = createTile(word, false);
+            wordBank.appendChild(tile);
+        });
+
+        // 2. Setup Conjunction Bank (Left Column) with Scaffolding
+        const conjBank = document.getElementById('conj-bank');
+        conjBank.innerHTML = '';
+
+        const allConjunctions = ["and", "but", "or", "so"];
+        const correctConj = qData.conj;
+        
+        // Determine difficulty based on question index within topic (0-4)
+        const qIndex = state.currentQuestion % 5;
+        let visibleConjs = [];
+
+        if (qIndex === 0) {
+            // Level 1: Only correct answer
+            visibleConjs = [correctConj];
+        } else if (qIndex === 1) {
+            // Level 2: Correct + 1 Distractor
+            const distractors = allConjunctions.filter(c => c !== correctConj);
+            const randomDist = distractors[Math.floor(Math.random() * distractors.length)];
+            visibleConjs = [correctConj, randomDist];
+        } else if (qIndex === 2) {
+             // Level 3: Correct + 2 Distractors
+            const distractors = allConjunctions.filter(c => c !== correctConj);
+            // Shuffle distractors
+            distractors.sort(() => Math.random() - 0.5);
+            visibleConjs = [correctConj, distractors[0], distractors[1]];
+        } else {
+            // Level 4 (Q4 & Q5): All options
+            visibleConjs = [...allConjunctions];
+        }
+
+        // Shuffle visible options for display so correct isn't always first
+        if (visibleConjs.length > 1) {
+            visibleConjs.sort(() => Math.random() - 0.5);
+        }
+
+        visibleConjs.forEach(conj => {
+            const tile = createTile(conj, true);
+            conjBank.appendChild(tile);
+        });
+
+        resetTimer();
+    }
+
+    function isProperNoun(word) {
+        const properNouns = ["Tom", "Mom", "Dad", "Grandma", "Japan", "Harry", "Potter"];
+        return properNouns.includes(word);
+    }
+
+    // Updated createTile to handle both types
+    function createTile(text, isConj) {
+        const div = document.createElement('div');
+        
+        if (isConj) {
+            // Blue style for conjunctions
+            div.className = "conj-tile bg-blue-500 border-b-4 border-blue-700 text-white font-bold py-3 px-6 rounded-xl text-2xl md:text-3xl transform active:translate-y-1 active:border-b-0 w-full md:w-auto text-center";
+        } else {
+            // Standard Orange style for words
+            div.className = "word-tile bg-white border-b-4 border-orange-200 hover:border-orange-400 text-orange-900 font-bold py-3 px-6 rounded-xl shadow-lg text-2xl md:text-3xl transform active:translate-y-1 active:border-b-0";
+        }
+        
+        div.innerText = text;
+        
+        div.onclick = function() {
+            const parent = div.parentElement.id;
+            const answerArea = document.getElementById('answer-area');
+            const wordBank = document.getElementById('word-bank');
+            const conjBank = document.getElementById('conj-bank');
+            
+            // Interaction Logic:
+            // 1. If in Conj Bank -> Move to Answer
+            // 2. If in Word Bank -> Move to Answer
+            // 3. If in Answer -> Return to respective bank based on type
+            
+            if (parent === 'answer-area') {
+                // Return to source
+                if (isConj) {
+                    conjBank.appendChild(div);
+                } else {
+                    wordBank.appendChild(div);
+                }
+            } else {
+                // Move to Answer Area
+                answerArea.appendChild(div);
+            }
+            
+            checkAnswerLive();
+        };
+        return div;
+    }
+
+    function resetTimer() {
+        clearInterval(state.timerInterval);
+        state.timer = TOTAL_TIME;
+        const timerBar = document.getElementById('timer-bar');
+        timerBar.style.width = '100%';
+        timerBar.className = "bg-gradient-to-r from-green-400 to-green-600 h-4 rounded-full transition-all duration-1000 ease-linear";
+
+        state.timerInterval = setInterval(() => {
+            state.timer--;
+            const pct = (state.timer / TOTAL_TIME) * 100;
+            timerBar.style.width = `${pct}%`;
+
+            if(state.timer < 10) timerBar.className = "bg-gradient-to-r from-yellow-400 to-orange-500 h-4 rounded-full transition-all duration-1000 ease-linear";
+            if(state.timer < 5) timerBar.className = "bg-red-500 h-4 rounded-full transition-all duration-1000 ease-linear animate-pulse";
+
+            if (state.timer <= 0) {
+                clearInterval(state.timerInterval);
+                timeOut();
+            }
+        }, 1000);
+    }
+
+    function checkAnswerLive() {
+        const answerArea = document.getElementById('answer-area');
+        const tiles = Array.from(answerArea.children);
+        
+        if (tiles.length < 5) return; // Need c1, comma, conj, c2, period
+
+        let userSentence = tiles.map(t => t.innerText).join(" ");
+        validateAnswer(userSentence);
+    }
+
+    function validateAnswer(userString) {
+        const q = questionsDB[state.currentQuestion];
+        
+        const norm = str => str.toLowerCase().replace(/\s+/g, ' ').trim();
+        const userNorm = norm(userString);
+        
+        const target = norm(`${q.c1} , ${q.conj} ${q.c2} .`);
+        
+        if (userNorm === target) {
+            clearInterval(state.timerInterval);
+            let c2Lower = q.c2;
+            const firstWord = q.c2.split(' ')[0];
+            if (firstWord !== "I" && !isProperNoun(firstWord)) {
+                 c2Lower = c2Lower.charAt(0).toLowerCase() + c2Lower.slice(1);
+            }
+            
+            const correctText = `${q.c1}, ${q.conj} ${c2Lower}.`;
+            handleWin(correctText, q.ch);
+        }
+    }
+
+    function timeOut() {
+        const q = questionsDB[state.currentQuestion];
+        let c2Lower = q.c2;
+            const firstWord = q.c2.split(' ')[0];
+            if (firstWord !== "I" && !isProperNoun(firstWord)) {
+                 c2Lower = c2Lower.charAt(0).toLowerCase() + c2Lower.slice(1);
+            }
+        const defaultAnswer = `${q.c1}, ${q.conj} ${c2Lower}.`;
+        handleLoss(defaultAnswer, q.ch);
+    }
+
+    function handleWin(engText, chText) {
+        state.score += 10; 
+        updateScore();
+        document.getElementById('sfx-correct').play();
+        showFeedback(true, engText, chText);
+    }
+
+    function handleLoss(engText, chText) {
+        document.getElementById('sfx-wrong').play();
+        showFeedback(false, engText, chText);
+    }
+
+    function updateScore() {
+        document.getElementById('score-display').innerText = state.score;
+    }
+
+    function showFeedback(isWin, eng, ch) {
+        const modal = document.getElementById('feedback-modal');
+        const icon = document.getElementById('feedback-icon');
+        const title = document.getElementById('feedback-title');
+        
+        modal.classList.remove('hidden');
+        
+        if (isWin) {
+            icon.innerHTML = '<i class="fas fa-check-circle text-green-500"></i>';
+            title.innerText = "Great Job!";
+            title.className = "text-3xl font-bold mb-2 text-green-600";
+        } else {
+            icon.innerHTML = '<i class="fas fa-times-circle text-red-500"></i>';
+            title.innerText = "Time's Up!";
+            title.className = "text-3xl font-bold mb-2 text-red-600";
+        }
+
+        document.getElementById('feedback-english').innerText = eng;
+        document.getElementById('feedback-chinese').innerText = ch;
+        
+        setTimeout(() => {
+            speakText(isWin ? `Great job! ${eng}` : `The answer is: ${eng}`);
+        }, 500);
+    }
+
+    function playAudioFeedback() {
+        const text = document.getElementById('feedback-english').innerText;
+        speakText(text);
+    }
+
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); 
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            utterance.rate = 0.85; 
+            
+            if (state.approvedVoices.length > 0) {
+                const randomVoice = state.approvedVoices[Math.floor(Math.random() * state.approvedVoices.length)];
+                utterance.voice = randomVoice;
+            }
+            
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    function nextQuestion() {
+        document.getElementById('feedback-modal').classList.add('hidden');
+        state.currentQuestion++;
+        loadQuestion();
+    }
+
+    function endGame() {
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('start-screen').classList.remove('hidden');
+        
+        const h1 = document.querySelector('#start-screen h1');
+        h1.innerText = `Game Over! Score: ${state.score}`;
+        state.score = 0;
+        state.currentQuestion = 0;
+    }
+
+</script>
+</body>
+</html>
