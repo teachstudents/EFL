@@ -514,78 +514,79 @@
             }
         ];
 
+        // NEW: Sample Topics populated directly from Mock Exam Data to match user request
         const sampleTopics = {
-            "volcano": { 
-                title: "My Science Project", 
-                point1: "NOW: I really enjoy science class because it is very practical. I have been interested in doing experiments since I was in primary school.", 
-                point2: "PAST: Last week, I made a volcano model using clay and paint. When I poured the vinegar in, it erupted messily all over the table!", 
-                point3: "COMPARE: This experiment is much more exciting than reading textbooks because I can see the reaction happen instantly.", 
-                point4: "FUTURE: Next term, I'm going to build a solar car for the school competition. I think it will be difficult, but I am going to try my best.", 
-                question: "Do you like doing science experiments?", 
-                vocab: ["vinegar (醋)", "baking soda (小苏打)", "eruption (爆发)", "lava (岩浆)", "messy (脏乱)", "exciting (刺激)", "science (科学)", "experiment (实验)", "reaction (反应)", "goggles (护目镜)", "pour (倒)", "bubble (气泡)", "clean up (清理)"] 
+            "mock1": { 
+                title: "Mock 1: Mid-Autumn Festival", 
+                point1: "NOW: I really enjoy the Mid-Autumn Festival because it is a time for family reunion. We usually eat mooncakes and admire the full moon together.", 
+                point2: "PAST: Last year, we had a big dinner at my grandmother's house. We sat in the garden and played with colourful lanterns.", 
+                point3: "COMPARE: I think mooncakes with egg yolks are tastier than the ones with just bean paste, although they are more expensive.", 
+                point4: "FUTURE: Next year, I am going to learn how to make mooncakes myself. I hope they will be delicious.", 
+                question: "Do you prefer traditional festivals or modern ones?", 
+                vocab: mockExams[0].vocab
             },
-            "rail": { 
-                title: "A Special Trip", 
-                point1: "NOW: I love travelling by train because it is very relaxing. I have travelled by high-speed rail many times with my parents.", 
-                point2: "PAST: Last month, I went to Shanghai to visit my aunt. The journey only took 4 hours and I watched a movie on my tablet.", 
-                point3: "COMPARE: The train is much faster and more comfortable than the bus. Also, you can walk around on the train, which is better.", 
-                point4: "FUTURE: I'm going to visit Beijing next summer by train. I am going to take a lot of photos of the scenery on the way.", 
-                question: "Do you prefer travelling by train or by plane?", 
-                vocab: ["comfortable (舒适)", "scenery (风景)", "fast (快)", "ticket (车票)", "station (车站)", "seat (座位)", "modern (现代)", "trip (旅行)", "expensive (贵)", "convenient (方便)", "arrive (到达)", "leave (离开)", "passenger (乘客)"] 
+            "mock2": { 
+                title: "Mock 2: Transport in My City", 
+                point1: "NOW: Public transport in my city is very convenient. I take the subway to school every day because it is reliable and fast.", 
+                point2: "PAST: Yesterday, there was a traffic jam, so I was late. I decided to take the bus instead of the car.", 
+                point3: "COMPARE: The subway is much faster than the bus, but the bus is cheaper. I prefer the subway because it is cleaner.", 
+                point4: "FUTURE: The city is going to build a new subway line next year. It will make travelling even easier for everyone.", 
+                question: "How do you usually travel to school?", 
+                vocab: mockExams[1].vocab
             },
-            "minecraft": { 
-                title: "My Favourite Hobby", 
-                point1: "NOW: My favourite hobby is playing Minecraft on the weekend. I have played this game since I was 10 years old, so I am quite good at it.", 
-                point2: "PAST: Yesterday, I built a huge medieval castle with my friend online. It took us three hours, but we were very proud of it.", 
-                point3: "COMPARE: Playing creative mode is better than survival mode because I can build anything I want without dying.", 
-                point4: "FUTURE: I'm going to start a new world next weekend. I plan to build an underwater city, which will be very challenging.", 
-                question: "Do you play any computer games?", 
-                vocab: ["creeper (苦力怕)", "tower (塔)", "survival (生存)", "creative (创造)", "blocks (方块)", "build (建造)", "zombies (僵尸)", "design (设计)", "night (夜晚)", "diamond (钻石)", "tools (工具)", "house (房子)", "fun (有趣)"] 
+            "mock3": { 
+                title: "Mock 3: My 10th Birthday", 
+                point1: "NOW: My 10th birthday is a very special memory for me. I love parties because I can see all my friends.", 
+                point2: "PAST: For my 10th birthday, my parents organised a surprise party at a pizza restaurant. I received a lot of great gifts.", 
+                point3: "COMPARE: It was more exciting than my 9th birthday because more people came. The cake was also bigger and tastier.", 
+                point4: "FUTURE: For my next birthday, I am going to have a pool party. I am going to invite all my classmates.", 
+                question: "When is your birthday?", 
+                vocab: mockExams[2].vocab
             },
-            "spring": { 
-                title: "Spring Festival", 
-                point1: "NOW: Spring Festival is the most important holiday for my family. We have celebrated it in my hometown every year since I was born.", 
-                point2: "PAST: Last year, we had a huge reunion dinner with all my relatives. After dinner, we went outside and watched the beautiful fireworks.", 
-                point3: "COMPARE: I prefer Spring Festival to National Day because the atmosphere is livelier and the food is more delicious.", 
-                point4: "FUTURE: Next year, I'm going to learn how to make dumplings with my grandmother. I am also going to save my red envelope money.", 
-                question: "How do you usually celebrate festivals?", 
-                vocab: ["dumplings (饺子)", "reunion (团圆)", "fireworks (烟花)", "ugly (丑)", "red envelope (红包)", "celebrate (庆祝)", "dinner (晚餐)", "family (家庭)", "visit (拜访)", "new clothes (新衣)", "lucky (幸运)", "happy (快乐)", "tradition (传统)"] 
+            "mock4": { 
+                title: "Mock 4: My Hobby (Guitar)", 
+                point1: "NOW: I have played the guitar for two years. I practice every evening for 30 minutes because I want to improve.", 
+                point2: "PAST: Last month, I performed in a school concert. I was very nervous, but I played well and everyone clapped.", 
+                point3: "COMPARE: Playing the guitar is harder than playing the recorder, but it sounds much cooler. I prefer rock music to classical music.", 
+                point4: "FUTURE: I am going to learn a new song by my favourite band next week. I might start a band with my friends soon.", 
+                question: "Do you play any musical instruments?", 
+                vocab: mockExams[3].vocab
             },
-            "zongzi": { 
-                title: "Dragon Boat Festival", 
-                point1: "NOW: I really love the Dragon Boat Festival traditions. I have eaten Zongzi every year, and my favourite flavour is sweet red bean.", 
-                point2: "PAST: Last year, I watched a dragon boat race on TV with my dad. The teams paddled very fast and it was very exciting.", 
-                point3: "COMPARE: I think sweet Zongzi is tastier than salty Zongzi because I have a sweet tooth. Salty ones are too oily for me.", 
-                point4: "FUTURE: Next festival, I'm going to try to make Zongzi myself. I am going to buy the bamboo leaves and sticky rice tomorrow.", 
-                question: "Have you ever seen a dragon boat race?", 
-                vocab: ["salty (咸)", "sweet (甜)", "sticky rice (糯米)", "bamboo (竹)", "leaves (叶子)", "filling (馅料)", "taste (尝)", "dragon boat (端午)", "pork (猪肉)", "bean paste (豆沙)", "boil (煮)", "grandmother (祖母)", "make (制作)"] 
+            "mock5": { 
+                title: "Mock 5: Going to the Cinema", 
+                point1: "NOW: I love going to the cinema on weekends. I usually go with my best friend to watch action movies.", 
+                point2: "PAST: We went to see a new superhero movie last Saturday. We ate a huge bucket of popcorn and drank cola.", 
+                point3: "COMPARE: The cinema experience is better than watching TV because the screen is huge and the sound is amazing.", 
+                point4: "FUTURE: There is a new comedy coming out next month. I am going to buy tickets as soon as possible.", 
+                question: "Do you prefer the cinema or watching TV?", 
+                vocab: mockExams[4].vocab
             },
-            "magnet": { 
-                title: "A Science Lesson", 
-                point1: "NOW: We are learning about physics in school. I have just learned about how magnets have a north pole and a south pole.", 
-                point2: "PAST: Yesterday, we tested different materials in the lab. We found that the magnet attracted the iron nails but not the copper coins.", 
-                point3: "COMPARE: The horseshoe magnet is much stronger than the bar magnet. It can pick up more paperclips at one time.", 
-                point4: "FUTURE: We are going to make a simple compass next week. I am going to bring a needle and a bowl of water to class.", 
-                question: "Do you like learning about magnets?", 
-                vocab: ["attract (吸引)", "metal (金属)", "strong (强)", "test (测试)", "repel (排斥)", "force (力)", "north (北)", "south (南)", "coins (硬币)", "paper clip (回形针)", "plastic (塑料)", "stick (吸附)", "science (科学)"] 
+            "mock6": { 
+                title: "Mock 6: Trip to Beijing", 
+                point1: "NOW: Beijing is the capital of China and has many historical places. I have been there once with my family.", 
+                point2: "PAST: We visited the Great Wall two years ago. It was very long and steep, and we took hundreds of photos.", 
+                point3: "COMPARE: The Great Wall was more impressive than the Forbidden City, but the Forbidden City was more colourful.", 
+                point4: "FUTURE: If I go to Beijing again, I am going to visit the Summer Palace. I am also going to eat Peking Duck again.", 
+                question: "Have you ever been to Beijing?", 
+                vocab: mockExams[5].vocab
             },
-            "club": { 
-                title: "School Football Club", 
-                point1: "NOW: I am an active member of the school football club. I have been in the team for 6 months and we practice twice a week.", 
-                point2: "PAST: Last week, we played a match against another school. We won 2-1, and I was so happy that I cheered loudly.", 
-                point3: "COMPARE: Playing football is more exciting than just watching it on TV because you can exercise and make friends.", 
-                point4: "FUTURE: We are going to have a training camp next summer holiday. I am going to buy a new pair of football boots for it.", 
-                question: "Have you ever joined a school club?", 
-                vocab: ["hands-on (动手)", "teamwork (团队)", "skill (技能)", "fix (修理)", "model (模型)", "project (项目)", "learn (学习)", "fun (有趣)", "join (加入)", "after school (放学后)", "science (科学)", "art (艺术)", "together (一起)"] 
+            "mock7": { 
+                title: "Mock 7: Favourite Game", 
+                point1: "NOW: My favourite computer game is Minecraft. It is a creative game where you can build anything you imagine.", 
+                point2: "PAST: I played it for three hours yesterday. I built a secret base under a mountain with my friends online.", 
+                point3: "COMPARE: This game is more fun than homework because I can be creative. It is also more social than reading books.", 
+                point4: "FUTURE: I am going to download a new map this weekend. I am going to try to survive in the jungle mode.", 
+                question: "Do you play video games?", 
+                vocab: mockExams[6].vocab
             },
-            "mooncake": { 
-                title: "Mid-Autumn Festival", 
-                point1: "NOW: I enjoy the Mid-Autumn Festival very much. I have always liked looking at the full moon because it is so bright and round.", 
-                point2: "PAST: Last year, we sat in the garden, ate mooncakes, and drank tea. My grandfather told us stories about the moon.", 
-                point3: "COMPARE: I prefer lotus seed mooncakes to nut mooncakes because they are softer. Nut mooncakes are a bit too hard for me.", 
-                point4: "FUTURE: Next year, I'm going to buy a colourful lantern. I am also going to send mooncakes to my friends as gifts.", 
-                question: "What is your favourite mooncake flavour?", 
-                vocab: ["lotus seed (莲蓉)", "smooth (细腻)", "share (分享)", "traditional (传统)", "moon (月亮)", "mid-autumn (中秋)", "round (圆)", "sweet (甜)", "ranking (排名)", "flavour (口味)", "box (盒子)", "gift (礼物)", "family (家庭)", "eat (吃)", "tea (茶)"] 
+            "mock8": { 
+                title: "Mock 8: Cousin's Wedding", 
+                point1: "NOW: Weddings are happy occasions. I have just attended my cousin's wedding and it was beautiful.", 
+                point2: "PAST: The wedding was last Sunday at a big hotel. The bride wore a stunning white dress and everyone danced.", 
+                point3: "COMPARE: It was the best wedding I have ever been to. It was much livelier than my uncle's wedding last year.", 
+                point4: "FUTURE: My sister is going to get married next year. I am going to be the ring bearer, which is a big responsibility.", 
+                question: "Do you like weddings?", 
+                vocab: mockExams[7].vocab
             }
         };
 
@@ -648,7 +649,7 @@
                                     <div className={`w-3 h-3 rounded-full border flex items-center justify-center transition-colors ${
                                         checkedItems[item.k] ? 'bg-green-500 border-green-500' : 'border-gray-400'
                                     }`}>
-                                        {checkedItems[item.k] && <Check className="w-2 h-2 text-white" />}
+                                            {checkedItems[item.k] && <Check className="w-2 h-2 text-white" />}
                                     </div>
                                     {item.label}
                                 </span>
@@ -882,19 +883,14 @@
             return (
                 <div className="h-full overflow-hidden flex flex-col">
                     <div className="flex justify-between items-center mb-1 flex-shrink-0">
-                        <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2"><BookOpen className="w-5 h-5 text-purple-600" /> Topic Planner</h2>
+                        <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2"><BookOpen className="w-5 h-5 text-purple-600" /> Topic Planner (Mock Exams)</h2>
                         <div className="flex gap-2 items-center">
                             <PhaseTimer {...timerProps} />
-                            <select onChange={(e) => loadTopic(e.target.value)} className="bg-purple-600 text-white text-xs font-bold py-1 px-2 rounded shadow-md border-none outline-none cursor-pointer max-w-[150px]">
-                                <option value="">Load Topic...</option>
-                                <option value="volcano">Science Project</option>
-                                <option value="rail">Special Trip</option>
-                                <option value="minecraft">My Hobby</option>
-                                <option value="spring">Spring Festival</option>
-                                <option value="zongzi">Dragon Boat</option>
-                                <option value="magnet">Science Lesson</option>
-                                <option value="club">School Club</option>
-                                <option value="mooncake">Mid-Autumn</option>
+                            <select onChange={(e) => loadTopic(e.target.value)} className="bg-purple-600 text-white text-xs font-bold py-1 px-2 rounded shadow-md border-none outline-none cursor-pointer max-w-[200px]">
+                                <option value="">Load Mock Topic...</option>
+                                {Object.entries(sampleTopics).map(([key, data]) => (
+                                    <option key={key} value={key}>{data.title}</option>
+                                ))}
                             </select>
                         </div>
                     </div>
