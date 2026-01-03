@@ -365,14 +365,17 @@
         state.allVoices = window.speechSynthesis.getVoices();
         const targetNames = ["Ava", "Brian", "Andrew", "Emma"];
         
+        // Use case-insensitive matching to find the specific target voices
         state.approvedVoices = state.allVoices.filter(v => 
-            targetNames.some(name => v.name.includes(name))
+            targetNames.some(name => v.name.toLowerCase().includes(name.toLowerCase()))
         );
         
+        // Fallback: If no specific targets found, use any US English voice
         if (state.approvedVoices.length === 0) {
             state.approvedVoices = state.allVoices.filter(v => v.lang === 'en-US');
         }
         
+        // Final fallback: Use all available
         if (state.approvedVoices.length === 0) {
             state.approvedVoices = state.allVoices; 
         }
@@ -399,6 +402,11 @@
         document.getElementById('rules-screen').classList.add('hidden');
         document.getElementById('game-screen').classList.remove('hidden');
         
+        // Ensure voices are loaded again just in case async loading was slow
+        if(state.approvedVoices.length === 0 && 'speechSynthesis' in window) {
+            loadVoices();
+        }
+
         state.currentQuestion = 0;
         state.score = 0;
         updateScore();
