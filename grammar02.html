@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Canvas Confetti for Rewards -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
     
@@ -58,6 +60,11 @@
         .floating {
             animation: float 3s ease-in-out infinite;
         }
+        /* Speaker button hover effect */
+        .speak-btn:hover {
+            transform: scale(1.1);
+            color: #f97316; /* orange-500 */
+        }
     </style>
 </head>
 <body class="bg-orange-50 h-screen flex flex-col overflow-hidden">
@@ -72,6 +79,11 @@
             <div id="player-display" class="hidden bg-orange-700 px-3 py-1 rounded-full">
                 <i class="fas fa-user mr-2"></i><span id="player-name-span">Player</span>
             </div>
+            <!-- Streak Counter -->
+            <div class="bg-red-500 text-white px-3 py-1 rounded-full shadow flex items-center gap-1">
+                <i class="fas fa-fire text-yellow-300 animate-pulse"></i> <span id="streak-display">0</span>
+            </div>
+            <!-- Score -->
             <div class="bg-yellow-400 text-orange-900 px-3 py-1 rounded-full shadow">
                 <i class="fas fa-star mr-1"></i> Score: <span id="score-display">0</span>
             </div>
@@ -155,9 +167,27 @@
                 <div class="md:w-3/4 flex flex-col order-1 md:order-2">
                     <!-- Question Card -->
                     <div class="bg-white rounded-2xl shadow-lg p-4 mb-3 border-l-8 border-orange-500">
-                        <div class="flex flex-col gap-2 text-gray-600 text-xl md:text-3xl ml-2 font-medium">
-                            <span id="simple-1" class="flex items-center"><i class="fas fa-circle text-xs text-orange-300 mr-3"></i>I like to run.</span>
-                            <span id="simple-2" class="flex items-center"><i class="fas fa-circle text-xs text-orange-300 mr-3"></i>It is healthy.</span>
+                        <div class="flex items-center gap-3 mb-2">
+                            <!-- Dynamic Topic Icon -->
+                            <div id="topic-icon-container" class="bg-orange-100 p-2 rounded-full">
+                                <i id="topic-icon" class="fas fa-futbol text-orange-500 text-2xl"></i>
+                            </div>
+                            <span class="text-gray-400 text-sm uppercase tracking-wide">Combine these sentences:</span>
+                        </div>
+                        
+                        <div class="flex flex-col gap-3 text-gray-600 text-xl md:text-3xl ml-2 font-medium">
+                            <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
+                                <span id="simple-1" class="flex items-center"><i class="fas fa-circle text-xs text-orange-300 mr-3"></i>I like to run.</span>
+                                <button onclick="speakInput('simple-1-text')" class="speak-btn text-gray-400 transition-colors">
+                                    <i class="fas fa-volume-up"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
+                                <span id="simple-2" class="flex items-center"><i class="fas fa-circle text-xs text-orange-300 mr-3"></i>It is healthy.</span>
+                                <button onclick="speakInput('simple-2-text')" class="speak-btn text-gray-400 transition-colors">
+                                    <i class="fas fa-volume-up"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -225,12 +255,27 @@
     const TOTAL_TIME = 30; // 30 seconds for compound sentences
     let state = {
         score: 0,
+        streak: 0,
         currentQuestion: 0,
         timer: TOTAL_TIME,
         timerInterval: null,
         playerName: "",
         approvedVoices: [], 
         allVoices: []
+    };
+
+    // Topic Icon Mapping
+    const topicIcons = {
+        "Sports": "fa-futbol",
+        "Pets": "fa-paw",
+        "Food": "fa-pizza-slice",
+        "Friends": "fa-user-friends",
+        "Travel": "fa-plane",
+        "Family": "fa-home",
+        "Books": "fa-book",
+        "School": "fa-school",
+        "Hobbies": "fa-paint-brush",
+        "Nature": "fa-tree"
     };
 
     // 50 Questions (10 Topics x 5 Questions)
@@ -357,6 +402,7 @@
         state.currentQuestion = 0;
         state.score = 0;
         updateScore();
+        updateStreak();
         
         loadQuestion();
     }
@@ -380,11 +426,20 @@
             return trimmed.charAt(0).toUpperCase() + trimmed.slice(1) + ".";
         };
 
+        // UI Updates
         document.getElementById('topic-label').innerText = `Topic: ${qData.t}`;
+        // Update Icon
+        const iconClass = topicIcons[qData.t] || "fa-question-circle";
+        document.getElementById('topic-icon').className = `fas ${iconClass} text-orange-500 text-2xl`;
+
         document.getElementById('progress-label').innerText = `${state.currentQuestion + 1}/${questionsDB.length}`;
         
-        document.getElementById('simple-1').innerHTML = `<i class="fas fa-circle text-xs text-orange-300 mr-3"></i>${formatForDisplay(qData.c1)}`;
-        document.getElementById('simple-2').innerHTML = `<i class="fas fa-circle text-xs text-orange-300 mr-3"></i>${formatForDisplay(qData.c2)}`;
+        // Inject Text and Hidden Spans for Reading
+        const s1Formatted = formatForDisplay(qData.c1);
+        const s2Formatted = formatForDisplay(qData.c2);
+
+        document.getElementById('simple-1').innerHTML = `<i class="fas fa-circle text-xs text-orange-300 mr-3"></i><span id="simple-1-text">${s1Formatted}</span>`;
+        document.getElementById('simple-2').innerHTML = `<i class="fas fa-circle text-xs text-orange-300 mr-3"></i><span id="simple-2-text">${s2Formatted}</span>`;
         
         // 1. Setup Word Bank (Sentences and Punctuation ONLY)
         let c2TileText = qData.c2.trim();
@@ -566,19 +621,40 @@
     }
 
     function handleWin(engText, chText) {
-        state.score += 10; 
+        state.score += 10;
+        state.streak += 1;
         updateScore();
+        updateStreak();
+        
         document.getElementById('sfx-correct').play();
+        triggerConfetti();
         showFeedback(true, engText, chText);
     }
 
     function handleLoss(engText, chText) {
+        state.streak = 0; // Reset streak
+        updateStreak();
         document.getElementById('sfx-wrong').play();
         showFeedback(false, engText, chText);
     }
 
     function updateScore() {
         document.getElementById('score-display').innerText = state.score;
+    }
+    
+    function updateStreak() {
+        document.getElementById('streak-display').innerText = state.streak;
+    }
+
+    function triggerConfetti() {
+        // Simple confetti burst
+        if (window.confetti) {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
     }
 
     function showFeedback(isWin, eng, ch) {
@@ -611,6 +687,12 @@
         speakText(text);
     }
 
+    // New helper to speak text from the DOM elements
+    function speakInput(elementId) {
+        const text = document.getElementById(elementId).innerText;
+        speakText(text);
+    }
+
     function speakText(text) {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel(); 
@@ -640,6 +722,7 @@
         const h1 = document.querySelector('#start-screen h1');
         h1.innerText = `Game Over! Score: ${state.score}`;
         state.score = 0;
+        state.streak = 0;
         state.currentQuestion = 0;
     }
 
