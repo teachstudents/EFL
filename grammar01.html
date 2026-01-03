@@ -176,7 +176,6 @@
             
             <!-- Correct Answer Display -->
             <div class="bg-indigo-50 rounded-xl p-4 mb-4 border border-indigo-100">
-                <!-- Removed "Correct Answer" text as requested -->
                 <p id="feedback-english" class="text-3xl md:text-4xl font-bold text-indigo-900 mb-2 leading-tight"></p>
                 <div class="h-px bg-indigo-200 w-full my-3"></div>
                 <p id="feedback-chinese" class="chinese-text text-2xl text-indigo-600 font-medium"></p>
@@ -281,28 +280,49 @@
      * INITIALIZATION
      */
     window.onload = function() {
-        // Initialize Speech Synthesis
+        // Initialize Speech Synthesis with a retry mechanism
         if ('speechSynthesis' in window) {
-            window.speechSynthesis.onvoiceschanged = loadVoices;
+            // Chrome often loads voices asynchronously, so we wait for them
+            window.speechSynthesis.onvoiceschanged = () => {
+                loadVoices();
+            };
+            // Try loading immediately, and retry if empty
             loadVoices();
+            setTimeout(loadVoices, 500);
+            setTimeout(loadVoices, 2000);
         }
     };
 
     function loadVoices() {
-        state.allVoices = window.speechSynthesis.getVoices();
-        const targetNames = ["Ava", "Brian", "Andrew", "Emma"];
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length === 0) return; // Wait for voices to load
+
+        state.allVoices = voices;
         
-        state.approvedVoices = state.allVoices.filter(v => 
-            targetNames.some(name => v.name.includes(name))
-        );
+        // Priority 1: Strict filter for "English Multilingual" voices
+        // User request: "only use English Multilingual voices"
+        state.approvedVoices = state.allVoices.filter(v => {
+            const n = v.name.toLowerCase();
+            // Must contain "multilingual" AND be an English language voice
+            return n.includes("multilingual") && v.lang.startsWith('en');
+        });
         
+        // Fallback 1: Microsoft Natural English (if Multilingual is missing)
         if (state.approvedVoices.length === 0) {
-            state.approvedVoices = state.allVoices.filter(v => v.lang === 'en-US');
+            console.warn("Requested Multilingual voice not found. Falling back to Microsoft Natural voices.");
+            state.approvedVoices = state.allVoices.filter(v => 
+                v.name.toLowerCase().includes("microsoft") && 
+                v.name.toLowerCase().includes("natural") && 
+                v.lang.startsWith('en')
+            );
+        }
+
+        // Fallback 2: Any English Voice (Standard safety net)
+        if (state.approvedVoices.length === 0) {
+            state.approvedVoices = state.allVoices.filter(v => v.lang.startsWith('en')); 
         }
         
-        if (state.approvedVoices.length === 0) {
-            state.approvedVoices = state.allVoices; 
-        }
+        console.log("Voices loaded:", state.approvedVoices.map(v => v.name));
     }
 
     /**
@@ -346,6 +366,7 @@
 
         const qData = questionsDB[state.currentQuestion];
         
+        // Formatter for the display area (Keep as is for the question hint)
         const formatSimple = (str) => {
             const trimmed = str.trim();
             return trimmed.charAt(0).toUpperCase() + trimmed.slice(1) + ".";
@@ -359,6 +380,7 @@
         document.getElementById('simple-2').innerHTML = `<i class="fas fa-circle text-xs text-indigo-300 mr-3"></i>${formatSimple(qData.c2)}`;
         
         const words = [qData.c1, qData.c2, "because", ",", "."];
+        // Shuffle
         words.sort(() => Math.random() - 0.5);
 
         const wordBank = document.getElementById('word-bank');
@@ -372,6 +394,8 @@
             wordBank.appendChild(tile);
         });
 
+        // Initialize capitalization for the new tiles (ensure they start lowercase unless "I")
+        updateCapitalizationAll();
         resetTimer();
     }
 
@@ -379,10 +403,6 @@
         const div = document.createElement('div');
         div.className = "word-tile bg-white border-b-4 border-indigo-200 hover:border-indigo-400 text-indigo-900 font-bold py-3 px-6 rounded-xl shadow-lg text-2xl md:text-3xl transform active:translate-y-1 active:border-b-0";
         div.innerText = text;
-        // Mark the 'because' tile so we can find it easily
-        if(text.toLowerCase() === 'because') {
-            div.dataset.type = 'because';
-        }
         
         div.onclick = function() {
             const parent = div.parentElement.id;
@@ -395,36 +415,50 @@
                 wordBank.appendChild(div);
             }
             
-            updateCapitalization(answerArea);
+            // Trigger capitalization update whenever a tile moves
+            updateCapitalizationAll();
             checkAnswerLive();
         };
         return div;
     }
 
-    /**
-     * Updates the capitalization of 'because' based on its position
-     */
-    function updateCapitalization(answerArea) {
-        const tiles = Array.from(answerArea.children);
+    function formatTileText(text, shouldCapitalize) {
+        if (!text || text.length === 0) return text;
         
-        // Find the 'because' tile anywhere in the game (in answer area or word bank)
-        // Actually, we only need to update tiles currently in the answer area
-        // or revert ones in the word bank.
+        const firstChar = text.charAt(0);
+        const rest = text.slice(1);
         
-        const allBecauseTiles = document.querySelectorAll('[data-type="because"]');
+        // "I" Rule: If it starts with I followed by space or is just "I", keep it Capital
+        // Regex checks for "I" at start, followed by space or end of string.
+        const isI = (firstChar.toLowerCase() === 'i' && (rest.length === 0 || rest.charAt(0) === ' '));
         
-        allBecauseTiles.forEach(tile => {
-            if (tile.parentElement.id === 'answer-area') {
-                // Check if it is the first child
-                if (answerArea.firstElementChild === tile) {
-                    tile.innerText = "Because";
-                } else {
-                    tile.innerText = "because";
-                }
-            } else {
-                // In word bank, always lowercase
-                tile.innerText = "because";
-            }
+        if (isI) {
+            return "I" + rest; // Ensure I is capital
+        }
+        
+        if (shouldCapitalize) {
+            return firstChar.toUpperCase() + rest;
+        } else {
+            return firstChar.toLowerCase() + rest;
+        }
+    }
+
+    function updateCapitalizationAll() {
+        const answerArea = document.getElementById('answer-area');
+        const wordBank = document.getElementById('word-bank');
+
+        // Handle Answer Area
+        Array.from(answerArea.children).forEach((tile, index) => {
+            const currentText = tile.innerText;
+            // Only capitalize if it's the very first tile (index 0)
+            const shouldCap = (index === 0);
+            tile.innerText = formatTileText(currentText, shouldCap);
+        });
+
+        // Handle Word Bank (Always lowercase, unless "I")
+        Array.from(wordBank.children).forEach(tile => {
+            const currentText = tile.innerText;
+            tile.innerText = formatTileText(currentText, false);
         });
     }
 
@@ -474,9 +508,17 @@
 
         if (userNorm === patternA) {
             isCorrect = true;
+            // Reconstruct the correct casing for display based on logic
+            // c1 + because + c2 + .
+            // c1 is usually "I..." or "The...", so kept capital if at start
             correctText = `${q.c1} because ${q.c2}.`; 
         } else if (userNorm === patternB) {
             isCorrect = true;
+            // Because + c2 + , + c1 + .
+            // c2 might need lowercase if it's "it is fun" -> "Because it is fun..."
+            // But c1 "The match..." -> ", the match..."
+            // We'll use the user's casing mostly, but here we just need a string to read.
+            // Let's rely on standard construction for the feedback text reading.
             correctText = `Because ${q.c2}, ${q.c1}.`;
         }
 
@@ -528,8 +570,15 @@
         document.getElementById('feedback-english').innerText = eng;
         document.getElementById('feedback-chinese').innerText = ch;
         
+        // Auto-speak feedback logic
         setTimeout(() => {
-            speakText(isWin ? `Great job! ${eng}` : `The answer is: ${eng}`);
+            if (isWin) {
+                // Modified: Just speak the sentence, removed "Great Job"
+                speakText(eng);
+            } else {
+                // For loss, provide the correct answer context, then the sentence
+                speakText(`The answer is: ${eng}`);
+            }
         }, 500);
     }
 
@@ -543,9 +592,11 @@
             window.speechSynthesis.cancel(); 
             const utterance = new SpeechSynthesisUtterance(text);
             
-            utterance.rate = 0.85; 
+            utterance.rate = 0.85; // Slow down speech
             
+            // Try to pick a preferred voice if available
             if (state.approvedVoices.length > 0) {
+                // Rotate through approved voices or pick random
                 const randomVoice = state.approvedVoices[Math.floor(Math.random() * state.approvedVoices.length)];
                 utterance.voice = randomVoice;
             }
