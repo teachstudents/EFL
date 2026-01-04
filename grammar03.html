@@ -176,13 +176,13 @@
                         
                         <div class="flex flex-col gap-3 text-gray-600 text-xl md:text-3xl ml-2 font-medium">
                             <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
-                                <span id="indep-display" class="flex items-center"><i class="fas fa-circle text-xs text-violet-300 mr-3"></i>Main: I play soccer</span>
+                                <span id="indep-display" class="flex items-center"><i class="fas fa-circle text-xs text-violet-300 mr-3"></i>I play soccer.</span>
                                 <button onclick="speakInput('indep-display-text')" class="speak-btn text-gray-400 transition-colors">
                                     <i class="fas fa-volume-up"></i>
                                 </button>
                             </div>
                             <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
-                                <span id="dep-display" class="flex items-center"><i class="fas fa-circle text-xs text-violet-300 mr-3"></i>Time: It is sunny</span>
+                                <span id="dep-display" class="flex items-center"><i class="fas fa-circle text-xs text-violet-300 mr-3"></i>It is sunny.</span>
                                 <button onclick="speakInput('dep-display-text')" class="speak-btn text-gray-400 transition-colors">
                                     <i class="fas fa-volume-up"></i>
                                 </button>
@@ -336,7 +336,7 @@
         { t: "Books", indep: "do you dream", dep: "you read books", conj: "when", ch: "当你读书时，你会做梦吗？", punctuation: "?" }, // QUESTION
 
         // Topic 8: School
-        { t: "School", indep: "we raise our hands", dep: "we have a question", conj: "when", ch: "当我们有问题时，我们举手。" },
+        { t: "School", indep: "we raise our hands", dep: "we have a question", conj: "when", ch: "当我问题时，我们举手。" },
         { t: "School", indep: "I took notes", dep: "the teacher was talking", conj: "while", ch: "老师说话时，我记笔记。" },
         { t: "School", indep: "class starts", dep: "the bell rings", conj: "when", ch: "铃响时，上课了。" },
         { t: "School", indep: "the room was quiet", dep: "we were taking a test", conj: "while", ch: "我们考试时，房间很安静。" },
@@ -454,8 +454,9 @@
         const indepText = capitalizeSentence(qData.indep);
         const depText = capitalizeSentence(qData.dep);
 
-        document.getElementById('indep-display').innerHTML = `<i class="fas fa-circle text-xs text-violet-300 mr-3"></i><span id="indep-display-text">${indepText}</span>`;
-        document.getElementById('dep-display').innerHTML = `<i class="fas fa-circle text-xs text-violet-300 mr-3"></i><span id="dep-display-text">${depText}</span>`;
+        // MODIFIED: Removed "Main:" and "Time:" labels, added periods at the end
+        document.getElementById('indep-display').innerHTML = `<i class="fas fa-circle text-xs text-violet-300 mr-3"></i><span id="indep-display-text">${indepText}.</span>`;
+        document.getElementById('dep-display').innerHTML = `<i class="fas fa-circle text-xs text-violet-300 mr-3"></i><span id="dep-display-text">${depText}.</span>`;
         
         // --- Setup Word Bank ---
         // We need: Indep Clause, Dep Clause, Comma, Punctuation Mark.
@@ -739,7 +740,7 @@
         document.getElementById('feedback-chinese').innerText = ch;
         
         setTimeout(() => {
-            speakText(isWin ? `Great job! ${eng}` : `The answer is: ${eng}`);
+            speakText(isWin ? eng : `The answer is: ${eng}`);
         }, 500);
     }
 
@@ -749,9 +750,8 @@
     }
 
     function speakInput(elementId) {
-        // Strip the label "Main:" or "Time:" before speaking
+        // Grab the text, which now ends in a period (e.g. "I play soccer.")
         let text = document.getElementById(elementId).innerText;
-        text = text.replace("Main:", "").replace("Time:", "");
         speakText(text);
     }
 
