@@ -1,0 +1,448 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Volume2, Mic, ArrowRight, BookOpen, Home, Utensils, Briefcase, RefreshCw, Settings } from 'lucide-react';
+
+// --- EMOJI SCENE COMPONENTS ---
+
+const SchoolIllustration = ({ activeItem, onInteract }) => (
+  <div className="relative w-full h-80 bg-blue-50 rounded-xl border-2 border-blue-200 overflow-hidden cursor-pointer shadow-inner group">
+    <div className="absolute top-0 left-0 w-full h-6 bg-blue-200 opacity-50"></div>
+    <div className="absolute bottom-0 left-0 w-full h-16 bg-orange-100 border-t-2 border-orange-200"></div>
+
+    <EmojiItem emoji="⏰" label="clock" x="50%" y="10%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="📅" label="calendar" x="20%" y="12%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🖼️" label="picture" x="75%" y="12%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🪟" label="window" x="85%" y="25%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🚪" label="door" x="10%" y="40%" size="6xl" activeItem={activeItem} onClick={onInteract} />
+
+    <EmojiItem emoji="🖥️" label="computer" x="30%" y="45%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="📘" label="workbook" x="45%" y="60%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="✏️" label="pencil sharpener" x="60%" y="55%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="📎" label="paper clip" x="35%" y="65%" size="2xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="📏" label="ruler" x="55%" y="65%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🖊️" label="pen" x="25%" y="60%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="✂️" label="scissors" x="68%" y="60%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🖍️" label="crayon" x="50%" y="50%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+
+    <EmojiItem emoji="🎒" label="backpack" x="20%" y="85%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🗑️" label="trash can" x="85%" y="80%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🪑" label="chair" x="50%" y="80%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+  </div>
+);
+
+const HouseIllustration = ({ activeItem, onInteract }) => (
+  <div className="relative w-full h-80 bg-green-50 rounded-xl border-2 border-green-200 overflow-hidden cursor-pointer shadow-inner">
+    <div className="absolute top-1/2 left-0 w-full h-2 bg-green-800 opacity-20"></div>
+    <div className="absolute top-0 left-1/2 w-2 h-full bg-green-800 opacity-20"></div>
+
+    <div className="absolute top-2 left-2 text-xs text-green-700 font-bold opacity-50">BEDROOM</div>
+    <EmojiItem emoji="🛏️" label="bed" x="15%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="💡" label="lamp" x="35%" y="25%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🧸" label="toy box" x="40%" y="40%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🖼️" label="poster" x="25%" y="10%" size="2xl" activeItem={activeItem} onClick={onInteract} />
+
+    <div className="absolute top-2 right-2 text-xs text-green-700 font-bold opacity-50">BATHROOM</div>
+    <EmojiItem emoji="🛁" label="bathtub" x="65%" y="20%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🚽" label="toilet" x="85%" y="25%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🚿" label="shower" x="60%" y="10%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🪞" label="mirror" x="80%" y="10%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+
+    <div className="absolute bottom-2 left-2 text-xs text-green-700 font-bold opacity-50">LIVING ROOM</div>
+    <EmojiItem emoji="🛋️" label="sofa" x="20%" y="70%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="📺" label="TV" x="40%" y="65%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🪴" label="plant" x="10%" y="85%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="☎️" label="telephone" x="45%" y="85%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+
+    <div className="absolute bottom-2 right-2 text-xs text-green-700 font-bold opacity-50">KITCHEN</div>
+    <EmojiItem emoji="🍳" label="stove" x="65%" y="70%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🚰" label="sink" x="85%" y="70%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🧊" label="fridge" x="90%" y="85%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🍽️" label="table" x="65%" y="85%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+  </div>
+);
+
+const FoodIllustration = ({ activeItem, onInteract }) => (
+  <div className="relative w-full h-80 bg-orange-50 rounded-xl border-2 border-orange-200 overflow-hidden cursor-pointer shadow-inner">
+    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#EA580C 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+    
+    <EmojiItem emoji="🍳" label="omelet" x="20%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🥞" label="pancake" x="40%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🥣" label="cereal" x="60%" y="20%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🥗" label="salad" x="80%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    
+    <EmojiItem emoji="🍕" label="pizza" x="15%" y="50%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🍔" label="hamburger" x="35%" y="50%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🍟" label="french fries" x="55%" y="50%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🥪" label="sandwich" x="75%" y="50%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🍗" label="chicken" x="90%" y="45%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+
+    <EmojiItem emoji="🍑" label="peach" x="15%" y="80%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🍐" label="pear" x="30%" y="80%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🍎" label="apple" x="45%" y="80%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🍌" label="banana" x="60%" y="80%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🍦" label="yogurt" x="75%" y="75%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🥛" label="milk" x="85%" y="80%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🍵" label="tea" x="95%" y="80%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+  </div>
+);
+
+const OccupationsIllustration = ({ activeItem, onInteract }) => (
+  <div className="relative w-full h-80 bg-purple-50 rounded-xl border-2 border-purple-200 overflow-hidden cursor-pointer shadow-inner">
+    <div className="absolute bottom-0 w-full h-1/4 bg-gray-300 opacity-50"></div>
+    
+    <EmojiItem emoji="👨‍🍳" label="cook" x="15%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="👩‍⚕️" label="nurse" x="35%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🏪" label="shopkeeper" x="55%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="👨‍⚕️" label="doctor" x="75%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+
+    <EmojiItem emoji="🚕" label="taxi driver" x="20%" y="50%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🧑‍🌾" label="farmer" x="45%" y="50%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="👩‍🏫" label="teacher" x="65%" y="50%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="✈️" label="pilot" x="85%" y="40%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+
+    <EmojiItem emoji="👮" label="police officer" x="15%" y="80%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="👨‍🚒" label="firefighter" x="35%" y="80%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="🎨" label="artist" x="55%" y="80%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+    <EmojiItem emoji="⚽" label="soccer player" x="80%" y="80%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+  </div>
+);
+
+const EmojiItem = ({ emoji, label, x, y, size, activeItem, onClick }) => {
+  const isActive = activeItem === label;
+  
+  return (
+    <div 
+      onClick={(e) => { e.stopPropagation(); onClick(label); }}
+      className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 hover:scale-125 hover:z-10
+        ${isActive ? 'scale-125 z-20 drop-shadow-xl filter brightness-110' : 'opacity-95 hover:brightness-110'}
+      `}
+      style={{ left: x, top: y }}
+    >
+      <div className={`text-${size} cursor-pointer select-none drop-shadow-sm`}>
+        {emoji}
+      </div>
+      {isActive && (
+        <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-0.5 rounded-full whitespace-nowrap opacity-75 z-50 animate-bounce">
+          {label}
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+// --- MAIN DATA & PATTERN GENERATION ---
+
+const units = [
+  {
+    id: 1,
+    title: "At School", // Shortened title
+    color: "blue",
+    icon: <BookOpen className="w-5 h-5" />,
+    illustration: SchoolIllustration,
+    vocabulary: ["pencil sharpener", "clock", "workbook", "paper clip", "door", "window", "calendar", "computer", "ruler", "pen", "scissors", "backpack", "trash can", "picture"],
+    getPatterns: (word) => {
+      const noun = word || "[object]";
+      const article = ["a","e","i","o","u"].includes(noun[0]) ? "an" : "a";
+      return [
+        { q: "What's this?", a: `It's ${article} ${noun}.` },
+        { q: `Is this ${article} ${noun}?`, a: "Yes, it is." },
+        { q: "What are these?", a: `They are ${noun}s.` },
+        { q: `Whose ${noun} is this?`, a: `It's Scott's ${noun}.` }
+      ];
+    }
+  },
+  {
+    id: 3,
+    title: "My House", // Shortened title
+    color: "green",
+    icon: <Home className="w-5 h-5" />,
+    illustration: HouseIllustration,
+    vocabulary: ["bed", "bathtub", "sofa", "stove", "lamp", "sink", "toilet", "TV", "mirror", "shower", "plant", "toy box", "poster", "table", "fridge", "telephone"],
+    getPatterns: (word) => {
+      const noun = word || "[object]";
+      const article = ["a","e","i","o","u"].includes(noun[0]) ? "an" : "a";
+      
+      // LOGIC: Map vocabulary words to specific rooms
+      const roomMap = {
+        "bed": "bedroom", "lamp": "bedroom", "toy box": "bedroom", "poster": "bedroom",
+        "bathtub": "bathroom", "toilet": "bathroom", "shower": "bathroom", "mirror": "bathroom",
+        "sofa": "living room", "TV": "living room", "plant": "living room", "telephone": "living room",
+        "stove": "kitchen", "fridge": "kitchen", "table": "kitchen", "sink": "kitchen" // sink is technically in kitchen in this layout
+      };
+      
+      const room = roomMap[noun] || "house"; // Default fallback
+
+      return [
+        { q: `Where's the ${noun}?`, a: `It's in the ${room}.` },
+        { q: `Is there ${article} ${noun}?`, a: "Yes, there is." },
+        { q: `Are there ${noun}s in the ${room}?`, a: "Yes, there are." },
+        { q: "What do you see?", a: `I see ${article} ${noun}.` }
+      ];
+    }
+  },
+  {
+    id: 4,
+    title: "Things to Eat", // Shortened title
+    color: "orange",
+    icon: <Utensils className="w-5 h-5" />,
+    illustration: FoodIllustration,
+    vocabulary: ["omelet", "peach", "pear", "pancake", "yogurt", "cereal", "tea", "pizza", "hamburger", "french fries", "salad", "sandwich", "chicken", "apple", "banana", "milk"],
+    getPatterns: (word) => {
+      const noun = word || "[food]";
+      return [
+        { q: "What does he want?", a: `He wants ${noun}.` },
+        { q: `Do you like ${noun}?`, a: "Yes, I do." },
+        { q: `Does she want ${noun}?`, a: "No, she doesn't." },
+        { q: "What's for lunch?", a: `${noun} and milk.` }
+      ];
+    }
+  },
+  {
+    id: 5,
+    title: "Occupations", // Shortened title
+    color: "purple",
+    icon: <Briefcase className="w-5 h-5" />,
+    illustration: OccupationsIllustration,
+    vocabulary: ["shopkeeper", "cook", "nurse", "farmer", "taxi driver", "teacher", "doctor", "pilot", "police officer", "firefighter", "artist", "soccer player"],
+    getPatterns: (word) => {
+      const noun = word || "[job]";
+      const article = ["a","e","i","o","u"].includes(noun[0]) ? "an" : "a";
+      return [
+        { q: "Who's she?", a: `She's ${article} ${noun}.` },
+        { q: `Is he ${article} ${noun}?`, a: "No, he isn't." },
+        { q: `Are they ${noun}s?`, a: "Yes, they are." },
+        { q: "Who are they?", a: `They are ${noun}s.` }
+      ];
+    }
+  }
+];
+
+// --- MAIN APP COMPONENT ---
+
+export default function App() {
+  const [currentUnitId, setCurrentUnitId] = useState(1);
+  const [activeItem, setActiveItem] = useState(null);
+  const [availableVoices, setAvailableVoices] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState(null);
+  
+  const currentUnit = units.find(u => u.id === currentUnitId);
+
+  // Initialize Voices
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        setAvailableVoices(voices);
+        // Prioritize Edge High Quality Voices
+        const preferred = [
+          "Microsoft Emma Online (Natural)", 
+          "Microsoft Ava Online (Natural)", 
+          "Microsoft Brian Online (Natural)", 
+          "Microsoft Andrew Online (Natural)",
+          "Google US English"
+        ];
+        
+        // Find best match
+        let bestVoice = null;
+        for (let p of preferred) {
+          const found = voices.find(v => v.name.includes(p));
+          if (found) { bestVoice = found; break; }
+        }
+        
+        // Fallback to any English voice
+        if (!bestVoice) bestVoice = voices.find(v => v.lang.startsWith('en'));
+        
+        setSelectedVoice(bestVoice);
+      }
+    };
+
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  }, []);
+
+  const cycleVoice = () => {
+    if (availableVoices.length === 0) return;
+    const currentIndex = availableVoices.indexOf(selectedVoice);
+    const nextIndex = (currentIndex + 1) % availableVoices.length;
+    setSelectedVoice(availableVoices[nextIndex]);
+  };
+
+  const speak = (text) => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    if (selectedVoice) utterance.voice = selectedVoice;
+    utterance.rate = 0.85; 
+    utterance.pitch = 1.1; 
+    utterance.lang = 'en-US';
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleObjectClick = (word) => {
+    setActiveItem(word);
+    speak(word);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 font-sans text-gray-800 pb-10">
+      
+      {/* Streamlined Header */}
+      <header className="bg-white shadow-sm sticky top-0 z-10 border-b border-gray-100">
+        <div className="max-w-4xl mx-auto px-2 py-2 flex items-center justify-between gap-2 overflow-x-hidden">
+          
+          {/* Navigation Tabs - Moved Higher & Condensed */}
+          <div className="flex overflow-x-auto gap-2 py-1 hide-scrollbar flex-1">
+            {units.map((unit) => (
+              <button
+                key={unit.id}
+                onClick={() => { setCurrentUnitId(unit.id); setActiveItem(null); }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full whitespace-nowrap transition-all text-sm ${
+                  currentUnitId === unit.id 
+                    ? `bg-${unit.color}-100 text-${unit.color}-700 ring-2 ring-${unit.color}-400 font-bold shadow-sm` 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {unit.icon}
+                {unit.title}
+              </button>
+            ))}
+          </div>
+
+          {/* Voice Control */}
+          <button 
+            onClick={cycleVoice}
+            className="flex-shrink-0 text-xs bg-gray-50 hover:bg-gray-100 border border-gray-200 px-3 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            title={selectedVoice ? selectedVoice.name : "Loading voices..."}
+          >
+            <Settings className="w-3 h-3 text-gray-400" />
+            <span className="font-medium hidden sm:inline text-gray-600">
+               {selectedVoice ? selectedVoice.name.split(' ')[1] || "Voice" : "..."}
+            </span>
+          </button>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-4 py-6 space-y-8">
+        
+        {/* Interactive Scene & Patterns Grid */}
+        <section className="grid md:grid-cols-2 gap-6">
+          
+          {/* LEFT: Interactive Scene */}
+          <div className="space-y-4">
+             <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+               <div className="flex justify-between items-center mb-4">
+                 <h2 className={`text-xl font-bold text-${currentUnit.color}-600 flex items-center gap-2`}>
+                   <Mic className="w-5 h-5" />
+                   {currentUnit.title}
+                 </h2>
+                 <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-500 font-medium">
+                    Click items below
+                 </span>
+               </div>
+               
+               <currentUnit.illustration 
+                 activeItem={activeItem} 
+                 onInteract={handleObjectClick} 
+               />
+               
+               <div className="mt-4 h-10 flex justify-center items-center">
+                 {activeItem ? (
+                   <div className={`px-4 py-2 bg-${currentUnit.color}-50 rounded-lg border border-${currentUnit.color}-200 animate-fade-in`}>
+                     <span className={`text-xl font-bold text-${currentUnit.color}-700`}>
+                       {activeItem.toUpperCase()}
+                     </span>
+                   </div>
+                 ) : (
+                   <span className="text-gray-400 italic text-sm">
+                     Select an emoji to practice...
+                   </span>
+                 )}
+               </div>
+             </div>
+          </div>
+
+          {/* RIGHT: Dynamic Pattern Engine */}
+          <div className="space-y-6">
+            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 h-full flex flex-col">
+              <h3 className="font-bold text-gray-700 mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4 text-blue-500" />
+                  Practice Patterns
+                </div>
+              </h3>
+
+              <div className="space-y-3 flex-1">
+                {currentUnit.getPatterns(activeItem).map((pat, idx) => (
+                  <div 
+                    key={idx} 
+                    className="p-3 rounded-xl bg-gray-50 hover:bg-blue-50 transition-colors border border-gray-100 group"
+                  >
+                    {/* Pattern Text */}
+                    <div className="mb-2 pl-3 border-l-4 border-gray-300 group-hover:border-blue-400 transition-colors">
+                      <p className="font-semibold text-gray-800 text-sm">{pat.q}</p>
+                      <p className="text-gray-600 text-sm">{pat.a}</p>
+                    </div>
+
+                    {/* Interactive Buttons */}
+                    <div className="flex gap-2 mt-2 opacity-90 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        onClick={() => speak(pat.q)}
+                        className="flex-1 text-[10px] uppercase tracking-wide font-bold bg-white border border-gray-200 hover:bg-gray-100 text-gray-500 py-1.5 rounded"
+                      >
+                        Question
+                      </button>
+                      <button 
+                        onClick={() => speak(pat.a)}
+                        className="flex-1 text-[10px] uppercase tracking-wide font-bold bg-white border border-gray-200 hover:bg-gray-100 text-gray-500 py-1.5 rounded"
+                      >
+                        Answer
+                      </button>
+                      <button 
+                        onClick={() => speak(`${pat.q}... ${pat.a}`)}
+                        className="flex-1 text-[10px] uppercase tracking-wide font-bold bg-blue-100 hover:bg-blue-200 text-blue-700 py-1.5 rounded"
+                      >
+                        Dialog
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {!activeItem && (
+                <div className="text-center mt-4 text-xs text-orange-500 font-medium bg-orange-50 py-2 rounded">
+                  ⚠ Click an emoji in the picture to update sentences
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Vocabulary Bank */}
+        <section className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+           <h3 className="font-bold text-gray-700 mb-3 text-xs uppercase tracking-wider flex items-center gap-2">
+             <BookOpen className="w-4 h-4" />
+             Word Bank
+           </h3>
+           <div className="flex flex-wrap gap-2">
+             {currentUnit.vocabulary.map((word) => (
+               <button
+                 key={word}
+                 onClick={() => handleObjectClick(word)}
+                 className={`px-3 py-1.5 rounded-lg text-xs transition-colors border ${
+                   activeItem === word
+                     ? `bg-${currentUnit.color}-100 border-${currentUnit.color}-300 text-${currentUnit.color}-700 font-bold scale-105 shadow-sm`
+                     : 'bg-gray-50 border-gray-100 hover:bg-gray-100 text-gray-600'
+                 }`}
+               >
+                 {word}
+               </button>
+             ))}
+           </div>
+        </section>
+
+      </main>
+    </div>
+  );
+}
