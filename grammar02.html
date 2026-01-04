@@ -41,10 +41,10 @@
         }
         .drop-zone {
             min-height: 80px;
-            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-image: radial-gradient(#fdba74 1px, transparent 1px); /* Orange tint */
             background-size: 20px 20px;
         }
-        /* Custom Scrollbar for the word bank */
+        /* Custom Scrollbar */
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
         }
@@ -128,7 +128,7 @@
                 <!-- Rule 2 -->
                 <div class="bg-green-50 p-4 rounded-xl border-2 border-green-200">
                     <h3 class="font-bold text-xl text-green-600 mb-2">Connecting Words</h3>
-                    <ul class="text-left text-gray-700 space-y-1 text-sm md:text-base">
+                    <ul class="text-left text-gray-700 space-y-1 text-sm md:text-base ml-4 list-disc">
                         <li><b>and</b> = addition (和)</li>
                         <li><b>but</b> = contrast (但是)</li>
                         <li><b>so</b> = result (所以)</li>
@@ -177,13 +177,13 @@
                         
                         <div class="flex flex-col gap-3 text-gray-600 text-xl md:text-3xl ml-2 font-medium">
                             <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
-                                <span id="simple-1" class="flex items-center"><i class="fas fa-circle text-xs text-orange-300 mr-3"></i>I like to run.</span>
+                                <span id="simple-1" class="flex items-center"><i class="fas fa-circle text-xs text-orange-300 mr-3"></i>I play soccer.</span>
                                 <button onclick="speakInput('simple-1-text')" class="speak-btn text-gray-400 transition-colors">
                                     <i class="fas fa-volume-up"></i>
                                 </button>
                             </div>
                             <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
-                                <span id="simple-2" class="flex items-center"><i class="fas fa-circle text-xs text-orange-300 mr-3"></i>It is healthy.</span>
+                                <span id="simple-2" class="flex items-center"><i class="fas fa-circle text-xs text-orange-300 mr-3"></i>It is sunny.</span>
                                 <button onclick="speakInput('simple-2-text')" class="speak-btn text-gray-400 transition-colors">
                                     <i class="fas fa-volume-up"></i>
                                 </button>
@@ -252,7 +252,7 @@
     /**
      * GAME CONFIGURATION & STATE
      */
-    const TOTAL_TIME = 30; // 30 seconds for compound sentences
+    const TOTAL_TIME = 35; 
     let state = {
         score: 0,
         streak: 0,
@@ -278,7 +278,12 @@
         "Nature": "fa-tree"
     };
 
-    // 50 Questions (10 Topics x 5 Questions)
+    // DB Structure: 
+    // t: Topic
+    // c1: Clause 1 (Sentence 1)
+    // c2: Clause 2 (Sentence 2)
+    // conj: Conjunction
+    // ch: Chinese translation
     const questionsDB = [
         // Topic 1: Sports
         { t: "Sports", c1: "I like soccer", c2: "I don't like tennis", conj: "but", ch: "我喜欢足球，但是我不喜欢网球。" },
@@ -363,21 +368,27 @@
 
     function loadVoices() {
         state.allVoices = window.speechSynthesis.getVoices();
-        const targetNames = ["Ava", "Brian", "Andrew", "Emma"];
         
-        // Use case-insensitive matching to find the specific target voices
-        state.approvedVoices = state.allVoices.filter(v => 
-            targetNames.some(name => v.name.toLowerCase().includes(name.toLowerCase()))
+        // Priority 1: Exact matches for "Microsoft Online Natural" voices (Ava, Brian, Andrew, Emma)
+        const microsoftVoices = state.allVoices.filter(v => 
+            v.name.includes("Microsoft") && v.name.includes("Online") && 
+            (v.name.includes("Ava") || v.name.includes("Brian") || v.name.includes("Andrew") || v.name.includes("Emma"))
         );
         
-        // Fallback: If no specific targets found, use any US English voice
-        if (state.approvedVoices.length === 0) {
-            state.approvedVoices = state.allVoices.filter(v => v.lang === 'en-US');
-        }
-        
-        // Final fallback: Use all available
-        if (state.approvedVoices.length === 0) {
-            state.approvedVoices = state.allVoices; 
+        // Priority 2: Matches for names only (if "Microsoft Online" prefix is hidden/different)
+        const nameMatches = state.allVoices.filter(v => 
+            v.name.includes("Ava") || v.name.includes("Brian") || v.name.includes("Andrew") || v.name.includes("Emma")
+        );
+
+        // Priority 3: Fallback to US English
+        const fallbacks = state.allVoices.filter(v => v.lang === 'en-US');
+
+        if (microsoftVoices.length > 0) {
+            state.approvedVoices = microsoftVoices;
+        } else if (nameMatches.length > 0) {
+            state.approvedVoices = nameMatches;
+        } else {
+            state.approvedVoices = fallbacks.length > 0 ? fallbacks : state.allVoices;
         }
     }
 
@@ -402,9 +413,9 @@
         document.getElementById('rules-screen').classList.add('hidden');
         document.getElementById('game-screen').classList.remove('hidden');
         
-        // Ensure voices are loaded again just in case async loading was slow
-        if(state.approvedVoices.length === 0 && 'speechSynthesis' in window) {
-            loadVoices();
+        // Re-check voices in case they loaded late
+        if(state.approvedVoices.length === 0 || state.approvedVoices[0].name.includes("Microsoft") === false) {
+             loadVoices();
         }
 
         state.currentQuestion = 0;
@@ -427,12 +438,6 @@
         }
 
         const qData = questionsDB[state.currentQuestion];
-        
-        // Helper to ensure sentences display correctly at the top
-        const formatForDisplay = (str) => {
-            const trimmed = str.trim();
-            return trimmed.charAt(0).toUpperCase() + trimmed.slice(1) + ".";
-        };
 
         // UI Updates
         document.getElementById('topic-label').innerText = `Topic: ${qData.t}`;
@@ -442,25 +447,16 @@
 
         document.getElementById('progress-label').innerText = `${state.currentQuestion + 1}/${questionsDB.length}`;
         
-        // Inject Text and Hidden Spans for Reading
-        const s1Formatted = formatForDisplay(qData.c1);
-        const s2Formatted = formatForDisplay(qData.c2);
+        // Display Sentences
+        const c1Text = capitalizeSentence(qData.c1);
+        const c2Text = capitalizeSentence(qData.c2);
 
-        document.getElementById('simple-1').innerHTML = `<i class="fas fa-circle text-xs text-orange-300 mr-3"></i><span id="simple-1-text">${s1Formatted}</span>`;
-        document.getElementById('simple-2').innerHTML = `<i class="fas fa-circle text-xs text-orange-300 mr-3"></i><span id="simple-2-text">${s2Formatted}</span>`;
+        document.getElementById('simple-1').innerHTML = `<i class="fas fa-circle text-xs text-orange-300 mr-3"></i><span id="simple-1-text">${c1Text}.</span>`;
+        document.getElementById('simple-2').innerHTML = `<i class="fas fa-circle text-xs text-orange-300 mr-3"></i><span id="simple-2-text">${c2Text}.</span>`;
         
-        // 1. Setup Word Bank (Sentences and Punctuation ONLY)
-        let c2TileText = qData.c2.trim();
-        const firstWord = c2TileText.split(' ')[0];
-        if (firstWord !== "I" && !isProperNoun(firstWord)) {
-             c2TileText = c2TileText.charAt(0).toLowerCase() + c2TileText.slice(1);
-        }
-
-        let c1TileText = qData.c1.trim();
-        c1TileText = c1TileText.charAt(0).toUpperCase() + c1TileText.slice(1);
-
-        const words = [c1TileText, c2TileText, ",", "."];
-        // Note: No conjunction in bottom bank
+        // --- Setup Word Bank ---
+        // We need: C1, C2, Comma, Period.
+        const words = [c1Text, c2Text, ",", "."];
         words.sort(() => Math.random() - 0.5);
 
         const wordBank = document.getElementById('word-bank');
@@ -471,43 +467,39 @@
 
         words.forEach(word => {
             const tile = createTile(word, false);
+            // Add custom attributes to track logic
+            if(word === c1Text) tile.dataset.type = 'c1';
+            if(word === c2Text) tile.dataset.type = 'c2';
+            
             wordBank.appendChild(tile);
         });
 
-        // 2. Setup Conjunction Bank (Left Column) with Scaffolding
+        // --- Setup Conjunction Bank ---
         const conjBank = document.getElementById('conj-bank');
         conjBank.innerHTML = '';
 
         const allConjunctions = ["and", "but", "or", "so"];
         const correctConj = qData.conj;
         
-        // Determine difficulty based on question index within topic (0-4)
+        // Scaffolding: 
         const qIndex = state.currentQuestion % 5;
         let visibleConjs = [];
 
-        if (qIndex === 0) {
-            // Level 1: Only correct answer
+        if (qIndex < 2) {
+             // Level 1: Easier, fewer options
             visibleConjs = [correctConj];
-        } else if (qIndex === 1) {
-            // Level 2: Correct + 1 Distractor
-            const distractors = allConjunctions.filter(c => c !== correctConj);
-            const randomDist = distractors[Math.floor(Math.random() * distractors.length)];
-            visibleConjs = [correctConj, randomDist];
-        } else if (qIndex === 2) {
-             // Level 3: Correct + 2 Distractors
-            const distractors = allConjunctions.filter(c => c !== correctConj);
-            // Shuffle distractors
-            distractors.sort(() => Math.random() - 0.5);
-            visibleConjs = [correctConj, distractors[0], distractors[1]];
+            // Add one random distractor for level 2
+            if (qIndex === 1) {
+                 const distractors = allConjunctions.filter(c => c !== correctConj);
+                 visibleConjs.push(distractors[Math.floor(Math.random() * distractors.length)]);
+            }
         } else {
-            // Level 4 (Q4 & Q5): All options
+             // Level 3+: All options
             visibleConjs = [...allConjunctions];
         }
 
-        // Shuffle visible options for display so correct isn't always first
-        if (visibleConjs.length > 1) {
-            visibleConjs.sort(() => Math.random() - 0.5);
-        }
+        // Shuffle
+        if (visibleConjs.length > 1) visibleConjs.sort(() => Math.random() - 0.5);
 
         visibleConjs.forEach(conj => {
             const tile = createTile(conj, true);
@@ -517,24 +509,29 @@
         resetTimer();
     }
 
-    function isProperNoun(word) {
-        const properNouns = ["Tom", "Mom", "Dad", "Grandma", "Japan", "Harry", "Potter"];
-        return properNouns.includes(word);
+    // Helper: Initial Cap
+    function capitalizeSentence(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+    
+    // Helper: is Proper Noun or I
+    function shouldBeCapitalized(word) {
+        const alwaysCap = ["I", "Dad", "Mom", "Tom", "Grandma", "Japan", "Harry", "Potter"];
+        return alwaysCap.includes(word);
     }
 
-    // Updated createTile to handle both types
     function createTile(text, isConj) {
         const div = document.createElement('div');
         
         if (isConj) {
-            // Blue style for conjunctions
             div.className = "conj-tile bg-blue-500 border-b-4 border-blue-700 text-white font-bold py-3 px-6 rounded-xl text-2xl md:text-3xl transform active:translate-y-1 active:border-b-0 w-full md:w-auto text-center";
         } else {
-            // Standard Orange style for words
             div.className = "word-tile bg-white border-b-4 border-orange-200 hover:border-orange-400 text-orange-900 font-bold py-3 px-6 rounded-xl shadow-lg text-2xl md:text-3xl transform active:translate-y-1 active:border-b-0";
         }
         
-        div.innerText = text;
+        // Store original text for logic comparisons
+        div.dataset.original = text;
+        div.innerText = text; // Initial display
         
         div.onclick = function() {
             const parent = div.parentElement.id;
@@ -542,26 +539,70 @@
             const wordBank = document.getElementById('word-bank');
             const conjBank = document.getElementById('conj-bank');
             
-            // Interaction Logic:
-            // 1. If in Conj Bank -> Move to Answer
-            // 2. If in Word Bank -> Move to Answer
-            // 3. If in Answer -> Return to respective bank based on type
-            
             if (parent === 'answer-area') {
                 // Return to source
-                if (isConj) {
-                    conjBank.appendChild(div);
-                } else {
-                    wordBank.appendChild(div);
-                }
+                if (isConj) conjBank.appendChild(div);
+                else wordBank.appendChild(div);
             } else {
                 // Move to Answer Area
                 answerArea.appendChild(div);
             }
             
+            updateVisuals();
             checkAnswerLive();
         };
         return div;
+    }
+
+    /**
+     * Updates capitalization based on position in the answer area
+     */
+    function updateVisuals() {
+        const answerArea = document.getElementById('answer-area');
+        const tiles = Array.from(answerArea.children);
+        
+        // Also get tiles in banks to reset them to default state
+        const bankTiles = [
+            ...Array.from(document.getElementById('word-bank').children),
+            ...Array.from(document.getElementById('conj-bank').children)
+        ];
+
+        // 1. Reset Bank Tiles to Default (Sentences -> Cap, Conjunctions -> Lower)
+        bankTiles.forEach(tile => {
+            let txt = tile.dataset.original; 
+            if(tile.classList.contains('conj-tile')) {
+                tile.innerText = txt.toLowerCase();
+            } else if ([',', '.', '?'].includes(txt)) {
+                 tile.innerText = txt;
+            } else {
+                // Sentences in bank: Always Capitalized for readability
+                tile.innerText = capitalizeSentence(txt);
+            }
+        });
+
+        // 2. Update Answer Area Tiles
+        tiles.forEach((tile, index) => {
+            let txt = tile.dataset.original;
+            
+            if([',', '.', '?'].includes(txt)) {
+                tile.innerText = txt;
+                return;
+            }
+
+            // If it's the first tile: Capitalize
+            if (index === 0) {
+                tile.innerText = capitalizeSentence(txt);
+            } else {
+                // Otherwise: Lowercase, unless it's a special word
+                if (txt.startsWith("I ") || txt === "I") {
+                    tile.innerText = txt;
+                } else if (shouldBeCapitalized(txt.split(' ')[0])) {
+                     tile.innerText = txt; 
+                } else {
+                     tile.innerText = txt.charAt(0).toLowerCase() + txt.slice(1);
+                }
+            }
+        });
     }
 
     function resetTimer() {
@@ -590,7 +631,8 @@
         const answerArea = document.getElementById('answer-area');
         const tiles = Array.from(answerArea.children);
         
-        if (tiles.length < 5) return; // Need c1, comma, conj, c2, period
+        // We need: C1, comma, Conj, C2, Period (5 items)
+        if (tiles.length < 5) return; 
 
         let userSentence = tiles.map(t => t.innerText).join(" ");
         validateAnswer(userSentence);
@@ -599,33 +641,70 @@
     function validateAnswer(userString) {
         const q = questionsDB[state.currentQuestion];
         
-        const norm = str => str.toLowerCase().replace(/\s+/g, ' ').trim();
-        const userNorm = norm(userString);
-        
-        const target = norm(`${q.c1} , ${q.conj} ${q.c2} .`);
-        
-        if (userNorm === target) {
-            clearInterval(state.timerInterval);
-            let c2Lower = q.c2;
-            const firstWord = q.c2.split(' ')[0];
-            if (firstWord !== "I" && !isProperNoun(firstWord)) {
-                 c2Lower = c2Lower.charAt(0).toLowerCase() + c2Lower.slice(1);
-            }
+        // Normalize for checking.
+        const norm = str => str.toLowerCase()
+            .replace(/\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .replace(/\s+\./g, '.')
+            .replace(/\s+\?/g, '?')
+            .trim();
             
-            const correctText = `${q.c1}, ${q.conj} ${c2Lower}.`;
-            handleWin(correctText, q.ch);
+        const userNorm = norm(userString); 
+
+        // Pattern 1: Clause1 , Conj Clause2 . (Standard)
+        const patternStandard = norm(`${q.c1} , ${q.conj} ${q.c2} .`);
+        
+        // Pattern 2: Clause2 , Conj Clause1 . (Swapped - Only for "or")
+        // We allow this because "or" choices usually don't depend on order in this game
+        // (e.g. "We can swim or we can hike" == "We can hike or we can swim")
+        const patternSwapped = norm(`${q.c2} , ${q.conj} ${q.c1} .`);
+        
+        let matched = false;
+        let displayAnswer = "";
+
+        if (userNorm === patternStandard) {
+            matched = true;
+            // Build nice display text for standard order
+            let c2Display = q.c2;
+            const c2FirstWord = c2Display.split(' ')[0];
+            if (!shouldBeCapitalized(c2FirstWord) && c2FirstWord !== "I") {
+                c2Display = c2Display.charAt(0).toLowerCase() + c2Display.slice(1);
+            }
+            displayAnswer = `${capitalizeSentence(q.c1)}, ${q.conj} ${c2Display}.`;
+        
+        } else if (q.conj === 'or' && userNorm === patternSwapped) {
+            matched = true;
+            // Build nice display text for SWAPPED order
+            // 1. New Start = q.c2 (Capitalized)
+            let newStart = capitalizeSentence(q.c2);
+            
+            // 2. New End = q.c1 (Lowercased unless proper noun)
+            let newEnd = q.c1;
+            const c1FirstWord = newEnd.split(' ')[0];
+            if (!shouldBeCapitalized(c1FirstWord) && c1FirstWord !== "I") {
+                newEnd = newEnd.charAt(0).toLowerCase() + newEnd.slice(1);
+            }
+
+            displayAnswer = `${newStart}, ${q.conj} ${newEnd}.`;
+        }
+
+        if (matched) {
+            clearInterval(state.timerInterval);
+            handleWin(displayAnswer, q.ch);
         }
     }
 
     function timeOut() {
         const q = questionsDB[state.currentQuestion];
-        let c2Lower = q.c2;
-            const firstWord = q.c2.split(' ')[0];
-            if (firstWord !== "I" && !isProperNoun(firstWord)) {
-                 c2Lower = c2Lower.charAt(0).toLowerCase() + c2Lower.slice(1);
-            }
-        const defaultAnswer = `${q.c1}, ${q.conj} ${c2Lower}.`;
-        handleLoss(defaultAnswer, q.ch);
+        // Need to handle C2 capitalization properly for display
+        let c2Display = q.c2;
+        const c2FirstWord = c2Display.split(' ')[0];
+        if (!shouldBeCapitalized(c2FirstWord) && c2FirstWord !== "I") {
+             c2Display = c2Display.charAt(0).toLowerCase() + c2Display.slice(1);
+        }
+        
+        const displayAnswer = `${capitalizeSentence(q.c1)}, ${q.conj} ${c2Display}.`;
+        handleLoss(displayAnswer, q.ch);
     }
 
     function handleWin(engText, chText) {
@@ -640,7 +719,7 @@
     }
 
     function handleLoss(engText, chText) {
-        state.streak = 0; // Reset streak
+        state.streak = 0; 
         updateStreak();
         document.getElementById('sfx-wrong').play();
         showFeedback(false, engText, chText);
@@ -655,7 +734,6 @@
     }
 
     function triggerConfetti() {
-        // Simple confetti burst
         if (window.confetti) {
             confetti({
                 particleCount: 100,
@@ -686,7 +764,7 @@
         document.getElementById('feedback-chinese').innerText = ch;
         
         setTimeout(() => {
-            speakText(isWin ? `Great job! ${eng}` : `The answer is: ${eng}`);
+            speakText(isWin ? eng : `The answer is: ${eng}`);
         }, 500);
     }
 
@@ -695,9 +773,8 @@
         speakText(text);
     }
 
-    // New helper to speak text from the DOM elements
     function speakInput(elementId) {
-        const text = document.getElementById(elementId).innerText;
+        let text = document.getElementById(elementId).innerText;
         speakText(text);
     }
 
@@ -706,6 +783,7 @@
             window.speechSynthesis.cancel(); 
             const utterance = new SpeechSynthesisUtterance(text);
             
+            // Personalization: Speed 85%
             utterance.rate = 0.85; 
             
             if (state.approvedVoices.length > 0) {
