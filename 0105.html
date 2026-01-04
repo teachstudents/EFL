@@ -90,10 +90,10 @@
         const EmojiItem = ({ emoji, label, x, y, size, activeItem, onClick }) => {
             const isActive = activeItem === label;
             
-            // Map for increasing size (approx 20-25% boost per step)
+            // Map for increasing size (approx 35-40% boost total - 2 steps up)
             const largerSizes = {
-                'xs': 'sm', 'sm': 'base', 'base': 'lg', 'lg': 'xl', 'xl': '2xl',
-                '2xl': '3xl', '3xl': '4xl', '4xl': '5xl', '5xl': '6xl', '6xl': '7xl', '7xl': '8xl'
+                'xs': 'base', 'sm': 'lg', 'base': 'xl', 'lg': '2xl', 'xl': '3xl',
+                '2xl': '4xl', '3xl': '5xl', '4xl': '6xl', '5xl': '7xl', '6xl': '8xl', '7xl': '9xl'
             };
             const finalSize = largerSizes[size] || size;
 
@@ -120,7 +120,7 @@
         // --- SCENE ILLUSTRATIONS ---
 
         const SchoolIllustration = ({ activeItem, onInteract }) => (
-            <div className="relative w-full h-[28rem] bg-blue-50 rounded-xl border-2 border-blue-200 overflow-hidden cursor-pointer shadow-inner group">
+            <div className="relative w-full h-[34rem] bg-blue-50 rounded-xl border-2 border-blue-200 overflow-hidden cursor-pointer shadow-inner group">
                 <div className="absolute top-0 left-0 w-full h-6 bg-blue-200 opacity-50"></div>
                 <div className="absolute bottom-0 left-0 w-full h-16 bg-orange-100 border-t-2 border-orange-200"></div>
 
@@ -146,7 +146,7 @@
         );
 
         const HouseIllustration = ({ activeItem, onInteract }) => (
-            <div className="relative w-full h-[28rem] bg-green-50 rounded-xl border-2 border-green-200 overflow-hidden cursor-pointer shadow-inner">
+            <div className="relative w-full h-[34rem] bg-green-50 rounded-xl border-2 border-green-200 overflow-hidden cursor-pointer shadow-inner">
                 <div className="absolute top-1/2 left-0 w-full h-2 bg-green-800 opacity-20"></div>
                 <div className="absolute top-0 left-1/2 w-2 h-full bg-green-800 opacity-20"></div>
 
@@ -177,7 +177,7 @@
         );
 
         const FoodIllustration = ({ activeItem, onInteract }) => (
-            <div className="relative w-full h-[28rem] bg-orange-50 rounded-xl border-2 border-orange-200 overflow-hidden cursor-pointer shadow-inner">
+            <div className="relative w-full h-[34rem] bg-orange-50 rounded-xl border-2 border-orange-200 overflow-hidden cursor-pointer shadow-inner">
                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#EA580C 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
                 
                 <EmojiItem emoji="🍳" label="omelet" x="20%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
@@ -202,7 +202,7 @@
         );
 
         const OccupationsIllustration = ({ activeItem, onInteract }) => (
-            <div className="relative w-full h-[28rem] bg-purple-50 rounded-xl border-2 border-purple-200 overflow-hidden cursor-pointer shadow-inner">
+            <div className="relative w-full h-[34rem] bg-purple-50 rounded-xl border-2 border-purple-200 overflow-hidden cursor-pointer shadow-inner">
                 <div className="absolute bottom-0 w-full h-1/4 bg-gray-300 opacity-50"></div>
                 
                 <EmojiItem emoji="👨‍🍳" label="cook" x="15%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
@@ -225,7 +225,7 @@
         // --- NEW TOPICS: TOWN & ACTIVITIES ---
 
         const TownIllustration = ({ activeItem, onInteract }) => (
-            <div className="relative w-full h-[28rem] bg-gray-200 rounded-xl border-2 border-gray-300 overflow-hidden cursor-pointer shadow-inner">
+            <div className="relative w-full h-[34rem] bg-gray-200 rounded-xl border-2 border-gray-300 overflow-hidden cursor-pointer shadow-inner">
                 {/* Roads */}
                 <div className="absolute top-1/2 left-0 w-full h-16 bg-gray-600 transform -translate-y-1/2 border-t-2 border-b-2 border-yellow-400 border-dashed"></div>
                 <div className="absolute top-0 left-1/2 w-16 h-full bg-gray-600 transform -translate-x-1/2 border-l-2 border-r-2 border-yellow-400 border-dashed"></div>
@@ -253,7 +253,7 @@
         );
 
         const ActivityIllustration = ({ activeItem, onInteract }) => (
-            <div className="relative w-full h-[28rem] bg-green-100 rounded-xl border-2 border-green-300 overflow-hidden cursor-pointer shadow-inner">
+            <div className="relative w-full h-[34rem] bg-green-100 rounded-xl border-2 border-green-300 overflow-hidden cursor-pointer shadow-inner">
                 {/* Grass texture hint */}
                 <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(#166534 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
                 
@@ -457,7 +457,7 @@
             return (
                 <div className="min-h-screen bg-gray-50 font-sans text-gray-800 pb-10">
                     <header className="bg-white shadow-sm sticky top-0 z-10 border-b border-gray-100">
-                        <div className="max-w-6xl mx-auto px-2 py-2 flex items-center justify-between gap-2 overflow-x-hidden">
+                        <div className="max-w-7xl mx-auto px-2 py-2 flex items-center justify-between gap-2 overflow-x-hidden">
                             <div className="flex overflow-x-auto gap-2 py-1 hide-scrollbar flex-1">
                                 {units.map((unit) => (
                                     <button
@@ -487,7 +487,7 @@
                         </div>
                     </header>
 
-                    <main className="max-w-6xl mx-auto px-4 py-6 space-y-8">
+                    <main className="max-w-7xl mx-auto px-4 py-6 space-y-8">
                         <section className="grid md:grid-cols-2 gap-6">
                             <div className="space-y-4">
                                 <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
