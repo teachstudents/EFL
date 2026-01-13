@@ -69,6 +69,7 @@
         <div id="start-screen" class="text-center space-y-8 animate-pop">
             <h1 class="text-5xl font-bold text-gray-800 mb-2">Word Math</h1>
             <p class="text-xl text-gray-600">Convert words to numbers in your head, add them up, and type the answer in words!</p>
+            <p class="text-md text-indigo-600 font-bold">100 Questions • 60 Seconds Each</p>
             
             <div class="bg-blue-50 p-6 rounded-xl border-2 border-blue-100 max-w-md mx-auto">
                 <p class="text-lg font-semibold text-blue-800 mb-2">Example:</p>
@@ -82,21 +83,25 @@
             </div>
 
             <button onclick="startGame()" class="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-indigo-600 font-pj rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 hover:bg-indigo-700 hover:scale-105 shadow-lg">
-                <i class="fas fa-play mr-2"></i> Start Challenge (60s)
+                <i class="fas fa-play mr-2"></i> Start Challenge
             </button>
         </div>
 
         <!-- GAME SCREEN -->
         <div id="game-screen" class="hidden h-full flex flex-col justify-between">
-            <!-- Header: Timer and Score -->
-            <div class="flex justify-between items-center mb-8">
-                <div class="flex items-center space-x-3 bg-indigo-50 px-4 py-2 rounded-lg">
-                    <i class="fas fa-clock text-indigo-600 text-xl"></i>
-                    <span id="timer" class="text-2xl font-bold text-indigo-900">60</span>
+            <!-- Header: Timer, Question Count and Score -->
+            <div class="flex justify-between items-center mb-8 gap-2">
+                <div class="flex items-center space-x-2 md:space-x-3 bg-indigo-50 px-3 py-2 rounded-lg">
+                    <i class="fas fa-clock text-indigo-600 text-lg md:text-xl"></i>
+                    <span id="timer" class="text-xl md:text-2xl font-bold text-indigo-900">60</span>
                 </div>
-                <div class="flex items-center space-x-3 bg-green-50 px-4 py-2 rounded-lg">
-                    <i class="fas fa-star text-green-600 text-xl"></i>
-                    <span id="score" class="text-2xl font-bold text-green-900">0</span>
+                 <div class="flex items-center space-x-2 md:space-x-3 bg-blue-50 px-3 py-2 rounded-lg">
+                    <i class="fas fa-list-ol text-blue-600 text-lg md:text-xl"></i>
+                    <span id="question-count" class="text-xl md:text-2xl font-bold text-blue-900">1/100</span>
+                </div>
+                <div class="flex items-center space-x-2 md:space-x-3 bg-green-50 px-3 py-2 rounded-lg">
+                    <i class="fas fa-star text-green-600 text-lg md:text-xl"></i>
+                    <span id="score" class="text-xl md:text-2xl font-bold text-green-900">0</span>
                 </div>
             </div>
 
@@ -135,7 +140,7 @@
                 <i class="fas fa-trophy"></i>
             </div>
             
-            <h2 class="text-4xl font-bold text-gray-800">Time's Up!</h2>
+            <h2 class="text-4xl font-bold text-gray-800">Challenge Complete!</h2>
             
             <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
                 <p class="text-gray-600 mb-1">Final Score</p>
@@ -265,6 +270,7 @@
         let problems = [];
         let currentProblemIndex = 0;
         let isGameActive = false;
+        const TOTAL_QUESTIONS = 100;
 
         // --- Number to Words Logic ---
         const ONES = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
@@ -316,7 +322,6 @@
         function startGame() {
             initAudio(); // User interaction required to start audio context
             score = 0;
-            timeLeft = 60;
             currentProblemIndex = 0;
             isGameActive = true;
             
@@ -324,11 +329,15 @@
             document.getElementById('end-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
             
-            updateUI();
             generateProblems();
             showNextProblem();
-            
+        }
+
+        function startTimerForQuestion() {
             clearInterval(timerInterval);
+            timeLeft = 60; // Reset for each question
+            updateTimerUI();
+
             timerInterval = setInterval(() => {
                 timeLeft--;
                 updateTimerUI();
@@ -337,15 +346,13 @@
                 if (timeLeft <= 10 && timeLeft > 0) {
                     playSound('tick-fast');
                 } else if (timeLeft > 0) {
-                    playSound('tick');
+                    playSound('tick'); 
                 }
 
                 if (timeLeft <= 0) {
-                    endGame();
+                    handleQuestionTimeout();
                 }
             }, 1000);
-            
-            setTimeout(() => document.getElementById('answer-input').focus(), 100);
         }
 
         function updateTimerUI() {
@@ -366,12 +373,17 @@
 
         function updateUI() {
             document.getElementById('score').innerText = score;
+            document.getElementById('question-count').innerText = `${currentProblemIndex + 1}/${TOTAL_QUESTIONS}`;
         }
 
         function showNextProblem() {
+            if (currentProblemIndex >= TOTAL_QUESTIONS) {
+                endGame();
+                return;
+            }
+
             if (currentProblemIndex >= problems.length) {
                 generateProblems();
-                currentProblemIndex = 0;
             }
             
             const p = problems[currentProblemIndex];
@@ -387,6 +399,9 @@
 
             document.getElementById('answer-input').value = '';
             document.getElementById('answer-input').focus();
+            
+            updateUI();
+            startTimerForQuestion();
         }
 
         function speakCurrentProblem() {
@@ -407,6 +422,9 @@
             const input = document.getElementById('answer-input').value.trim();
             if (!input) return;
 
+            // Stop timer while feedback shows
+            clearInterval(timerInterval);
+
             const currentProblem = problems[currentProblemIndex];
             const cleanInput = normalize(input);
             const cleanAnswer = normalize(currentProblem.a);
@@ -419,7 +437,7 @@
             if (cleanInput === cleanAnswer || isDigitCorrect) {
                 // Correct
                 score++;
-                playSound('correct'); // Sound effect
+                playSound('correct'); 
                 container.classList.add('correct-flash');
                 setTimeout(() => container.classList.remove('correct-flash'), 500);
                 
@@ -438,7 +456,32 @@
                 feedback.classList.add('opacity-0');
             }, 1000);
 
-            updateUI();
+            currentProblemIndex++;
+            showNextProblem();
+        }
+
+        function handleQuestionTimeout() {
+            if (!isGameActive) return;
+            
+            clearInterval(timerInterval);
+            
+            const currentProblem = problems[currentProblemIndex];
+            const container = document.getElementById('game-container');
+            const feedback = document.getElementById('feedback');
+            
+            // Timeout Feedback
+            container.classList.add('wrong-flash');
+            setTimeout(() => container.classList.remove('wrong-flash'), 500);
+            
+            feedback.innerText = `Time's Up! It was "${currentProblem.a}"`;
+            feedback.className = "h-6 text-center font-bold text-red-500 opacity-100";
+            
+            playSound('end'); // Fail sound
+            
+            setTimeout(() => {
+                feedback.classList.add('opacity-0');
+            }, 1000);
+
             currentProblemIndex++;
             showNextProblem();
         }
@@ -446,30 +489,30 @@
         function endGame() {
             isGameActive = false;
             clearInterval(timerInterval);
-            playSound('end'); // Sound effect
-            window.speechSynthesis.cancel(); // Stop talking
+            playSound('correct'); 
+            window.speechSynthesis.cancel(); 
             
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('end-screen').classList.remove('hidden');
             
-            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-score').innerText = `${score} / ${TOTAL_QUESTIONS}`;
             
-            // Determine Award
+            // Determine Award based on 100 questions
             const awardElement = document.getElementById('award-title');
             const medalIcon = document.getElementById('medal-icon');
             let awardText = "";
             let medalHtml = "";
 
-            if (score < 5) {
+            if (score < 20) {
                 awardText = "Math Novice";
                 medalHtml = '<i class="fas fa-seedling text-green-400"></i>';
-            } else if (score < 10) {
+            } else if (score < 50) {
                 awardText = "Number Student";
                 medalHtml = '<i class="fas fa-book-reader text-blue-400"></i>';
-            } else if (score < 15) {
+            } else if (score < 70) {
                 awardText = "Word Wizard";
                 medalHtml = '<i class="fas fa-hat-wizard text-purple-500"></i>';
-            } else if (score < 25) {
+            } else if (score < 90) {
                 awardText = "Calculation Captain";
                 medalHtml = '<i class="fas fa-medal text-silver-400"></i>';
             } else {
