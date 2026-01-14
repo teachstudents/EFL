@@ -14,7 +14,7 @@
         h1 { color: var(--primary); margin: 0; font-size: 24px; }
         
         .header-controls { display: flex; align-items: center; gap: 15px; }
-        .voice-status { font-size: 0.9em; color: #666; }
+        .voice-status { font-size: 0.9em; color: #666; display: none; }
         .control-btn { background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .control-btn:hover { background: #004494; }
         
@@ -33,29 +33,31 @@
         .topic-title p { margin: 0; color: #555; }
 
         /* Questions */
-        .question-block { margin-bottom: 20px; padding: 15px; background: #fff; border: 1px solid #eee; border-radius: 8px; }
-        .q-header { font-weight: 700; margin-bottom: 10px; display: block; color: #444; }
+        .question-block { margin-bottom: 10px; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; }
+        .q-header { font-weight: 700; margin-bottom: 5px; display: block; color: #444; }
         
-        .options label { display: block; margin: 8px 0; cursor: pointer; padding: 8px; border-radius: 4px; background: #f9f9f9; }
+        .options label { display: block; margin: 5px 0; cursor: pointer; padding: 5px; border-radius: 4px; background: #f9f9f9; }
         .options label:hover { background: #eee; }
-        .input-gap { border: none; border-bottom: 2px solid #999; padding: 5px; width: 200px; font-size: 1em; background: transparent; }
-        .input-gap:focus { border-color: var(--primary); outline: none; }
+        /* Gap input styling to look like inline text */
+        .gap-text { display: inline; }
+        .input-gap { border: none; border-bottom: 1px solid #333; padding: 2px 5px; width: 120px; font-size: 1em; background: transparent; text-align: center; margin: 0 5px; }
+        .input-gap:focus { border-color: var(--primary); outline: none; background: #eef; }
         
-        .match-select { padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 100%; max-width: 300px; }
+        .match-select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; width: 100%; max-width: 300px; }
 
         /* Feedback */
-        .controls-area { margin-top: 30px; display: flex; gap: 15px; }
-        .action-btn { flex: 1; padding: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .controls-area { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+        .mini-btn { padding: 8px 15px; border: none; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer; }
         .btn-check { background: #28a745; color: white; }
         .btn-check.active { background: #155724; box-shadow: inset 0 3px 5px rgba(0,0,0,0.2); }
         .btn-script { background: #6c757d; color: white; }
         
-        .transcript-box { display: none; margin-top: 20px; padding: 20px; background: #f1f3f4; border-radius: 8px; line-height: 1.6; white-space: pre-line; font-size: 0.95em; }
+        .transcript-box { display: none; margin-top: 20px; padding: 15px; background: #f1f3f4; border-radius: 8px; line-height: 1.5; white-space: pre-line; font-size: 0.9em; }
         
-        .correct-ans { color: #28a745; font-weight: bold; display: none; margin-top: 5px; }
+        .correct-ans { color: #28a745; font-weight: bold; display: none; margin-top: 5px; font-size: 0.9em; }
         .show-keys .correct-ans { display: block; }
-        .show-keys .question-block.correct { border-left: 5px solid #28a745; }
-        .show-keys .question-block.incorrect { border-left: 5px solid #dc3545; }
+        .show-keys .question-block.correct { border-left: 4px solid #28a745; }
+        .show-keys .question-block.incorrect { border-left: 4px solid #dc3545; }
 
         /* Startup Overlay */
         #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
@@ -74,9 +76,19 @@
     <header>
         <div>
             <h1>IELTS Listening Part 2</h1>
-            <div class="voice-status" id="voiceStatus">Loading voices...</div>
         </div>
-        <!-- Speed is fixed at 1.0x, hidden from user as requested -->
+        <div class="header-controls">
+            <!-- Small Header Buttons -->
+            <button class="control-btn" id="headerPlayBtn" onclick="toggleAudio()" title="Play/Pause">
+                ❚❚
+            </button>
+            <button class="control-btn" onclick="restartAudio()" title="Replay">
+                ↺
+            </button>
+            <button class="control-btn" onclick="goHome()" title="Home">
+                ⌂
+            </button>
+        </div>
     </header>
 
     <!-- 2x4 Grid Navigation -->
@@ -287,12 +299,10 @@ function startApp() {
             speechSynthesis.onvoiceschanged = () => {
                 initVoices();
                 renderTabs();
-                loadTest(0);
             };
         } else {
             initVoices();
             renderTabs();
-            loadTest(0);
         }
     } else {
         alert("Text-to-Speech not supported.");
@@ -315,8 +325,6 @@ function initVoices() {
         
         voiceMap[name] = v;
     });
-    
-    document.getElementById('voiceStatus').innerText = "✓ System Ready (1.0x Speed)";
 }
 
 function renderTabs() {
@@ -336,12 +344,22 @@ function loadTest(idx) {
     currentTestIdx = idx;
     checkMode = false; // Reset check mode
     
-    // Update active tab visual
-    const btns = document.querySelectorAll('.nav-btn');
-    btns.forEach((b, i) => b.classList.toggle('active', i === idx));
+    // Reset Check Button
+    const checkBtn = document.getElementById('checkBtn');
+    if(checkBtn) {
+        checkBtn.classList.remove('active');
+        checkBtn.innerText = "Check Answers";
+    }
+
+    // Hide Grid when test loads
+    document.getElementById('navGrid').style.display = 'none';
+    
+    // Show Back Button Context
+    // (Implied by UI design)
 
     const test = tests[idx];
     const container = document.getElementById('testContainer');
+    container.style.display = 'block';
     
     let html = `
         <div class="test-section active">
@@ -350,13 +368,9 @@ function loadTest(idx) {
                     <h2>Unit ${test.id}: ${test.title}</h2>
                     <p>${test.topic}</p>
                 </div>
-                <div class="header-controls">
-                    <button class="control-btn" id="localPlayBtn" onclick="toggleAudio()" title="Pause/Resume">
-                        ❚❚
-                    </button>
-                    <button class="control-btn" onclick="restartAudio()" title="Restart Audio">
-                        ↺
-                    </button>
+                <div class="controls-area">
+                    <button class="mini-btn btn-check" id="checkBtn" onclick="toggleCheckAnswers()">Check Answers</button>
+                    <button class="mini-btn btn-script" onclick="toggleScript()">Show Transcript</button>
                 </div>
             </div>
             
@@ -364,25 +378,25 @@ function loadTest(idx) {
 
     test.questions.forEach((q, i) => {
         html += `<div class="question-block" id="q-${i}">
-            <span class="q-header">Q${i+1}. ${q.text}</span>`;
+            <span class="q-header">Q${i+1}</span>`;
         
         if (q.type === 'mcq') {
-            html += `<div class="options">`;
+            html += `<span class="q-text" style="display:block;margin-bottom:5px;font-weight:600">${q.text}</span><div class="options">`;
             q.options.forEach((opt, oi) => {
                 const val = String.fromCharCode(65 + oi);
                 html += `<label><input type="radio" name="q${i}" value="${val}"> ${val}. ${opt}</label>`;
             });
             html += `</div>`;
         } else if (q.type === 'gap' || q.type === 'map') {
-            // Note: Map questions converted to text gaps per instruction
             const parts = q.text.split('________');
             if(parts.length > 1) {
-                html += `${parts[0]} <input type="text" class="input-gap" name="q${i}" autocomplete="off"> ${parts[1]}`;
+                html += `<div class="gap-text">${parts[0]}<input type="text" class="input-gap" name="q${i}" autocomplete="off">${parts[1]}</div>`;
             } else {
-                html += `<input type="text" class="input-gap" name="q${i}" autocomplete="off">`;
+                html += `<div class="gap-text"><input type="text" class="input-gap" name="q${i}" autocomplete="off"></div>`;
             }
         } else if (q.type === 'match') {
-            html += `<select class="match-select" name="q${i}">
+            html += `<span class="q-text" style="display:block;margin-bottom:5px;font-weight:600">${q.text}</span>
+            <select class="match-select" name="q${i}">
                 <option value="">Select...</option>
                 ${q.options.map(o => `<option value="${o}">${o}</option>`).join('')}
             </select>`;
@@ -392,10 +406,6 @@ function loadTest(idx) {
     });
 
     html += `</form>
-            <div class="controls-area">
-                <button class="action-btn btn-check" id="checkBtn" onclick="toggleCheckAnswers()">Check Answers</button>
-                <button class="action-btn btn-script" onclick="toggleScript()">Show Transcript</button>
-            </div>
             <div class="transcript-box" id="scriptBox">${test.script}</div>
         </div>`;
 
@@ -403,6 +413,12 @@ function loadTest(idx) {
     
     // Auto-play audio on tab switch
     playAudio();
+}
+
+function goHome() {
+    stopAudio();
+    document.getElementById('testContainer').style.display = 'none';
+    document.getElementById('navGrid').style.display = 'grid';
 }
 
 function playAudio() {
@@ -417,18 +433,15 @@ function playAudio() {
     currentUtterance.rate = 1.0;
     
     const playBtn = document.getElementById('headerPlayBtn');
-    const localBtn = document.getElementById('localPlayBtn');
     
     currentUtterance.onstart = () => {
         isPlaying = true;
         if(playBtn) { playBtn.innerText = "❚❚"; playBtn.title = "Pause"; }
-        if(localBtn) { localBtn.innerText = "❚❚"; localBtn.title = "Pause"; }
     };
     
     currentUtterance.onend = () => {
         isPlaying = false;
         if(playBtn) { playBtn.innerText = "▶"; playBtn.title = "Play"; }
-        if(localBtn) { localBtn.innerText = "▶"; localBtn.title = "Play"; }
     };
     
     synth.speak(currentUtterance);
@@ -436,35 +449,34 @@ function playAudio() {
 
 function toggleAudio() {
     const playBtn = document.getElementById('headerPlayBtn');
-    const localBtn = document.getElementById('localPlayBtn');
     
     if (synth.paused) {
         synth.resume();
         if(playBtn) playBtn.innerText = "❚❚";
-        if(localBtn) localBtn.innerText = "❚❚";
         isPlaying = true;
     } else if (synth.speaking) {
         synth.pause();
         if(playBtn) playBtn.innerText = "▶";
-        if(localBtn) localBtn.innerText = "▶";
         isPlaying = false;
     } else {
-        playAudio();
+        if(document.getElementById('testContainer').style.display !== 'none') {
+            playAudio();
+        }
     }
 }
 
 function restartAudio() {
-    stopAudio();
-    playAudio();
+    if(document.getElementById('testContainer').style.display !== 'none') {
+        stopAudio();
+        playAudio();
+    }
 }
 
 function stopAudio() {
     synth.cancel();
     isPlaying = false;
     const playBtn = document.getElementById('headerPlayBtn');
-    const localBtn = document.getElementById('localPlayBtn');
     if(playBtn) playBtn.innerText = "▶";
-    if(localBtn) localBtn.innerText = "▶";
 }
 
 function toggleCheckAnswers() {
