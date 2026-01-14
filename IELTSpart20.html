@@ -13,11 +13,17 @@
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
         h1 { color: var(--primary); margin: 0; font-size: 24px; }
         
-        .header-controls { display: flex; align-items: center; gap: 15px; }
+        .header-controls { display: flex; align-items: center; gap: 10px; }
         .voice-status { font-size: 0.9em; color: #666; display: none; }
         .control-btn { background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .control-btn:hover { background: #004494; }
-        
+        /* Smaller buttons for the Check/Transcript actions in header */
+        .header-action-btn { padding: 8px 15px; border: none; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer; background: #6c757d; color: white; transition: 0.2s; }
+        .header-action-btn:hover { background: #5a6268; }
+        .btn-check { background: #28a745; }
+        .btn-check:hover { background: #218838; }
+        .btn-check.active { background: #155724; box-shadow: inset 0 3px 5px rgba(0,0,0,0.2); }
+
         /* Navigation Grid (2x4) */
         .nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 30px; }
         .nav-btn { padding: 15px; border: none; background: #e0e0e0; cursor: pointer; border-radius: 8px; font-weight: 600; transition: 0.2s; text-align: center; }
@@ -28,33 +34,30 @@
         .test-section { display: none; animation: fadeIn 0.4s; }
         .test-section.active { display: block; }
         
-        .topic-header { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
-        .topic-title h2 { margin: 0 0 5px 0; font-size: 1.2em; }
-        .topic-title p { margin: 0; color: #555; }
-
-        /* Questions */
-        .question-block { margin-bottom: 10px; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; }
-        .q-header { font-weight: 700; margin-bottom: 5px; display: block; color: #444; }
+        .topic-header { background: #e3f2fd; padding: 10px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid var(--primary); display: flex; justify-content: space-between; align-items: center;}
+        .topic-title { flex: 1; } /* Take up remaining space on the left */
+        .topic-title h2 { margin: 0 0 5px 0; font-size: 1.1em; }
+        .topic-title p { margin: 0; color: #555; font-size: 0.9em; }
         
-        .options label { display: block; margin: 5px 0; cursor: pointer; padding: 5px; border-radius: 4px; background: #f9f9f9; }
+        /* Questions Layout - Compact to fit on page */
+        #quizForm { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } /* 2 Column layout */
+        .question-block { margin-bottom: 0; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; font-size: 0.9em; }
+        .q-header { font-weight: 700; margin-bottom: 5px; display: block; color: #444; font-size: 0.95em; }
+        
+        .options label { display: block; margin: 3px 0; cursor: pointer; padding: 4px; border-radius: 4px; background: #f9f9f9; font-size: 0.9em; }
         .options label:hover { background: #eee; }
-        /* Gap input styling to look like inline text */
+        
+        /* Gap input styling */
         .gap-text { display: inline; }
-        .input-gap { border: none; border-bottom: 1px solid #333; padding: 2px 5px; width: 120px; font-size: 1em; background: transparent; text-align: center; margin: 0 5px; }
+        .input-gap { border: none; border-bottom: 1px solid #333; padding: 0 5px; width: 100px; font-size: 1em; background: transparent; text-align: center; margin: 0 3px; height: 1.2em;}
         .input-gap:focus { border-color: var(--primary); outline: none; background: #eef; }
         
-        .match-select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; width: 100%; max-width: 300px; }
+        .match-select { padding: 4px; border-radius: 4px; border: 1px solid #ccc; width: 100%; max-width: 100%; font-size: 0.9em; }
 
         /* Feedback */
-        .controls-area { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
-        .mini-btn { padding: 8px 15px; border: none; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer; }
-        .btn-check { background: #28a745; color: white; }
-        .btn-check.active { background: #155724; box-shadow: inset 0 3px 5px rgba(0,0,0,0.2); }
-        .btn-script { background: #6c757d; color: white; }
+        .transcript-box { display: none; margin-top: 15px; padding: 15px; background: #f1f3f4; border-radius: 8px; line-height: 1.4; white-space: pre-line; font-size: 0.85em; height: 200px; overflow-y: auto; }
         
-        .transcript-box { display: none; margin-top: 20px; padding: 15px; background: #f1f3f4; border-radius: 8px; line-height: 1.5; white-space: pre-line; font-size: 0.9em; }
-        
-        .correct-ans { color: #28a745; font-weight: bold; display: none; margin-top: 5px; font-size: 0.9em; }
+        .correct-ans { color: #28a745; font-weight: bold; display: none; margin-top: 3px; font-size: 0.85em; }
         .show-keys .correct-ans { display: block; }
         .show-keys .question-block.correct { border-left: 4px solid #28a745; }
         .show-keys .question-block.incorrect { border-left: 4px solid #dc3545; }
@@ -64,6 +67,14 @@
         #startBtn { padding: 20px 40px; font-size: 24px; background: var(--primary); color: white; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 0 20px rgba(0,86,179,0.5); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #quizForm { grid-template-columns: 1fr; }
+            .header-controls { flex-wrap: wrap; justify-content: flex-end; }
+            .topic-header { flex-direction: column; align-items: flex-start; } /* Stack on smaller screens */
+            .controls-area { width: 100%; justify-content: space-between; margin-top: 10px; }
+        }
     </style>
 </head>
 <body>
@@ -75,10 +86,14 @@
 <div class="container">
     <header>
         <div>
-            <h1>IELTS Listening Part 2</h1>
+            <!-- Removed text per request -->
         </div>
         <div class="header-controls">
-            <!-- Small Header Buttons -->
+            <!-- Header Action Buttons -->
+            <button class="header-action-btn btn-check" id="checkBtn" onclick="toggleCheckAnswers()" style="display:none">Check Answers</button>
+            <button class="header-action-btn btn-script" id="scriptBtn" onclick="toggleScript()" style="display:none">Transcript</button>
+            
+            <!-- Controls -->
             <button class="control-btn" id="headerPlayBtn" onclick="toggleAudio()" title="Play/Pause">
                 ❚❚
             </button>
@@ -349,7 +364,12 @@ function loadTest(idx) {
     if(checkBtn) {
         checkBtn.classList.remove('active');
         checkBtn.innerText = "Check Answers";
+        checkBtn.style.display = "inline-block"; // Show button now
     }
+    
+    // Show transcript button
+    const scriptBtn = document.getElementById('scriptBtn');
+    if(scriptBtn) scriptBtn.style.display = "inline-block";
 
     // Hide Grid when test loads
     document.getElementById('navGrid').style.display = 'none';
@@ -369,8 +389,7 @@ function loadTest(idx) {
                     <p>${test.topic}</p>
                 </div>
                 <div class="controls-area">
-                    <button class="mini-btn btn-check" id="checkBtn" onclick="toggleCheckAnswers()">Check Answers</button>
-                    <button class="mini-btn btn-script" onclick="toggleScript()">Show Transcript</button>
+                    <!-- Buttons are in header, this is supplementary or can be removed if strictly header only -->
                 </div>
             </div>
             
@@ -419,6 +438,9 @@ function goHome() {
     stopAudio();
     document.getElementById('testContainer').style.display = 'none';
     document.getElementById('navGrid').style.display = 'grid';
+    // Hide header buttons when on home
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('scriptBtn').style.display = 'none';
 }
 
 function playAudio() {
