@@ -36,13 +36,13 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .action-button, .nav-button, .quiz-option, .tfng-button, .word-bank-word, .btn-animated-3d, .tier-btn {
+        .action-button, .nav-button, .quiz-option, .tfng-button, .word-bank-word, .btn-animated-3d, .tier-btn, .project-card {
             transition: all 0.15s ease-out;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.06);
             border: none;
             cursor: pointer;
         }
-        .action-button:hover, .nav-button:hover, .quiz-option:hover:not(:disabled), .tfng-button:hover:not(:disabled), .word-bank-word:hover, .btn-animated-3d:hover, .tier-btn:hover {
+        .action-button:hover, .nav-button:hover, .quiz-option:hover:not(:disabled), .tfng-button:hover:not(:disabled), .word-bank-word:hover, .btn-animated-3d:hover, .tier-btn:hover, .project-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
         }
@@ -121,6 +121,10 @@
         .bubble-left { background: #e0f2fe; margin-right: auto; border-bottom-left-radius: 2px; }
         .bubble-right { background: #fef3c7; margin-left: auto; border-bottom-right-radius: 2px; }
 
+        /* Pedagogical Box Styles */
+        .pedagogy-box { border-left: 4px solid #f59e0b; background: #fffbeb; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem; }
+        .pedagogy-title { font-weight: bold; color: #b45309; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; display: block; margin-bottom: 0.25rem; }
+
     </style>
 </head>
 <body class="antialiased text-gray-800 text-lg bg-slate-50">
@@ -159,6 +163,10 @@
                 <h1 id="main-title" class="text-4xl md:text-5xl font-bold text-slate-800 mb-2">Grade 11 Unit 1</h1>
                 <h2 class="text-2xl text-blue-600 font-semibold mb-6">Sports & Fitness</h2>
                 <p id="main-subtitle" class="text-xl text-gray-500 mb-8 max-w-lg">Explore the world of elite sports, history, and physical limits.</p>
+                <div class="flex flex-wrap gap-2 justify-center mb-8">
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Transferable Idea: Adaptation</span>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Theme: Nature vs. Nurture</span>
+                </div>
                 <button onclick="startApp()" class="action-button bg-blue-600 text-white font-bold py-4 px-10 rounded-full text-xl hover:bg-blue-700 shadow-lg transition-transform transform hover:scale-105">ENTER UNIT</button>
             </div>
         </section>
@@ -167,7 +175,7 @@
     
     <script>
         // ===================================================================================
-        // --- LESSON CONTENT CONFIGURATION: SPORTS & FITNESS ---
+        // --- LESSON CONTENT CONFIGURATION ---
         // ===================================================================================
         const lessonData = {
             title: "Unit 1: Sports",
@@ -175,36 +183,75 @@
             startPageId: 'title-screen',
             homePageId: 'main-menu',
             mainMenu: [
-                { id: 'menu-1a-intro', text: '1A: The World\'s Game (Soccer) <span aria-hidden="true">⚽</span>', color: 'blue', target: '1a-intro' },
-                { id: 'menu-1a-vocab', text: '1A: Vocabulary <span aria-hidden="true">📚</span>', color: 'sky', target: '1a-vocab' },
-                { id: 'menu-1a-read', text: '1A: Reading & Comprehension <span aria-hidden="true">📖</span>', color: 'indigo', target: '1a-reading' },
-                { id: 'menu-1a-quiz', text: '1A: Quiz <span aria-hidden="true">✅</span>', color: 'violet', target: '1a-comp-mcq' },
-                { id: 'menu-1b-intro', text: '1B: Olympic Champion <span aria-hidden="true">🥇</span>', color: 'amber', target: '1b-intro' },
-                { id: 'menu-1b-vocab', text: '1B: Vocabulary <span aria-hidden="true">🧠</span>', color: 'orange', target: '1b-vocab' },
-                { id: 'menu-1b-read', text: '1B: Reading & Comprehension <span aria-hidden="true">🏋️</span>', color: 'amber', target: '1b-reading' },
-                { id: 'menu-1b-quiz', text: '1B: Quiz <span aria-hidden="true">✅</span>', color: 'red', target: '1b-comp-gap' },
-                { id: 'menu-climbing', text: 'Video: Sport Climbing <span aria-hidden="true">🧗</span>', color: 'emerald', target: 'climbing-intro' },
-                { id: 'menu-speaking', text: 'Speaking: Interview <span aria-hidden="true">🗣️</span>', color: 'pink', target: 'speaking-task' },
-                { id: 'menu-final', text: 'Final Plenary <span aria-hidden="true">🤔</span>', color: 'teal', target: 'final-plenary' },
+                { id: 'menu-goals', text: '🎯 Learning Roadmap (W.H.E.R.E.T.O.)', color: 'slate', target: 'goals-intro' },
+                { id: 'menu-warmup', text: '🧠 Warm-up & Background', color: 'orange', target: 'warmup' },
+                { id: 'menu-vocab', text: '📚 Keywords (10 Words)', color: 'sky', target: 'vocab-intro' },
+                { id: 'menu-1a', text: '⚽ 1A: Reading & Quiz (Soccer)', color: 'blue', target: '1a-intro' },
+                { id: 'menu-1b', text: '🥇 1B: Reading & Quiz (Olympic)', color: 'amber', target: '1b-intro' },
+                { id: 'menu-speaking', text: '🗣️ Speaking (IELTS/TOEFL/Harkness)', color: 'pink', target: 'speaking-menu' },
+                { id: 'menu-writing', text: '✍️ Writing Task (Scaffolded)', color: 'indigo', target: 'writing-task' },
+                { id: 'menu-projects', text: '🚀 Active Learning Projects', color: 'emerald', target: 'project-menu' },
+                { id: 'menu-final', text: '🤔 Plenary & Self-Assessment', color: 'teal', target: 'final-plenary' },
             ],
-            // Global Vocab for reference
-            vocabulary: [],
+            // 10 Keywords with IPA, Sentence, Definition
+            vocabulary: [
+                { word: 'Established', ipa: '/ɪˈstæblɪʃt/', def: 'Set up or created (e.g. rules).', sentence: 'The rules of soccer were established in England.' },
+                { word: 'Passion', ipa: '/ˈpæʃən/', def: 'Strong feeling or emotion.', sentence: 'Fans show great passion for their teams.' },
+                { word: 'Victory', ipa: '/ˈvɪktəri/', def: 'Winning a game or contest.', sentence: 'The team celebrated their victory.' },
+                { word: 'Universal', ipa: '/ˌjuːnɪˈvɜːrsəl/', def: 'Relating to all people in the world.', sentence: 'Soccer has universal appeal.' },
+                { word: 'Elite', ipa: '/eɪˈliːt/', def: 'Belonging to the highest class/best group.', sentence: 'Elite athletes train for hours every day.' },
+                { word: 'Stamina', ipa: '/ˈstæmɪnə/', def: 'Physical strength to continue for a long time.', sentence: 'Marathon runners need incredible stamina.' },
+                { word: 'Genetic', ipa: '/dʒəˈnɛtɪk/', def: 'Relating to genes or heredity.', sentence: 'Scientists study the genetic basis of speed.' },
+                { word: 'Adapt', ipa: '/əˈdæpt/', def: 'To change to fit a new situation.', sentence: 'Athletes adapt their training to the climate.' },
+                { word: 'Fatigue', ipa: '/fəˈtiːg/', def: 'Extreme tiredness.', sentence: 'Slow-twitch fibers help control fatigue.' },
+                { word: 'Differentiate', ipa: '/ˌdɪfəˈrɛnʃieɪt/', def: 'To show the difference between things.', sentence: 'Genes differentiate elite athletes from average ones.' }
+            ],
             pages: [
-                // --- UNIT 1A: SOCCER ---
-                { id: '1a-intro', type: 'simple', content: { title: '1A: The World\'s Game <span aria-hidden="true">⚽</span>', text: 'Soccer (football) is the world\'s most popular sport. We will explore its history, why it is so popular, and the simplicity that makes it universal.' } },
-                
-                { id: '1a-vocab', type: 'vocab-list', content: { 
-                    title: '1A: Vocabulary', 
-                    words: [
-                        { word: 'Established', def: 'Set up or created (e.g. rules).' },
-                        { word: 'Passion', def: 'Strong feeling or emotion.' },
-                        { word: 'Victory', def: 'Winning a game or contest.' },
-                        { word: 'Defeat', def: 'Losing a game or contest.' },
-                        { word: 'Universal', def: 'Relating to all people in the world.' },
-                        { word: 'Wealth', def: 'A large amount of money or property.' }
-                    ]
+                // --- GOALS & W.H.E.R.E.T.O. ---
+                { id: 'goals-intro', type: 'simple', content: { 
+                    title: 'Learning Roadmap', 
+                    text: `
+                    <div class="pedagogy-box"><span class="pedagogy-title">W.H.E.R.E.T.O. Framework</span>
+                    <strong>W (Where):</strong> Analyze texts on sports genetics.<br>
+                    <strong>H (Hook):</strong> Why is soccer so popular?<br>
+                    <strong>E (Equip):</strong> 10 Academic Keywords.<br>
+                    <strong>E (Evaluate):</strong> Quizzes & Writing.<br>
+                    </div>
+                    <ul class="list-disc list-inside text-left space-y-2 mt-4">
+                        <li><strong>Objective 1:</strong> Analyze texts to distinguish between genetic and environmental factors in sports.</li>
+                        <li><strong>Objective 2:</strong> Synthesize evidence to argue whether athletes are born or made.</li>
+                        <li><strong>Outcome:</strong> Participate in a Harkness discussion and produce a persuasive paragraph.</li>
+                        <li><strong>Success Criteria:</strong> I can define 10 key terms and explain the role of fast-twitch fibers.</li>
+                    </ul>
+                    ` 
                 }},
 
+                // --- WARM UP ---
+                { id: 'warmup', type: 'simple', content: {
+                    title: 'Background Building',
+                    text: `
+                    <div class="space-y-4 text-left">
+                        <p><strong>1. Cultural Awareness:</strong> Soccer originated as "Cuju" in China (2500 BCE) but was codified in England. Why do you think simple games become global?</p>
+                        <p><strong>2. Personal Connection:</strong> Do you prefer individual sports (like swimming) or team sports (like basketball)? Why?</p>
+                        <p><strong>3. Transferable Idea:</strong> "Persistence." How is training for a sport similar to studying for an exam?</p>
+                    </div>
+                    `
+                }},
+
+                // --- VOCAB (Intro + Matching) ---
+                { id: 'vocab-intro', type: 'vocab-list', content: { title: '10 Academic Keywords', words: [] } }, // Populated dynamically
+                { id: 'vocab-match', type: 'quiz-mcq', content: { 
+                    title: 'Vocabulary Matching', 
+                    questions: [
+                        { question: 'Definition: "Extreme tiredness"', options: ['Passion', 'Fatigue', 'Victory', 'Elite'], correctAnswer: 'Fatigue' },
+                        { question: 'Definition: "Belonging to the best group"', options: ['Universal', 'Genetic', 'Elite', 'Established'], correctAnswer: 'Elite' },
+                        { question: 'Definition: "Set up or created"', options: ['Established', 'Adapt', 'Stamina', 'Differentiate'], correctAnswer: 'Established' }
+                    ] 
+                }},
+
+                // --- UNIT 1A: SOCCER ---
+                { id: '1a-intro', type: 'simple', content: { title: '1A: The World\'s Game', text: '<strong>Pre-Reading Questions:</strong><br>1. Scan the text: When did modern soccer start?<br>2. Look at the headings: What are the main reasons for popularity?<br>3. Predict: Why is "wealth" mentioned?' } },
+                
                 { id: '1a-reading', type: 'tiered-reading', content: { 
                     title: '1A: The World\'s Game',
                     texts: {
@@ -214,31 +261,33 @@
                     }
                 }},
 
-                { id: '1a-comp-mcq', type: 'quiz-mcq', content: { 
-                    title: '1A: Comprehension', 
-                    questions: [
-                        { question: 'What is the main idea of the reading?', options: ['Soccer is popular for many reasons.', 'Soccer has a long history.', 'Famous players make a lot of money.'], correctAnswer: 'Soccer is popular for many reasons.' },
-                        { question: 'In paragraph B, what does "camaraderie" mean?', options: ['Competition', 'Shared feelings', 'Great wealth'], correctAnswer: 'Shared feelings' },
-                        { question: 'Which is NOT given as a reason for soccer\'s popularity?', options: ['Its international quality', 'The promise of wealth', 'The expensive equipment'], correctAnswer: 'The expensive equipment' },
-                        { question: 'Where did the modern game of soccer originate with established rules?', options: ['China', 'Brazil', 'Britain'], correctAnswer: 'Britain' },
-                        { question: 'According to the text, what is the MAIN reason for soccer\'s universal appeal?', options: ['Great wealth', 'It is a simple game', 'Famous players'], correctAnswer: 'It is a simple game' }
-                    ]
-                }},
+                // 1A Assessments (5 of each)
+                { id: '1a-gap', type: 'quiz-gap-fill', content: { title: '1A: Gap Fill', sentences: [
+                    { text: ['The Football Association', 'the rules in the 1840s.'], answer: 'established' },
+                    { text: ['Soccer is known for its', 'appeal.'], answer: 'universal' },
+                    { text: ['Fans feel', 'when their team wins.'], answer: 'victory' },
+                    { text: ['Players can make great', 'if they become professionals.'], answer: 'wealth' },
+                    { text: ['The feeling of shared friendship is called', '.'], answer: 'camaraderie' }
+                ], wordBank: ['established', 'universal', 'victory', 'wealth', 'camaraderie'] }},
+                
+                { id: '1a-tf', type: 'quiz-tfng', content: { title: '1A: True/False', questions: [
+                    { statement: 'Soccer began in the United States in 2500 B.C.E.', correctAnswer: 'False' },
+                    { statement: 'The modern rules were established in Britain.', correctAnswer: 'True' },
+                    { statement: 'You need expensive equipment to play soccer.', correctAnswer: 'False' },
+                    { statement: 'Camaraderie helps make the sport popular.', correctAnswer: 'True' },
+                    { statement: 'Only rich people can become professional players.', correctAnswer: 'False' }
+                ]}},
+
+                { id: '1a-mcq', type: 'quiz-mcq', content: { title: '1A: Multiple Choice', questions: [
+                    { question: 'What is the main idea of the reading?', options: ['Soccer is popular for many reasons.', 'Soccer has a long history.', 'Famous players make a lot of money.', 'Britain invented sports.'], correctAnswer: 'Soccer is popular for many reasons.' },
+                    { question: 'In paragraph B, what does "camaraderie" mean?', options: ['Competition', 'Shared feelings', 'Great wealth', 'Winning'], correctAnswer: 'Shared feelings' },
+                    { question: 'Which is NOT given as a reason for soccer\'s popularity?', options: ['Its international quality', 'The promise of wealth', 'The expensive equipment', 'The simplicity'], correctAnswer: 'The expensive equipment' },
+                    { question: 'Where did the modern game of soccer originate with established rules?', options: ['China', 'Brazil', 'Britain', 'USA'], correctAnswer: 'Britain' },
+                    { question: 'According to the text, what is the MAIN reason for soccer\'s universal appeal?', options: ['Great wealth', 'It is a simple game', 'Famous players', 'TV rights'], correctAnswer: 'It is a simple game' }
+                ]}},
 
                 // --- UNIT 1B: OLYMPIC ---
-                { id: '1b-intro', type: 'simple', content: { title: '1B: Olympic Champion <span aria-hidden="true">🥇</span>', text: 'How does someone become an Olympic champion? It takes a mix of biology, environment, and psychology. Let\'s look at muscles!' } },
-
-                { id: '1b-vocab', type: 'vocab-list', content: { 
-                    title: '1B: Vocabulary', 
-                    words: [
-                        { word: 'Biological', def: 'Relating to living things.' },
-                        { word: 'Genetic', def: 'Relating to genes or heredity.' },
-                        { word: 'Adapt', def: 'To change to fit a new situation.' },
-                        { word: 'Required', def: 'Necessary or needed.' },
-                        { word: 'Elite', def: 'Belonging to the highest class or best group.' },
-                        { word: 'Fatigue', def: 'Extreme tiredness.' }
-                    ]
-                }},
+                { id: '1b-intro', type: 'simple', content: { title: '1B: Olympic Champion', text: '<strong>Pre-Reading:</strong><br>1. What does "Elite" mean?<br>2. Do you think you have more fast-twitch or slow-twitch fibers?<br>3. Scan for the word "Genetic".' } },
 
                 { id: '1b-reading', type: 'tiered-reading', content: { 
                     title: '1B: What Makes a Champion?',
@@ -249,43 +298,53 @@
                     }
                 }},
 
-                { id: '1b-comp-gap', type: 'quiz-gap-fill', content: { 
-                    title: '1B: Gap Fill', 
-                    sentences: [
-                        { text: ['Fast-twitch fibers help athletes move', '.'], answer: 'quickly' },
-                        { text: ['Marathon runners have more', 'fibers to run for a long time.'], answer: 'slow-twitch' },
-                        { text: ['Elite athletes need a combination of biological and', 'factors.'], answer: 'psychological' },
-                        { text: ['Slow-twitch fibers help athletes control', '.'], answer: 'fatigue' },
-                        { text: ['Many athletes have physical characteristics that', 'them from average people.'], answer: 'differentiate' }
-                    ],
-                    wordBank: ['quickly', 'slow-twitch', 'psychological', 'fatigue', 'differentiate']
+                // 1B Assessments (5 of each)
+                { id: '1b-gap', type: 'quiz-gap-fill', content: { title: '1B: Gap Fill', sentences: [
+                    { text: ['Fast-twitch fibers help athletes move', '.'], answer: 'quickly' },
+                    { text: ['Marathon runners have more', 'fibers to run for a long time.'], answer: 'slow-twitch' },
+                    { text: ['Elite athletes need a combination of biological and', 'factors.'], answer: 'psychological' },
+                    { text: ['Slow-twitch fibers help athletes control', '.'], answer: 'fatigue' },
+                    { text: ['Many athletes have physical characteristics that', 'them from average people.'], answer: 'differentiate' }
+                ], wordBank: ['quickly', 'slow-twitch', 'psychological', 'fatigue', 'differentiate'] }},
+
+                { id: '1b-tf', type: 'quiz-tfng', content: { title: '1B: True/False', questions: [
+                    { statement: 'Becoming an Olympic champion depends only on training.', correctAnswer: 'False' },
+                    { statement: 'Fast-twitch fibers are useful for marathon runners.', correctAnswer: 'False' },
+                    { statement: 'Weightlifters need to lift heavy weights quickly.', correctAnswer: 'True' },
+                    { statement: '90% of a marathon runner\'s muscles might be slow-twitch.', correctAnswer: 'True' },
+                    { statement: 'Lactic acid causes feelings of tiredness.', correctAnswer: 'True' }
+                ]}},
+
+                { id: '1b-mcq', type: 'quiz-mcq', content: { title: '1B: Multiple Choice', questions: [
+                    { question: 'What is the main topic of Paragraph B?', options: ['Training methods', 'Genetic factors', 'Psychology', 'Diet'], correctAnswer: 'Genetic factors' },
+                    { question: 'What do fast-twitch fibers allow athletes to do?', options: ['Run far', 'Control fatigue', 'Move quickly', 'Breath easier'], correctAnswer: 'Move quickly' },
+                    { question: 'Which athlete would need more slow-twitch fibers?', options: ['Sprinter', 'Weightlifter', 'Marathon runner', 'High jumper'], correctAnswer: 'Marathon runner' },
+                    { question: 'What differentiates elite athletes from average people?', options: ['Physical characteristics', 'Money', 'Clothing', 'Travel'], correctAnswer: 'Physical characteristics' },
+                    { question: 'What causes muscle pain?', options: ['Fast-twitch fibers', 'Lactic acid', 'Genetics', 'Victory'], correctAnswer: 'Lactic acid' }
+                ]}},
+
+                // --- SPEAKING & LISTENING ---
+                { id: 'speaking-menu', type: 'simple', content: { 
+                    title: 'Speaking Tasks', 
+                    text: `
+                    <div class="space-y-4 text-left">
+                        <div class="p-4 bg-blue-50 rounded-lg">
+                            <strong>IELTS Part 1 (Interview):</strong> Do you like sports? Do you prefer watching or playing? (Use: 'I prefer...', 'In my opinion...')
+                        </div>
+                        <div class="p-4 bg-green-50 rounded-lg">
+                            <strong>IELTS Part 2 (Long Turn):</strong> Describe a famous athlete you admire. Say who they are, what they play, and why you admire them.
+                        </div>
+                        <div class="p-4 bg-purple-50 rounded-lg">
+                            <strong>Harkness Discussion:</strong> "To what extent is talent more important than hard work?" (Use evidence from the text).
+                        </div>
+                        <div class="p-4 bg-orange-50 rounded-lg">
+                            <strong>Interactive Dialogue:</strong> Click Next to listen to a model conversation.
+                        </div>
+                    </div>` 
                 }},
 
-                // --- VIDEO / LISTENING: SPORT CLIMBING ---
-                { id: 'climbing-intro', type: 'simple', content: { title: 'Video: Sport Climbing <span aria-hidden="true">🧗</span>', text: 'Listen to the story of how modern sport climbing began in the Verdon Gorge in France.' } },
-
-                { id: 'climbing-dialogue', type: 'dialogue', content: { 
-                    title: 'Origins of Sport Climbing', 
-                    dialogue: `Narrator: Sport climbing is more popular than ever before. And its origins can be traced back to the walls of the Verdon Gorge in France 40 years ago.
-
-Emily Harrington: Modern day climbing and mountaineering began in the European Alps. The Verdon Gorge was actually big enough and inspiring enough to become an objective in its own.
-
-Matt Segal: On Verdon! It's pretty good here. It's absolutely an amazing limestone canyon. I would consider it more of, like, the Yosemite Valley of Europe.
-
-Emily Harrington: The early climbers, the early mountaineers in the 1960s actually thought that the Verdon Gorge was impossible to climb. It was too big; it was too blank, and it was too difficult.
-
-Francois Guillot: Our objective was to, in the summer, go in the Alps and do big ascents as alpinists. So, at that time, the Verdon was not even considered as a place climbable. But I decided to have a double-check.
-
-Narrator: Until the early 1980s, the only way to climb Verdon was using anchors along cracks in the rock. The huge blank walls were too challenging. But then new technology introduced a new era in the history of climbing.
-
-Francois Guillot: The concept of hard depends on how strong you are.
-
-Alan Carne: Sport climbing is evolving faster and stronger than it ever has. And it's inspiring to think that it all began almost 40 years ago within the walls of the Verdon Gorge.` 
-                }},
-
-                // --- SPEAKING TASK ---
-                { id: 'speaking-task', type: 'dialogue', content: { 
-                    title: 'Pairwork Interview <span aria-hidden="true">🗣️</span>', 
+                { id: 'speaking-dialogue', type: 'dialogue', content: { 
+                    title: 'Model Interview', 
                     dialogue: `Student A: Do you like soccer? Why or why not?
 
 Student B: Yes, I love the camaraderie. What about you? Do you have a favorite sports team?
@@ -296,108 +355,115 @@ Student B: I am good at running, probably because of my slow-twitch fibers! I'm 
 
 Student A: I prefer watching. When was the last time you watched a live sports event? What was it?
 
-Student B: I watched the Olympics last year. It was amazing to see the elite athletes. Now, let me ask you: Who is a famous sportsperson you admire?
-
-Student A: I admire Serena Williams because of her mental strength. Do you like watching the Olympic Games?
-
-Student B: I do! My favorite events are the gymnastics. Have you ever taken part in a sports event?
-
-Student A: Yes, I ran a 5k charity race last summer.` 
+Student B: I watched the Olympics last year. It was amazing to see the elite athletes.` 
                 }},
 
-                { id: 'final-plenary', type: 'simple', content: { title: 'Plenary <span aria-hidden="true">🤔</span>', text: '<strong>Think about it:</strong><br>Are you more "fast-twitch" or "slow-twitch"?<br>How does the "camaraderie" of sports affect your life?' } }
+                // --- WRITING ---
+                { id: 'writing-task', type: 'simple', content: {
+                    title: 'Scaffolded Writing',
+                    text: `
+                    <div class="text-left">
+                        <p class="mb-4"><strong>Topic:</strong> Are champions born or made? Write 200-250 words.</p>
+                        <div class="bg-gray-100 p-4 rounded mb-4">
+                            <strong>Word Bank:</strong>
+                            <div class="flex flex-wrap gap-2 mt-2 font-mono text-sm text-blue-700">
+                                <span>Adapt</span> | <span>Biological</span> | <span>Differentiate</span> | <span>Elite</span> | <span>Established</span> | <span>Fatigue</span> | <span>Genetic</span> | <span>Passion</span> | <span>Stamina</span> | <span>Victory</span>
+                            </div>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded">
+                            <strong>Sentence Stems:</strong>
+                            <ul class="list-disc list-inside">
+                                <li>While many believe talent is born, evidence suggests...</li>
+                                <li>On the one hand, genetics play a role by...</li>
+                                <li>However, training is crucial because...</li>
+                                <li>Ultimately, I argue that...</li>
+                            </ul>
+                        </div>
+                    </div>
+                    `
+                }},
+
+                // --- PROJECTS ---
+                { id: 'project-menu', type: 'simple', content: {
+                    title: 'Active Learning Menu',
+                    text: `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                        <div class="project-card bg-blue-100 p-4 rounded-lg">
+                            <strong>PBL 1: Training Plan</strong><br>Create a 4-week plan for a specific athlete (sprinter vs marathoner).
+                        </div>
+                        <div class="project-card bg-green-100 p-4 rounded-lg">
+                            <strong>Inquiry: The 10,000 Hour Rule</strong><br>Research: Is practice really all you need? Present findings.
+                        </div>
+                        <div class="project-card bg-red-100 p-4 rounded-lg">
+                            <strong>Experiential: Wall Sit</strong><br>Hold a wall sit. When do you feel fatigue? Is it mental or physical?
+                        </div>
+                        <div class="project-card bg-purple-100 p-4 rounded-lg">
+                            <strong>GRASPS Task</strong><br>Role: Sports Psychologist. Audience: Young Athletes. Goal: Explain success.
+                        </div>
+                    </div>
+                    `
+                }},
+
+                // --- PLENARY ---
+                { id: 'final-plenary', type: 'simple', content: { 
+                    title: 'Plenary & Reflection', 
+                    text: `
+                    <div class="text-left space-y-4">
+                        <p><strong>Synthesis Question:</strong> How does understanding "fast-twitch" vs "slow-twitch" change how you view different sports?</p>
+                        <hr>
+                        <strong>Metacognitive Self-Assessment:</strong>
+                        <ul class="list-disc list-inside">
+                            <li>What was the most challenging vocabulary word today? How will you remember it?</li>
+                            <li>Did your opinion on "Nature vs Nurture" change after reading the texts? Why?</li>
+                        </ul>
+                    </div>
+                    ` 
+                }}
             ]
         };
-        // --- END CONFIGURATION ---
 
-        // --- SPEECH SERVICE (Configured for Microsoft Natural Voices) ---
+        // ... [SpeechService Class remains the same, ensuring Microsoft voices] ...
         class SpeechService {
              constructor() { this.synth = window.speechSynthesis; this.isInitialized = false; this.isTtsEnabled = true; this.voices = {}; this.speechRate = 0.85; this.isDialoguePlaying = false; }
-             
              async _setupVoices() {
                  const voicesPromise = new Promise(resolve => { if (this.synth.getVoices().length) return resolve(this.synth.getVoices()); this.synth.onvoiceschanged = () => resolve(this.synth.getVoices()); });
                  const availableVoices = await voicesPromise;
-                 
-                 // Strict mapping to requested Microsoft Natural voices
                  const findVoice = (name) => availableVoices.find(v => v.name.includes(name) && v.name.includes('Natural')) || availableVoices.find(v => v.name.includes(name));
-                 
                  this.voices = {
-                     'narrator': findVoice('Brian') || findVoice('United States') || availableVoices[0],
-                     'emily harrington': findVoice('Emma') || findVoice('United States'),
-                     'matt segal': findVoice('Andrew') || findVoice('United States'),
-                     'francois guillot': findVoice('Brian') || findVoice('United Kingdom'), 
-                     'alan carne': findVoice('Andrew') || findVoice('United Kingdom'),
-                     'student a': findVoice('Ava') || findVoice('United States'),
-                     'student b': findVoice('Andrew') || findVoice('United States'),
+                     'narrator': findVoice('Brian') || availableVoices[0],
+                     'student a': findVoice('Ava') || availableVoices[0],
+                     'student b': findVoice('Andrew') || availableVoices[0],
                      'default': findVoice('Ava') || availableVoices[0]
                  };
-                 console.log("Voices loaded:", this.voices);
              }
-             
              async init() { if (this.isInitialized) return; await this._setupVoices(); this.isInitialized = true; }
-             
-             _cleanTextForSpeech(text) { 
-                 const tempDiv = document.createElement('div'); 
-                 tempDiv.innerHTML = text.replace(/<span aria-hidden="true">.*?<\/span>/g, ' '); 
-                 return tempDiv.innerText || tempDiv.textContent || ''; 
-             }
-             
-             speak(text) { 
-                 if (!this.isTtsEnabled || !text) return; 
-                 this.cancel(); 
-                 const utterance = new SpeechSynthesisUtterance(this._cleanTextForSpeech(text)); 
-                 utterance.voice = this.voices['default'];
-                 utterance.rate = this.speechRate; 
-                 this.synth.speak(utterance); 
-             }
-             
-             speakDialogue(text) { 
-                 if (!this.isTtsEnabled || !text) return; 
-                 this.cancel(); 
-                 const lines = text.split('\n\n'); 
-                 const speakLine = (index) => { 
-                     if (index >= lines.length) return; 
-                     const line = lines[index]; 
-                     const [speaker, ...rest] = line.split(': '); 
-                     const lineText = rest.join(': '); 
-                     
-                     const utterance = new SpeechSynthesisUtterance(this._cleanTextForSpeech(lineText || speaker)); 
-                     
-                     // Lookup voice by speaker name (lowercase)
-                     const key = speaker.toLowerCase().trim();
-                     utterance.voice = this.voices[key] || this.voices['default']; 
-                     utterance.rate = this.speechRate; 
-                     utterance.onend = () => speakLine(index + 1); 
-                     this.synth.speak(utterance); 
-                 }; 
-                 speakLine(0); 
-             }
+             _cleanTextForSpeech(text) { const tempDiv = document.createElement('div'); tempDiv.innerHTML = text.replace(/<span aria-hidden="true">.*?<\/span>/g, ' '); return tempDiv.innerText || tempDiv.textContent || ''; }
+             speak(text) { if (!this.isTtsEnabled || !text) return; this.cancel(); const utterance = new SpeechSynthesisUtterance(this._cleanTextForSpeech(text)); utterance.voice = this.voices['default']; utterance.rate = this.speechRate; this.synth.speak(utterance); }
+             speakDialogue(text) { if (!this.isTtsEnabled || !text) return; this.cancel(); const lines = text.split('\n\n'); const speakLine = (index) => { if (index >= lines.length) return; const line = lines[index]; const [speaker, ...rest] = line.split(': '); const lineText = rest.join(': '); const utterance = new SpeechSynthesisUtterance(this._cleanTextForSpeech(lineText || speaker)); const key = speaker.toLowerCase().trim(); utterance.voice = this.voices[key] || this.voices['default']; utterance.rate = this.speechRate; utterance.onend = () => speakLine(index + 1); this.synth.speak(utterance); }; speakLine(0); }
              cancel() { this.synth.cancel(); }
              toggleTTS() { this.isTtsEnabled = !this.isTtsEnabled; if(!this.isTtsEnabled) this.cancel(); return this.isTtsEnabled; }
          }
 
-        // --- CORE APP LOGIC ---
+        // --- CORE LOGIC (Updated for new navigation) ---
         const speechService = new SpeechService();
         let score = 0, currentPage = lessonData.startPageId;
         const pageHistory = [lessonData.startPageId];
-        let pageSequence = [];
+        
+        // Dynamic Vocab List Population
+        lessonData.pages.find(p => p.id === 'vocab-intro').content.words = lessonData.vocabulary;
 
-        function calculateSequence() {
-            let seq = [lessonData.startPageId];
-            lessonData.mainMenu.forEach(item => {
-                if(item.target === '1a-intro') seq.push('1a-intro', '1a-vocab', '1a-reading', '1a-comp-mcq');
-                if(item.target === '1b-intro') seq.push('1b-intro', '1b-vocab', '1b-reading', '1b-comp-gap');
-                if(item.target === 'climbing-intro') seq.push('climbing-intro', 'climbing-dialogue');
-                if(item.target === 'speaking-task') seq.push('speaking-task');
-                if(item.target === 'final-plenary') seq.push('final-plenary');
-            });
-            return [...new Set(seq)];
+        function getPageSequence() {
+            // Simple linear sequence for "Next" button logic
+            return ['title-screen', 'goals-intro', 'warmup', 'vocab-intro', 'vocab-match', 
+                    '1a-intro', '1a-reading', '1a-gap', '1a-tf', '1a-mcq',
+                    '1b-intro', '1b-reading', '1b-gap', '1b-tf', '1b-mcq',
+                    'speaking-menu', 'speaking-dialogue', 'writing-task', 'project-menu', 'final-plenary'];
         }
+        let pageSequence = getPageSequence();
 
         window.startApp = async function() {
             await speechService.init();
             try { await Tone.start(); } catch(e){}
-            pageSequence = calculateSequence();
             navigateTo(lessonData.homePageId);
         }
 
@@ -405,7 +471,6 @@ Student A: Yes, I ran a 5k charity race last summer.`
             const target = document.getElementById(`page-${pageId}`);
             if (!target) return;
             speechService.cancel();
-            
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             target.classList.add('active');
             currentPage = pageId;
@@ -418,22 +483,14 @@ Student A: Yes, I ran a 5k charity race last summer.`
                     const activeTab = target.querySelector('.reading-content:not(.hidden)');
                     if(activeTab) speechService.speak(activeTab.innerText);
                 } else {
+                    // Read title and first paragraph
                     const h2 = target.querySelector('h2');
-                    const p = target.querySelector('p');
+                    const p = target.querySelector('p'); // Reads first paragraph only to avoid reading whole menus
                     const text = (h2 ? h2.innerText : '') + '. ' + (p ? p.innerText : '');
                     speechService.speak(text);
                 }
             }
-
-            const container = document.getElementById('emoji-floating-container');
-            container.innerHTML = ''; 
-            if (pageId.includes('1a')) spawnEmojis(['⚽','🥅','👟','🌍']);
-            else if (pageId.includes('1b')) spawnEmojis(['🥇','🏋️','🏃','💪']);
-            else if (pageId.includes('climbing')) spawnEmojis(['🧗','⛰️','🪢']);
-            else spawnEmojis(['🏆','🏅','🎓']);
-
             updateNavButtons();
-            updateProgressBar();
             window.scrollTo(0,0);
         }
 
@@ -479,9 +536,9 @@ Student A: Yes, I ran a 5k charity race last summer.`
                 const wrapper = (content) => `<div class="bg-white rounded-3xl shadow-lg p-6 md:p-8 pt-12 border border-slate-100 relative overflow-hidden">${content}</div>`;
                 
                 if (page.type === 'simple') {
-                    html = wrapper(`<h2 class="text-3xl font-bold text-slate-800 mb-4">${page.content.title}</h2><p class="text-xl text-slate-600 leading-relaxed">${page.content.text}</p>`);
+                    html = wrapper(`<h2 class="text-3xl font-bold text-slate-800 mb-4">${page.content.title}</h2><div class="text-xl text-slate-600 leading-relaxed">${page.content.text}</div>`);
                 } else if (page.type === 'vocab-list') {
-                    const list = page.content.words.map(w => `<div class="bg-slate-50 p-3 rounded-lg border-l-4 border-blue-500"><strong class="text-blue-700 text-lg block">${w.word}</strong><span class="text-slate-600">${w.def}</span></div>`).join('');
+                    const list = page.content.words.map(w => `<div class="bg-slate-50 p-3 rounded-lg border-l-4 border-blue-500"><div class="flex justify-between items-baseline"><strong class="text-blue-700 text-lg">${w.word}</strong><span class="text-sm text-gray-500 font-mono">${w.ipa}</span></div><p class="text-slate-600 italic mt-1 text-sm">${w.def}</p><p class="text-slate-800 mt-2 text-sm">"${w.sentence}"</p></div>`).join('');
                     html = wrapper(`<h2 class="text-3xl font-bold text-slate-800 mb-6">${page.content.title}</h2><div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${list}</div>`);
                 } else if (page.type === 'tiered-reading') {
                     html = wrapper(`
@@ -496,7 +553,7 @@ Student A: Yes, I ran a 5k charity race last summer.`
                 } else if (page.type === 'dialogue') {
                     const lines = page.content.dialogue.split('\n\n').map(l => {
                         const [speaker, text] = l.split(': ');
-                        const isLeft = ['student a', 'narrator', 'emily harrington', 'francois guillot'].includes(speaker.toLowerCase());
+                        const isLeft = ['student a', 'narrator'].includes(speaker.toLowerCase());
                         return `<div class="dialogue-bubble ${isLeft ? 'bubble-left' : 'bubble-right'}"><strong class="text-sm uppercase tracking-wide text-slate-500 mb-1 block">${speaker}</strong><p>${text}</p></div>`;
                     }).join('');
                     html = wrapper(`<h2 class="text-3xl font-bold text-slate-800 mb-6 text-center">${page.content.title}</h2><div class="space-y-4">${lines}</div>`);
@@ -511,6 +568,12 @@ Student A: Yes, I ran a 5k charity race last summer.`
                             <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
                                 <p class="font-bold text-lg mb-3">${i+1}. ${q.question}</p>
                                 <div class="grid gap-2">${q.options.map(opt => `<button onclick="checkMCQ(this, ${opt===q.correctAnswer})" class="quiz-option w-full text-left p-3 rounded-lg bg-white border border-slate-200 hover:bg-blue-50">${opt}</button>`).join('')}</div>
+                            </div>`).join('');
+                    } else if (page.type === 'quiz-tfng') {
+                        qHtml = page.content.questions.map((q,i) => `
+                            <div class="mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                                <p class="font-medium text-lg flex-1">${q.statement}</p>
+                                <div class="flex gap-2">${['True','False'].map(opt => `<button onclick="checkTF(this, '${opt}', '${q.correctAnswer}')" class="tfng-button px-4 py-2 bg-white border border-slate-200 rounded-lg font-bold text-sm hover:bg-blue-50">${opt}</button>`).join('')}</div>
                             </div>`).join('');
                     }
                     html = wrapper(`<h2 class="text-3xl font-bold text-slate-800 mb-6 text-center">${page.content.title}</h2>${qHtml}`);
@@ -529,19 +592,13 @@ Student A: Yes, I ran a 5k charity race last summer.`
             speechService.speak(page.querySelector(`#content-${pageId}-${tier}`).innerText);
         }
 
-        window.updateProgressBar = () => {
-            if(pageSequence.length === 0) return;
-            const idx = pageSequence.indexOf(currentPage);
-            const pct = ((idx + 1) / pageSequence.length) * 100;
-            document.getElementById('progress-bar').style.width = `${pct}%`;
-        }
-
         window.updateNavButtons = () => {
             const nav = document.getElementById('nav-header');
             if (currentPage === 'title-screen') nav.style.display = 'none';
             else nav.style.display = 'block';
         }
 
+        // --- DRAG & DROP / QUIZ LOGIC ---
         window.allowDrop = (ev) => ev.preventDefault();
         window.drag = (ev) => ev.dataTransfer.setData("text", ev.target.dataset.word);
         window.drop = (ev) => {
@@ -561,7 +618,6 @@ Student A: Yes, I ran a 5k charity race last summer.`
             if(word.toLowerCase() === correct.toLowerCase()) {
                 gap.classList.add('correct');
                 addPoints(10);
-                spawnReward(gap);
                 playTone('C5');
             } else {
                 gap.classList.add('incorrect');
@@ -576,7 +632,6 @@ Student A: Yes, I ran a 5k charity race last summer.`
             if(isCorrect) {
                 btn.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
                 addPoints(10);
-                spawnReward(btn);
                 playTone('C5');
             } else {
                 btn.classList.add('bg-red-100', 'border-red-500', 'shake');
@@ -584,40 +639,21 @@ Student A: Yes, I ran a 5k charity race last summer.`
             }
         }
 
+        window.checkTF = (btn, val, correct) => {
+             const parent = btn.parentElement;
+             Array.from(parent.children).forEach(c => c.disabled = true);
+             if(val === correct) {
+                 btn.classList.add('bg-green-500', 'text-white');
+                 addPoints(10);
+                 playTone('C5');
+             } else {
+                 btn.classList.add('bg-red-500', 'text-white');
+                 playTone('C3');
+             }
+        }
+
         function addPoints(pts) { score += pts; document.getElementById('score-display').innerText = score; }
         function playTone(note) { try { const synth = new Tone.Synth().toDestination(); synth.triggerAttackRelease(note, "8n"); } catch(e){} }
-
-        function spawnReward(el) {
-            const rect = el.getBoundingClientRect();
-            const container = document.getElementById('reward-animation-container');
-            for(let i=0; i<15; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle glitter';
-                p.style.left = (rect.left + rect.width/2) + 'px';
-                p.style.top = (rect.top + rect.height/2) + 'px';
-                p.style.backgroundColor = ['#fbbf24','#3b82f6','#22c55e'][Math.floor(Math.random()*3)];
-                container.appendChild(p);
-                const angle = Math.random() * Math.PI * 2;
-                const velocity = Math.random() * 100 + 50;
-                p.animate([
-                    { transform: `translate(0,0) scale(1)`, opacity: 1 },
-                    { transform: `translate(${Math.cos(angle)*velocity}px, ${Math.sin(angle)*velocity}px) scale(0)`, opacity: 0 }
-                ], { duration: 800, easing: 'ease-out' }).onfinish = () => p.remove();
-            }
-        }
-
-        function spawnEmojis(list) {
-            const container = document.getElementById('emoji-floating-container');
-            for(let i=0; i<6; i++) {
-                const el = document.createElement('div');
-                el.className = 'floating-emoji';
-                el.innerText = list[Math.floor(Math.random()*list.length)];
-                el.style.top = Math.random()*80 + 10 + '%';
-                el.style.animationDuration = (Math.random()*10 + 10) + 's';
-                el.style.animationDelay = (Math.random()*5) + 's';
-                container.appendChild(el);
-            }
-        }
 
         // Init
         renderPages();
