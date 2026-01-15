@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 11 Unit 12: The Final Frontier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Segoe+UI:wght@400;600;700&display=swap');
+        
+        @keyframes spaceFlow {
+            0% { background-color: #0f172a; } /* slate-900 */
+            25% { background-color: #1e1b4b; } /* indigo-950 */
+            50% { background-color: #312e81; } /* indigo-900 */
+            75% { background-color: #172554; } /* blue-950 */
+            100% { background-color: #0f172a; } /* slate-900 */
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            overscroll-behavior: none;
+            animation: spaceFlow 60s linear infinite;
+            padding-top: 85px;
+            color: #1e293b;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Merriweather', serif;
+        }
+        #background-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+        }
+        .page { display: none; position: relative; }
+        .page.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .action-button, .nav-button, .quiz-option, .tfng-button, .word-bank-word, .btn-animated-3d, .tier-btn, .project-card {
+            transition: all 0.15s ease-out;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.06);
+            border: none;
+            cursor: pointer;
+        }
+        .action-button:hover, .nav-button:hover, .quiz-option:hover:not(:disabled), .tfng-button:hover:not(:disabled), .word-bank-word:hover, .btn-animated-3d:hover, .tier-btn:hover, .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+        .action-button:active, .nav-button:active, .quiz-option:active, .tfng-button:active, .btn-animated-3d:active, .tier-btn:active {
+            transform: translateY(1px);
+        }
+        
+        /* Gap Fill Styles */
+        .gap-fill-container .gap {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 100px; height: 40px; padding: 0 8px;
+            border: 2px dashed #94a3b8; border-radius: 6px; margin: 0 4px;
+            vertical-align: middle; background-color: #ffffff;
+            font-weight: bold; color: #334155;
+        }
+        .word-bank-word {
+            cursor: grab; padding: 8px 16px; border-radius: 9999px;
+            background-color: white; user-select: none; border: 1px solid #cbd5e1;
+            font-weight: 600; color: #475569;
+        }
+        .word-bank-word.selected { outline: 2px solid #3b82f6; transform: scale(1.05); }
+        .gap .word-bank-word { cursor: pointer; border: none; background: transparent; padding: 0; }
+        .gap.correct { background-color: #dcfce7; border-color: #22c55e; color: #15803d; border-style: solid; }
+        .gap.incorrect { background-color: #fee2e2; border-color: #ef4444; color: #b91c1c; border-style: solid; }
+
+        /* Feedback Toast */
+        .feedback-toast, .badge-toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            padding: 12px 24px; border-radius: 9999px; color: white;
+            font-weight: bold; z-index: 200; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            animation: slideUpFadeIn 0.5s ease-out, slideDownFadeOut 0.5s ease-in 3.5s forwards;
+        }
+        .feedback-toast.correct { background-color: #22c55e; }
+        .feedback-toast.encouraging { background-color: #f59e0b; }
+        .badge-toast { background: linear-gradient(45deg, #3b82f6, #8b5cf6); animation-duration: 4.5s; }
+        @keyframes slideUpFadeIn { from { opacity: 0; bottom: 0; } to { opacity: 1; bottom: 30px; } }
+        @keyframes slideDownFadeOut { from { opacity: 1; bottom: 30px; } to { opacity: 0; bottom: 0; } }
+
+        /* Progress Bar */
+        #progress-container { background-color: #e2e8f0; border-radius: 9999px; overflow: hidden; height: 8px; width: 100%; margin-top: 8px; }
+        #progress-bar { height: 100%; width: 0%; background-color: #3b82f6; transition: width 0.5s ease-out; }
+        
+        /* Shake Animation */
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .shake { animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both; }
+
+        /* Floating Emoji */
+        #emoji-floating-container { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
+        .floating-emoji {
+            position: absolute; font-size: 28px; will-change: transform, opacity;
+            opacity: 0; display: inline-block; animation-name: floatAcross;
+            animation-timing-function: linear; animation-iteration-count: 1;
+        }
+        @keyframes floatAcross {
+            0% { transform: translateX(-10vw) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateX(110vw) rotate(20deg); opacity: 0; }
+        }
+
+        /* Particles */
+        .particle { position: fixed; pointer-events: none; z-index: 9999; opacity: 1; transition: opacity 0.5s ease-out; }
+        .particle.glitter { width: 8px; height: 8px; border-radius: 50%; background: #fbbf24; }
+
+        /* Tiered Reading Tabs */
+        .tier-btn.active { background-color: #1e3a8a; color: white; border-color: #1e3a8a; }
+        .tier-btn { background-color: white; color: #64748b; border: 1px solid #cbd5e1; }
+        
+        /* Dialogue Bubbles */
+        .dialogue-bubble { padding: 15px; margin: 10px 0; border-radius: 12px; position: relative; max-width: 90%; }
+        .bubble-left { background: #e0e7ff; margin-right: auto; border-bottom-left-radius: 2px; }
+        .bubble-right { background: #ffedd5; margin-left: auto; border-bottom-right-radius: 2px; }
+
+        /* Pedagogical Box Styles */
+        .pedagogy-box { border-left: 4px solid #f59e0b; background: #fffbeb; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem; }
+        .pedagogy-title { font-weight: bold; color: #b45309; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; display: block; margin-bottom: 0.25rem; }
+
+    </style>
+</head>
+<body class="antialiased text-gray-800 text-lg bg-slate-50">
+    <canvas id="background-canvas"></canvas>
+    <div id="reward-animation-container" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[60]"></div>
+
+    <header id="nav-header" class="fixed top-0 left-0 right-0 z-50 p-2" style="display: none;">
+        <div class="max-w-md mx-auto bg-white/95 backdrop-blur-sm shadow-md rounded-2xl p-3 border border-slate-200">
+            <div class="flex justify-between items-center gap-2">
+                <button onclick="goBack()" class="nav-button bg-slate-100 text-slate-600 p-2 rounded-xl hover:bg-slate-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <div class="flex-1 text-center font-bold text-slate-700 whitespace-nowrap"><span id="score-display" class="text-indigo-600 text-xl">0</span> XP</div>
+                <button onclick="navigateTo('main-menu')" class="nav-button bg-indigo-600 text-white p-2 rounded-xl hover:bg-indigo-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4h.01M5 19h14"></path></svg>
+                </button>
+                <button onclick="toggleTTS(this)" class="nav-button p-2 rounded-xl bg-slate-100 hover:bg-slate-200" title="Read Aloud">
+                    <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 5.858a3 3 0 104.243 4.243M9 12l4.243 4.243"></path></svg>
+                </button>
+                <button onclick="goNext()" class="nav-button bg-emerald-500 hover:bg-emerald-600 text-white p-2 rounded-xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+        </div>
+    </header>
+
+    <div id="emoji-floating-container" aria-hidden="true"></div>
+
+    <div id="app-container" class="max-w-3xl mx-auto p-4 sm:p-6 pb-20">
+        <section id="page-title-screen" class="page active text-center bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
+            <div class="h-full flex flex-col justify-center items-center py-10">
+                <div class="text-6xl mb-4">🚀</div>
+                <h1 id="main-title" class="text-4xl md:text-5xl font-bold text-slate-800 mb-2">Grade 11 Unit 12</h1>
+                <h2 class="text-2xl text-indigo-600 font-semibold mb-6">The Final Frontier 🌌</h2>
+                <p id="main-subtitle" class="text-xl text-gray-500 mb-8 max-w-lg">Explore the scientific, technological, and philosophical challenges of space exploration.</p>
+                <div class="flex flex-wrap gap-2 justify-center mb-8">
+                    <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">Theme: Exploration</span>
+                    <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">Skills: Argumentation</span>
+                </div>
+                <button onclick="startApp()" class="action-button bg-indigo-600 text-white font-bold py-4 px-10 rounded-full text-xl hover:bg-indigo-700 shadow-lg transition-transform transform hover:scale-105">ENTER UNIT</button>
+            </div>
+        </section>
+        <div id="dynamic-pages-container"></div>
+    </div>
+    
+    <script>
+        // ===================================================================================
+        // --- LESSON CONTENT CONFIGURATION ---
+        // ===================================================================================
+        const lessonData = {
+            title: "Unit 12: Space",
+            subtitle: "Defying Gravity & The Search for Life 🚀 👽",
+            startPageId: 'title-screen',
+            homePageId: 'main-menu',
+            mainMenu: [
+                { id: 'menu-goals', text: '🎯 Learning Roadmap (W.H.E.R.E.T.O.)', color: 'slate', target: 'goals-intro' },
+                { id: 'menu-12a-intro', text: '🚀 12A: Defying Gravity', color: 'indigo', target: '12a-intro' },
+                { id: 'menu-12b-intro', text: '👽 12B: The Search for Life', color: 'purple', target: '12b-intro' },
+                { id: 'menu-grasps', text: '🏆 GRASPS Performance Task', color: 'amber', target: 'grasps-task' },
+                { id: 'menu-projects', text: '🚀 Active Learning Menu', color: 'blue', target: 'project-menu' },
+                { id: 'menu-plenary', text: '🤔 Plenary & Reflection', color: 'teal', target: 'final-plenary' },
+            ],
+            // Combined Vocab for Unit 12A and 12B
+            vocabulary: [
+                { word: 'Astronaut', ipa: '/ˈæstrəˌnɔːt/', def: 'A person trained to travel in a spacecraft.', sentence: 'The astronaut floated in zero gravity.' },
+                { word: 'Colonize', ipa: '/ˈkɒlənaɪz/', def: 'To send settlers to a place.', sentence: 'Humans may one day colonize Mars.' },
+                { word: 'Gravity', ipa: '/ˈɡrævɪti/', def: 'The force attracting a body toward Earth.', sentence: 'Zero gravity affects bone density.' },
+                { word: 'Launch', ipa: '/lɔːntʃ/', def: 'To send a rocket into the air.', sentence: 'The rocket launch was successful.' },
+                { word: 'Orbit', ipa: '/ˈɔːrbɪt/', def: 'The curved path of a celestial object.', sentence: 'The satellite is in orbit around Earth.' },
+                { word: 'Radiation', ipa: '/ˌreɪdiˈeɪʃən/', def: 'Energy emitted as rays or waves.', sentence: 'Space radiation is dangerous to DNA.' },
+                { word: 'Exoplanet', ipa: '/ˈɛksoʊˌplænɪt/', def: 'A planet outside our solar system.', sentence: 'Kepler discovered many exoplanets.' },
+                { word: 'Habitable', ipa: '/ˈhæbɪtəbəl/', def: 'Suitable to live in.', sentence: 'Scientists look for habitable zones.' },
+                { word: 'Biosignature', ipa: '/ˈbaɪoʊˌsɪɡnətʃər/', def: 'Evidence of past or present life.', sentence: 'Oxygen might be a biosignature.' },
+                { word: 'Telescope', ipa: '/ˈtɛlɪskoʊp/', def: 'Instrument to make distant objects appear nearer.', sentence: 'The James Webb Telescope sees far.' }
+            ],
+            pages: [
+                // --- GOALS ---
+                { id: 'goals-intro', type: 'simple', content: { 
+                    title: 'Learning Roadmap', 
+                    text: `
+                    <div class="pedagogy-box"><span class="pedagogy-title">W.H.E.R.E.T.O. Framework</span>
+                    <strong>W (Where):</strong> Evaluate space exploration ethics.<br>
+                    <strong>H (Hook):</strong> Would you take a one-way trip to Mars?<br>
+                    <strong>E (Equip):</strong> 20 Academic Space Terms.<br>
+                    <strong>O (Organize):</strong> Debate: Mars Colony vs. Earth Repair.<br>
+                    </div>
+                    <ul class="list-disc list-inside text-left space-y-2 mt-4">
+                        <li><strong>Objective:</strong> Analyze physiological challenges of spaceflight.</li>
+                        <li><strong>Outcome:</strong> Argue for or against funding space colonies.</li>
+                        <li><strong>Essential Question:</strong> Is space colonization necessary for human survival?</li>
+                    </ul>
+                    ` 
+                }},
+
+                // --- 12A: DEFYING GRAVITY ---
+                { id: '12a-intro', type: 'simple', content: { title: '12A: Defying Gravity 🚀', text: '<strong>Hook:</strong> Show "Pale Blue Dot".<br><strong>Fact:</strong> A trip to Mars takes 7 months one-way. What happens to your body in that time?' } },
+                
+                { id: '12a-vocab', type: 'vocab-list', content: { title: '12A Vocabulary', words: [] } }, // Populated dynamically
+
+                { id: '12a-reading', type: 'tiered-reading', content: { 
+                    title: '12A: The Mars Challenge',
+                    texts: {
+                        'A2': "<h3>Humans in Space (A2)</h3><p>In 1961, Yuri Gagarin became the first **astronaut**. In 1969, humans landed on the Moon. Now, we want to go to Mars.</p><p><strong>The Danger:</strong> Space has little **gravity**, making muscles weak. There is also dangerous **radiation** from the sun that can cause cancer.</p><p><strong>The Goal:</strong> Mars is far away. The trip takes seven months. Keeping astronauts healthy and happy is the biggest challenge.</p>",
+                        'B1': "<h3>A New Space Age (B1)</h3><p>A new era is emerging, driven by national agencies and commercial companies. The goal is to **colonize** Mars. However, the challenges are immense.</p><p><strong>Physiological Hurdles:</strong> Without Earth's **gravity**, astronauts lose bone density. Outside Earth's protection, they face cosmic **radiation**.</p><p><strong>Tyranny of Distance:</strong> A one-way journey takes seven months. This isolation creates immense psychological pressure. There is no quick rescue.</p>",
+                        'B2': "<h3>Interplanetary Ambitions (B2)</h3><p>We are witnessing a shift to commercial investment in space, making Mars colonization theoretically viable. However, biomedical barriers remain formidable.</p><p><strong>The Biomedical Barrier:</strong> Microgravity induces cardiovascular deconditioning. Cosmic **radiation** poses severe long-term health risks that shielding cannot fully mitigate.</p><p><strong>Ethical Dimensions:</strong> The crew faces extreme isolation. Ethically, some argue that escaping Earth distracts from solving ecological crises at home.</p>"
+                    }
+                }},
+
+                { id: '12a-gap', type: 'quiz-gap-fill', content: { title: '12A: Gap Fill', sentences: [
+                    { text: ['Commercial companies are driving down', 'costs.'], answer: 'launch' },
+                    { text: ['Microgravity causes loss of', 'mass.'], answer: 'bone' },
+                    { text: ['Astronauts are exposed to dangerous', '.'], answer: 'radiation' },
+                    { text: ['The ultimate goal is to', 'Mars.'], answer: 'colonize' },
+                    { text: ['Isolation causes', 'stress.'], answer: 'psychological' }
+                ], wordBank: ['launch', 'bone', 'radiation', 'colonize', 'psychological'] }},
+
+                { id: '12a-tf', type: 'quiz-tfng', content: { title: '12A: True/False', questions: [
+                    { statement: 'Going to Mars is easier than the Moon.', correctAnswer: 'False' },
+                    { statement: 'Zero gravity has no effect on the body.', correctAnswer: 'False' },
+                    { statement: 'Commercial companies are involved in space.', correctAnswer: 'True' },
+                    { statement: 'Radiation is a major health risk.', correctAnswer: 'True' }
+                ]}},
+
+                { id: '12a-mcq', type: 'quiz-mcq', content: { title: '12A: Multiple Choice', questions: [
+                    { question: 'What is a major physiological challenge?', options: ['Weight gain', 'Bone loss', 'Too much sleep'], correctAnswer: 'Bone loss' },
+                    { question: 'Who is involved in the new space age?', options: ['Only governments', 'Commercial companies too', 'Only robots'], correctAnswer: 'Commercial companies too' },
+                    { question: 'How long is the trip to Mars?', options: ['7 days', '7 months', '7 years'], correctAnswer: '7 months' }
+                ]}},
+
+                { id: '12a-dialogue', type: 'dialogue', content: { 
+                    title: 'Roleplay: The Mars Debate', 
+                    dialogue: `Person A: Given the massive problems on Earth, spending billions on Mars seems irresponsible.
+
+Person B: While I agree we have issues here, space tech often leads to innovations that help Earth, like solar panels.
+
+Person A: That may be true, but the physiological risks of radiation mean astronauts might not survive.
+
+Person B: Every frontier has risks. If we stop exploring, humanity stops progressing. Colonization is insurance.` 
+                }},
+
+                // --- 12B: SEARCH FOR LIFE ---
+                { id: '12b-intro', type: 'simple', content: { title: '12B: Search for Life 👽', text: '<strong>Hook:</strong> Do you think aliens exist? (Fermi Paradox)<br><strong>Focus:</strong> Defining planets (Pluto) and finding biosignatures.' } },
+
+                { id: '12b-vocab', type: 'vocab-list', content: { title: '12B Vocabulary', words: [] } }, // Populated dynamically
+
+                { id: '12b-reading', type: 'tiered-reading', content: { 
+                    title: '12B: Pluto & Beyond',
+                    texts: {
+                        'A2': "<h3>The Pluto Problem (A2)</h3><p>In 2006, scientists voted to change Pluto to a '**dwarf planet**'. It was too small. In 2015, the New Horizons **probe** flew past it.</p><p><strong>New Pictures:</strong> The probe sent back clear photos of ice mountains. Pluto has a thin **atmosphere**.</p><p><strong>Are We Alone?:</strong> Scientists look for **exoplanets** (planets around other stars). They search for **habitable** ones with water.</p>",
+                        'B1': "<h3>Redefining Our Neighborhood (B1)</h3><p>The discovery of the Kuiper Belt forced **astronomers** to rethink. Pluto is one of many objects there. In 2006, the IAU set three **criteria** for planets. Pluto failed one and became a **dwarf planet**.</p><p><strong>New Horizons:</strong> The 2015 flyby revealed a geologically active world with nitrogen-ice plains. It transformed our view of Pluto.</p><p><strong>Biosignatures:</strong> The search for life extends to **exoplanets**. Telescopes look for **biosignatures** like oxygen and methane together.</p>",
+                        'B2': "<h3>Shifting Paradigms (B2)</h3><p>The 2006 reclassification highlighted that 'planet' is a human definition. The **criteria**, specifically 'clearing the neighborhood', remain controversial.</p><p><strong>Geophysics:</strong> New Horizons data shattered models of cold worlds. Pluto exhibits geophysical vigor and surface renewal.</p><p><strong>Spectroscopy:</strong> The frontier is detecting **biosignatures** on **exoplanets**. Finding thermodynamic disequilibrium (methane + oxygen) would be strong evidence for **extraterrestrial** biology.</p>"
+                    }
+                }},
+
+                { id: '12b-gap', type: 'quiz-gap-fill', content: { title: '12B: Gap Fill', sentences: [
+                    { text: ['Pluto is now a', 'planet.'], answer: 'dwarf' },
+                    { text: ['New Horizons was a robotic', '.'], answer: 'probe' },
+                    { text: ['Scientists look for', 'on other worlds.'], answer: 'biosignatures' },
+                    { text: ['An', 'orbits a different star.'], answer: 'exoplanet' },
+                    { text: ['Astronomers use', 'to see far.'], answer: 'telescopes' }
+                ], wordBank: ['dwarf', 'probe', 'biosignatures', 'exoplanet', 'telescopes'] }},
+
+                { id: '12b-tf', type: 'quiz-tfng', content: { title: '12B: True/False', questions: [
+                    { statement: 'Pluto is still a main planet.', correctAnswer: 'False' },
+                    { statement: 'New Horizons landed on Pluto.', correctAnswer: 'False' },
+                    { statement: 'Biosignatures suggest life.', correctAnswer: 'True' },
+                    { statement: 'Exoplanets are in our solar system.', correctAnswer: 'False' }
+                ]}},
+
+                { id: '12b-mcq', type: 'quiz-mcq', content: { title: '12B: Multiple Choice', questions: [
+                    { question: 'Why was Pluto reclassified?', options: ['It exploded', 'It didn\'t meet criteria', 'It is blue'], correctAnswer: 'It didn\'t meet criteria' },
+                    { question: 'What did New Horizons find?', options: ['Aliens', 'Ice mountains', 'Trees'], correctAnswer: 'Ice mountains' },
+                    { question: 'What gas is a biosignature?', options: ['Oxygen', 'Helium', 'Iron'], correctAnswer: 'Oxygen' }
+                ]}},
+
+                { id: '12b-dialogue', type: 'dialogue', content: { 
+                    title: 'Roleplay: The Pluto Debate', 
+                    dialogue: `Person A: I still think Pluto should be a planet. It has moons and an atmosphere.
+
+Person B: I understand your point, but science updates definitions. We found Eris, which is bigger.
+
+Person A: That may be true, but the rule about "clearing the neighborhood" is unfair.
+
+Person B: The crucial difference is gravity. Earth dominates its orbit; Pluto is just debris in the Kuiper Belt.` 
+                }},
+
+                // --- GRASPS ---
+                { id: 'grasps-task', type: 'simple', content: { 
+                    title: '🏆 GRASPS Task: Mission Proposal', 
+                    text: `
+                    <div class="text-left space-y-3">
+                        <p><strong>Goal:</strong> Secure funding for a space mission.</p>
+                        <p><strong>Role:</strong> Chief Scientist.</p>
+                        <p><strong>Audience:</strong> Budget Committee.</p>
+                        <p><strong>Situation:</strong> Budget for ONE mission: Mars Colony OR Jupiter Moon Probe.</p>
+                        <p><strong>Product:</strong> 3-minute speech.</p>
+                        <div class="bg-yellow-50 p-3 rounded text-sm">
+                            <strong>Rubric (KASEC):</strong> Knowledge, Analysis, Structure, Evidence, Clarity.
+                        </div>
+                    </div>
+                    ` 
+                }},
+
+                // --- PROJECTS ---
+                { id: 'project-menu', type: 'simple', content: {
+                    title: 'Active Learning Menu',
+                    text: `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                        <div class="project-card bg-indigo-100 p-4 rounded-lg">
+                            <strong>PBL: Mars Habitat</strong><br>Design living quarters for a Mars crew. Address radiation and psychology.
+                        </div>
+                        <div class="project-card bg-blue-100 p-4 rounded-lg">
+                            <strong>Inquiry: Drake Equation</strong><br>Estimate the number of civilizations in the galaxy using the Drake Equation.
+                        </div>
+                        <div class="project-card bg-purple-100 p-4 rounded-lg">
+                            <strong>Experiential: Glove Work</strong><br>Perform tasks wearing thick gloves to simulate spacesuit limitations.
+                        </div>
+                        <div class="project-card bg-green-100 p-4 rounded-lg">
+                            <strong>Problem-Based: The Signal</strong><br>We received a signal. Draft a response representing humanity.
+                        </div>
+                    </div>
+                    `
+                }},
+
+                // --- PLENARY ---
+                { id: 'final-plenary', type: 'simple', content: { 
+                    title: 'Plenary: So What? Now What?', 
+                    text: `
+                    <div class="text-left space-y-4">
+                        <p><strong>So What?</strong> We learned that space is hostile but understanding it defines our place in the cosmos.</p>
+                        <p><strong>Now What?</strong> Will you vote for politicians who support space funding? Why?</p>
+                        <hr>
+                        <strong>Self-Assessment:</strong>
+                        <ul class="list-disc list-inside">
+                            <li>Did you understand the difference between a planet and a dwarf planet?</li>
+                            <li>How did you handle the technical vocab (radiation, physiological)?</li>
+                        </ul>
+                    </div>
+                    ` 
+                }}
+            ]
+        };
+
+        // --- SPEECH SERVICE ---
+        class SpeechService {
+             constructor() { this.synth = window.speechSynthesis; this.isInitialized = false; this.isTtsEnabled = true; this.voices = {}; this.speechRate = 0.85; }
+             async _setupVoices() {
+                 const voicesPromise = new Promise(resolve => { if (this.synth.getVoices().length) return resolve(this.synth.getVoices()); this.synth.onvoiceschanged = () => resolve(this.synth.getVoices()); });
+                 const availableVoices = await voicesPromise;
+                 const findVoice = (name) => availableVoices.find(v => v.name.includes(name) && v.name.includes('Natural')) || availableVoices.find(v => v.name.includes(name));
+                 this.voices = {
+                     'person a': findVoice('Andrew') || availableVoices[0],
+                     'person b': findVoice('Ava') || availableVoices[0],
+                     'default': findVoice('Ava') || availableVoices[0]
+                 };
+             }
+             async init() { if (this.isInitialized) return; await this._setupVoices(); this.isInitialized = true; }
+             _cleanTextForSpeech(text) { const tempDiv = document.createElement('div'); tempDiv.innerHTML = text.replace(/<span aria-hidden="true">.*?<\/span>/g, ' '); return tempDiv.innerText || tempDiv.textContent || ''; }
+             speak(text) { if (!this.isTtsEnabled || !text) return; this.cancel(); const utterance = new SpeechSynthesisUtterance(this._cleanTextForSpeech(text)); utterance.voice = this.voices['default']; utterance.rate = this.speechRate; this.synth.speak(utterance); }
+             speakDialogue(text) { if (!this.isTtsEnabled || !text) return; this.cancel(); const lines = text.split('\n\n'); const speakLine = (index) => { if (index >= lines.length) return; const line = lines[index]; const [speaker, ...rest] = line.split(': '); const lineText = rest.join(': '); const utterance = new SpeechSynthesisUtterance(this._cleanTextForSpeech(lineText || speaker)); const key = speaker.toLowerCase().trim(); utterance.voice = this.voices[key] || this.voices['default']; utterance.rate = this.speechRate; utterance.onend = () => speakLine(index + 1); this.synth.speak(utterance); }; speakLine(0); }
+             cancel() { this.synth.cancel(); }
+             toggleTTS() { this.isTtsEnabled = !this.isTtsEnabled; if(!this.isTtsEnabled) this.cancel(); return this.isTtsEnabled; }
+         }
+
+        // --- CORE LOGIC ---
+        const speechService = new SpeechService();
+        let score = 0, currentPage = lessonData.startPageId;
+        const pageHistory = [lessonData.startPageId];
+        
+        // Populate Vocab Lists dynamically
+        lessonData.pages.find(p => p.id === '12a-vocab').content.words = lessonData.vocabulary.slice(0, 5);
+        lessonData.pages.find(p => p.id === '12b-vocab').content.words = lessonData.vocabulary.slice(5, 10);
+
+        function getPageSequence() {
+            return ['title-screen', 'goals-intro', 
+                    '12a-intro', '12a-vocab', '12a-reading', '12a-gap', '12a-tf', '12a-mcq', '12a-dialogue',
+                    '12b-intro', '12b-vocab', '12b-reading', '12b-gap', '12b-tf', '12b-mcq', '12b-dialogue',
+                    'grasps-task', 'project-menu', 'final-plenary'];
+        }
+        let pageSequence = getPageSequence();
+
+        window.startApp = async function() {
+            await speechService.init();
+            try { await Tone.start(); } catch(e){}
+            navigateTo(lessonData.homePageId);
+        }
+
+        window.navigateTo = (pageId) => {
+            const target = document.getElementById(`page-${pageId}`);
+            if (!target) return;
+            speechService.cancel();
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            target.classList.add('active');
+            currentPage = pageId;
+            if (pageHistory[pageHistory.length - 1] !== pageId) pageHistory.push(pageId);
+            
+            const pageDef = lessonData.pages.find(p => p.id === pageId);
+            if (pageDef) {
+                if (pageDef.type === 'dialogue') speechService.speakDialogue(pageDef.content.dialogue);
+                else if (pageDef.type === 'tiered-reading') {
+                    const activeTab = target.querySelector('.reading-content:not(.hidden)');
+                    if(activeTab) speechService.speak(activeTab.innerText);
+                } else {
+                    const h2 = target.querySelector('h2');
+                    const p = target.querySelector('p'); 
+                    const text = (h2 ? h2.innerText : '') + '. ' + (p ? p.innerText : '');
+                    speechService.speak(text);
+                }
+            }
+            updateNavButtons();
+            window.scrollTo(0,0);
+        }
+
+        window.goBack = () => { if(pageHistory.length > 1) { pageHistory.pop(); navigateTo(pageHistory.pop()); } }
+        window.goNext = () => { 
+            const idx = pageSequence.indexOf(currentPage);
+            if(idx > -1 && idx < pageSequence.length - 1) navigateTo(pageSequence[idx+1]);
+            else navigateTo(lessonData.homePageId);
+        }
+        window.toggleTTS = (btn) => {
+            const enabled = speechService.toggleTTS();
+            btn.classList.toggle('bg-blue-100', enabled);
+            btn.classList.toggle('bg-gray-200', !enabled);
+            if(enabled) navigateTo(currentPage); 
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function createPageElement(id, html) {
+            const sec = document.createElement('section');
+            sec.id = `page-${id}`;
+            sec.className = 'page';
+            sec.innerHTML = html;
+            document.getElementById('dynamic-pages-container').appendChild(sec);
+        }
+
+        function renderPages() {
+            // Render Main Menu
+            const menuBtns = lessonData.mainMenu.map(item => `
+                <button onclick="navigateTo('${item.target}')" class="btn-animated-3d bg-${item.color}-500 text-white font-bold text-lg p-4 rounded-xl w-full text-left shadow-md hover:bg-${item.color}-600 border-b-4 border-${item.color}-700 active:border-b-0 active:translate-y-1 transition-all">
+                    ${item.text}
+                </button>
+            `).join('');
+            createPageElement(lessonData.homePageId, `
+                <div class="bg-white rounded-3xl shadow-lg p-8 border border-slate-100">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 mb-6">Unit Map</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${menuBtns}</div>
+                </div>
+            `);
+
+            // Render Lesson Pages
+            lessonData.pages.forEach(page => {
+                let html = '';
+                const wrapper = (content) => `<div class="bg-white rounded-3xl shadow-lg p-6 md:p-8 pt-12 border border-slate-100 relative overflow-hidden">${content}</div>`;
+                
+                if (page.type === 'simple') {
+                    html = wrapper(`<h2 class="text-3xl font-bold text-slate-800 mb-4">${page.content.title}</h2><div class="text-xl text-slate-600 leading-relaxed">${page.content.text}</div>`);
+                } else if (page.type === 'vocab-list') {
+                    const list = page.content.words.map(w => `<div class="bg-slate-50 p-3 rounded-lg border-l-4 border-indigo-500"><div class="flex justify-between items-baseline"><strong class="text-indigo-700 text-lg">${w.word}</strong><span class="text-sm text-gray-500 font-mono">${w.ipa}</span></div><p class="text-slate-600 italic mt-1 text-sm">${w.def}</p><p class="text-slate-800 mt-2 text-sm">"${w.sentence}"</p></div>`).join('');
+                    html = wrapper(`<h2 class="text-3xl font-bold text-slate-800 mb-6">${page.content.title}</h2><div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${list}</div>`);
+                } else if (page.type === 'tiered-reading') {
+                    html = wrapper(`
+                        <h2 class="text-3xl font-bold text-slate-800 mb-4">${page.content.title}</h2>
+                        <div class="flex justify-center gap-2 mb-6">
+                            ${['A2','B1','B2'].map(lvl => `<button onclick="switchTier('${page.id}', '${lvl}')" class="tier-btn px-4 py-2 rounded-full font-bold ${lvl==='B1'?'active':''} text-sm">${lvl}</button>`).join('')}
+                        </div>
+                        <div id="content-${page.id}-A2" class="reading-content hidden text-lg leading-relaxed text-slate-700 bg-blue-50 p-4 rounded-xl border-l-4 border-blue-400">${page.content.texts['A2']}</div>
+                        <div id="content-${page.id}-B1" class="reading-content text-lg leading-relaxed text-slate-700 bg-indigo-50 p-4 rounded-xl border-l-4 border-indigo-400">${page.content.texts['B1']}</div>
+                        <div id="content-${page.id}-B2" class="reading-content hidden text-lg leading-relaxed text-slate-700 bg-purple-50 p-4 rounded-xl border-l-4 border-purple-400">${page.content.texts['B2']}</div>
+                    `);
+                } else if (page.type === 'dialogue') {
+                    const lines = page.content.dialogue.split('\n\n').map(l => {
+                        const [speaker, text] = l.split(': ');
+                        const isLeft = ['person a'].includes(speaker.toLowerCase());
+                        return `<div class="dialogue-bubble ${isLeft ? 'bubble-left' : 'bubble-right'}"><strong class="text-sm uppercase tracking-wide text-slate-500 mb-1 block">${speaker}</strong><p>${text}</p></div>`;
+                    }).join('');
+                    html = wrapper(`<h2 class="text-3xl font-bold text-slate-800 mb-6 text-center">${page.content.title}</h2><div class="space-y-4">${lines}</div>`);
+                } else if (page.type.includes('quiz')) {
+                    let qHtml = '';
+                    if (page.type === 'quiz-gap-fill') {
+                        const sentences = page.content.sentences.map((s,i) => `<p class="mb-4 text-lg">${i+1}. ${s.text[0]} <span class="gap" data-answer="${s.answer}" ondrop="drop(event)" ondragover="allowDrop(event)"></span> ${s.text[1]||''}</p>`).join('');
+                        const words = page.content.wordBank.map(w => `<div class="word-bank-word inline-block m-1" draggable="true" ondragstart="drag(event)" data-word="${w}">${w}</div>`).join('');
+                        qHtml = `<div class="gap-fill-container">${sentences}</div><div class="bg-slate-100 p-4 rounded-xl mt-6 flex flex-wrap gap-2 justify-center border border-slate-200">${words}</div>`;
+                    } else if (page.type === 'quiz-mcq') {
+                        qHtml = page.content.questions.map((q,i) => `
+                            <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                                <p class="font-bold text-lg mb-3">${i+1}. ${q.question}</p>
+                                <div class="grid gap-2">${q.options.map(opt => `<button onclick="checkMCQ(this, ${opt===q.correctAnswer})" class="quiz-option w-full text-left p-3 rounded-lg bg-white border border-slate-200 hover:bg-blue-50">${opt}</button>`).join('')}</div>
+                            </div>`).join('');
+                    } else if (page.type === 'quiz-tfng') {
+                        qHtml = page.content.questions.map((q,i) => `
+                            <div class="mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                                <p class="font-medium text-lg flex-1">${q.statement}</p>
+                                <div class="flex gap-2">${['True','False'].map(opt => `<button onclick="checkTF(this, '${opt}', '${q.correctAnswer}')" class="tfng-button px-4 py-2 bg-white border border-slate-200 rounded-lg font-bold text-sm hover:bg-blue-50">${opt}</button>`).join('')}</div>
+                            </div>`).join('');
+                    }
+                    html = wrapper(`<h2 class="text-3xl font-bold text-slate-800 mb-6 text-center">${page.content.title}</h2>${qHtml}`);
+                }
+                createPageElement(page.id, html);
+            });
+        }
+
+        // --- HELPER FUNCTIONS ---
+        window.switchTier = (pageId, tier) => {
+            const page = document.getElementById(`page-${pageId}`);
+            page.querySelectorAll('.reading-content').forEach(d => d.classList.add('hidden'));
+            page.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
+            page.querySelector(`#content-${pageId}-${tier}`).classList.remove('hidden');
+            Array.from(page.querySelectorAll('.tier-btn')).find(b => b.innerText === tier).classList.add('active');
+            speechService.speak(page.querySelector(`#content-${pageId}-${tier}`).innerText);
+        }
+
+        window.updateNavButtons = () => {
+            const nav = document.getElementById('nav-header');
+            if (currentPage === 'title-screen') nav.style.display = 'none';
+            else nav.style.display = 'block';
+        }
+
+        // --- DRAG & DROP / QUIZ LOGIC ---
+        window.allowDrop = (ev) => ev.preventDefault();
+        window.drag = (ev) => ev.dataTransfer.setData("text", ev.target.dataset.word);
+        window.drop = (ev) => {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text");
+            const target = ev.target;
+            if(target.classList.contains('gap') && !target.hasChildNodes()) {
+                const wordEl = document.querySelector(`.word-bank-word[data-word="${data}"]`);
+                target.appendChild(wordEl);
+                checkGap(target);
+            }
+        }
+        
+        function checkGap(gap) {
+            const word = gap.innerText.trim();
+            const correct = gap.dataset.answer;
+            if(word.toLowerCase() === correct.toLowerCase()) {
+                gap.classList.add('correct');
+                addPoints(10);
+                playTone('C5');
+            } else {
+                gap.classList.add('incorrect');
+                playTone('C3');
+                setTimeout(() => gap.classList.remove('incorrect'), 1000);
+            }
+        }
+
+        window.checkMCQ = (btn, isCorrect) => {
+            const parent = btn.parentElement;
+            Array.from(parent.children).forEach(c => c.disabled = true);
+            if(isCorrect) {
+                btn.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                addPoints(10);
+                playTone('C5');
+            } else {
+                btn.classList.add('bg-red-100', 'border-red-500', 'shake');
+                playTone('C3');
+            }
+        }
+
+        window.checkTF = (btn, val, correct) => {
+             const parent = btn.parentElement;
+             Array.from(parent.children).forEach(c => c.disabled = true);
+             if(val === correct) {
+                 btn.classList.add('bg-green-500', 'text-white');
+                 addPoints(10);
+                 playTone('C5');
+             } else {
+                 btn.classList.add('bg-red-500', 'text-white');
+                 playTone('C3');
+             }
+        }
+
+        function addPoints(pts) { score += pts; document.getElementById('score-display').innerText = score; }
+        function playTone(note) { try { const synth = new Tone.Synth().toDestination(); synth.triggerAttackRelease(note, "8n"); } catch(e){} }
+
+        // Init
+        renderPages();
+    </script>
+</body>
+</html>
