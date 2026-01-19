@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EFL Speaking Practice - Interactive</title>
+    <title>EFL Speaking Practice - Expanded</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -55,34 +55,40 @@
         // --- ICONS (SVG components) ---
         
         const BookOpen = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         );
         const Home = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         );
         const Utensils = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
         );
         const Briefcase = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
         );
         const MapPin = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         );
         const Activity = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-4"/><path d="M8 18v-2"/><path d="M16 18v-6"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-4"/><path d="M8 18v-2"/><path d="M16 18v-6"/></svg>
+        );
+        const Shirt = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+        );
+        const PawPrint = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="17.5" r="3.5"/><circle cx="17.5" cy="11.5" r="2.5"/><circle cx="6.5" cy="11.5" r="2.5"/><circle cx="15.5" cy="6.5" r="2.5"/><circle cx="8.5" cy="6.5" r="2.5"/></svg>
+        );
+        const Sun = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/></svg>
         );
         const Mic = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="23"/><line x1="8" x2="16" y1="23" y2="23"/></svg>
-        );
-        const Volume2 = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="23"/><line x1="8" x2="16" y1="23" y2="23"/></svg>
         );
         const Settings = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         );
         const RefreshCw = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
         );
 
         // --- HELPER COMPONENTS ---
@@ -129,15 +135,19 @@
                 <EmojiItem emoji="🖼️" label="picture" x="75%" y="12%" size="3xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🪟" label="window" x="85%" y="25%" size="5xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🚪" label="door" x="10%" y="40%" size="6xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🌍" label="globe" x="90%" y="50%" size="4xl" activeItem={activeItem} onClick={onInteract} />
 
                 <EmojiItem emoji="🖥️" label="computer" x="30%" y="45%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="📘" label="workbook" x="45%" y="60%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="✏️" label="pencil sharpener" x="60%" y="55%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="📓" label="notebook" x="15%" y="60%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+                
                 <EmojiItem emoji="📎" label="paper clip" x="35%" y="65%" size="2xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="📏" label="ruler" x="55%" y="65%" size="3xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🖊️" label="pen" x="25%" y="60%" size="3xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="✂️" label="scissors" x="68%" y="60%" size="3xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🖍️" label="crayon" x="50%" y="50%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🧴" label="glue" x="72%" y="52%" size="3xl" activeItem={activeItem} onClick={onInteract} />
 
                 <EmojiItem emoji="🎒" label="backpack" x="20%" y="85%" size="5xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🗑️" label="trash can" x="85%" y="80%" size="4xl" activeItem={activeItem} onClick={onInteract} />
@@ -155,24 +165,28 @@
                 <EmojiItem emoji="💡" label="lamp" x="35%" y="25%" size="3xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🧸" label="toy box" x="40%" y="40%" size="3xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🖼️" label="poster" x="25%" y="10%" size="2xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🛌" label="pillow" x="15%" y="20%" size="2xl" activeItem={activeItem} onClick={onInteract} />
 
                 <div className="absolute top-2 right-2 text-xs text-green-700 font-bold opacity-50">BATHROOM</div>
                 <EmojiItem emoji="🛁" label="bathtub" x="65%" y="20%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🚽" label="toilet" x="85%" y="25%" size="3xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🚿" label="shower" x="60%" y="10%" size="3xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🪞" label="mirror" x="80%" y="10%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🧖" label="towel" x="90%" y="18%" size="3xl" activeItem={activeItem} onClick={onInteract} />
 
                 <div className="absolute bottom-2 left-2 text-xs text-green-700 font-bold opacity-50">LIVING ROOM</div>
                 <EmojiItem emoji="🛋️" label="sofa" x="20%" y="70%" size="5xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="📺" label="TV" x="40%" y="65%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🪴" label="plant" x="10%" y="85%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="☎️" label="telephone" x="45%" y="85%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🧶" label="rug" x="25%" y="85%" size="4xl" activeItem={activeItem} onClick={onInteract} />
 
                 <div className="absolute bottom-2 right-2 text-xs text-green-700 font-bold opacity-50">KITCHEN</div>
                 <EmojiItem emoji="🍳" label="stove" x="65%" y="70%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🚰" label="sink" x="85%" y="70%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🧊" label="fridge" x="90%" y="85%" size="3xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🍽️" label="table" x="65%" y="85%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🥘" label="pan" x="68%" y="65%" size="3xl" activeItem={activeItem} onClick={onInteract} />
             </div>
         );
 
@@ -191,13 +205,15 @@
                 <EmojiItem emoji="🥪" label="sandwich" x="75%" y="50%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🍗" label="chicken" x="90%" y="45%" size="4xl" activeItem={activeItem} onClick={onInteract} />
 
-                <EmojiItem emoji="🍑" label="peach" x="15%" y="80%" size="4xl" activeItem={activeItem} onClick={onInteract} />
-                <EmojiItem emoji="🍐" label="pear" x="30%" y="80%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🍪" label="cookie" x="15%" y="80%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🍩" label="donut" x="30%" y="80%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🍎" label="apple" x="45%" y="80%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🍌" label="banana" x="60%" y="80%" size="4xl" activeItem={activeItem} onClick={onInteract} />
-                <EmojiItem emoji="🍦" label="yogurt" x="75%" y="75%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🥤" label="soda" x="75%" y="75%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🥛" label="milk" x="85%" y="80%" size="3xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🍵" label="tea" x="95%" y="80%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🍓" label="strawberry" x="50%" y="70%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🥩" label="steak" x="85%" y="35%" size="4xl" activeItem={activeItem} onClick={onInteract} />
             </div>
         );
 
@@ -214,15 +230,15 @@
                 <EmojiItem emoji="🧑‍🌾" label="farmer" x="45%" y="50%" size="5xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="👩‍🏫" label="teacher" x="65%" y="50%" size="5xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="✈️" label="pilot" x="85%" y="40%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🐕‍🦺" label="vet" x="55%" y="40%" size="4xl" activeItem={activeItem} onClick={onInteract} />
 
                 <EmojiItem emoji="👮" label="police officer" x="15%" y="80%" size="5xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="👨‍🚒" label="firefighter" x="35%" y="80%" size="5xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🎨" label="artist" x="55%" y="80%" size="5xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="⚽" label="soccer player" x="80%" y="80%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🎤" label="singer" x="90%" y="70%" size="5xl" activeItem={activeItem} onClick={onInteract} />
             </div>
         );
-
-        // --- NEW TOPICS: TOWN & ACTIVITIES ---
 
         const TownIllustration = ({ activeItem, onInteract }) => (
             <div className="relative w-full h-[34rem] bg-gray-200 rounded-xl border-2 border-gray-300 overflow-hidden cursor-pointer shadow-inner">
@@ -233,19 +249,23 @@
                 {/* Top Left Block */}
                 <EmojiItem emoji="🏥" label="hospital" x="20%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🚓" label="police station" x="10%" y="35%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🚒" label="fire station" x="30%" y="10%" size="4xl" activeItem={activeItem} onClick={onInteract} />
 
                 {/* Top Right Block */}
                 <EmojiItem emoji="🏫" label="school" x="80%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="📚" label="library" x="65%" y="30%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🏦" label="bank" x="85%" y="10%" size="4xl" activeItem={activeItem} onClick={onInteract} />
 
                 {/* Bottom Left Block */}
                 <EmojiItem emoji="🌳" label="park" x="20%" y="80%" size="6xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🏊" label="pool" x="35%" y="70%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🦁" label="zoo" x="10%" y="90%" size="4xl" activeItem={activeItem} onClick={onInteract} />
 
                 {/* Bottom Right Block */}
                 <EmojiItem emoji="🏪" label="store" x="80%" y="80%" size="5xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🥖" label="bakery" x="65%" y="70%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🎬" label="movie theater" x="90%" y="65%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🍽️" label="restaurant" x="85%" y="90%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 
                 {/* Vehicles on Road */}
                 <EmojiItem emoji="🚌" label="bus" x="50%" y="60%" size="3xl" activeItem={activeItem} onClick={onInteract} />
@@ -270,8 +290,79 @@
                 <EmojiItem emoji="🎨" label="drawing" x="40%" y="30%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="😴" label="sleeping" x="60%" y="30%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 <EmojiItem emoji="🎤" label="singing" x="80%" y="30%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🪁" label="flying a kite" x="10%" y="20%" size="4xl" activeItem={activeItem} onClick={onInteract} />
                 
                 <EmojiItem emoji="💃" label="dancing" x="50%" y="85%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="📺" label="watching TV" x="70%" y="85%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+            </div>
+        );
+
+        // --- NEW ILLUSTRATIONS ---
+
+        const ClothesIllustration = ({ activeItem, onInteract }) => (
+            <div className="relative w-full h-[34rem] bg-pink-50 rounded-xl border-2 border-pink-200 overflow-hidden cursor-pointer shadow-inner">
+                {/* Closet Rod */}
+                <div className="absolute top-10 left-10 right-10 h-4 bg-gray-400 rounded-full"></div>
+                
+                <EmojiItem emoji="👕" label="t-shirt" x="20%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="👗" label="dress" x="40%" y="25%" size="6xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🧥" label="coat" x="60%" y="25%" size="6xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="👚" label="blouse" x="80%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+                
+                <EmojiItem emoji="👖" label="jeans" x="20%" y="55%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🩳" label="shorts" x="40%" y="55%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="👔" label="tie" x="60%" y="50%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="👒" label="hat" x="80%" y="50%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+                
+                <EmojiItem emoji="👟" label="sneakers" x="25%" y="85%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="👢" label="boots" x="45%" y="85%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🧦" label="socks" x="65%" y="85%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="👓" label="glasses" x="85%" y="80%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+            </div>
+        );
+
+        const AnimalsIllustration = ({ activeItem, onInteract }) => (
+            <div className="relative w-full h-[34rem] bg-yellow-50 rounded-xl border-2 border-yellow-200 overflow-hidden cursor-pointer shadow-inner">
+                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(45deg, #166534 25%, transparent 25%, transparent 75%, #166534 75%, #166534), linear-gradient(45deg, #166534 25%, transparent 25%, transparent 75%, #166534 75%, #166534)', backgroundSize: '40px 40px', backgroundPosition: '0 0, 20px 20px' }}></div>
+                
+                <EmojiItem emoji="🦁" label="lion" x="20%" y="20%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🐯" label="tiger" x="40%" y="25%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🦒" label="giraffe" x="70%" y="30%" size="6xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🦓" label="zebra" x="85%" y="40%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+                
+                <EmojiItem emoji="🐘" label="elephant" x="20%" y="55%" size="6xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🐒" label="monkey" x="45%" y="50%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🐊" label="crocodile" x="65%" y="60%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🐧" label="penguin" x="85%" y="60%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                
+                <EmojiItem emoji="🐻" label="bear" x="15%" y="80%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🐍" label="snake" x="35%" y="85%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🦛" label="hippo" x="60%" y="85%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🦘" label="kangaroo" x="85%" y="80%" size="5xl" activeItem={activeItem} onClick={onInteract} />
+            </div>
+        );
+
+        const NatureIllustration = ({ activeItem, onInteract }) => (
+            <div className="relative w-full h-[34rem] bg-cyan-100 rounded-xl border-2 border-cyan-200 overflow-hidden cursor-pointer shadow-inner">
+                {/* Sky gradient */}
+                <div className="absolute inset-0 bg-gradient-to-b from-blue-300 to-cyan-100 h-1/2"></div>
+                {/* Grass */}
+                <div className="absolute bottom-0 w-full h-1/2 bg-green-200 border-t-4 border-green-300"></div>
+                
+                <EmojiItem emoji="☀️" label="sun" x="85%" y="15%" size="6xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="☁️" label="cloud" x="20%" y="15%" size="6xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🌈" label="rainbow" x="50%" y="20%" size="6xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🐦" label="bird" x="35%" y="10%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+                
+                <EmojiItem emoji="🏔️" label="mountain" x="15%" y="40%" size="6xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🌲" label="tree" x="80%" y="55%" size="7xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🌸" label="flower" x="25%" y="80%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🦋" label="butterfly" x="30%" y="65%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+                
+                <EmojiItem emoji="🌊" label="ocean" x="50%" y="90%" size="6xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🐚" label="shell" x="50%" y="80%" size="3xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="🌙" label="moon" x="10%" y="10%" size="4xl" activeItem={activeItem} onClick={onInteract} />
+                <EmojiItem emoji="⭐" label="star" x="60%" y="10%" size="3xl" activeItem={activeItem} onClick={onInteract} />
             </div>
         );
 
@@ -284,7 +375,7 @@
                 color: "blue",
                 icon: <BookOpen className="w-5 h-5" />,
                 illustration: SchoolIllustration,
-                vocabulary: ["pencil sharpener", "clock", "workbook", "paper clip", "door", "window", "calendar", "computer", "ruler", "pen", "scissors", "backpack", "trash can", "picture"],
+                vocabulary: ["pencil sharpener", "clock", "workbook", "paper clip", "door", "window", "calendar", "computer", "ruler", "pen", "scissors", "backpack", "trash can", "picture", "notebook", "glue", "globe", "chair"],
                 getPatterns: (word) => {
                     const noun = word || "[object]";
                     const article = ["a","e","i","o","u"].includes(noun[0]) ? "an" : "a";
@@ -302,15 +393,15 @@
                 color: "green",
                 icon: <Home className="w-5 h-5" />,
                 illustration: HouseIllustration,
-                vocabulary: ["bed", "bathtub", "sofa", "stove", "lamp", "sink", "toilet", "TV", "mirror", "shower", "plant", "toy box", "poster", "table", "fridge", "telephone"],
+                vocabulary: ["bed", "bathtub", "sofa", "stove", "lamp", "sink", "toilet", "TV", "mirror", "shower", "plant", "toy box", "poster", "table", "fridge", "telephone", "pillow", "rug", "towel", "pan"],
                 getPatterns: (word) => {
                     const noun = word || "[object]";
                     const article = ["a","e","i","o","u"].includes(noun[0]) ? "an" : "a";
                     const roomMap = {
-                        "bed": "bedroom", "lamp": "bedroom", "toy box": "bedroom", "poster": "bedroom",
-                        "bathtub": "bathroom", "toilet": "bathroom", "shower": "bathroom", "mirror": "bathroom",
-                        "sofa": "living room", "TV": "living room", "plant": "living room", "telephone": "living room",
-                        "stove": "kitchen", "fridge": "kitchen", "table": "kitchen", "sink": "kitchen"
+                        "bed": "bedroom", "lamp": "bedroom", "toy box": "bedroom", "poster": "bedroom", "pillow": "bedroom",
+                        "bathtub": "bathroom", "toilet": "bathroom", "shower": "bathroom", "mirror": "bathroom", "towel": "bathroom",
+                        "sofa": "living room", "TV": "living room", "plant": "living room", "telephone": "living room", "rug": "living room",
+                        "stove": "kitchen", "fridge": "kitchen", "table": "kitchen", "sink": "kitchen", "pan": "kitchen"
                     };
                     const room = roomMap[noun] || "house";
                     return [
@@ -327,7 +418,7 @@
                 color: "orange",
                 icon: <Utensils className="w-5 h-5" />,
                 illustration: FoodIllustration,
-                vocabulary: ["omelet", "peach", "pear", "pancake", "yogurt", "cereal", "tea", "pizza", "hamburger", "french fries", "salad", "sandwich", "chicken", "apple", "banana", "milk"],
+                vocabulary: ["omelet", "pancake", "yogurt", "cereal", "tea", "pizza", "hamburger", "french fries", "salad", "sandwich", "chicken", "apple", "banana", "milk", "cookie", "donut", "soda", "strawberry", "steak"],
                 getPatterns: (word) => {
                     const noun = word || "[food]";
                     return [
@@ -344,7 +435,7 @@
                 color: "purple",
                 icon: <Briefcase className="w-5 h-5" />,
                 illustration: OccupationsIllustration,
-                vocabulary: ["shopkeeper", "cook", "nurse", "farmer", "taxi driver", "teacher", "doctor", "pilot", "police officer", "firefighter", "artist", "soccer player"],
+                vocabulary: ["shopkeeper", "cook", "nurse", "farmer", "taxi driver", "teacher", "doctor", "pilot", "police officer", "firefighter", "artist", "soccer player", "vet", "singer"],
                 getPatterns: (word) => {
                     const noun = word || "[job]";
                     const article = ["a","e","i","o","u"].includes(noun[0]) ? "an" : "a";
@@ -362,7 +453,7 @@
                 color: "gray",
                 icon: <MapPin className="w-5 h-5" />,
                 illustration: TownIllustration,
-                vocabulary: ["hospital", "park", "school", "library", "store", "police station", "pool", "bakery", "movie theater", "bus"],
+                vocabulary: ["hospital", "park", "school", "library", "store", "police station", "pool", "bakery", "movie theater", "bus", "fire station", "bank", "zoo", "restaurant"],
                 getPatterns: (word) => {
                     const place = word || "[place]";
                     return [
@@ -379,15 +470,68 @@
                 color: "red",
                 icon: <Activity className="w-5 h-5" />,
                 illustration: ActivityIllustration,
-                vocabulary: ["running", "swimming", "dancing", "singing", "reading", "sleeping", "drawing", "playing soccer", "riding a bike"],
+                vocabulary: ["running", "swimming", "dancing", "singing", "reading", "sleeping", "drawing", "playing soccer", "riding a bike", "flying a kite", "watching TV"],
                 getPatterns: (word) => {
-                    // Because vocabulary is already in gerund form (e.g. "running"), we use it directly
                     const action = word || "[action]";
                     return [
                         { q: "What are you doing?", a: `I am ${action}.` },
                         { q: `Is he ${action}?`, a: "Yes, he is." },
                         { q: `Can you see him ${action}?`, a: "Yes, I can." },
                         { q: "What is she doing?", a: `She is ${action}.` }
+                    ];
+                }
+            },
+            {
+                id: 8,
+                title: "Clothes",
+                color: "pink",
+                icon: <Shirt className="w-5 h-5" />,
+                illustration: ClothesIllustration,
+                vocabulary: ["t-shirt", "dress", "coat", "blouse", "jeans", "shorts", "tie", "hat", "sneakers", "boots", "socks", "glasses"],
+                getPatterns: (word) => {
+                    const item = word || "[item]";
+                    const isPlural = item.endsWith('s') && item !== "dress"; 
+                    return [
+                        { q: "What are you wearing?", a: `I'm wearing ${isPlural ? '' : 'a '}${item}.` },
+                        { q: `Is this your ${item}?`, a: "Yes, it is." },
+                        { q: `Put on your ${item}.`, a: "Okay!" },
+                        { q: "Whose are these?", a: `They're my ${item}.` }
+                    ];
+                }
+            },
+            {
+                id: 9,
+                title: "Animals",
+                color: "yellow",
+                icon: <PawPrint className="w-5 h-5" />,
+                illustration: AnimalsIllustration,
+                vocabulary: ["lion", "tiger", "giraffe", "zebra", "elephant", "monkey", "crocodile", "penguin", "bear", "snake", "hippo", "kangaroo"],
+                getPatterns: (word) => {
+                    const animal = word || "[animal]";
+                    const article = ["a","e","i","o","u"].includes(animal[0]) ? "an" : "a";
+                    return [
+                        { q: "What's that?", a: `It's ${article} ${animal}.` },
+                        { q: `Do you like ${animal}s?`, a: "Yes, I do." },
+                        { q: "What can it do?", a: `The ${animal} can jump.` },
+                        { q: "Where does it live?", a: "It lives in the zoo." }
+                    ];
+                }
+            },
+            {
+                id: 10,
+                title: "Nature",
+                color: "cyan",
+                icon: <Sun className="w-5 h-5" />,
+                illustration: NatureIllustration,
+                vocabulary: ["sun", "cloud", "rainbow", "bird", "mountain", "tree", "flower", "butterfly", "ocean", "shell", "moon", "star"],
+                getPatterns: (word) => {
+                    const nature = word || "[nature]";
+                    const article = ["a","e","i","o","u"].includes(nature[0]) ? "an" : "a";
+                    return [
+                        { q: "How's the weather?", a: `It's sunny.` },
+                        { q: "What can you see?", a: `I can see the ${nature}.` },
+                        { q: `Is that ${article} ${nature}?`, a: "Yes, it is." },
+                        { q: "Look at the sky!", a: `Wow! A ${nature}.` }
                     ];
                 }
             }
@@ -443,7 +587,7 @@
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
                 if (selectedVoice) utterance.voice = selectedVoice;
-                utterance.rate = 0.85; 
+                utterance.rate = 0.85; // Slow down speech
                 utterance.pitch = 1.1; 
                 utterance.lang = 'en-US';
                 window.speechSynthesis.speak(utterance);
