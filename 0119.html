@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Sentence Builder A1</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Google Fonts: Comic Neue -->
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Comic Neue', 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+            background-color: #f3f4f6;
+            touch-action: manipulation;
+        }
+
+        .no-select {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Sentence Part Styling */
+        .sentence-part {
+            border-bottom-width: 4px;
+            border-bottom-style: dashed;
+            border-color: #d1d5db; /* Gray 300 */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            padding: 8px 12px; 
+            border-radius: 12px;
+            margin: 4px;
+            display: inline-flex; 
+            align-items: center;
+            justify-content: center;
+            background-color: #e5e7eb; /* Gray 200 */
+            color: transparent; /* Text hidden initially */
+            min-width: 60px;
+            min-height: 50px;
+            position: relative;
+            text-shadow: none;
+        }
+
+        /* The Reveal State */
+        .sentence-part.revealed {
+            background-color: white;
+            color: #1f2937; /* Gray 800 */
+            border-bottom-style: solid;
+            border-bottom-width: 6px;
+        }
+
+        /* Question Label (appears above text when revealed) */
+        .sentence-part.revealed::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #374151;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 999px;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+            white-space: nowrap;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            pointer-events: none;
+        }
+
+        @keyframes fadeIn {
+            to { top: -20px; opacity: 1; }
+        }
+
+        /* Active/Highlight States (Matched to Button Colors) */
+        .revealed.active-orange { border-color: #f97316; background-color: #fff7ed; } 
+        .revealed.active-yellow { border-color: #eab308; background-color: #fefce8; } 
+        .revealed.active-green  { border-color: #16a34a; background-color: #f0fdf4; } 
+        .revealed.active-blue   { border-color: #0ea5e9; background-color: #f0f9ff; } 
+        .revealed.active-brown  { border-color: #854d0e; background-color: #fdf8f6; } 
+        .revealed.active-pink   { border-color: #ec4899; background-color: #fdf2f8; } 
+        .revealed.active-purple { border-color: #a855f7; background-color: #faf5ff; } 
+        .revealed.active-teal   { border-color: #14b8a6; background-color: #f0fdfa; }
+
+        /* Specific text colors for emojis vs text if needed, but standard text color works well */
+
+        /* Button interactions */
+        .card:active { transform: scale(0.95); }
+        
+        /* Navigation Button Styles */
+        .nav-btn {
+            background-color: white;
+            border: 2px solid #e5e7eb;
+            padding: 8px 16px; 
+            border-radius: 9999px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #e5e7eb;
+        }
+        .nav-btn:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+        .nav-btn:hover {
+            border-color: #d1d5db;
+            background-color: #f9fafb;
+        }
+
+        /* Points Animation */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .pop-anim { animation: pop 0.2s ease-in-out; }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden text-gray-800">
+
+    <!-- Header: Sentence Display & Navigation -->
+    <div class="bg-white shadow-lg z-20 sticky top-0 border-b-2 border-gray-200 shrink-0">
+        <div class="max-w-7xl mx-auto p-4 flex flex-col gap-4">
+              
+             <!-- The Sentence (Fixed Height Container) -->
+             <div class="h-[20rem] md:h-[24rem] w-full relative flex items-center justify-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-6 shadow-inner">
+                 <!-- Helper Text Removed -->
+
+                 <div id="sentence-container" class="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 text-center leading-snug no-select flex flex-wrap justify-center items-center gap-x-3 gap-y-4 w-full overflow-y-auto max-h-full">
+                    <!-- Content injected via JS -->
+                </div>
+             </div>
+            
+            <!-- Navigation & Controls Toolbar -->
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                
+                <!-- Left Group: Nav -->
+                <div class="flex items-center gap-3">
+                    <button onclick="goHome()" class="nav-btn text-gray-600" title="Start Over">
+                        <i class="ph ph-arrow-counter-clockwise text-xl"></i>
+                    </button>
+                    
+                    <button onclick="prevSentence()" class="nav-btn text-gray-600" title="Previous">
+                        <i class="ph ph-caret-left text-2xl"></i>
+                    </button>
+                    
+                    <span id="counter" class="text-lg font-bold text-gray-400 min-w-[80px] text-center font-mono">1/100</span>
+
+                    <button onclick="nextSentence()" class="nav-btn text-gray-600" title="Next">
+                        <i class="ph ph-caret-right text-2xl"></i>
+                    </button>
+
+                    <!-- Shuffle Button -->
+                    <button onclick="randomSentence()" class="nav-btn text-purple-600 border-purple-200 hover:bg-purple-50" title="Random Sentence">
+                        <i class="ph ph-shuffle text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Center: Read & Reveal All -->
+                <div class="flex gap-2">
+                    <button onclick="revealAll()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 border-gray-200 px-5 py-2 rounded-full font-bold text-base flex items-center gap-2 transition shadow-md border-b-4 active:translate-y-1 active:shadow-none">
+                        <i class="ph ph-eye text-xl"></i>
+                        <span>Show All</span>
+                    </button>
+
+                    <button onclick="speakSentence()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 border-blue-200 px-6 py-2 rounded-full font-bold text-base flex items-center gap-2 transition shadow-md border-b-4 active:translate-y-1 active:shadow-none">
+                        <i class="ph ph-speaker-high text-xl"></i>
+                        <span>Read</span>
+                    </button>
+                </div>
+
+                <!-- Right: Points -->
+                <button id="pointsBtn" onclick="addPoint()" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-yellow-200 px-6 py-2 rounded-full font-bold text-lg flex items-center gap-2 transition shadow-md border-b-4 active:translate-y-1 active:shadow-none ml-auto md:ml-0">
+                    <i class="ph ph-star-fill text-2xl text-yellow-500"></i>
+                    <span id="pointsDisplay">0</span>
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content: Buttons Grid -->
+    <div class="flex-1 overflow-y-auto p-4 bg-gray-100">
+        <div class="max-w-5xl mx-auto h-full flex flex-col justify-start pt-2 pb-12">
+            
+            <!-- Question Cards Grid (Reduced sizes by ~25%) -->
+            <div class="grid grid-cols-4 gap-3 md:gap-4">
+                <!-- WHO? -->
+                <button onclick="activatePart('who')" class="card bg-[#fed7aa] text-gray-900 rounded-xl flex flex-col items-center justify-center shadow-[0_4px_0_#f97316] border-2 border-[#f97316] py-2 hover:bg-orange-200 hover:-translate-y-1 transition-all active:translate-y-1 active:shadow-none h-auto min-h-[85px]">
+                    <span class="text-[10px] md:text-xs font-black uppercase tracking-widest opacity-70 mb-1">Who?</span>
+                    <i class="ph ph-user text-2xl md:text-3xl text-orange-800"></i>
+                </button>
+                
+                <!-- DOING WHAT? -->
+                <button onclick="activatePart('action')" class="card bg-[#fef08a] text-gray-900 rounded-xl flex flex-col items-center justify-center shadow-[0_4px_0_#eab308] border-2 border-[#eab308] py-2 hover:bg-yellow-200 hover:-translate-y-1 transition-all active:translate-y-1 active:shadow-none h-auto min-h-[85px]">
+                    <span class="text-[10px] md:text-xs font-black uppercase tracking-widest opacity-70 mb-1 text-center leading-none">Doing<br>what?</span>
+                    <i class="ph ph-person-simple-run text-2xl md:text-3xl text-yellow-800"></i>
+                </button>
+                
+                <!-- WHAT? -->
+                <button onclick="activatePart('what')" class="card bg-[#bbf7d0] text-gray-900 rounded-xl flex flex-col items-center justify-center shadow-[0_4px_0_#16a34a] border-2 border-[#16a34a] py-2 hover:bg-green-200 hover:-translate-y-1 transition-all active:translate-y-1 active:shadow-none h-auto min-h-[85px]">
+                    <span class="text-[10px] md:text-xs font-black uppercase tracking-widest opacity-70 mb-1">What?</span>
+                    <i class="ph ph-soccer-ball text-2xl md:text-3xl text-green-800"></i>
+                </button>
+                
+                <!-- WHERE? -->
+                <button onclick="activatePart('where')" class="card bg-[#bae6fd] text-gray-900 rounded-xl flex flex-col items-center justify-center shadow-[0_4px_0_#0ea5e9] border-2 border-[#0ea5e9] py-2 hover:bg-sky-200 hover:-translate-y-1 transition-all active:translate-y-1 active:shadow-none h-auto min-h-[85px]">
+                    <span class="text-[10px] md:text-xs font-black uppercase tracking-widest opacity-70 mb-1">Where?</span>
+                    <i class="ph ph-map-pin text-2xl md:text-3xl text-sky-800"></i>
+                </button>
+                
+                <!-- WHEN? -->
+                <button onclick="activatePart('when')" class="card bg-[#e7d5c9] text-gray-900 rounded-xl flex flex-col items-center justify-center shadow-[0_4px_0_#854d0e] border-2 border-[#854d0e] py-2 hover:bg-[#dcc0b0] hover:-translate-y-1 transition-all active:translate-y-1 active:shadow-none h-auto min-h-[85px]">
+                    <span class="text-[10px] md:text-xs font-black uppercase tracking-widest opacity-70 mb-1">When?</span>
+                    <i class="ph ph-clock text-2xl md:text-3xl text-amber-900"></i>
+                </button>
+                
+                <!-- TO WHOM? -->
+                <button onclick="activatePart('whom')" class="card bg-[#fbcfe8] text-gray-900 rounded-xl flex flex-col items-center justify-center shadow-[0_4px_0_#ec4899] border-2 border-[#ec4899] py-2 hover:bg-pink-200 hover:-translate-y-1 transition-all active:translate-y-1 active:shadow-none h-auto min-h-[85px]">
+                    <span class="text-[10px] md:text-xs font-black uppercase tracking-widest opacity-70 mb-1 text-center leading-none">To<br>whom?</span>
+                    <i class="ph ph-gift text-2xl md:text-3xl text-pink-800"></i>
+                </button>
+                
+                <!-- WHY? -->
+                <button onclick="activatePart('why')" class="card bg-[#e9d5ff] text-gray-900 rounded-xl flex flex-col items-center justify-center shadow-[0_4px_0_#a855f7] border-2 border-[#a855f7] py-2 hover:bg-purple-200 hover:-translate-y-1 transition-all active:translate-y-1 active:shadow-none h-auto min-h-[85px]">
+                    <span class="text-[10px] md:text-xs font-black uppercase tracking-widest opacity-70 mb-1">Why?</span>
+                    <i class="ph ph-question text-2xl md:text-3xl text-purple-800"></i>
+                </button>
+                
+                <!-- HOW? -->
+                <button onclick="activatePart('how')" class="card bg-[#99f6e4] text-gray-900 rounded-xl flex flex-col items-center justify-center shadow-[0_4px_0_#14b8a6] border-2 border-[#14b8a6] py-2 hover:bg-teal-200 hover:-translate-y-1 transition-all active:translate-y-1 active:shadow-none h-auto min-h-[85px]">
+                    <span class="text-[10px] md:text-xs font-black uppercase tracking-widest opacity-70 mb-1">How?</span>
+                    <i class="ph ph-lightning text-2xl md:text-3xl text-teal-800"></i>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Hidden Voice Selector -->
+    <select id="voiceSelect" class="hidden"></select>
+
+    <script>
+        // --- Data: 100 A1 Sentences with Emojis ---
+        const allSentences = [
+            { who: "The cat 🐱", action: "eats 🍽️", what: "a fish 🐟", whom: "", where: "in the kitchen 🏠", when: "now ⏰", why: "because hungry 😋", how: "quickly ⚡" },
+            { who: "I 🙋", action: "play 🎮", what: "soccer ⚽", whom: "with friends 👫", where: "at the park 🌳", when: "on Sunday 📅", why: "for fun 😄", how: "happily 😊" },
+            { who: "My mom 👩", action: "cooks 🍳", what: "dinner 🍝", whom: "for us 👨‍👩‍👧", where: "at home 🏡", when: "at 6pm 🕕", why: "to eat 🍴", how: "well 👍" },
+            { who: "The dog 🐶", action: "runs 🏃", what: "", whom: "to me 🙋", where: "in the garden 🌻", when: "today ☀️", why: "to play 🎾", how: "fast 💨" },
+            { who: "She 👧", action: "reads 📖", what: "a book 📚", whom: "", where: "in bed 🛏️", when: "at night 🌙", why: "to sleep 😴", how: "quietly 🤫" },
+            { who: "We 👨‍👩‍👦", action: "go 🚶", what: "", whom: "", where: "to school 🏫", when: "every day 🗓️", why: "to learn 🧠", how: "together 🤝" },
+            { who: "The bird 🐦", action: "sings 🎵", what: "a song 🎶", whom: "", where: "in the tree 🌳", when: "in the morning 🌅", why: "because happy 😄", how: "sweetly 🍭" },
+            { who: "He 👦", action: "drinks 🥤", what: "milk 🥛", whom: "", where: "at the table 🪑", when: "for breakfast 🥞", why: "to grow 💪", how: "slowly 🐢" },
+            { who: "The car 🚗", action: "stops 🛑", what: "", whom: "", where: "at the light 🚦", when: "now ⏰", why: "for safety 🛡️", how: "suddenly ❗" },
+            { who: "You 🫵", action: "wear 👕", what: "a hat 🧢", whom: "", where: "outside 🌲", when: "in winter ❄️", why: "because cold 🥶", how: "always ♾️" },
+            { who: "The teacher 👩‍🏫", action: "writes ✍️", what: "words 🔤", whom: "", where: "on the board 🟩", when: "in class 🏫", why: "to teach 🎓", how: "clearly 👀" },
+            { who: "Rain 🌧️", action: "falls 💧", what: "", whom: "", where: "on the ground 🌍", when: "in April 🗓️", why: "for flowers 🌸", how: "softly ☁️" },
+            { who: "My brother 👦", action: "jumps 🦘", what: "", whom: "", where: "on the bed 🛏️", when: "after school 🎒", why: "for fun 😆", how: "high ⬆️" },
+            { who: "The moon 🌙", action: "shines ✨", what: "", whom: "", where: "in the sky 🌌", when: "tonight 🌃", why: "for light 💡", how: "brightly 🌟" },
+            { who: "My friend 👫", action: "calls 📱", what: "me 🙋", whom: "", where: "on the phone 📞", when: "often 🔁", why: "to talk 🗣️", how: "loudly 🔊" },
+            { who: "The baby 👶", action: "cries 😭", what: "", whom: "for milk 🍼", where: "in the crib 🛏️", when: "at night 🌑", why: "because hungry 😋", how: "loudly 📢" },
+            { who: "We 👫", action: "watch 📺", what: "a movie 🎬", whom: "", where: "at the cinema 🍿", when: "on Friday 📅", why: "to relax 😌", how: "quietly 🤫" },
+            { who: "Tom 👨", action: "eats 🍕", what: "pizza 🍕", whom: "", where: "at the party 🎉", when: "today 📅", why: "because tasty 😋", how: "quickly 🏃" },
+            { who: "The bus 🚌", action: "goes 💨", what: "", whom: "", where: "to the city 🏙️", when: "at 8am 🕗", why: "for work 💼", how: "fast 🏎️" },
+            { who: "Grandma 👵", action: "sits 🪑", what: "", whom: "", where: "in the chair 🛋️", when: "in the afternoon ☀️", why: "to rest 💤", how: "calmly 😌" },
+            { who: "I 🙋", action: "love ❤️", what: "my family 👨‍👩‍👧‍👦", whom: "", where: "at home 🏠", when: "always ♾️", why: "because nice 😊", how: "very much 💯" },
+            { who: "The sun ☀️", action: "comes 🌅", what: "up ⬆️", whom: "", where: "in the east 🧭", when: "early 🕖", why: "to start day 📅", how: "brightly 🌟" },
+            { who: "Fish 🐟", action: "swim 🏊", what: "", whom: "", where: "in the water 🌊", when: "all day 🕰️", why: "to live ❤️", how: "fast 💨" },
+            { who: "Dad 👨", action: "washes 🧼", what: "the car 🚗", whom: "", where: "outside 🏡", when: "on Saturday 📅", why: "to clean ✨", how: "well 👍" },
+            { who: "We 👫", action: "dance 💃", what: "", whom: "together 🤝", where: "at the club 🪩", when: "at night 🌙", why: "to music 🎵", how: "happily 😊" },
+            { who: "The girl 👧", action: "draws 🎨", what: "a flower 🌸", whom: "", where: "on paper 📄", when: "in art class 🎨", why: "for fun 😄", how: "neatly 🖊️" },
+            { who: "He 👦", action: "walks 🚶", what: "to school 🏫", whom: "", where: "on the path 🛣️", when: "today 📅", why: "for class 📚", how: "slowly 🐢" },
+            { who: "The horse 🐎", action: "eats 🌾", what: "grass 🌿", whom: "", where: "in the field 🚜", when: "all day ☀️", why: "because hungry 😋", how: "slowly 🐢" },
+            { who: "We 👨‍👩‍👦", action: "listen 👂", what: "to music 🎧", whom: "", where: "in the car 🚗", when: "on trips 🎒", why: "to enjoy 😄", how: "loudly 🔊" },
+            { who: "The shop 🏪", action: "opens 🔓", what: "", whom: "", where: "in town 🏘️", when: "at 9am 🕘", why: "for business 💼", how: "early ⏰" },
+            { who: "You 🫵", action: "help 🤝", what: "me 🙋", whom: "", where: "with homework 📝", when: "now ⏰", why: "because kind 💖", how: "nicely 😊" },
+            { who: "The train 🚂", action: "arrives 🏁", what: "", whom: "", where: "at the station 🚉", when: "soon ⏳", why: "for people 👥", how: "fast 💨" },
+            { who: "We 👫", action: "clean 🧹", what: "the house 🏠", whom: "", where: "inside 🚪", when: "on Sunday 📅", why: "to be tidy ✨", how: "well 👍" },
+            { who: "The star ⭐", action: "twinkles ✨", what: "", whom: "", where: "above us ⬆️", when: "at night 🌌", why: "like a diamond 💎", how: "brightly 🌟" },
+            { who: "My dad 👨", action: "works 💼", what: "", whom: "", where: "in an office 🏢", when: "every week 🗓️", why: "for money 💰", how: "hard 💪" },
+            { who: "She 👩", action: "smiles 🙂", what: "", whom: "at me 🙋", where: "in class 🏫", when: "when happy 😄", why: "because friendly 💖", how: "sweetly 🍬" },
+            { who: "The game 🎮", action: "starts ▶️", what: "", whom: "", where: "on TV 📺", when: "at 5pm 🕔", why: "for fans 📣", how: "soon ⏳" },
+            { who: "I 🙋", action: "brush 🪥", what: "my teeth 🦷", whom: "", where: "in the bathroom 🚽", when: "at night 🌙", why: "to be clean ✨", how: "carefully ⚠️" },
+            { who: "Birds 🐦", action: "fly ✈️", what: "", whom: "", where: "in the sky ☁️", when: "in the morning 🌅", why: "to find food 🐛", how: "high ⬆️" },
+            { who: "We 👫", action: "say 🗣️", what: "hello 👋", whom: "to the teacher 👩‍🏫", where: "at the door 🚪", when: "at 8am 🕗", why: "to be polite 🤝", how: "loudly 📢" },
+            { who: "The snow ❄️", action: "falls 🌨️", what: "", whom: "", where: "outside 🏡", when: "in winter ⛄", why: "from clouds ☁️", how: "silently 🤫" },
+            { who: "Students 🎒", action: "sit 🪑", what: "", whom: "", where: "at desks 🏫", when: "in class 📚", why: "to learn 🧠", how: "quietly 🤫" },
+            { who: "My sister 👧", action: "draws 🖍️", what: "a cat 🐱", whom: "", where: "in her book 📓", when: "after dinner 🍽️", why: "for fun 😆", how: "well 👍" },
+            { who: "We 👫", action: "walk 🚶", what: "", whom: "", where: "in the forest 🌲", when: "on Sunday 📅", why: "for air 🌬️", how: "slowly 🐢" },
+            { who: "The boy 👦", action: "rides 🚴", what: "his bike 🚲", whom: "", where: "to the park 🌳", when: "after school 🎒", why: "to play 🎾", how: "fast 💨" },
+            { who: "I 🙋", action: "see 👀", what: "a big dog 🐕", whom: "", where: "on the street 🛣️", when: "today 📅", why: "walking 🚶", how: "clearly 👓" },
+            { who: "She 👧", action: "likes 👍", what: "ice cream 🍦", whom: "", where: "", when: "in summer ☀️", why: "because cold ❄️", how: "very much 💯" },
+            { who: "He 👨", action: "plays 🎸", what: "guitar 🎸", whom: "", where: "in his room 🏠", when: "at night 🌙", why: "to practice 🎵", how: "loudly 🔊" },
+            { who: "We 👫", action: "drink 🍹", what: "juice 🍊", whom: "", where: "at lunch 🥪", when: "every day 🗓️", why: "because sweet 🍬", how: "happily 😊" },
+            { who: "Teacher 👨‍🏫", action: "reads 📖", what: "a story 📚", whom: "to us 👂", where: "in the library 📖", when: "on Friday 📅", why: "for fun 😄", how: "clearly 🗣️" },
+            { who: "Mom 👩", action: "buys 🛒", what: "food 🍎", whom: "", where: "at the store 🏪", when: "on Friday 📅", why: "for the week 🗓️", how: "carefully 🧐" },
+            { who: "The girl 👧", action: "sings 🎤", what: "", whom: "", where: "in the shower 🚿", when: "in the morning ☀️", why: "because happy 😄", how: "loudly 📢" },
+            { who: "I 🙋", action: "wash 🧼", what: "my hands 👐", whom: "", where: "in the sink 🚰", when: "before dinner 🍽️", why: "to be clean ✨", how: "carefully ⚠️" },
+            { who: "The bus 🚌", action: "goes 🚌", what: "", whom: "", where: "to the city 🏙️", when: "every hour 🕐", why: "for people 👥", how: "slowly 🐢" },
+            { who: "We 😴", action: "sleep 💤", what: "", whom: "", where: "in beds 🛏️", when: "at night 🌙", why: "to rest 🔋", how: "soundly 😴" },
+            { who: "The sun ☀️", action: "rises 🌅", what: "", whom: "", where: "in the morning 🌄", when: "at 6am 🕕", why: "start day 📅", how: "brightly 🌟" },
+            { who: "I ✍️", action: "write 📝", what: "my name 🏷️", whom: "", where: "on paper 📄", when: "in class 🏫", why: "for teacher 👩‍🏫", how: "neatly 🖊️" },
+            { who: "She 👩", action: "buys 🛍️", what: "milk 🥛", whom: "", where: "at the shop 🏪", when: "today 📅", why: "for cereal 🥣", how: "quickly 🏃" },
+            { who: "He 🏃", action: "runs 🏃", what: "", whom: "", where: "to the bus 🚌", when: "in morning ☀️", why: "because late ⌚", how: "fast 💨" },
+            { who: "They 👯", action: "play 🤾", what: "games 🎲", whom: "", where: "outside 🌳", when: "after school 🎒", why: "for fun 😆", how: "happily 😊" },
+            { who: "The cat 🐱", action: "chases 🏃", what: "a mouse 🐭", whom: "", where: "in the house 🏠", when: "sometimes 🕰️", why: "for food 🧀", how: "fast ⚡" },
+            { who: "We 🔭", action: "look 👀", what: "at stars ✨", whom: "", where: "outside 🌌", when: "at night 🌙", why: "because pretty 🤩", how: "quietly 🤫" },
+            { who: "Mom 👩", action: "works 💻", what: "", whom: "", where: "at home 🏡", when: "every day 🗓️", why: "for her job 💼", how: "hard 💪" },
+            { who: "The dog 🐕", action: "sleeps 💤", what: "", whom: "", where: "on the floor 🧱", when: "in afternoon ☀️", why: "to rest 🔋", how: "quietly 🤫" },
+            { who: "I 🙋", action: "close 🚪", what: "the window 🪟", whom: "", where: "in my room 🛌", when: "at night 🌙", why: "because cold 🥶", how: "tightly 🔒" },
+            { who: "She 👗", action: "wears 👗", what: "a red dress 💃", whom: "", where: "to the party 🎉", when: "tonight 🌃", why: "to look nice 💅", how: "proudly 🦚" },
+            { who: "He 🎁", action: "gives 🎁", what: "a flower 🌹", whom: "to his mom 👩", where: "at home 🏠", when: "on Sunday 📅", why: "for love ❤️", how: "kindly 🤝" },
+            { who: "We 🍰", action: "make 🎂", what: "a cake 🍰", whom: "", where: "in kitchen 🍳", when: "for birthday 🎂", why: "to eat 🍴", how: "carefully 🧐" },
+            { who: "Rain 🌧️", action: "hits ☔", what: "the window 🪟", whom: "", where: "in my room 🏠", when: "now ⏰", why: "from storm ⛈️", how: "hard 🔨" },
+            { who: "I 📖", action: "read 📖", what: "words 🔡", whom: "", where: "in the book 📘", when: "in class 🏫", why: "to learn 🧠", how: "slowly 🐢" },
+            { who: "The bird 🦅", action: "flies ✈️", what: "", whom: "", where: "to the nest 🪺", when: "at night 🌙", why: "to sleep 😴", how: "fast 💨" },
+            { who: "My friend 👯", action: "smiles 😊", what: "", whom: "", where: "at school 🏫", when: "today 📅", why: "because happy 😄", how: "nicely 🌸" },
+            { who: "The car 🚗", action: "stops 🛑", what: "", whom: "", where: "at the sign 🛑", when: "now ⏰", why: "for safety 🛡️", how: "quickly ⚡" },
+            { who: "We 🤸", action: "jump 🤸", what: "rope ➰", whom: "", where: "in the yard 🏡", when: "after lunch 🥪", why: "for exercise 💪", how: "high ⬆️" },
+            { who: "She 📞", action: "calls 📱", what: "her dad 👨", whom: "", where: "on phone 📞", when: "at night 🌙", why: "to say hello 👋", how: "happily 😊" },
+            { who: "He 📦", action: "opens 📦", what: "the box 📦", whom: "", where: "on table 🪑", when: "now ⏰", why: "to see inside 👀", how: "carefully 🧐" },
+            { who: "They 🚶", action: "walk 🚶", what: "", whom: "", where: "to the shop 🏪", when: "in morning ☀️", why: "to buy food 🍎", how: "together 🤝" },
+            { who: "Wind 🌬️", action: "blows 🌬️", what: "", whom: "", where: "outside 🌳", when: "today 📅", why: "weather 🌤️", how: "strongly 💪" },
+            { who: "I 🆘", action: "help 🆘", what: "my mom 👩", whom: "", where: "in kitchen 🍳", when: "at dinner 🍽️", why: "to be good 😇", how: "well 👍" },
+            { who: "The baby 👶", action: "plays 🧸", what: "with toys 🧸", whom: "", where: "on rug 🧶", when: "now ⏰", why: "for fun 😆", how: "happily 😊" },
+            { who: "We 🧘", action: "sit 🧘", what: "", whom: "", where: "on grass 🌱", when: "in summer ☀️", why: "to relax 😌", how: "calmly 🍃" },
+            { who: "Dad 🚗", action: "drives 🚘", what: "the car 🚗", whom: "", where: "to work 🏢", when: "at 8am 🕗", why: "to go there 📍", how: "safely 🛡️" },
+            { who: "The girl 🥪", action: "eats 🥪", what: "lunch 🍱", whom: "", where: "at school 🏫", when: "at 12pm 🕛", why: "because hungry 😋", how: "quickly 🏃" },
+            { who: "I ❤️", action: "love ❤️", what: "my dog 🐶", whom: "", where: "at home 🏠", when: "always ♾️", why: "he is cute 🥺", how: "truly 💖" },
+            { who: "The boy ✍️", action: "writes ✍️", what: "a letter ✉️", whom: "to grandma 👵", where: "at desk 🪑", when: "today 📅", why: "to say hi 👋", how: "slowly 🐢" },
+            { who: "We 🍿", action: "watch 🍿", what: "a movie 🎬", whom: "", where: "at cinema 🎥", when: "on Saturday 📅", why: "for fun 😆", how: "quietly 🤫" },
+            { who: "She 🚿", action: "washes 🧼", what: "her face 👱‍♀️", whom: "", where: "in bathroom 🚽", when: "in morning ☀️", why: "to be clean ✨", how: "well 👍" },
+            { who: "He 👂", action: "listens 👂", what: "to teacher 👩‍🏫", whom: "", where: "in class 🏫", when: "now ⏰", why: "to learn 🧠", how: "carefully 🧐" },
+            { who: "Sun 🌅", action: "goes 📉", what: "", whom: "", where: "down ⬇️", when: "at night 🌙", why: "end day 🔚", how: "slowly 🐢" },
+            { who: "I 😊", action: "am 😊", what: "happy 😄", whom: "", where: "at school 🏫", when: "today 📅", why: "friends 👫", how: "very 💯" },
+            { who: "We 👨‍👩‍👧", action: "are 👨‍👩‍👧", what: "family ❤️", whom: "", where: "at home 🏠", when: "always ♾️", why: "love ❤️", how: "truly ✨" },
+            { who: "Sam 🧑", action: "kicks ⚽", what: "the ball ⚽", whom: "to Ben 🧑", where: "in park 🌳", when: "tomorrow 📅", why: "to practice 🏃", how: "happily 😊" },
+            { who: "The cat 🐈", action: "sleeps 💤", what: "", whom: "", where: "on rug 🧶", when: "all day 🕰️", why: "tired 😴", how: "quietly 🤫" },
+            { who: "I 🍎", action: "eat 🍎", what: "an apple 🍎", whom: "", where: "in kitchen 🍳", when: "morning ☀️", why: "breakfast 🥣", how: "slowly 🐢" },
+            { who: "She 🚶‍♀️", action: "walks 🚶‍♀️", what: "to school 🏫", whom: "", where: "on street 🛣️", when: "every day 🗓️", why: "to learn 🧠", how: "quickly 🏃‍♀️" },
+            { who: "The dog 🐕", action: "barks 🗣️", what: "", whom: "at mailman 📮", where: "in garden 🏡", when: "at noon 🕛", why: "protect 🛡️", how: "loudly 🔊" },
+            { who: "We ⚽", action: "play ⚽", what: "soccer ⚽", whom: "with friends 👫", where: "at field 🥅", when: "on Sunday 📅", why: "fun 😆", how: "well 👍" },
+            { who: "Mom 👩‍🍳", action: "cooks 🥘", what: "dinner 🥘", whom: "for us 👨‍👩‍👧", where: "at home 🏠", when: "at 6pm 🕕", why: "hungry 😋", how: "nicely 👌" },
+            { who: "Bird 🐦", action: "sings 🎶", what: "song 🎵", whom: "", where: "in tree 🌳", when: "now ⏰", why: "morning ☀️", how: "sweetly 🍬" },
+            { who: "They 📺", action: "watch 📺", what: "TV 📺", whom: "", where: "in room 🛋️", when: "after dinner 🍽️", why: "relax 😌", how: "quietly 🤫" }
+        ];
+
+        // --- State Management ---
+        let currentIndex = 0;
+        let points = 0;
+        let currentActive = null;
+
+        // --- DOM Elements ---
+        const container = document.getElementById('sentence-container');
+        const counterDisplay = document.getElementById('counter');
+        const pointsDisplay = document.getElementById('pointsDisplay');
+
+        // --- Config ---
+        const config = {
+            'who': { id: 'part-who', class: 'active-orange', label: 'Who?' },
+            'action': { id: 'part-action', class: 'active-yellow', label: 'Action' },
+            'what': { id: 'part-what', class: 'active-green', label: 'What?' },
+            'where': { id: 'part-where', class: 'active-blue', label: 'Where?' },
+            'when': { id: 'part-when', class: 'active-brown', label: 'When?' },
+            'whom': { id: 'part-whom', class: 'active-pink', label: 'To Whom?' },
+            'why': { id: 'part-why', class: 'active-purple', label: 'Why?' },
+            'how': { id: 'part-how', class: 'active-teal', label: 'How?' }
+        };
+
+        // --- Render Logic ---
+        function renderSentence() {
+            if (allSentences.length === 0) return;
+            const s = allSentences[currentIndex];
+            container.innerHTML = ''; // Clear previous
+            currentActive = null; 
+
+            // Define parts in order
+            const parts = ['who', 'action', 'what', 'whom', 'where', 'when', 'why', 'how'];
+
+            // Create masked elements
+            parts.forEach(key => {
+                if (s[key]) {
+                    const span = document.createElement('span');
+                    span.id = config[key].id;
+                    span.className = 'sentence-part';
+                    span.setAttribute('data-full-text', s[key]);
+                    span.setAttribute('data-label', config[key].label); // Set label for CSS ::before
+                    // span.textContent = "_____"; // Hidden state (handled by color transparent now)
+                    span.textContent = s[key]; // Text is there but hidden by color:transparent
+                    
+                    // Allow clicking the word itself to reveal
+                    span.onclick = () => activatePart(key);
+                    
+                    container.appendChild(span);
+                }
+            });
+
+            counterDisplay.textContent = `${currentIndex + 1}/${allSentences.length}`;
+            resetStyles();
+        }
+
+        function resetStyles() {
+            const parts = document.querySelectorAll('.sentence-part');
+            parts.forEach(p => {
+                p.classList.remove('revealed', 'active-orange', 'active-yellow', 'active-green', 'active-blue', 'active-brown', 'active-pink', 'active-purple', 'active-teal');
+                // Ensure text is hidden again
+            });
+        }
+
+        // --- Interaction Logic ---
+        function activatePart(partName) {
+            const targetConfig = config[partName];
+            if (!targetConfig) return;
+
+            const el = document.getElementById(targetConfig.id);
+            
+            // If element exists for this sentence
+            if (el) {
+                // Remove active highlight from all others to focus on this one
+                document.querySelectorAll('.sentence-part').forEach(p => {
+                    // Remove specific active color classes but keep 'revealed' if it was revealed
+                    Object.values(config).forEach(c => p.classList.remove(c.class));
+                });
+
+                // Add revealed class (makes text visible) and specific color class
+                el.classList.add('revealed');
+                el.classList.add(targetConfig.class);
+                
+                // Animation for emphasis
+                el.animate([
+                    { transform: 'scale(1)' },
+                    { transform: 'scale(1.1)' },
+                    { transform: 'scale(1)' }
+                ], { duration: 200 });
+
+                // Speak just this part
+                speakText(el.innerText);
+            }
+        }
+
+        function revealAll() {
+            const parts = document.querySelectorAll('.sentence-part');
+            parts.forEach(el => {
+                el.classList.add('revealed');
+                // Add default border color or keep gray
+                el.style.borderBottomStyle = 'solid';
+            });
+        }
+
+        // --- Navigation ---
+        function nextSentence() {
+            if (currentIndex < allSentences.length - 1) {
+                currentIndex++;
+                renderSentence();
+            }
+        }
+
+        function prevSentence() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderSentence();
+            }
+        }
+
+        function goHome() {
+            currentIndex = 0;
+            renderSentence();
+        }
+
+        function randomSentence() {
+            currentIndex = Math.floor(Math.random() * allSentences.length);
+            renderSentence();
+        }
+
+        // --- Points ---
+        function addPoint() {
+            points += 5;
+            pointsDisplay.textContent = points;
+            const btn = document.getElementById('pointsBtn');
+            btn.classList.remove('pop-anim');
+            void btn.offsetWidth; 
+            btn.classList.add('pop-anim');
+            playDing();
+        }
+
+        function playDing() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                const ctx = new AudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.05, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            }
+        }
+
+        // --- TTS Logic (Emoji Stripping + Slow Speed + Voice Rotation) ---
+        const synth = window.speechSynthesis;
+        let voices = [];
+
+        function populateVoices() {
+            voices = synth.getVoices();
+        }
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoices;
+        }
+
+        function speakText(text) {
+            if (synth.speaking) synth.cancel();
+
+            // Strip emojis using regex so the robot doesn't read them
+            const cleanText = text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
+
+            const utterThis = new SpeechSynthesisUtterance(cleanText);
+            
+            // User Preference: 85% speed
+            utterThis.rate = 0.85; 
+
+            // Voice Rotation Logic based on currentIndex
+            // Preferred voices: Brian, Emma, Ava, Andrew
+            const preferredRotation = ['Brian', 'Emma', 'Ava', 'Andrew'];
+            
+            // Determine which name to look for based on index (0,1,2,3,0,1...)
+            const targetName = preferredRotation[currentIndex % preferredRotation.length];
+
+            if (voices.length === 0) populateVoices();
+            
+            let selectedVoice = null;
+
+            // 1. Try to find the specific "Microsoft [Name] Online (Natural)" voice
+            selectedVoice = voices.find(v => v.name.includes(targetName) && v.name.includes('Online'));
+            
+            // 2. Fallback: Try to find just the name (e.g. offline versions)
+            if (!selectedVoice) {
+                selectedVoice = voices.find(v => v.name.includes(targetName));
+            }
+
+            // 3. Fallback: Generic English
+            if (!selectedVoice) {
+                selectedVoice = voices.find(v => v.lang.includes('en'));
+            }
+
+            if (selectedVoice) utterThis.voice = selectedVoice;
+
+            synth.speak(utterThis);
+        }
+
+        function speakSentence() {
+            // Get full text from data attributes to ensure we get hidden parts too if user clicks Read before revealing
+            // Or just read visible text? Better to read full sentence for comprehension.
+            const parts = document.querySelectorAll('.sentence-part');
+            let sentence = "";
+            parts.forEach(p => sentence += p.getAttribute('data-full-text') + " ");
+            speakText(sentence);
+        }
+        
+        // Initial load
+        window.onload = () => {
+            setTimeout(populateVoices, 100);
+            renderSentence();
+        };
+
+    </script>
+</body>
+</html>
