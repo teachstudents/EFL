@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Food Fun: Learn English</title>
     
     <!-- Fonts -->
@@ -24,6 +24,7 @@
         body {
             font-family: "Comic Sans MS", "Chalkboard SE", "Comic Neue", sans-serif;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(10px); }
@@ -32,15 +33,49 @@
         .animate-fade-in {
           animation: fade-in 0.5s ease-out forwards;
         }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFFDF0; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useCallback } = React;
 
-        // --- Inline Icons to avoid UMD dependency issues ---
+        // --- Safe Storage Helper ---
+        // Prevents crashes in iframe/incognito modes where localStorage is restricted
+        const safeStorage = {
+            getItem: (key) => {
+                try {
+                    return localStorage.getItem(key);
+                } catch (e) {
+                    console.warn('LocalStorage access denied', e);
+                    return null;
+                }
+            },
+            setItem: (key, value) => {
+                try {
+                    localStorage.setItem(key, value);
+                } catch (e) {
+                    console.warn('LocalStorage write failed', e);
+                }
+            }
+        };
+
+        // --- Inline Icons ---
         const Star = (props) => (
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
@@ -76,31 +111,39 @@
             const [currentCategory, setCurrentCategory] = useState(null);
             const [grammarMode, setGrammarMode] = useState(null);
             const [currentPage, setCurrentPage] = useState(0);
-            // Initialize score from localStorage
+            
+            // Initialize score from localStorage safely
             const [score, setScore] = useState(() => {
-                const saved = localStorage.getItem('foodFunScore');
+                const saved = safeStorage.getItem('foodFunScore');
                 return saved ? parseInt(saved, 10) : 0;
             });
+            
             const [confetti, setConfetti] = useState(false);
             const [shuffledItems, setShuffledItems] = useState([]);
             const [voices, setVoices] = useState([]);
             const [revealedItems, setRevealedItems] = useState({});
 
-            // Save score to localStorage whenever it changes
+            // Save score safely
             useEffect(() => {
-                localStorage.setItem('foodFunScore', score);
+                safeStorage.setItem('foodFunScore', score);
             }, [score]);
 
             // --- Voice Setup ---
             useEffect(() => {
                 const loadVoices = () => {
+                    // Filter out non-local voices if possible to reduce latency, 
+                    // but keep high quality online ones if available
                     const available = window.speechSynthesis.getVoices();
-                    setVoices(available);
+                    if (available.length > 0) {
+                        setVoices(available);
+                    }
                 };
 
                 loadVoices();
-                // Browsers load voices asynchronously
-                window.speechSynthesis.onvoiceschanged = loadVoices;
+                // Chrome loads voices asynchronously
+                if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                    window.speechSynthesis.onvoiceschanged = loadVoices;
+                }
             }, []);
 
             // Reset revealed items when page or mode changes
@@ -118,9 +161,11 @@
                 'Drink': 'Brian'
             };
 
-            const playAudio = (text) => {
+            const playAudio = useCallback((text) => {
                 if ('speechSynthesis' in window) {
+                    // Cancel current speech to prevent queue buildup
                     window.speechSynthesis.cancel();
+                    
                     const utterance = new SpeechSynthesisUtterance(text);
                     
                     // Determine target voice name based on category
@@ -134,10 +179,11 @@
                     if (selected) utterance.voice = selected;
                     
                     utterance.lang = 'en-US';
-                    utterance.rate = 0.9;
+                    utterance.rate = 0.85; // Set to 85% speed for clarity
+                    
                     window.speechSynthesis.speak(utterance);
                 }
-            };
+            }, [currentCategory, voices]);
 
             const handleItemClick = (idx, audioText, isTest) => {
                 playAudio(audioText);
