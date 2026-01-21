@@ -41,6 +41,14 @@
         .animate-pop {
             animation: pop 0.2s ease-in-out;
         }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake {
+            animation: shake 0.3s ease-in-out;
+        }
         /* Hide scrollbar for clean UI */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
@@ -69,6 +77,55 @@
             }
         };
 
+        // --- Audio Helper (Synth) ---
+        const playSound = (type) => {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                const now = ctx.currentTime;
+                
+                if (type === 'correct') {
+                    // Ding sound (Sine wave, high pitch)
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(1000, now + 0.1);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                } else if (type === 'wrong') {
+                    // Buzz sound (Sawtooth, low pitch)
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'complete') {
+                    // Victory chord
+                    [400, 500, 600].forEach((freq, i) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.type = 'triangle';
+                        o.frequency.value = freq;
+                        g.gain.setValueAtTime(0.1, now);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + 1);
+                        o.start(now + i * 0.1);
+                        o.stop(now + 1.5);
+                    });
+                }
+            } catch (e) {
+                console.warn("Audio context failed", e);
+            }
+        };
+
         // --- Icons ---
         const Zap = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
         const Home = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
@@ -77,6 +134,7 @@
         const ArrowLeft = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>;
         const Check = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" {...props}><polyline points="20 6 9 17 4 12"/></svg>;
         const XIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
+        const Fire = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" {...props}><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-5-6.33-5-6.33S1 10.62 1 12a2.5 2.5 0 002.5 2.5 2.5 2.5 0 002.5-2.5 2.5 2.5 0 002.5 2.5z" transform="scale(1.5) translate(2,2)"/><path d="M15.58 7.37a5.55 5.55 0 00-1.66-2.61c-.55 2.12-2 3.69-2 3.69s1 5.34-3.13 8.36c4.69 2.15 9.21-1.77 9.21-5.71 0-1.92-1.34-3.52-2.42-3.73z"/></svg>;
 
         // --- Helpers for Grammar/Capitalization ---
         const cap = (str) => {
@@ -152,28 +210,19 @@
                 desc: 'Present Simple',
                 color: 'bg-sky-100 text-sky-800 border-sky-300',
                 construct: (verb, subject, marker, form = 'pos') => {
-                    // Logic: Mid-sentence adverbs (always/usually) vs End-sentence phrases (every day)
                     const isMid = marker.type === 'mid';
                     const markerText = marker.text;
                     const v = subject.type === 'third' ? verb.s : verb.base;
 
                     if (form === 'neg') {
                         const aux = subject.do === 'does' ? "doesn't" : "don't";
-                        // Ex: He doesn't usually play. (Mid) / He doesn't play every day. (End)
                         if (isMid) {
-                            return { 
-                                text: `${subject.pronoun} ${aux} ${markerText} ${verb.base}.`, 
-                                audio: `${subject.pronoun} ${aux} ${markerText} ${verb.base}.` 
-                            };
+                            return { text: `${subject.pronoun} ${aux} ${markerText} ${verb.base}.`, audio: `${subject.pronoun} ${aux} ${markerText} ${verb.base}.` };
                         } else {
-                            return { 
-                                text: `${subject.pronoun} ${aux} ${verb.base} ${markerText}.`, 
-                                audio: `${subject.pronoun} ${aux} ${verb.base} ${markerText}.` 
-                            };
+                            return { text: `${subject.pronoun} ${aux} ${verb.base} ${markerText}.`, audio: `${subject.pronoun} ${aux} ${verb.base} ${markerText}.` };
                         }
                     }
                     if (form === 'que') {
-                        // Ex: Does he usually play? (Mid) / Does he play every day? (End)
                         if (isMid) {
                              const question = `${cap(subject.do)} ${formatSubject(subject.pronoun)} ${markerText} ${verb.base}?`;
                              return { text: question, audio: question };
@@ -182,7 +231,6 @@
                              return { text: question, audio: question };
                         }
                     }
-                    // Pos: He always plays (Mid) / He plays every day (End)
                     if (isMid) {
                          return { text: `${subject.pronoun} ${markerText} ${v}.`, audio: `${subject.pronoun} ${markerText} ${v}.` };
                     } else {
@@ -196,7 +244,7 @@
                 desc: 'Present Continuous',
                 color: 'bg-rose-100 text-rose-800 border-rose-300',
                 construct: (verb, subject, marker, form = 'pos') => {
-                    const markerText = marker.text; // Always at end for now
+                    const markerText = marker.text; 
                     if (form === 'neg') {
                         return { text: `${subject.pronoun} ${subject.be} not ${verb.cont} ${markerText}.`, audio: `${subject.pronoun} ${subject.be} not ${verb.cont} ${markerText}.` };
                     }
@@ -213,7 +261,7 @@
                 desc: 'Past Simple',
                 color: 'bg-amber-100 text-amber-800 border-amber-300',
                 construct: (verb, subject, marker, form = 'pos') => {
-                    const markerText = marker.text; // Always at end
+                    const markerText = marker.text; 
                     if (form === 'neg') {
                         return { text: `${subject.pronoun} didn't ${verb.base} ${markerText}.`, audio: `${subject.pronoun} didn't ${verb.base} ${markerText}.` };
                     }
@@ -247,7 +295,6 @@
                 desc: 'Present Perfect',
                 color: 'bg-teal-100 text-teal-800 border-teal-300',
                 construct: (verb, subject, marker, form = 'pos') => {
-                    // Marker not used heavily here to keep simple, defaulting to standard patterns
                      if (form === 'neg') {
                         return { text: `${subject.pronoun} ${subject.have} never ${verb.pp}.`, audio: `${subject.pronoun} ${subject.have} never ${verb.pp}.` };
                     }
@@ -263,12 +310,13 @@
         // --- SUB-VIEWS ---
 
         // 1. Practice Mode (Drill + Toggle)
-        const PracticeView = ({ items, mode, speak, onScore }) => {
+        const PracticeView = ({ items, mode, speak, onScore, onStreak }) => {
             const [formState, setFormState] = useState({}); // { 0: 'pos', 1: 'neg' ... }
 
             const toggleForm = (idx, form, e) => {
                 e.stopPropagation();
                 setFormState(prev => ({...prev, [idx]: form}));
+                playSound('correct'); // Minor feedback on toggle
             };
 
             return (
@@ -280,15 +328,11 @@
                         return (
                             <div key={idx} className="bg-white rounded-3xl border-4 border-slate-100 shadow-sm overflow-hidden group hover:border-blue-200 transition-colors">
                                 <div className="p-4 flex flex-col md:flex-row items-center gap-4">
-                                    {/* Emoji & Subject */}
                                     <div className="bg-slate-50 p-4 rounded-2xl flex flex-col items-center min-w-[100px] border border-slate-100">
                                         <span className="text-5xl transform group-hover:scale-110 transition-transform">{item.verb.emoji}</span>
                                         <span className="font-bold text-slate-500 mt-2">{item.subject.pronoun}</span>
                                     </div>
-
-                                    {/* Controls & Sentence */}
                                     <div className="flex-grow w-full flex flex-col items-center md:items-start gap-3">
-                                        {/* Toggle */}
                                         <div className="flex bg-slate-100 rounded-lg p-1 gap-1">
                                             {['pos', 'neg', 'que'].map(f => (
                                                 <button 
@@ -300,7 +344,6 @@
                                                 </button>
                                             ))}
                                         </div>
-
                                         <p className="text-xl md:text-2xl font-bold text-slate-800 text-center md:text-left cursor-pointer hover:text-blue-600" onClick={() => speak(content.audio)}>
                                             {content.text}
                                         </p>
@@ -314,7 +357,7 @@
         };
 
         // 2. Quiz View (Multiple Choice)
-        const QuizView = ({ items, mode, speak, onScore }) => {
+        const QuizView = ({ items, mode, speak, onScore, onStreak }) => {
             const [answered, setAnswered] = useState({}); // { idx: 'correct' | 'wrong' }
 
             const handleAnswer = (idx, isCorrect, correctText) => {
@@ -322,11 +365,15 @@
                 
                 if (isCorrect) {
                     onScore(10);
+                    onStreak(true);
                     setAnswered(prev => ({...prev, [idx]: 'correct'}));
                     speak("Correct! " + correctText);
+                    playSound('correct');
                 } else {
+                    onStreak(false);
                     setAnswered(prev => ({...prev, [idx]: 'wrong'}));
                     speak("Try again.");
+                    playSound('wrong');
                     setTimeout(() => setAnswered(prev => {
                          const copy = {...prev};
                          delete copy[idx];
@@ -342,33 +389,27 @@
 
                 if (mode === 'habit') {
                     const wrongV = item.subject.type === 'third' ? item.verb.base : item.verb.s; 
-                    // Distractor 1: Wrong verb conjugation (He play vs He plays)
                     if (item.marker.type === 'mid') {
                          distractors.push(`${item.subject.pronoun} ${mText} ${wrongV}.`);
                     } else {
                          distractors.push(`${item.subject.pronoun} ${wrongV} ${mText}.`);
                     }
-                    // Distractor 2: Present continuous usage
                     distractors.push(`${item.subject.pronoun} ${item.verb.cont} ${mText}.`);
-
                 } else if (mode === 'now') {
-                    distractors.push(`${item.subject.pronoun} ${item.verb.cont} ${mText}.`); // Missing 'be'
-                    distractors.push(`${item.subject.pronoun} ${item.subject.be} ${item.verb.base} ${mText}.`); // Wrong verb form
+                    distractors.push(`${item.subject.pronoun} ${item.verb.cont} ${mText}.`);
+                    distractors.push(`${item.subject.pronoun} ${item.subject.be} ${item.verb.base} ${mText}.`);
                 } else if (mode === 'past') {
                     distractors.push(`${item.subject.pronoun} ${item.verb.base} ${mText}.`);
                     distractors.push(`${item.subject.pronoun} ${item.subject.be} ${item.verb.past} ${mText}.`);
                 } else if (mode === 'future') {
-                     distractors.push(`${item.subject.pronoun} going to ${item.verb.base} ${mText}.`); // Missing BE
-                     distractors.push(`${item.subject.pronoun} will going to ${item.verb.base} ${mText}.`); // Confused future
+                     distractors.push(`${item.subject.pronoun} going to ${item.verb.base} ${mText}.`);
+                     distractors.push(`${item.subject.pronoun} will going to ${item.verb.base} ${mText}.`);
                 } else if (mode === 'perfect') {
-                     // Wrong Aux (Have vs Has)
                      const wrongAux = item.subject.have === 'has' ? 'have' : 'has';
                      distractors.push(`${item.subject.pronoun} ${wrongAux} ${item.verb.pp} before.`);
-                     // Wrong Verb Form (Base instead of PP)
                      distractors.push(`${item.subject.pronoun} ${item.subject.have} ${item.verb.base} before.`);
                 }
                 
-                // Fallback padding if something goes wrong
                 if (distractors.length < 2) {
                     distractors.push(`${item.subject.pronoun} ${item.verb.base}.`);
                     distractors.push(`${item.subject.pronoun} is ${item.verb.base}.`);
@@ -388,13 +429,12 @@
                         const options = useMemo(() => generateOptions(item), [item]);
 
                         return (
-                            <div key={idx} className={`bg-white rounded-3xl border-4 p-6 shadow-sm transition-all ${status === 'correct' ? 'border-green-400 bg-green-50' : status === 'wrong' ? 'border-red-400' : 'border-slate-100'}`}>
+                            <div key={idx} className={`bg-white rounded-3xl border-4 p-6 shadow-sm transition-all ${status === 'correct' ? 'border-green-400 bg-green-50' : status === 'wrong' ? 'border-red-400 animate-shake' : 'border-slate-100'}`}>
                                 <div className="flex flex-col items-center gap-4">
                                     <div className="flex items-center gap-2">
                                         <span className="text-4xl">{item.verb.emoji}</span>
                                         <span className="text-xl font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg">{item.subject.pronoun}</span>
                                     </div>
-                                    
                                     <div className="grid gap-2 w-full">
                                         {options.map((opt, oIdx) => (
                                             <button
@@ -420,19 +460,18 @@
         };
 
         // 3. Scramble View (Word Order)
-        const ScrambleView = ({ items, mode, speak, onScore }) => {
+        const ScrambleView = ({ items, mode, speak, onScore, onStreak, onExit }) => {
             const [currentIdx, setCurrentIdx] = useState(0);
             const [builtSentence, setBuiltSentence] = useState([]);
             const [availableWords, setAvailableWords] = useState([]);
             const [isCorrect, setIsCorrect] = useState(null);
+            const [isFinished, setIsFinished] = useState(false);
 
             const currentItem = items[currentIdx];
             const targetSentence = currentItem ? modes[mode].construct(currentItem.verb, currentItem.subject, currentItem.marker, 'pos').text : "";
 
-            // Init puzzle
             useEffect(() => {
                 if (currentItem) {
-                    // Split, remove punctuation, shuffle
                     const words = targetSentence.replace(/[.?!]/g, '').split(' ');
                     setAvailableWords(words.map((w, i) => ({ id: i, text: w })).sort(() => 0.5 - Math.random()));
                     setBuiltSentence([]);
@@ -443,6 +482,7 @@
             const handleWordClick = (word) => {
                 setBuiltSentence([...builtSentence, word]);
                 setAvailableWords(availableWords.filter(w => w.id !== word.id));
+                playSound('correct'); // Subtle click sound
             };
 
             const handleRemoveWord = (word) => {
@@ -456,12 +496,15 @@
                 
                 if (userStr === targetClean) {
                     setIsCorrect(true);
+                    onStreak(true);
                     speak("Great job! " + targetSentence);
                     onScore(15);
+                    playSound('correct');
                 } else {
                     setIsCorrect(false);
+                    onStreak(false);
                     speak("Not quite.");
-                    // Reset
+                    playSound('wrong');
                     setTimeout(() => {
                         setIsCorrect(null);
                         setAvailableWords([...availableWords, ...builtSentence]);
@@ -471,26 +514,44 @@
             };
 
             const next = () => {
-                if (currentIdx < items.length - 1) setCurrentIdx(p => p + 1);
+                if (currentIdx < items.length - 1) {
+                    setCurrentIdx(p => p + 1);
+                } else {
+                    setIsFinished(true);
+                    playSound('complete');
+                }
             };
 
-            if (!currentItem) return <div>Done!</div>;
+            if (isFinished) {
+                return (
+                    <div className="w-full max-w-xl animate-pop flex flex-col items-center gap-6 p-6">
+                        <div className="bg-white rounded-3xl border-4 border-yellow-300 p-8 flex flex-col items-center gap-6 shadow-lg text-center w-full">
+                            <div className="text-6xl">🏆</div>
+                            <h2 className="text-3xl font-bold text-slate-800">Level Complete!</h2>
+                            <p className="text-slate-500">You unscrambled all the sentences.</p>
+                            <button onClick={onExit} className="w-full bg-blue-500 text-white font-bold py-3 rounded-xl shadow-lg border-b-4 border-blue-700 active:border-b-0 active:translate-y-1">
+                                Play Again
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (!currentItem) return null;
 
             return (
                 <div className="w-full max-w-xl animate-slide-up flex flex-col gap-6">
-                    <div className="bg-white rounded-3xl border-4 border-slate-100 p-6 flex flex-col items-center gap-6 min-h-[300px] shadow-sm relative overflow-hidden">
+                    <div className={`bg-white rounded-3xl border-4 p-6 flex flex-col items-center gap-6 min-h-[300px] shadow-sm relative overflow-hidden transition-colors ${isCorrect === false ? 'border-red-300 animate-shake' : 'border-slate-100'}`}>
                         
                         {isCorrect && <div className="absolute inset-0 bg-green-100/90 z-10 flex items-center justify-center animate-pop">
                             <Check className="w-24 h-24 text-green-600" />
                         </div>}
 
-                        {/* Hint */}
                         <div className="flex gap-4 items-center">
                             <span className="text-6xl">{currentItem.verb.emoji}</span>
                             <span className="bg-slate-100 px-3 py-1 rounded-lg font-bold text-slate-500">{currentItem.subject.pronoun}</span>
                         </div>
 
-                        {/* Drop Zone */}
                         <div className="w-full bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl min-h-[80px] flex flex-wrap items-center justify-center p-2 gap-2">
                             {builtSentence.map(w => (
                                 <button key={w.id} onClick={() => handleRemoveWord(w)} className="bg-white border-2 border-blue-200 text-blue-800 px-3 py-1 rounded-lg font-bold shadow-sm animate-pop">
@@ -500,7 +561,6 @@
                             {builtSentence.length === 0 && <span className="text-slate-300 font-bold">Tap words below</span>}
                         </div>
 
-                        {/* Word Bank */}
                         <div className="flex flex-wrap gap-2 justify-center">
                             {availableWords.map(w => (
                                 <button key={w.id} onClick={() => handleWordClick(w)} className="bg-slate-100 hover:bg-slate-200 text-slate-700 border-b-4 border-slate-300 active:border-b-0 active:translate-y-1 px-4 py-2 rounded-xl font-bold transition-all">
@@ -509,7 +569,6 @@
                             ))}
                         </div>
 
-                        {/* Actions */}
                         <div className="mt-auto flex w-full gap-2">
                              {isCorrect ? (
                                  <button onClick={next} className="w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg border-b-4 border-green-700 active:border-b-0 active:translate-y-1">Next Sentence</button>
@@ -528,20 +587,19 @@
 
         // --- MAIN APP ---
         const MainApp = () => {
-            const [view, setView] = useState('home'); // home, category, activity_select, active_game
+            const [view, setView] = useState('home');
             const [activeCategory, setActiveCategory] = useState(null);
-            const [activeMode, setActiveMode] = useState(null); // tense
-            const [activeActivity, setActiveActivity] = useState(null); // 'drill', 'quiz', 'scramble'
+            const [activeMode, setActiveMode] = useState(null);
+            const [activeActivity, setActiveActivity] = useState(null);
             
             const [score, setScore] = useState(() => parseInt(safeStorage.getItem('actionStarScore') || '0'));
+            const [streak, setStreak] = useState(0); // New Streak State
             const [voices, setVoices] = useState([]);
             
-            // Game State
-            const [items, setItems] = useState([]); // Array of {verb, subject}
+            const [items, setItems] = useState([]);
 
             useEffect(() => { safeStorage.setItem('actionStarScore', score); }, [score]);
 
-            // Enhanced Voice Loading
             useEffect(() => {
                 const load = () => {
                     const vs = window.speechSynthesis.getVoices();
@@ -555,24 +613,20 @@
                 window.speechSynthesis.cancel();
                 const u = new SpeechSynthesisUtterance(text);
                 
-                // Specific priority for Microsoft English Multilingual as requested
                 const preferred = voices.find(v => v.name.includes('Microsoft English Multilingual')) ||
                                   voices.find(v => v.name.includes('Microsoft Ryan')) ||
                                   voices.find(v => v.name.includes('Google US English')) || 
                                   voices.find(v => v.lang === 'en-US');
                                   
                 if (preferred) u.voice = preferred;
-                
-                u.rate = 0.85; // Slowed down for secondary students
+                u.rate = 0.85; 
                 window.speechSynthesis.speak(u);
             }, [voices]);
 
             const generateItems = (catKey, modeKey) => {
-                // Generate random subject + verb pairings
                 const catData = categories[catKey];
                 const pool = [...catData.verbs].sort(() => 0.5 - Math.random());
                 
-                // Define markers per mode
                 const markers = {
                     'habit': [
                         { text: 'every day', type: 'end' },
@@ -624,7 +678,13 @@
             const startGame = (activityType) => {
                 setActiveActivity(activityType);
                 setItems(generateItems(activeCategory, activeMode));
+                setStreak(0); // Reset streak on new game start? Or keep global? Let's reset for new session focus.
                 setView('active_game');
+            };
+
+            const handleStreak = (isCorrect) => {
+                if (isCorrect) setStreak(s => s + 1);
+                else setStreak(0);
             };
 
             // RENDERERS
@@ -733,14 +793,23 @@
                             </span>
                         </div>
 
-                        <button onClick={() => setItems(generateItems(activeCategory, activeMode))} className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400">
-                            <Refresh />
-                        </button>
+                        {/* Streak Display */}
+                        <div className="flex items-center gap-4">
+                            {streak > 1 && (
+                                <div className="flex items-center gap-1 bg-orange-50 px-2 py-1 rounded-lg border border-orange-200 animate-pop">
+                                    <Fire className="text-orange-500" />
+                                    <span className="font-bold text-orange-600">{streak}</span>
+                                </div>
+                            )}
+                            <button onClick={() => setItems(generateItems(activeCategory, activeMode))} className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400">
+                                <Refresh />
+                            </button>
+                        </div>
                     </div>
 
-                    {activeActivity === 'drill' && <PracticeView items={items} mode={activeMode} speak={speak} onScore={(n) => setScore(s => s+n)} />}
-                    {activeActivity === 'quiz' && <QuizView items={items} mode={activeMode} speak={speak} onScore={(n) => setScore(s => s+n)} />}
-                    {activeActivity === 'scramble' && <ScrambleView items={items} mode={activeMode} speak={speak} onScore={(n) => setScore(s => s+n)} />}
+                    {activeActivity === 'drill' && <PracticeView items={items} mode={activeMode} speak={speak} onScore={(n) => setScore(s => s+n)} onStreak={handleStreak} />}
+                    {activeActivity === 'quiz' && <QuizView items={items} mode={activeMode} speak={speak} onScore={(n) => setScore(s => s+n)} onStreak={handleStreak} />}
+                    {activeActivity === 'scramble' && <ScrambleView items={items} mode={activeMode} speak={speak} onScore={(n) => setScore(s => s+n)} onStreak={handleStreak} onExit={() => setView('activity_select')} />}
 
                 </div>
             );
