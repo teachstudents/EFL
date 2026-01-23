@@ -428,9 +428,14 @@ Jack: But their families are hungry today. Survival is the most important instin
         class SpeechService {
              constructor() { this.synth = window.speechSynthesis; this.isInitialized = false; this.isTtsEnabled = true; this.voices = {}; this.speechRate = 0.85; this.isDialoguePlaying = false; }
              async _setupVoices() {
-                 const voicesPromise = new Promise(resolve => { if (this.synth.getVoices().length) return resolve(this.synth.getVoices()); this.synth.onvoiceschanged = () => resolve(this.synth.getVoices()); });
+                 console.log("[TTS] Initializing voices...");
+                 const voicesPromise = new Promise(resolve => {
+                     const voices = this.synth.getVoices();
+                     if (voices.length) return resolve(voices);
+                     this.synth.onvoiceschanged = () => resolve(this.synth.getVoices());
+                 });
                  const availableVoices = await voicesPromise;
-                 if (!availableVoices.length) { console.warn("No speech synthesis voices available."); return; }
+                 console.log(`[TTS] Available voices: ${availableVoices.length}`);
                  
                  const speakerToVoiceMap = {
                      'teacher': ['Microsoft Emma Online (Natural) - English (United States)'],
@@ -450,14 +455,43 @@ Jack: But their families are hungry today. Survival is the most important instin
                          const foundVoice = availableVoices.find(v => v.name === voiceName);
                          if (foundVoice) { chosenVoice = foundVoice; break; }
                      }
-                     if (chosenVoice) { this.voices[speaker] = chosenVoice; }
+                     if (chosenVoice) { 
+                         this.voices[speaker] = chosenVoice; 
+                         console.log(`[TTS] Mapped ${speaker} to ${chosenVoice.name}`);
+                     } else {
+                         console.log(`[TTS] Could not find specific voice for ${speaker}, using default.`);
+                     }
                  }
                  this.voices['default'] = availableVoices.find(v => v.name === 'Microsoft Ava Online (Natural) - English (United States)') || availableVoices.find(v => v.lang === 'en-US') || availableVoices[0];
+                 console.log(`[TTS] Default voice set to: ${this.voices['default'] ? this.voices['default'].name : 'None'}`);
              }
              async init() { if (this.isInitialized) return; try { const warmUp = new SpeechSynthesisUtterance(' '); warmUp.volume = 0; this.synth.speak(warmUp); this.synth.cancel(); await this._setupVoices(); this.isInitialized = true; } catch (e) { console.error("Speech init failed", e); } }
              _cleanTextForSpeech(text) { const tempDiv = document.createElement('div'); const textWithoutSpans = text.replace(/<span aria-hidden="true">.*?<\/span>/g, ' '); tempDiv.innerHTML = textWithoutSpans; return tempDiv.innerText || tempDiv.textContent || ''; }
              async speak(text, { onEndCallback = null } = {}) { if (!this.isInitialized || !this.isTtsEnabled || !text) { if (onEndCallback) onEndCallback(); return; } if (this.synth.speaking) { this.cancel(); } const utterance = new SpeechSynthesisUtterance(this._cleanTextForSpeech(text)); utterance.voice = this.voices['default']; utterance.rate = this.speechRate; if (onEndCallback) utterance.onend = onEndCallback; this.synth.speak(utterance); }
-             async speakDialogue(text) { if (!this.isInitialized || !this.isTtsEnabled || !text || this.isDialoguePlaying) return; this.cancel(); this.isDialoguePlaying = true; const lines = text.split('\n\n'); const speakLine = (index) => { if (index >= lines.length || !this.isDialoguePlaying) { this.isDialoguePlaying = false; return; } const line = lines[index]; const [speaker, ...rest] = line.split(': '); const lineText = rest.join(': '); const utterance = new SpeechSynthesisUtterance(this._cleanTextForSpeech(lineText || speaker)); utterance.voice = this.voices[speaker.trim().toLowerCase()] || this.voices['default']; utterance.rate = this.speechRate; utterance.onend = () => speakLine(index + 1); this.synth.speak(utterance); }; speakLine(0); }
+             async speakDialogue(text) { 
+                 if (!this.isInitialized || !this.isTtsEnabled || !text || this.isDialoguePlaying) return; 
+                 this.cancel(); 
+                 this.isDialoguePlaying = true; 
+                 const lines = text.split('\n\n'); 
+                 const speakLine = (index) => { 
+                     if (index >= lines.length || !this.isDialoguePlaying) { this.isDialoguePlaying = false; return; } 
+                     const line = lines[index]; 
+                     const [speaker, ...rest] = line.split(': '); 
+                     const lineText = rest.join(': '); 
+                     
+                     // Debug logging
+                     const cleanSpeaker = speaker.trim().toLowerCase();
+                     const selectedVoice = this.voices[cleanSpeaker] || this.voices['default'];
+                     console.log(`[TTS] Speaking line for "${speaker}" using voice: "${selectedVoice ? selectedVoice.name : 'Unknown'}"`);
+
+                     const utterance = new SpeechSynthesisUtterance(this._cleanTextForSpeech(lineText || speaker)); 
+                     utterance.voice = selectedVoice; 
+                     utterance.rate = this.speechRate; 
+                     utterance.onend = () => speakLine(index + 1); 
+                     this.synth.speak(utterance); 
+                 }; 
+                 speakLine(0); 
+             }
              cancel() { if (this.synth) { this.isDialoguePlaying = false; this.synth.cancel(); } }
              toggleTTS(forceState) { this.isTtsEnabled = forceState === undefined ? !this.isTtsEnabled : forceState; if (!this.isTtsEnabled) { this.cancel(); } return this.isTtsEnabled; }
          }
