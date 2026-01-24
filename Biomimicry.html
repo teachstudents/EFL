@@ -47,6 +47,15 @@
             box-shadow: 0 1px 2px -1px rgba(0,0,0,0.2), 0 1px 2px -2px rgba(0,0,0,0.1), inset 0 -2px 0 0 rgba(0,0,0,0.2);
         }
         
+        /* Interactive Content Card */
+        .content-card {
+            cursor: pointer;
+            transition: transform 0.1s ease-in-out;
+        }
+        .content-card:active {
+            transform: scale(0.995);
+        }
+
         /* Gap Fill Styles */
         .gap-fill-container .gap {
             display: inline-flex; align-items: center; justify-content: center;
@@ -183,8 +192,8 @@
                 { id: 'menu-compare', text: 'Lesson 9: Comparative Analysis <span aria-hidden="true">⚖️</span>', color: 'rose', target: 'debate-planning' },
                 
                 // PHASE 4: PRODUCTION (The Launch)
-                { id: 'menu-ethics', text: 'Lesson 10: Ethical Dilemma <span aria-hidden="true">⚠️</span>', color: 'red', target: 'dilemma-ethics' },
-                { id: 'menu-final', text: 'Lesson 11: Final Pitch & Launch <span aria-hidden="true">🎤</span>', color: 'violet', target: 'final-project-hub' },
+                { id: 'menu-ethics', text: 'Bonus: Ethical Dilemma <span aria-hidden="true">⚠️</span>', color: 'red', target: 'dilemma-ethics' },
+                { id: 'menu-final', text: 'Lesson 10: The Launch <span aria-hidden="true">✍️</span>', color: 'violet', target: 'final-project-hub' },
             ],
             vocabulary: [
                 { word: 'Intelligent', def: 'Able to learn and understand things easily.', sentence: 'Dolphins are highly intelligent animals that can solve problems.' },
@@ -364,7 +373,7 @@ Teacher: Excellent points. For your inventions, think: Do you want a device that
                 { id: 'debate-planning-quiz-mcq', type: 'quiz-mcq', content: { title: 'Comparison Quiz', questions: [] } },
 
                 // LESSON 10: Ethics
-                { id: 'dilemma-ethics', type: 'dialogue', content: { title: 'Lesson 10: Ethical Dilemma <span aria-hidden="true">⚠️</span>', dialogue: `Guide: In Laguna, the dolphins help the fishermen. But imagine this scenario. One year, the dolphins stop coming. The fishermen catch very few fish. Their families are hungry.
+                { id: 'dilemma-ethics', type: 'dialogue', content: { title: 'Bonus: Ethical Dilemma <span aria-hidden="true">⚠️</span>', dialogue: `Guide: In Laguna, the dolphins help the fishermen. But imagine this scenario. One year, the dolphins stop coming. The fishermen catch very few fish. Their families are hungry.
 
 Guide: Suddenly, the dolphins return, but they don't help. They just play near the nets. The fishermen have a choice. Do they throw the nets anyway, risking hurting the dolphins to feed their families? Or do they wait and go hungry?
 
@@ -374,7 +383,7 @@ Jack: But their families are hungry today. Survival is the most important instin
                 { id: 'dilemma-ethics-quiz-mcq', type: 'quiz-mcq', content: { title: 'Dilemma Quiz (MCQ)', questions: [] } },
 
                 // LESSON 11: Final Project
-                { id: 'final-project-hub', type: 'html-content', content: { title: 'Lesson 11: The Launch <span aria-hidden="true">✍️</span>', html: `
+                { id: 'final-project-hub', type: 'html-content', content: { title: 'Lesson 10: The Launch <span aria-hidden="true">✍️</span>', html: `
                                 <div class="bg-white rounded-2xl shadow-xl p-8 text-left">
                                 <h2 class="text-3xl font-bold text-violet-600 mb-4">GRASPS Task: The Biomimicry Pitch</h2>
                                 <div class="space-y-3 text-lg">
@@ -438,7 +447,7 @@ Jack: But their families are hungry today. Survival is the most important instin
                  console.log(`[TTS] Available voices: ${availableVoices.length}`);
                  
                  const speakerToVoiceMap = {
-                     'teacher': ['Microsoft Emma Online (Natural) - English (United States)'],
+                     'teacher': ['Microsoft Ava Online (Natural) - English (United States)'],
                      'professor': ['Microsoft Brian Online (Natural) - English (United States)'],
                      'host 1': ['Microsoft Emma Online (Natural) - English (United States)'],
                      'host 2': ['Microsoft Andrew Online (Natural) - English (United States)'],
@@ -446,7 +455,7 @@ Jack: But their families are hungry today. Survival is the most important instin
                      'student': ['Microsoft Andrew Online (Natural) - English (United States)'],
                      'jane': ['Microsoft Emma Online (Natural) - English (United States)'],
                      'jack': ['Microsoft Brian Online (Natural) - English (United States)'],
-                     'guide': ['Microsoft Brian Online (Natural) - English (United States)']
+                     'guide': ['Microsoft Andrew Online (Natural) - English (United States)']
                  };
                  for (const speaker in speakerToVoiceMap) {
                      const voicePriorityList = speakerToVoiceMap[speaker];
@@ -657,16 +666,20 @@ Jack: But their families are hungry today. Survival is the most important instin
             button.querySelector('path').setAttribute('d', iconPath);
 
             if (isNowEnabled) {
-                const pageData = lessonData.pages.find(p => p.id === currentPage);
-                const targetPage = document.getElementById(`page-${currentPage}`);
-                if (pageData && pageData.type === 'dialogue') {
-                    speechService.speakDialogue(pageData.content.dialogue);
-                } else if (targetPage) {
-                    const readableContent = targetPage.querySelector('.readable-content');
-                    const titleElement = targetPage.querySelector('h2, h3');
-                    if (readableContent) speechService.speak(readableContent.innerText);
-                    else if (titleElement) speechService.speak(titleElement.innerText);
-                }
+                window.speakCurrentPage();
+            }
+        };
+
+        window.speakCurrentPage = function() {
+            const pageData = lessonData.pages.find(p => p.id === currentPage);
+            const targetPage = document.getElementById(`page-${currentPage}`);
+            if (pageData && pageData.type === 'dialogue') {
+                speechService.speakDialogue(pageData.content.dialogue);
+            } else if (targetPage) {
+                const readableContent = targetPage.querySelector('.readable-content');
+                const titleElement = targetPage.querySelector('h2, h3');
+                if (readableContent) speechService.speak(readableContent.innerText);
+                else if (titleElement) speechService.speak(titleElement.innerText);
             }
         };
 
@@ -721,14 +734,8 @@ Jack: But their families are hungry today. Survival is the most important instin
                     showBadgeToast('🎉 Module Complete! Well done! 🎉');
                 }
                 
-                if (pageData.type === 'dialogue') {
-                    speechService.speakDialogue(pageData.content.dialogue);
-                } else {
-                    const readableContent = targetPage.querySelector('.readable-content');
-                    const titleElement = targetPage.querySelector('h2, h3');
-                    const contentToSpeak = readableContent ? readableContent.innerText : (titleElement ? titleElement.innerText : '');
-                    speechService.speak(contentToSpeak);
-                }
+                // Attempt to speak (browser may block)
+                window.speakCurrentPage();
             } else if (pageId === lessonData.homePageId) {
                 speechService.speak(targetPage.querySelector('h2').innerText);
                 updateMenuCompletionState();
@@ -1054,7 +1061,22 @@ Jack: But their families are hungry today. Survival is the most important instin
             const section = document.createElement('section');
             section.id = `page-${id}`;
             section.className = 'page';
-            section.innerHTML = content;
+            
+            // Add click-to-speak wrapper
+            const contentWithClick = content.replace(
+                'bg-white rounded-2xl shadow-lg p-8', 
+                'bg-white rounded-2xl shadow-lg p-8 content-card'
+            );
+            
+            section.innerHTML = contentWithClick;
+            
+            // Attach click event for speech
+            const card = section.querySelector('.content-card');
+            if (card) {
+                card.setAttribute('onclick', 'speakCurrentPage()');
+                card.setAttribute('title', 'Click text to read aloud');
+            }
+
             document.getElementById('dynamic-pages-container').appendChild(section);
         }
         
