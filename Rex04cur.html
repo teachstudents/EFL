@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Explorer 4: Curriculum</title>
+    <style>
+        :root {
+            --sidebar-width: 140px; 
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e67e22;
+            --success: #27ae60;
+            --purple: #8e44ad;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --bg: #f4f6f8;
+            --sidebar-bg: #1a252f;
+            --text-muted: #bdc3c7;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            background-color: var(--bg);
+            color: var(--dark);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR --- */
+        aside.sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            border-right: 1px solid #000;
+            overflow-y: auto;
+            transition: width 0.3s;
+        }
+
+        .brand-area {
+            padding: 15px 10px;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        .brand-area h1 { margin: 0; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.5px; }
+        .brand-meta { font-size: 0.6rem; color: var(--text-muted); margin-top: 4px; }
+
+        .nav-section { padding: 10px 5px; flex-grow: 1; }
+        .nav-label {
+            padding-left: 10px;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .unit-btn {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 10px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            font-size: 0.7rem;
+            margin-bottom: 2px;
+            line-height: 1.1;
+        }
+        .unit-btn:hover { background: rgba(255,255,255,0.05); color: white; padding-left: 12px; }
+        .unit-btn.active { background: var(--secondary); color: white; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .unit-num { opacity: 0.5; font-size: 0.65rem; margin-right: 6px; font-family: monospace; font-weight: bold; min-width: 15px; }
+
+        /* --- CONTENT --- */
+        main.content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 30px;
+            scroll-behavior: smooth;
+        }
+
+        .unit-display { display: none; animation: fadeIn 0.4s ease; max-width: 1100px; margin: 0 auto; }
+        .unit-display.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- HERO --- */
+        .unit-hero {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--accent);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; 
+        }
+        .hero-title { flex: 1; }
+        .hero-title h2 { margin: 0 0 5px 0; color: var(--primary); font-size: 1.6rem; }
+        .date-badge { font-size: 0.7rem; background: #eef2f7; color: var(--primary); padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-right: 10px; display:inline-block; vertical-align: middle;}
+        .big-question { font-style: italic; color: #555; background: #fff8e1; padding: 4px 10px; border-radius: 4px; display: inline-block; font-size: 0.9rem; margin-bottom: 8px;}
+        
+        /* NEW STYLE FOR FRICTION QUESTION */
+        .friction-question { 
+            color: var(--purple); 
+            font-weight: 700; 
+            font-size: 0.9rem; 
+            margin-top: 5px; 
+            white-space: nowrap; 
+            display: block; 
+        }
+
+        .cefr-tag { background: var(--primary); color: white; padding: 4px 10px; border-radius: 15px; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.5px; white-space: nowrap; margin-left: 15px; }
+
+        /* --- GRID --- */
+        .readings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 900px) { .readings-grid { grid-template-columns: 1fr; } }
+
+        .reading-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border-top: 4px solid var(--secondary);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .reading-panel.b-side { border-top-color: var(--purple); }
+        .panel-title { font-size: 1rem; font-weight: 800; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px; }
+
+        /* --- GENAI CARD --- */
+        .genai-card {
+            background: #fdfefe;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            padding: 12px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .genai-card:hover { background-color: #f0f8ff; }
+        .genai-card:active { transform: scale(0.99); }
+        .genai-card.speaking { border-color: var(--accent); background-color: #fff8e1; }
+
+        .genai-habit { font-size: 0.7rem; color: var(--accent); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; display: inline-block; background: #fff3e0; padding: 2px 6px; border-radius: 4px;}
+        .code-block { background: #2c3e50; color: #ecf0f1; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.75rem; margin: 8px 0; border-left: 3px solid var(--success); line-height: 1.4; }
+        .defense-block { background: #f1f8e9; padding: 8px; border-radius: 4px; font-size: 0.75rem; margin-top: 5px; border-left: 3px solid var(--secondary); color: #2e4053; font-style: italic; }
+        .vocab-list { font-size: 0.7rem; color: #e74c3c; margin-top: 8px; font-weight: 600; background: #fdedec; padding: 4px; border-radius: 4px; }
+
+        /* --- WRITING PROMPT CARD --- */
+        .writing-card {
+            background: #fff;
+            border: 1px solid #e1e8ed;
+            border-top: 3px solid #e67e22;
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .writing-card:hover { background-color: #fdf2e9; }
+        .writing-card:active { transform: scale(0.99); }
+        .writing-card.speaking { border-color: var(--secondary); background-color: #e8f8f5; }
+
+        .writing-title { font-size: 0.7rem; font-weight: 700; color: #e67e22; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .writing-text { font-size: 0.8rem; line-height: 1.5; color: #34495e; margin-bottom: 12px; }
+        .writing-part { margin-bottom: 8px; display: block; }
+        .writing-part strong { color: #d35400; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- SELF CHECK TOGGLE --- */
+        .sc-toggle-btn {
+            background: #f9e79f;
+            border: none;
+            color: #b7950b;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            margin-top: 5px;
+        }
+        .sc-toggle-btn:hover { background: #f7dc6f; }
+        
+        .self-check-container {
+            display: none; /* Hidden by default */
+            background: #fcf3cf;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #f9e79f;
+            margin-top: 5px;
+            cursor: default;
+        }
+        .self-check-container.open { display: block; }
+        
+        .sc-item { display: flex; align-items: center; font-size: 0.75rem; margin-bottom: 3px; color: #555; cursor: pointer; }
+        .sc-item input { margin-right: 6px; accent-color: #27ae60; cursor: pointer; }
+        .sc-item:hover { color: #000; }
+
+        /* --- SPEAKING TOOLKIT (QA) --- */
+        .qa-toggle-btn {
+            width: 100%;
+            background: #f3e5f5; /* Light Purple */
+            color: #8e44ad;
+            border: 1px solid #e1bee7;
+            padding: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-top: 10px;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .qa-toggle-btn:hover { background: #e1bee7; }
+        
+        .qa-content {
+            display: none;
+            background: #fbf6fd;
+            padding: 12px;
+            border: 1px solid #e1bee7;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            font-size: 0.8rem;
+            color: #4a235a;
+            cursor: pointer; /* Suggests clickable for TTS */
+            transition: background-color 0.2s;
+        }
+        .qa-content:hover { background-color: #f4ecf7; }
+        .qa-content.speaking { background-color: #e8daef; border-left: 4px solid #8e44ad; }
+        .qa-content.open { display: block; }
+        
+        .qa-section { margin-bottom: 10px; }
+        .qa-section:last-child { margin-bottom: 0; }
+        .qa-label { font-weight: 800; display: block; margin-bottom: 3px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.7; color: #8e44ad; }
+
+        /* --- PACKAGES & GRASPS --- */
+        .pkg-toggle {
+            width: 100%; text-align: left; background: white; border: 1px solid #ddd; padding: 12px 15px; font-weight: 600; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center; border-radius: 6px; margin-bottom: 8px; font-size: 0.9rem;
+        }
+        .pkg-toggle:hover { background: #f8f9fa; border-color: var(--secondary); }
+        .pkg-toggle.active { background: #f0f4f8; border-color: var(--secondary); border-radius: 6px 6px 0 0; margin-bottom: 0;}
+        .pkg-content { display: none; background: white; padding: 20px; border: 1px solid #ddd; border-top: none; margin-bottom: 10px; border-radius: 0 0 6px 6px; }
+        .pkg-content.open { display: block; }
+        
+        /* GRASPS SPECIFIC */
+        .grasps-btn { border-left: 4px solid var(--success); }
+        .grasps-role { font-size: 0.9rem; font-weight: 700; color: var(--success); margin-bottom: 5px; }
+        .grasps-meta { font-size: 0.85rem; margin-bottom: 5px; color: #555; }
+        .grasps-product { background: #e8f8f5; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 3px solid var(--success); font-size: 0.9rem;}
+
+        .vocab-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 10px; }
+        .vocab-table th, .vocab-table td { border: 1px solid #eee; padding: 6px; text-align: left; vertical-align: top;}
+        .vocab-table th { background: #f8f9fa; color: var(--primary); font-weight: 700; width: 30%; }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand-area">
+            <h1>Level 4</h1>
+            <div class="brand-meta"><span>20-Week Syllabus</span></div>
+        </div>
+        <div class="nav-section">
+            <div class="nav-label">Semester 1</div>
+            <button class="unit-btn active" onclick="showUnit('u1', this)"><span class="unit-num">01</span> Images</button>
+            <button class="unit-btn" onclick="showUnit('u2', this)"><span class="unit-num">02</span> Nature</button>
+            <button class="unit-btn" onclick="showUnit('u3', this)"><span class="unit-num">03</span> Food</button>
+            <button class="unit-btn" onclick="showUnit('u4', this)"><span class="unit-num">04</span> Design</button>
+            <button class="unit-btn" onclick="showUnit('u5', this)"><span class="unit-num">05</span> Human</button>
+            <button class="unit-btn" onclick="showUnit('u6', this)"><span class="unit-num">06</span> Money</button>
+            <div class="nav-label">Semester 2</div>
+            <button class="unit-btn" onclick="showUnit('u7', this)"><span class="unit-num">07</span> Group</button>
+            <button class="unit-btn" onclick="showUnit('u8', this)"><span class="unit-num">08</span> Invest</button>
+            <button class="unit-btn" onclick="showUnit('u9', this)"><span class="unit-num">09</span> Past</button>
+            <button class="unit-btn" onclick="showUnit('u10', this)"><span class="unit-num">10</span> Health</button>
+            <button class="unit-btn" onclick="showUnit('u11', this)"><span class="unit-num">11</span> Green</button>
+            <button class="unit-btn" onclick="showUnit('u12', this)"><span class="unit-num">12</span> Earth</button>
+        </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+        <!-- UNIT 1 -->
+        <div id="u1" class="unit-display active">
+            <div class="unit-hero">
+                <div class="hero-title">
+                    <span class="date-badge">Mar 2 - 13</span>
+                    <h2>Unit 1: Images of Life</h2>
+                    <div class="big-question">Can we trust what we see?</div>
+                    <span class="friction-question">"Does the frame create the truth?"</span>
+                </div>
+                <div class="cefr-tag">1A: Perceiving • 1B: Empathizing</div>
+            </div>
+            <div class="readings-grid">
+                <div class="reading-panel">
+                    <div class="panel-title">1A: The Visual Village</div>
+                    <div class="genai-card" onclick="speakCard(this, 1)">
+                        <div class="genai-habit">Perceiving</div>
+                        <div class="code-block">"Generate the area 'outside the frame' of a crowded protest photo. Show what was excluded."</div>
+                        <div class="vocab-list">Use: controversy, profound, realistic, represent, tremendous</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 1)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Explain the controversy surrounding the use of filters to edit news photos. Does editing make an image more dramatic and profound, or does it fail to represent the truth instantly?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe a specific photo you saw on your own social media feed recently that seemed obsessed with perfection. Did you feel the image was profound or fake?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Did I use transition words?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 1)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> Show a "Beauty Filter" app. Ask: "If you meet this person in real life, are they a liar? Or just 'enhanced'?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "If a war photographer removes a bloody object from a photo to make it less gruesome, is that an act of kindness or a lie?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "It is a lie because the photo needs to be realistic to show the truth."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "While the intention might be to protect the viewer, altering the image creates a controversy about what the photo truly represents."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if removing the blood helps the photo get published on the front page, alerting the world to the war? Does the outcome justify the edit?"</div>
+                    </div>
+                </div>
+                <div class="reading-panel b-side">
+                    <div class="panel-title">1B: Journey in Photos</div>
+                    <div class="genai-card" onclick="speakCard(this, 1)">
+                        <div class="genai-habit">Empathizing</div>
+                        <div class="code-block">"Write a diary entry describing the sensation of ice and fear for children."</div>
+                        <div class="vocab-list">Use: enrich, expectation, overcome, sincere, portrait</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 1)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Describe how a photographer must overcome the obsession with getting a perfect shot to form a sincere connection. How does teamwork help a project turn out successfully?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe a "quiet moment" or portrait you took of a friend. Was it hard to get a sincere reaction, or did you have to embrace the moment?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Did I use transition words?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 1)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> Play a sound clip of a storm. Ask: "How would you photograph 'Fear' without showing a face?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Is it ethical to take a portrait of a stranger who is suffering, just to win an award?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "It is wrong because the photographer is putting their project above the person."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "However, if the photo is sincere and helps the world understand the suffering, the photographer has overcome the ethical problem."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if the subject begs you not to take the photo, but you know the photo could stop the war? Do you click the shutter?"</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="instructional-package">
+                <!-- GRASPS BUTTON -->
+                <div class="pkg-toggle grasps-btn" onclick="togglePkg(this, 'g1')">GRASPS Task: Visual Literacy</div>
+                <div id="g1" class="pkg-content">
+                    <div class="grasps-meta"><strong>Goal:</strong> Establish a new ethical standard for digital photography.</div>
+                    <div class="grasps-role">Role: Chief Ethics Editor for National Geographic</div>
+                    <div class="grasps-meta"><strong>Audience:</strong> Board of Directors & Junior Photographers</div>
+                    <div class="grasps-meta"><strong>Situation:</strong> A prize-winning photo has been flagged as "digitally altered" (e.g. a pole removed). Decide if it is Truth or Deception.</div>
+                    <div class="grasps-product"><strong>Product:</strong> A "Code of Ethics" Manifesto and a verdict on the photo.</div>
+                </div>
+
+                <div class="pkg-toggle" onclick="togglePkg(this, 'p1')">Unit 1 Vocabulary</div>
+                <div id="p1" class="pkg-content">
+                    <table class="vocab-table">
+                        <tr><th>Word</th><th>Chinese</th><th>Word</th><th>Chinese</th></tr>
+                        <tr><td>controversy</td><td>争议</td><td>enrich</td><td>丰富</td></tr>
+                        <tr><td>dramatic</td><td>戏剧性的</td><td>expectation</td><td>期望</td></tr>
+                        <tr><td>embrace</td><td>拥抱</td><td>overcome</td><td>克服</td></tr>
+                        <tr><td>instantly</td><td>立即</td><td>portrait</td><td>肖像</td></tr>
+                        <tr><td>obsessed</td><td>着迷</td><td>project</td><td>项目</td></tr>
+                        <tr><td>profound</td><td>深远的</td><td>sincere</td><td>真诚</td></tr>
+                        <tr><td>relevant</td><td>相关的</td><td>teamwork</td><td>团队合作</td></tr>
+                        <tr><td>represent</td><td>代表</td><td>thus</td><td>因此</td></tr>
+                        <tr><td>tremendous</td><td>巨大的</td><td>turn out</td><td>结果是</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIT 2 -->
+        <div id="u2" class="unit-display">
+            <div class="unit-hero">
+                <div class="hero-title">
+                    <span class="date-badge">Mar 9 - 20</span>
+                    <h2>Unit 2: Natural Attraction</h2>
+                    <div class="big-question">Why do animals glow?</div>
+                    <span class="friction-question">"Is nature the ultimate engineer?"</span>
+                </div>
+                <div class="cefr-tag">2A: Patterning • 2B: Play</div>
+            </div>
+            <div class="readings-grid">
+                <div class="reading-panel">
+                    <div class="panel-title">2A: Living Light</div>
+                    <div class="genai-card" onclick="speakCard(this, 2)">
+                        <div class="genai-habit">Patterning</div>
+                        <div class="code-block">"Design a building using bioluminescence to remain invisible at night."</div>
+                        <div class="vocab-list">Use: astonishing, descend, invisible, predator, transparent</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 2)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Describe how a predator might use a sudden flash to disturb its prey. Explain why being transparent or invisible is a key factor in survival.</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe a time you observed an animal try to become invisible or use a sudden action. How is this different from how humans try to be relevant and seen?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Did I use transition words?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 2)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> Turn off the lights. Show a glow stick. "Why does a firefly glow? Is it to see, or to be seen?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "If humans could genetically engineer themselves to have one animal trait, should we choose to be invisible (camouflaged) or to flash (bioluminescent)?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "I would choose to be invisible because it protects me from a predator."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "I would choose to flash light because it is a vital factor for communication in the dark, unlike simply hiding."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if we used bioluminescent trees to replace streetlights? Would the disruption to the ecosystem be worth the energy savings?"</div>
+                    </div>
+                </div>
+                <div class="reading-panel b-side">
+                    <div class="panel-title">2B: Feathers of Love</div>
+                    <div class="genai-card" onclick="speakCard(this, 2)">
+                        <div class="genai-habit">Play</div>
+                        <div class="code-block">"Create a bird with prominent feathers performing an absurd dance ritual."</div>
+                        <div class="vocab-list">Use: absurd, bounce, evolution, harsh, ritual</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 2)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Explain why birds undergo such a harsh and complex ritual to display themselves prominently. Why is this considered a noble struggle for a mate?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe a human social ritual you have attended (like a wedding or prom) that might seem absurd to an outsider. Did participants wear clothes to attract attention?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Did I use transition words?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 2)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> Show a video of a Bird of Paradise dancing. "Is he dancing for love or for survival?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "In nature, males often have to be beautiful to survive. In human society, do we value beauty more than intelligence?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "We value beauty because, like the birds, we focus on the ritual of dating."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "It seems absurd, but humans also display evolutionary traits where we look for partners who display noble physical qualities."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if humans chose partners only based on a 'dance' (skill) and never on looks? How would society change?"</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="instructional-package">
+                <!-- GRASPS BUTTON -->
+                <div class="pkg-toggle grasps-btn" onclick="togglePkg(this, 'g2')">GRASPS Task: Bioluminescence</div>
+                <div id="g2" class="pkg-content">
+                    <div class="grasps-meta"><strong>Goal:</strong> Solve a human engineering problem using nature’s designs.</div>
+                    <div class="grasps-role">Role: Biomimicry Engineer</div>
+                    <div class="grasps-meta"><strong>Audience:</strong> Investors at a Tech Expo</div>
+                    <div class="grasps-meta"><strong>Situation:</strong> Design a safety device for cyclists using "Bioluminescence" or "Animal Vision".</div>
+                    <div class="grasps-product"><strong>Product:</strong> A Prototype Blueprint and Pitch Deck explaining how it mimics a predator or prey.</div>
+                </div>
+
+                <div class="pkg-toggle" onclick="togglePkg(this, 'p2')">Unit 2 Vocabulary</div>
+                <div id="p2" class="pkg-content">
+                    <table class="vocab-table">
+                        <tr><th>Word</th><th>Chinese</th><th>Word</th><th>Chinese</th></tr>
+                        <tr><td>astonishing</td><td>惊人的</td><td>absurd</td><td>荒谬的</td></tr>
+                        <tr><td>countless</td><td>无数的</td><td>bounce</td><td>弹跳</td></tr>
+                        <tr><td>descend</td><td>下降</td><td>breed</td><td>繁殖</td></tr>
+                        <tr><td>disturb</td><td>打扰</td><td>commence</td><td>开始</td></tr>
+                        <tr><td>flash</td><td>闪光</td><td>evolution</td><td>进化</td></tr>
+                        <tr><td>invisible</td><td>看不见的</td><td>harsh</td><td>严酷的</td></tr>
+                        <tr><td>predator</td><td>捕食者</td><td>noble</td><td>高尚的</td></tr>
+                        <tr><td>transparent</td><td>透明</td><td>ritual</td><td>仪式</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIT 3 -->
+        <div id="u3" class="unit-display">
+            <div class="unit-hero">
+                <div class="hero-title">
+                    <span class="date-badge">Mar 16 - 27</span>
+                    <h2>Unit 3: Food & Health</h2>
+                    <div class="big-question">How safe is our food?</div>
+                    <span class="friction-question">"Are we redefining what it means to be 'natural'?"</span>
+                </div>
+                <div class="cefr-tag">3A: Synthesizing • 3B: Abstracting</div>
+            </div>
+            <div class="readings-grid">
+                <div class="reading-panel">
+                    <div class="panel-title">3A: The Super-Label</div>
+                    <div class="genai-card" onclick="speakCard(this, 3)">
+                        <div class="genai-habit">Synthesizing</div>
+                        <div class="code-block">"Design a food warning label showing the risk of contamination and explaining that washing is compulsory."</div>
+                        <div class="vocab-list">Use: contamination, compulsory, integral, nationwide, optimistic</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 3)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Explain why it is integral to determine the source of an infection nationwide. Is it feasible to keep food completely safe, or will unseen bacteria always disturb our digestion?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe a specific local restaurant or school cafeteria you visit. Do you feel optimistic about their hygiene? Have you ever had an issue with digestion?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Did I use transition words?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 3)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "Imagine a tomato that never rots. It stays red for 10 years. Do you eat it?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "If a Genetically Modified (GM) crop can end world hunger, but might contaminate wild plants, should we plant it?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "We should plant it because feeding people is feasible and necessary."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "Even if we represent an optimistic view on hunger, we cannot determine the long-term damage if the genes infect the wild ecosystem."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if a company owns the patent to the 'Killer Corn' and forbids farmers from saving seeds? Is the food worth the loss of freedom?"</div>
+                    </div>
+                </div>
+                <div class="reading-panel b-side">
+                    <div class="panel-title">3B: GMO Metaphor</div>
+                    <div class="genai-card" onclick="speakCard(this, 3)">
+                        <div class="genai-habit">Abstracting</div>
+                        <div class="code-block">"Explain gene modification without biological terms, using a 'Lego' metaphor."</div>
+                        <div class="vocab-list">Use: allergic, conventional, diminish, modify, revolution</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 3)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>If we modify a plant's traits, might we accidentally create a new allergic reaction or infect the environment? Is there a safe alternative?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Go to your kitchen and find a food item with a label. Is it conventional or modified? Do you check labels compulsorily?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Did I use transition words?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 3)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "Germs are bad. True or False? (False - we need them)."</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Should the government ban raw milk to protect safety, or allow people to choose their own nutritional risks?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "The government should ban it to prevent a deficiency in safety standards."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "People should have an alternative choice; relying solely on conventional pasteurized milk ignores the potential benefits of raw bacteria."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if science proves that being 'too clean' causes allergies? Should we make it mandatory for children to play in the dirt?"</div>
+                    </div>
+                </div>
+            </div>
+            <div class="instructional-package">
+                <!-- GRASPS BUTTON -->
+                <div class="pkg-toggle grasps-btn" onclick="togglePkg(this, 'g3')">GRASPS Task: Nutrition</div>
+                <div id="g3" class="pkg-content">
+                    <div class="grasps-meta"><strong>Goal:</strong> Address a food crisis using controversial science.</div>
+                    <div class="grasps-role">Role: Food Scientist / Policy Maker</div>
+                    <div class="grasps-meta"><strong>Audience:</strong> Skeptical Consumers</div>
+                    <div class="grasps-meta"><strong>Situation:</strong> A region suffers from deficiency and contamination. Propose a GMO solution to a scared public.</div>
+                    <div class="grasps-product"><strong>Product:</strong> Public Service Campaign explaining feasibility and safety.</div>
+                </div>
+
+                <div class="pkg-toggle" onclick="togglePkg(this, 'p3')">Unit 3 Vocabulary</div>
+                <div id="p3" class="pkg-content">
+                    <table class="vocab-table">
+                        <tr><th>Word</th><th>Chinese</th><th>Word</th><th>Chinese</th></tr>
+                        <tr><td>compulsory</td><td>强制的</td><td>allergic</td><td>过敏的</td></tr>
+                        <tr><td>confine</td><td>限制</td><td>conventional</td><td>传统的</td></tr>
+                        <tr><td>contaminate</td><td>污染</td><td>diminish</td><td>减少</td></tr>
+                        <tr><td>determine</td><td>决定</td><td>modify</td><td>修改</td></tr>
+                        <tr><td>digestion</td><td>消化</td><td>nutritional</td><td>营养的</td></tr>
+                        <tr><td>feasible</td><td>可行的</td><td>revolution</td><td>革命</td></tr>
+                        <tr><td>integral</td><td>不可或缺</td><td>trait</td><td>特征</td></tr>
+                        <tr><td>optimistic</td><td>乐观的</td><td>alternative</td><td>替代品</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIT 4 -->
+        <div id="u4" class="unit-display">
+            <div class="unit-hero">
+                <div class="hero-title">
+                    <span class="date-badge">Mar 23 - Apr 3</span>
+                    <h2>Unit 4: Design by Nature</h2>
+                    <div class="big-question">What can we learn from nature?</div>
+                    <span class="friction-question">"Can we build our way out of overcrowding?"</span>
+                </div>
+                <div class="cefr-tag">4A: Modeling • 4B: Play</div>
+            </div>
+            <div class="readings-grid">
+                <div class="reading-panel">
+                    <div class="panel-title">4A: The Gecko Glove</div>
+                    <div class="genai-card" onclick="speakCard(this, 4)">
+                        <div class="genai-habit">Modeling</div>
+                        <div class="code-block">"Create a blueprint for a device that allows vertical climbing."</div>
+                        <div class="vocab-list">Use: device, gap, insight, vertical, reproduce</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 4)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Describe a device or phase of engineering that mimics a natural trait. How is this approach vital for bridging the gap between nature and vertical structures?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Identify one object or device in your room. How does its design bridge the gap between nature and engineering? Does it look like a conventional natural form?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Did I use transition words?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 4)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> Show a picture of a skyscraper covered in trees. "Is this a farm or an office?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Is living in a 'Vertical City' (skyscraper) a solution to overpopulation, or a disconnection from nature?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "It is a solution because it bridges the gap between city and farm."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "Although it is vital to save space, living in a vertical box might make us lose insight into the natural world."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if the Vertical Farm fails and the crops die? A whole city starves. Is it safer to keep farms on the ground?"</div>
+                    </div>
+                </div>
+                <div class="reading-panel b-side">
+                    <div class="panel-title">4B: Smart Fashion Show</div>
+                    <div class="genai-card" onclick="speakCard(this, 4)">
+                        <div class="genai-habit">Play</div>
+                        <div class="code-block">"Design a portable outfit that is not rigid, but flexible."</div>
+                        <div class="vocab-list">Use: fantasy, portable, rigid, suspend, forthcoming</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 4)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Explain how a specific appliance or fabric could be suspended in a liquid state before hardening. How does this innovation represent a vital step beyond science fantasy?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe a piece of clothing you own. If you could improve it using fantasy technology, what would you change? How would this be vital to your life?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Did I use transition words?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 4)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "How many phones have you owned in your life? Where are they now?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Should companies be forced to take back every old appliance they sell, or is waste the consumer's problem?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "The company is responsible because they made the device rigid and hard to fix."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "We must foresee a future where manufacturers are taxed for waste, thereby forcing them to design portable and recyclable goods."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if phones cost $2,000 but lasted for 10 years? Would you accept the price hike to save the planet?"</div>
+                    </div>
+                </div>
+            </div>
+            <div class="instructional-package">
+                <!-- GRASPS BUTTON -->
+                <div class="pkg-toggle grasps-btn" onclick="togglePkg(this, 'g4')">GRASPS Task: Vertical Farming</div>
+                <div id="g4" class="pkg-content">
+                    <div class="grasps-meta"><strong>Goal:</strong> Redesign urban spaces to be self-sustaining.</div>
+                    <div class="grasps-role">Role: Urban Architect</div>
+                    <div class="grasps-meta"><strong>Audience:</strong> The Mayor’s Office</div>
+                    <div class="grasps-meta"><strong>Situation:</strong> City running out of food/space. Design a "Vertical Farm" skyscraper.</div>
+                    <div class="grasps-product"><strong>Product:</strong> 3D Architectural Rendering (AI) and proposal on how the device maximizes vertical space.</div>
+                </div>
+
+                <div class="pkg-toggle" onclick="togglePkg(this, 'p4')">Unit 4 Vocabulary</div>
+                <div id="p4" class="pkg-content">
+                    <table class="vocab-table">
+                        <tr><th>Word</th><th>Chinese</th><th>Word</th><th>Chinese</th></tr>
+                        <tr><td>biological</td><td>生物的</td><td>appliance</td><td>器具</td></tr>
+                        <tr><td>device</td><td>设备</td><td>fantasy</td><td>幻想</td></tr>
+                        <tr><td>gap</td><td>缺口</td><td>foresee</td><td>预见</td></tr>
+                        <tr><td>gradually</td><td>逐渐地</td><td>forthcoming</td><td>即将到来的</td></tr>
+                        <tr><td>insight</td><td>洞察力</td><td>manufacturing</td><td>制造</td></tr>
+                        <tr><td>phase</td><td>阶段</td><td>portable</td><td>便携的</td></tr>
+                        <tr><td>vertical</td><td>垂直的</td><td>rigid</td><td>坚硬的</td></tr>
+                        <tr><td>vital</td><td>至关重要的</td><td>suspend</td><td>悬挂</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIT 5 -->
+        <div id="u5" class="unit-display">
+            <div class="unit-hero">
+                <div class="hero-title">
+                    <span class="date-badge">Mar 30 - Apr 10</span>
+                    <h2>Unit 5: Human Journey</h2>
+                    <div class="big-question">Where do we come from?</div>
+                    <span class="friction-question">"Does where we come from determine who we are?"</span>
+                </div>
+                <div class="cefr-tag">5A: Synthesizing • 5B: Embodied</div>
+            </div>
+            <div class="readings-grid">
+                <div class="reading-panel">
+                    <div class="panel-title">5A: The Ancestor's Face</div>
+                    <div class="genai-card" onclick="speakCard(this, 5)">
+                        <div class="genai-habit">Synthesizing</div>
+                        <div class="code-block">"Generate a face representing human migration history."</div>
+                        <div class="vocab-list">Use: descendant, immense, scattered, trace, migration</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 5)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Describe the immense journey from Africa. How did small groups leave and eventually become scattered across the globe? Did they move gradually or all at once?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Think about your family or community. Can you trace where they moved from? Was the movement gradual or sudden? Describe a tradition that hasn't vanished.</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 5)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "If you found out you were related to the Queen of England, would it change how you act today?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "If a DNA test proved you were a descendant of a historical villain (like a dictator), would you keep it secret?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "I would keep it secret because people might judge me at a high rate."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "I would reveal it because my DNA is just a trace of biology; it does not dictate my character or make me identical to my ancestor."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if insurance companies demanded your DNA test before giving you health insurance? Is that fair?"</div>
+                    </div>
+                </div>
+                <div class="reading-panel b-side">
+                    <div class="panel-title">5B: Star Compass</div>
+                    <div class="genai-card" onclick="speakCard(this, 5)">
+                        <div class="genai-habit">Embodied Thinking</div>
+                        <div class="code-block">"Visualize the horizon at night, highlighting navigation stars."</div>
+                        <div class="vocab-list">Use: horizon, phenomenon, stubborn, bulk, conquest</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 5)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Describe the phenomenon of Lapita navigation. How did they use a clue like a bird or cloud to stay on course? Was success due to stubborn determination?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe a time you had to find a location without GPS. Did you feel stubborn and guess, or look for signs? How is this analogous to the immense Lapita journey?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 5)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "Would you get on a spaceship to Mars if you knew you could never come back?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Why do humans engage in dangerous exploration? Is it bravery or just being stubborn?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "It is bravery because they want to find a clue to a new world."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "It is a phenomenon of human nature; we are driven to look beyond the horizon, even if the journey disrupts our intact safety."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if the first migrators to the Pacific failed and died? Would we still call them heroes or foolish?"</div>
+                    </div>
+                </div>
+            </div>
+            <div class="instructional-package">
+                <!-- GRASPS BUTTON -->
+                <div class="pkg-toggle grasps-btn" onclick="togglePkg(this, 'g5')">GRASPS Task: Migration Data</div>
+                <div id="g5" class="pkg-content">
+                    <div class="grasps-meta"><strong>Goal:</strong> Tell the story of human migration through data.</div>
+                    <div class="grasps-role">Role: Genetic Anthropologist</div>
+                    <div class="grasps-meta"><strong>Audience:</strong> Museum Visitors</div>
+                    <div class="grasps-meta"><strong>Situation:</strong> Found DNA linking scattered populations. Explain they are descendants of same group.</div>
+                    <div class="grasps-product"><strong>Product:</strong> Interactive Map/Exhibit proposal visualizing the immense journey.</div>
+                </div>
+
+                <div class="pkg-toggle" onclick="togglePkg(this, 'p5')">Unit 5 Vocabulary</div>
+                <div id="p5" class="pkg-content">
+                    <table class="vocab-table">
+                        <tr><th>Word</th><th>Chinese</th><th>Word</th><th>Chinese</th></tr>
+                        <tr><td>bulk</td><td>体积/大块</td><td>analogous</td><td>类似的</td></tr>
+                        <tr><td>calculate</td><td>计算</td><td>clue</td><td>线索</td></tr>
+                        <tr><td>descendant</td><td>后代</td><td>horizon</td><td>地平线</td></tr>
+                        <tr><td>immense</td><td>巨大的</td><td>navigation</td><td>导航</td></tr>
+                        <tr><td>scattered</td><td>分散的</td><td>phenomenon</td><td>现象</td></tr>
+                        <tr><td>trace</td><td>追踪</td><td>stubborn</td><td>顽固的</td></tr>
+                        <tr><td>vanish</td><td>消失</td><td>stretch</td><td>延伸</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIT 6 -->
+        <div id="u6" class="unit-display">
+            <div class="unit-hero">
+                <div class="hero-title">
+                    <span class="date-badge">Apr 13 - 24</span>
+                    <h2>Unit 6: Money & Trade</h2>
+                    <div class="big-question">How does money shape us?</div>
+                    <span class="friction-question">"Is money a shared hallucination?"</span>
+                </div>
+                <div class="cefr-tag">6A: Abstracting • 6B: Modeling</div>
+            </div>
+            <div class="readings-grid">
+                <div class="reading-panel">
+                    <div class="panel-title">6A: Currency of Trust</div>
+                    <div class="genai-card" onclick="speakCard(this, 6)">
+                        <div class="genai-habit">Abstracting</div>
+                        <div class="code-block">"Design a coin representing stable value for a future society."</div>
+                        <div class="vocab-list">Use: commodity, convenience, policy, stable, transaction</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 6)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>How did the policy of using coins trigger a change in history? Does physical commodity money signify a more stable system than credit, or is it an ancient phenomenon?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe your last purchase. Did the convenience trigger you to spend more? How does this compare to the phenomenon of ancient trade?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 6)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "I will trade this apple for your shoe. Why is that hard? Why is money easier?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Is convenience worth the loss of privacy? In a cashless society, the bank sees every transaction."</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "It is worth it because I value the convenience of digital payment."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "I disagree; essentially, every transaction becomes a surveillance tool, which could trigger a loss of freedom."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if the government turned off your digital wallet because you jaywalked? Is a cashless society a control tool?"</div>
+                    </div>
+                </div>
+                <div class="reading-panel b-side">
+                    <div class="panel-title">6B: Blockchain Block</div>
+                    <div class="genai-card" onclick="speakCard(this, 6)">
+                        <div class="genai-habit">Modeling</div>
+                        <div class="code-block">"Create a diagram showing how computers verify digital currency."</div>
+                        <div class="vocab-list">Use: drawback, fraud, principle, sophisticated, verify</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 6)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Despite the drawback of potential fraud, why invest in scarce crypto? Do you believe it's possible to verify every transaction, or is the safety supposedly exaggerated?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Have you encountered an online scam? How did your judgement (from 6A) help you avoid it? Is digital money truly scarce?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 6)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "This digital picture of a monkey sold for $1 million. Is it art or a scam?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Is buying Crypto investing, or is it just gambling on a fraud?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "It is gambling because the asset has no physical value."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "While some coins are fraud, the principle of decentralized money is sophisticated and solves the problem of government control."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if the internet goes down forever? Does gold become the only 'real' money again?"</div>
+                    </div>
+                </div>
+            </div>
+            <div class="instructional-package">
+                <!-- GRASPS BUTTON -->
+                <div class="pkg-toggle grasps-btn" onclick="togglePkg(this, 'g6')">GRASPS Task: Financial Crime</div>
+                <div id="g6" class="pkg-content">
+                    <div class="grasps-meta"><strong>Goal:</strong> Prevent financial crime in a cashless society.</div>
+                    <div class="grasps-role">Role: Fintech Security Analyst</div>
+                    <div class="grasps-meta"><strong>Audience:</strong> Bank Customers</div>
+                    <div class="grasps-meta"><strong>Situation:</strong> Fraud scheme involves fake digital assets. Design security protocol.</div>
+                    <div class="grasps-product"><strong>Product:</strong> Security Flowchart and Consumer Alert video script.</div>
+                </div>
+
+                <div class="pkg-toggle" onclick="togglePkg(this, 'p6')">Unit 6 Vocabulary</div>
+                <div id="p6" class="pkg-content">
+                    <table class="vocab-table">
+                        <tr><th>Word</th><th>Chinese</th><th>Word</th><th>Chinese</th></tr>
+                        <tr><td>commodity</td><td>商品</td><td>asset</td><td>资产</td></tr>
+                        <tr><td>convenience</td><td>便利</td><td>drawback</td><td>缺点</td></tr>
+                        <tr><td>policy</td><td>政策</td><td>fraud</td><td>欺诈</td></tr>
+                        <tr><td>stable</td><td>稳定的</td><td>principle</td><td>原则</td></tr>
+                        <tr><td>transaction</td><td>交易</td><td>sophisticated</td><td>复杂的</td></tr>
+                        <tr><td>trigger</td><td>触发</td><td>verify</td><td>核实</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIT 7 -->
+        <div id="u7" class="unit-display">
+            <div class="unit-hero">
+                <div class="hero-title">
+                    <span class="date-badge">May 11 - 15</span>
+                    <h2>Unit 7: Group Behavior</h2>
+                    <div class="big-question">Why follow the crowd?</div>
+                    <span class="friction-question">"Do we lose our identity in a crowd?"</span>
+                </div>
+                <div class="cefr-tag">7A: Empathizing • 7B: Perceiving</div>
+            </div>
+            <div class="readings-grid">
+                <div class="reading-panel">
+                    <div class="panel-title">7A: The Pilgrim's View</div>
+                    <div class="genai-card" onclick="speakCard(this, 7)">
+                        <div class="genai-habit">Empathizing</div>
+                        <div class="code-block">"Write a monologue from a participant in the crowd feeling harmony."</div>
+                        <div class="vocab-list">Use: harmony, participant, sacred, density, organize</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 7)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Explain how an organized society creates rituals to build faith. Is the progress of a community dependent on these gatherings, or do you suspect they are a transaction of power?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe a concert or festival you attended. Did you feel unity with the society there, or suspect the event was just a commercial transaction?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 7)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> Show a video of a mosh pit. "Are they fighting or dancing? How do they know the rules?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Are huge crowds (like concerts or protests) dangerous, or do they create necessary harmony?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "They are dangerous because organized people can quickly become chaotic."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "It depends; if every participant shares a goal, the crowd creates harmony, but if they suspect danger, it turns to panic."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if we used AI to monitor crowds and arrest people before they became violent? Is that safety or tyranny?"</div>
+                    </div>
+                </div>
+                <div class="reading-panel b-side">
+                    <div class="panel-title">7B: The Troll's Mirror</div>
+                    <div class="genai-card" onclick="speakCard(this, 7)">
+                        <div class="genai-habit">Perceiving</div>
+                        <div class="code-block">"Write a chat log showing online aggression and insults."</div>
+                        <div class="vocab-list">Use: aggression, insult, pressure, anonymity, reveal</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 7)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Explain why there is such a substantial division in contemporary internet culture. Does the pressure of social media destroy our humanity, or is harassment just a reflection of society?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe a post you saw with insults. Why do you think the pressure to look cool online makes people lose humanity? Is this different from face-to-face harmony?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 7)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "Red Team vs. Blue Team. Why do you hate the Blue Team? You don't even know them."</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Is it human nature to act with aggression toward people who are different from us?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "It is natural because we feel pressure to protect our own group."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "We often insult or confront outsiders to create a clear division, which strengthens our own group's identity."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if an alien invasion happened? Would all humans finally unite, or would we still fight each other?"</div>
+                    </div>
+                </div>
+            </div>
+            <div class="instructional-package">
+                <!-- GRASPS BUTTON -->
+                <div class="pkg-toggle grasps-btn" onclick="togglePkg(this, 'g7')">GRASPS Task: Crowd Control</div>
+                <div id="g7" class="pkg-content">
+                    <div class="grasps-meta"><strong>Goal:</strong> Manage a massive crowd event safely.</div>
+                    <div class="grasps-role">Role: Event Safety Coordinator</div>
+                    <div class="grasps-meta"><strong>Audience:</strong> Olympic Committee</div>
+                    <div class="grasps-meta"><strong>Situation:</strong> Ensure harmony and prevent aggression/harassment in a crowd of 100,000.</div>
+                    <div class="grasps-product"><strong>Product:</strong> Crowd Control Strategy and "Code of Conduct" for participants.</div>
+                </div>
+
+                <div class="pkg-toggle" onclick="togglePkg(this, 'p7')">Unit 7 Vocabulary</div>
+                <div id="p7" class="pkg-content">
+                    <table class="vocab-table">
+                        <tr><th>Word</th><th>Chinese</th><th>Word</th><th>Chinese</th></tr>
+                        <tr><td>evident</td><td>明显的</td><td>aggression</td><td>侵略</td></tr>
+                        <tr><td>harmony</td><td>和谐</td><td>confront</td><td>面对</td></tr>
+                        <tr><td>participant</td><td>参与者</td><td>division</td><td>分裂</td></tr>
+                        <tr><td>sacred</td><td>神圣的</td><td>insult</td><td>侮辱</td></tr>
+                        <tr><td>society</td><td>社会</td><td>pressure</td><td>压力</td></tr>
+                        <tr><td>suspect</td><td>怀疑</td><td>humanity</td><td>人性</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIT 8 -->
+        <div id="u8" class="unit-display">
+            <div class="unit-hero">
+                <div class="hero-title">
+                    <span class="date-badge">May 18 - 22</span>
+                    <h2>Unit 8: Investigations</h2>
+                    <div class="big-question">How do we know the truth?</div>
+                    <span class="friction-question">"Can science truly solve the past?"</span>
+                </div>
+                <div class="cefr-tag">8A: Synthesizing • 8B: Patterning</div>
+            </div>
+            <div class="readings-grid">
+                <div class="reading-panel">
+                    <div class="panel-title">8A: The Crime Board</div>
+                    <div class="genai-card" onclick="speakCard(this, 8)">
+                        <div class="genai-habit">Synthesizing</div>
+                        <div class="code-block">"Create a forensic image connecting stomach pain to arsenic."</div>
+                        <div class="vocab-list">Use: dispute, inconclusive, symptom, arsenic, debate</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 8)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Describe the plot that suggests Napoleon was killed by poison. Are the symptoms described in records compelling evidence of revenge, or do you suspect natural causes?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe a rumor or "mystery" in your school. Did people relentlessly discuss it? Was there a "suspect"? Did the truth ever come out?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 8)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "A healthy 19-year-old King dies. Accident or Murder?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Is it respectful to dig up a dead king to test for poison, or should we let him rest?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "We should dig him up to settle the dispute about his death."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "Even if the results are inconclusive, analyzing the symptoms of his death provides a compelling lesson in history."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if we clone King Tut from his DNA? Does he have the rights to the throne of Egypt?"</div>
+                    </div>
+                </div>
+                <div class="reading-panel b-side">
+                    <div class="panel-title">8B: The Unique Fingerprint</div>
+                    <div class="genai-card" onclick="speakCard(this, 8)">
+                        <div class="genai-habit">Patterning</div>
+                        <div class="code-block">"Visualize a digital footprint helping analyze criminal identity."</div>
+                        <div class="vocab-list">Use: manipulative, suspicious, analyze, inherit, proving</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 8)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>In terms of forensic science, how do experts evaluate an allegation? If a killer shows no remorse, can we rely on compelling clues to ensure justice isn't deprived?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe a time you had to figure out who did something minor. Did the person show remorse or act manipulative? Was the outcome inconclusive?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 8)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "History is written by the winners. Can we trust history books?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "If a historical figure did something terrible, should we remove their statue, or keep it to remember?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "Remove it because it feels weird to honor a bad person."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "Keep it, but add a plaque explaining the allegations; we should evaluate them in terms of their history, not erase them."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if we find proof that a 'Hero' was actually a 'Villain'? Do we rewrite all the textbooks?"</div>
+                    </div>
+                </div>
+            </div>
+            <div class="instructional-package">
+                <!-- GRASPS BUTTON -->
+                <div class="pkg-toggle grasps-btn" onclick="togglePkg(this, 'g8')">GRASPS Task: Cold Case</div>
+                <div id="g8" class="pkg-content">
+                    <div class="grasps-meta"><strong>Goal:</strong> Solve a historical cold case using modern logic.</div>
+                    <div class="grasps-role">Role: Forensic Historian</div>
+                    <div class="grasps-meta"><strong>Audience:</strong> Modern Tribunal / Jury</div>
+                    <div class="grasps-meta"><strong>Situation:</strong> Historical figure died under suspicious circumstances. Poison or symptom of illness?</div>
+                    <div class="grasps-product"><strong>Product:</strong> Closing Argument evaluating allegations and rendering verdict.</div>
+                </div>
+
+                <div class="pkg-toggle" onclick="togglePkg(this, 'p8')">Unit 8 Vocabulary</div>
+                <div id="p8" class="pkg-content">
+                    <table class="vocab-table">
+                        <tr><th>Word</th><th>Chinese</th><th>Word</th><th>Chinese</th></tr>
+                        <tr><td>cease</td><td>停止</td><td>allegation</td><td>指控</td></tr>
+                        <tr><td>compelling</td><td>令人信服的</td><td>evaluate</td><td>评估</td></tr>
+                        <tr><td>dispute</td><td>争端</td><td>frankly</td><td>坦率地</td></tr>
+                        <tr><td>inconclusive</td><td>非决定性的</td><td>manipulative</td><td>操纵的</td></tr>
+                        <tr><td>poison</td><td>毒药</td><td>remorse</td><td>悔恨</td></tr>
+                        <tr><td>symptom</td><td>症状</td><td>suspicious</td><td>可疑的</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIT 9 -->
+        <div id="u9" class="unit-display">
+            <div class="unit-hero">
+                <div class="hero-title">
+                    <span class="date-badge">May 25 - Jun 5</span>
+                    <h2>Unit 9: Rediscovering Past</h2>
+                    <div class="big-question">Rebuild or ruin?</div>
+                    <span class="friction-question">"Should we preserve the past or digitize it?"</span>
+                </div>
+                <div class="cefr-tag">9A: Modeling • 9B: Perceiving</div>
+            </div>
+            <div class="readings-grid">
+                <div class="reading-panel">
+                    <div class="panel-title">9A: The Digital Restoration</div>
+                    <div class="genai-card" onclick="speakCard(this, 9)">
+                        <div class="genai-habit">Modeling</div>
+                        <div class="code-block">"Show a memorial being assembled digitally so visitors can gaze at it."</div>
+                        <div class="vocab-list">Use: assemble, firsthand, gaze, memorial, stunned</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 9)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Modern technology allows us to create a virtual memorial. Can assembling a digital copy ever replace the firsthand experience of a grand historical site?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>When you gaze at a digital model of a carving or column, are you stunned by the detail? Compare this to a real museum visit.</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 9)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "If you upload your brain to a computer, are you still 'you'?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "If you can visit a virtual replica of the Great Wall that looks perfect, why travel to the broken real one?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "I would visit the real one for the firsthand experience."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "While the virtual model shows the original carvings perfectly, standing before the real memorial leaves me stunned in a way a screen cannot."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if the real Great Wall is destroyed by an earthquake? Does the Virtual Copy become the 'Real' one?"</div>
+                    </div>
+                </div>
+                <div class="reading-panel b-side">
+                    <div class="panel-title">9B: Lidar Vision</div>
+                    <div class="genai-card" onclick="speakCard(this, 9)">
+                        <div class="genai-habit">Perceiving</div>
+                        <div class="code-block">"Use a satellite view to look through dense jungle and find territory."</div>
+                        <div class="vocab-list">Use: inhabitant, legend, satellite, territory, dense</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 9)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Explorers were fascinated by the legend of a lost city hidden under vegetation. When they finally uncovered the inhabitants' pyramids, was the discovery as stunning as hoped?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe a local "legend" or historical site near you. Have you explored the trail or slope leading to it? Was it impressive?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 9)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "Tourism brings money, but footsteps destroy stone. Do we close the site?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "To save ancient sites, should we ban tourists and only allow scientists?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "Yes, because tourists destroy the vegetation and leave trash."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "No, because the local inhabitants rely on the extensive income from the legend of the site."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if we built a fake Petra next to the real one for tourists? Would people accept the fake?"</div>
+                    </div>
+                </div>
+            </div>
+            <div class="instructional-package">
+                <!-- GRASPS BUTTON -->
+                <div class="pkg-toggle grasps-btn" onclick="togglePkg(this, 'g9')">GRASPS Task: Digital Archaeology</div>
+                <div id="g9" class="pkg-content">
+                    <div class="grasps-meta"><strong>Goal:</strong> Reconstruct a lost civilization without damaging the ruins.</div>
+                    <div class="grasps-role">Role: VR Curator</div>
+                    <div class="grasps-meta"><strong>Audience:</strong> Ministry of Culture</div>
+                    <div class="grasps-meta"><strong>Situation:</strong> Tourists damaging pyramid. Propose closing site and replacing with VR.</div>
+                    <div class="grasps-product"><strong>Product:</strong> VR Experience Storyboard allowing users to uncover site as it looked 2000 years ago.</div>
+                </div>
+
+                <div class="pkg-toggle" onclick="togglePkg(this, 'p9')">Unit 9 Vocabulary</div>
+                <div id="p9" class="pkg-content">
+                    <table class="vocab-table">
+                        <tr><th>Word</th><th>Chinese</th><th>Word</th><th>Chinese</th></tr>
+                        <tr><td>assemble</td><td>组装</td><td>inhabitant</td><td>居民</td></tr>
+                        <tr><td>firsthand</td><td>第一手的</td><td>legend</td><td>传说</td></tr>
+                        <tr><td>gaze</td><td>凝视</td><td>satellite</td><td>卫星</td></tr>
+                        <tr><td>memorial</td><td>纪念碑</td><td>territory</td><td>领土</td></tr>
+                        <tr><td>stunned</td><td>震惊</td><td>dense</td><td>茂密的</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIT 10 -->
+        <div id="u10" class="unit-display">
+            <div class="unit-hero">
+                <div class="hero-title">
+                    <span class="date-badge">Jun 1 - 12</span>
+                    <h2>Unit 10: Healthy Living</h2>
+                    <div class="big-question">Live to 150?</div>
+                    <span class="friction-question">"Is aging a disease we can cure?"</span>
+                </div>
+                <div class="cefr-tag">10A: Abstracting • 10B: Synthesizing</div>
+            </div>
+            <div class="readings-grid">
+                <div class="reading-panel">
+                    <div class="panel-title">10A: The Aging Algorithm</div>
+                    <div class="genai-card" onclick="speakCard(this, 10)">
+                        <div class="genai-habit">Abstracting</div>
+                        <div class="code-block">"Illustrate the biological mechanism that limits lifespan and causes chronic disease."</div>
+                        <div class="vocab-list">Use: chronic, lifespan, mechanism, calorie, genetic</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 10)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>If scientists found a way to make us immune to chronic diseases, would it become mandatory to take the cure? Would you relocate to a region known for longevity?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Describe the oldest person you know personally. Do they have a specific habit or legend about why they lived so long? Would you relocate to live longer?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 10)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "Why do people in Sardinia live to 100? Is it the wine or the walking?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "If you could live to be 120, but you had to follow strict, mandatory diet rules, would you do it?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "I would do it to increase my lifespan."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "I would not; a long life is useless if I am immune to the joy of food and forced to follow chronic restrictions."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if only rich people can afford the 'Long Life' diet? Will we have a society where the rich live forever and the poor die young?"</div>
+                    </div>
+                </div>
+                <div class="reading-panel b-side">
+                    <div class="panel-title">10B: The Blue Zone Menu</div>
+                    <div class="genai-card" onclick="speakCard(this, 10)">
+                        <div class="genai-habit">Synthesizing</div>
+                        <div class="code-block">"Create a menu following the guideline for longevity, designed to relieve stress."</div>
+                        <div class="vocab-list">Use: discourage, guideline, longevity, privilege, relieve</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 10)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Describe the guidelines of the Blue Zones. Why do they discourage bad habits while encouraging people to relieve stress? Is health a privilege or a result of chronic discipline?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Analyze your own dinner from last night. Was it a lean meal? Did you eat it with family to relieve stress? Is eating healthy a privilege for your family?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 10)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "Your doctor is a robot. It has laser hands. Are you scared?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Would you trust a robot surgeon to perform a brain operation if it had a 99% success rate?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "I would trust it to relieve my pain."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "Ironically, I would trust the robot more than a human because it is industrious and does not get tired, which is a privilege human doctors don't have."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if the robot makes a mistake? Who do you sue? The hospital or the coder?"</div>
+                    </div>
+                </div>
+            </div>
+            <div class="instructional-package">
+                <!-- GRASPS BUTTON -->
+                <div class="pkg-toggle grasps-btn" onclick="togglePkg(this, 'g10')">GRASPS Task: Longevity Plan</div>
+                <div id="g10" class="pkg-content">
+                    <div class="grasps-meta"><strong>Goal:</strong> Increase the lifespan of a sick city.</div>
+                    <div class="grasps-role">Role: Public Health Commissioner</div>
+                    <div class="grasps-meta"><strong>Audience:</strong> City Residents</div>
+                    <div class="grasps-meta"><strong>Situation:</strong> City faces chronic epidemic of lifestyle diseases. Transform into "Blue Zone".</div>
+                    <div class="grasps-product"><strong>Product:</strong> "Longevity City" Master Plan changing laws/guidelines to encourage industrious living.</div>
+                </div>
+
+                <div class="pkg-toggle" onclick="togglePkg(this, 'p10')">Unit 10 Vocabulary</div>
+                <div id="p10" class="pkg-content">
+                    <table class="vocab-table">
+                        <tr><th>Word</th><th>Chinese</th><th>Word</th><th>Chinese</th></tr>
+                        <tr><td>chronic</td><td>慢性的</td><td>discourage</td><td>劝阻</td></tr>
+                        <tr><td>epidemic</td><td>流行病</td><td>guideline</td><td>指导方针</td></tr>
+                        <tr><td>immune</td><td>免疫的</td><td>longevity</td><td>长寿</td></tr>
+                        <tr><td>lifespan</td><td>寿命</td><td>privilege</td><td>特权</td></tr>
+                        <tr><td>mandatory</td><td>强制的</td><td>relieve</td><td>缓解</td></tr>
+                        <tr><td>relocate</td><td>搬迁</td><td>industrious</td><td>勤劳的</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIT 11 -->
+        <div id="u11" class="unit-display">
+            <div class="unit-hero">
+                <div class="hero-title">
+                    <span class="date-badge">Jun 15 - 19</span>
+                    <h2>Unit 11: Green Solutions</h2>
+                    <div class="big-question">Tech: Cause or Cure?</div>
+                    <span class="friction-question">"Is there such thing as 'away' when we throw things away?"</span>
+                </div>
+                <div class="cefr-tag">11A: Patterning • 11B: Play</div>
+            </div>
+            <div class="readings-grid">
+                <div class="reading-panel">
+                    <div class="panel-title">11A: The Water Footprint</div>
+                    <div class="genai-card" onclick="speakCard(this, 11)">
+                        <div class="genai-habit">Patterning</div>
+                        <div class="code-block">"Show the water shortage crisis by visualizing heavy usage for cotton."</div>
+                        <div class="vocab-list">Use: crisis, shortage, usage, import, process</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 11)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>The extent of the global water crisis is starting to surpass our ability to manage it. Whereby can we divert resources to prevent a shortage?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>How long was your shower today? Do you have any habits related to saving water? Describe a time you experienced a water shortage or power outage.</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 11)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "There is a patch of plastic in the ocean the size of France. How do we clean it?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Should plastic be banned entirely to stop the consumption crisis?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "Yes, because plastic creates a crisis for the ocean."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "We cannot ban it, but we must divert our efforts to ensure we don't surpass the planet's ability to handle the waste."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if plastic becomes illegal? How do we package medicine or food safely?"</div>
+                    </div>
+                </div>
+                <div class="reading-panel b-side">
+                    <div class="panel-title">11B: E-Waste Art</div>
+                    <div class="genai-card" onclick="speakCard(this, 11)">
+                        <div class="genai-habit">Play</div>
+                        <div class="code-block">"Create art from discarded components considered toxic and hazardous."</div>
+                        <div class="vocab-list">Use: discard, hazardous, toxic, recycle, component</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 11)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>It is distressing to see piles of obsolete electronics containing toxic substances. How can we facilitate a transition to better infrastructure to avoid discarding devices?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>Look in your "junk drawer". Do you see old phones you need to discard? Why haven't you thrown them away? Do you think local infrastructure handles this well?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 11)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "Your old laptop contains gold. Why don't you dig it out?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Is it better to dig new mines in the rainforest or mine our old, toxic landfills for metal?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "Mine the landfills to clean up the hazardous waste."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "We need a transition where we improve our infrastructure to reclaim materials from the pile of old trash."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if we run out of metal for iPhones? Will technology stop advancing?"</div>
+                    </div>
+                </div>
+            </div>
+            <div class="instructional-package">
+                <!-- GRASPS BUTTON -->
+                <div class="pkg-toggle grasps-btn" onclick="togglePkg(this, 'g11')">GRASPS Task: E-Waste</div>
+                <div id="g11" class="pkg-content">
+                    <div class="grasps-meta"><strong>Goal:</strong> Solve the E-Waste crisis through circular design.</div>
+                    <div class="grasps-role">Role: Circular Economy Designer</div>
+                    <div class="grasps-meta"><strong>Audience:</strong> Tech Manufacturers</div>
+                    <div class="grasps-meta"><strong>Situation:</strong> Discarding too many toxic devices. Shortage of raw materials.</div>
+                    <div class="grasps-product"><strong>Product:</strong> "Lifecycle Map" for new phone ensuring 0% hazardous waste.</div>
+                </div>
+
+                <div class="pkg-toggle" onclick="togglePkg(this, 'p11')">Unit 11 Vocabulary</div>
+                <div id="p11" class="pkg-content">
+                    <table class="vocab-table">
+                        <tr><th>Word</th><th>Chinese</th><th>Word</th><th>Chinese</th></tr>
+                        <tr><td>crisis</td><td>危机</td><td>discard</td><td>丢弃</td></tr>
+                        <tr><td>shortage</td><td>短缺</td><td>hazardous</td><td>危险的</td></tr>
+                        <tr><td>surpass</td><td>超过</td><td>toxic</td><td>有毒的</td></tr>
+                        <tr><td>divert</td><td>转移</td><td>infrastructure</td><td>基础设施</td></tr>
+                        <tr><td>consumption</td><td>消费</td><td>transition</td><td>过渡</td></tr>
+                        <tr><td>inherit</td><td>继承</td><td>obsolete</td><td>过时的</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIT 12 -->
+        <div id="u12" class="unit-display">
+            <div class="unit-hero">
+                <div class="hero-title">
+                    <span class="date-badge">Jun 22 - Jul 3</span>
+                    <h2>Unit 12: Earth & Beyond</h2>
+                    <div class="big-question">Mars: Lifeboat or Distraction?</div>
+                    <span class="friction-question">"Should we protect Earth at all costs?"</span>
+                </div>
+                <div class="cefr-tag">12A: Modeling • 12B: Abstracting</div>
+            </div>
+            <div class="readings-grid">
+                <div class="reading-panel">
+                    <div class="panel-title">12A: The Goldilocks Zone</div>
+                    <div class="genai-card" onclick="speakCard(this, 12)">
+                        <div class="genai-habit">Modeling</div>
+                        <div class="code-block">"Visualize a planet where plants thrive. Atmosphere resembles Earth's."</div>
+                        <div class="vocab-list">Use: atmosphere, composition, resemble, scope, thrive</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 12)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>Scientists analyze atomic composition to find planets that resemble Earth. Hence, if we find a planet where life can thrive, should we exclude moving there given Earth's toxic state?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>If you found a planet resembling Earth but with no pollution, would you move there? Does the size of the universe make you feel small or excited?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 12)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "Look up. There is a rock moving 30,000 mph. We can't see it. Should we worry?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "Should we spend billions to watch the sky for asteroids, or spend that money on poverty?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "Spend it on space because an asteroid has a huge scope of damage."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "We must spend it on space; poverty is bad, but an asteroid impact would change the composition of the atmosphere, making it impossible to thrive."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "What if we find an asteroid hitting in 50 years? Do we fix it now, or leave it for our children?"</div>
+                    </div>
+                </div>
+                <div class="reading-panel b-side">
+                    <div class="panel-title">12B: Asteroid Deflection</div>
+                    <div class="genai-card" onclick="speakCard(this, 12)">
+                        <div class="genai-habit">Abstracting</div>
+                        <div class="code-block">"Illustrate a scenario where we deflect a meteor to avoid a catastrophe."</div>
+                        <div class="vocab-list">Use: catastrophe, deflect, dilemma, scenario, smash</div>
+                    </div>
+                    <div class="writing-card" onclick="speakCard(this, 12)">
+                        <div class="writing-title">Writing Prompt</div>
+                        <div class="writing-text">
+                            <span class="writing-part"><strong>Part 1: Analysis</strong><br>We face a dilemma: should we engage nuclear motors to deflect an asteroid, or will that cause a worse catastrophe? Would such an event change the atmospheric composition?</span>
+                            <span class="writing-part"><strong>Part 2: Personal Connection</strong><br>How would your specific family react to this news? Who would panic, and who would try to solve it? Do you think humanity could thrive after such an event?</span>
+                        </div>
+                        <button class="sc-toggle-btn" onclick="toggleSelfCheck(event, this)">Rubric Self-Check ▼</button>
+                        <div class="self-check-container" onclick="event.stopPropagation()">
+                            <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
+                            <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Used transitions?</label>
+                        </div>
+                    </div>
+                    <button class="qa-toggle-btn" onclick="toggleQA(this)">Speaking Toolkit ▼</button>
+                    <div class="qa-content" onclick="speakCard(this, 12)">
+                        <div class="qa-section"><span class="qa-label">Warm-Up</span> "We can nuke the asteroid. Like in the movies. Is that actually a good idea?"</div>
+                        <div class="qa-section"><span class="qa-label">Prompt</span> "If an asteroid is coming, should we tell the public and cause panic, or keep it secret?"</div>
+                        <div class="qa-section"><span class="qa-label">Support</span> "Keep it secret to avoid a catastrophe of panic."</div>
+                        <div class="qa-section"><span class="qa-label">Extension</span> "Tell the public; engaging in a scenario where the government hides a dilemma like this creates mistrust."</div>
+                        <div class="qa-section"><span class="qa-label">Hypothetical</span> "We can save Earth by using nuclear weapons in space. But if it fails, the radiation will kill us faster. Do we risk it?"</div>
+                    </div>
+                </div>
+            </div>
+            <div class="instructional-package">
+                <!-- GRASPS BUTTON -->
+                <div class="pkg-toggle grasps-btn" onclick="togglePkg(this, 'g12')">GRASPS Task: Planetary Defense</div>
+                <div id="g12" class="pkg-content">
+                    <div class="grasps-meta"><strong>Goal:</strong> Save the planet from an existential threat.</div>
+                    <div class="grasps-role">Role: Planetary Defense Commander</div>
+                    <div class="grasps-meta"><strong>Audience:</strong> UN Security Council</div>
+                    <div class="grasps-meta"><strong>Situation:</strong> Asteroid predicted to smash into Earth. Choose: Deflect or Destroy?</div>
+                    <div class="grasps-product"><strong>Product:</strong> Crisis Action Plan comparing catastrophic risks vs cost.</div>
+                </div>
+
+                <div class="pkg-toggle" onclick="togglePkg(this, 'p12')">Unit 12 Vocabulary</div>
+                <div id="p12" class="pkg-content">
+                    <table class="vocab-table">
+                        <tr><th>Word</th><th>Chinese</th><th>Word</th><th>Chinese</th></tr>
+                        <tr><td>atmosphere</td><td>大气层</td><td>catastrophe</td><td>灾难</td></tr>
+                        <tr><td>composition</td><td>成分</td><td>deflect</td><td>使偏斜</td></tr>
+                        <tr><td>resemble</td><td>像</td><td>dilemma</td><td>困境</td></tr>
+                        <tr><td>scope</td><td>范围</td><td>scenario</td><td>方案</td></tr>
+                        <tr><td>thrive</td><td>繁荣</td><td>smash</td><td>粉碎</td></tr>
+                        <tr><td>exclude</td><td>排除</td><td>engage</td><td>参与</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function showUnit(unitId, btn) {
+            document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+
+            document.querySelectorAll('.unit-display').forEach(display => display.classList.remove('active'));
+            const target = document.getElementById(unitId);
+            if(target) {
+                target.classList.add('active');
+            }
+        }
+
+        function togglePkg(header, contentId) {
+            header.classList.toggle('active');
+            const content = document.getElementById(contentId);
+            content.classList.toggle('open');
+        }
+        
+        function toggleQA(btn) {
+            const content = btn.nextElementSibling;
+            content.classList.toggle('open');
+            btn.textContent = content.classList.contains('open') ? "Close Toolkit ▲" : "Speaking Toolkit ▼";
+        }
+
+        function toggleSelfCheck(e, btn) {
+            e.stopPropagation();
+            const container = btn.nextElementSibling;
+            container.classList.toggle('open');
+            btn.textContent = container.classList.contains('open') ? "Close Checklist ▲" : "Rubric Self-Check ▼";
+        }
+
+        // TEXT TO SPEECH LOGIC
+        const synth = window.speechSynthesis;
+        let voices = [];
+
+        function initVoices() {
+            voices = synth.getVoices();
+        }
+
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = initVoices;
+        }
+
+        function getVoiceForUnit(unitIndex) {
+            const map = {
+                1: 'Ava', 5: 'Ava', 9: 'Ava',
+                2: 'Brian', 6: 'Brian', 10: 'Brian',
+                3: 'Emma', 7: 'Emma', 11: 'Emma',
+                4: 'Andrew', 8: 'Andrew', 12: 'Andrew'
+            };
+            const targetName = map[unitIndex] || 'Ava';
+            
+            // Priority: Multilingual Natural -> Natural -> Any matching name -> Default US -> First available
+            let selectedVoice = voices.find(v => v.name.includes(targetName) && v.name.includes('Multilingual'));
+            if (!selectedVoice) selectedVoice = voices.find(v => v.name.includes(targetName) && v.name.includes('Natural'));
+            if (!selectedVoice) selectedVoice = voices.find(v => v.name.includes(targetName));
+            if (!selectedVoice) selectedVoice = voices.find(v => v.name.includes('Microsoft') && v.name.includes('United States'));
+            if (!selectedVoice) selectedVoice = voices[0];
+
+            return selectedVoice;
+        }
+
+        function speakCard(element, unitIndex) {
+            // Only speak if user didn't click the self-check button/checkbox area
+            if (synth.speaking) {
+                synth.cancel();
+            }
+
+            const originalBg = element.style.backgroundColor;
+            element.classList.add('speaking');
+            setTimeout(() => { element.classList.remove('speaking'); }, 500);
+
+            let textToRead = "";
+            
+            // Writing Card: Title + Prompt Text (ignoring checklist)
+            if(element.classList.contains('writing-card')) {
+                const title = element.querySelector('.writing-title').innerText;
+                const parts = element.querySelectorAll('.writing-part');
+                let promptText = "";
+                parts.forEach(p => promptText += p.innerText + " ");
+                textToRead = title + ". " + promptText;
+            } 
+            // GenAI Card: Habit + Constraint
+            else if(element.classList.contains('genai-card')) {
+                const habit = element.querySelector('.genai-habit').innerText;
+                const constraint = element.querySelector('.code-block').innerText;
+                textToRead = habit + ". " + constraint;
+            }
+            // Speaking Toolkit
+            else if(element.classList.contains('qa-content')) {
+                 textToRead = element.innerText;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(textToRead);
+            utterance.voice = getVoiceForUnit(unitIndex);
+            utterance.rate = 0.85; 
+            
+            synth.speak(utterance);
+        }
+    </script>
+</body>
+</html>
