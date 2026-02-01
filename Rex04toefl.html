@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEFL iBT Reading Section 2026</title>
+    <style>
+        :root {
+            --header-bg: #2c3e50;
+            --header-text: #ecf0f1;
+            --bg-color: #f4f6f7;
+            --panel-bg: #ffffff;
+            --accent-blue: #3498db;
+            --accent-hover: #2980b9;
+            --text-color: #333;
+            --border-color: #dcdcdc;
+            --highlight-color: #ffeaa7;
+            --active-nav: #34495e;
+            --correct-bg: #d4edda;
+            --correct-border: #c3e6cb;
+            --correct-text: #155724;
+            --incorrect-bg: #f8d7da;
+            --incorrect-border: #f5c6cb;
+            --incorrect-text: #721c24;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        /* --- Top Bar & Navigation --- */
+        .top-bar {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .user-display {
+            font-weight: 600;
+            margin-right: 15px;
+            color: #bdc3c7;
+            font-size: 14px;
+        }
+
+        .score-display {
+            background: rgba(0,0,0,0.3);
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #f1c40f;
+        }
+
+        .btn-nav-top {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
+        }
+
+        .btn-nav-top:hover { background: rgba(255,255,255,0.1); }
+        .btn-nav-top:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* --- Audio Player --- */
+        .audio-player {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+        
+        .btn-audio {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* --- Views --- */
+        .view {
+            display: none;
+            flex: 1;
+            overflow: hidden;
+            height: calc(100vh - 60px);
+        }
+        
+        .view.active {
+            display: flex;
+        }
+
+        /* --- Home Dashboard --- */
+        #home-view {
+            flex-direction: column;
+            padding: 40px;
+            overflow-y: auto;
+            align-items: center;
+        }
+
+        .user-input-container {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .user-input-container input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 250px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Smaller min-width */
+            gap: 15px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .unit-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 80px;
+        }
+
+        .unit-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-color: var(--accent-blue);
+            background-color: #f8fbff;
+        }
+
+        .unit-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        /* --- Passage View (Split Screen) --- */
+        #passage-view {
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .passage-panel {
+            flex: 1.2;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 30px;
+            overflow-y: auto;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        .passage-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .paragraph-marker {
+            font-weight: bold;
+            color: #7f8c8d;
+            margin-right: 8px;
+            float: left;
+        }
+
+        p { margin-bottom: 20px; text-align: justify; }
+
+        .reading-active {
+            background-color: rgba(255, 234, 167, 0.3);
+            border-left: 3px solid #fdcb6e;
+            padding-left: 10px;
+            transition: background 0.3s;
+        }
+
+        .question-panel {
+            flex: 0.8;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* --- Question Styling --- */
+        .option-item {
+            display: flex;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+        }
+        
+        .option-item:hover {
+            background-color: #f8f9fa;
+            border-color: #bdc3c7;
+        }
+
+        .option-item.selected {
+            background-color: #e3f2fd;
+            border-color: #3498db;
+        }
+
+        .option-item.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--correct-text);
+        }
+
+        .option-item.incorrect {
+            background-color: var(--incorrect-bg);
+            border-color: var(--incorrect-border);
+            color: var(--incorrect-text);
+        }
+
+        .bottom-nav {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-check {
+            background: white;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-check:hover { background-color: #f0f8ff; }
+        .btn-check:disabled { opacity: 0.5; cursor: default; border-color: #ccc; color: #ccc; }
+
+        .btn-next-q {
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-next-q:hover { background-color: var(--accent-hover); }
+
+        .feedback-text {
+            margin-top: 15px;
+            font-weight: 600;
+            font-size: 14px;
+            min-height: 20px;
+        }
+
+        /* Summary Overlay */
+        .summary-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: white;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .summary-overlay.active { display: flex; }
+        .summary-score { font-size: 48px; color: var(--accent-blue); margin: 20px 0; }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #95a5a6; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navigation -->
+    <header class="top-bar">
+        <div class="nav-controls">
+            <button class="btn-nav-top" id="btn-home">🏠 Home</button>
+            <button class="btn-nav-top" id="btn-back">⬅ Back</button>
+            <button class="btn-nav-top" id="btn-fwd">Forward ➡</button>
+            <span class="user-display" id="header-username"></span>
+            <span class="score-display" id="header-score">Score: 0</span>
+        </div>
+        
+        <div class="audio-player">
+            <button class="btn-audio" id="btn-play-pause">▶</button>
+            <button class="btn-audio" id="btn-stop">⏹</button>
+        </div>
+    </header>
+
+    <!-- HOME VIEW: Dashboard -->
+    <div id="home-view" class="view active">
+        <!-- Replaced generic title with simple spacing or specific branding if needed, 
+             but request asked to remove "TOEFL iBT Reading Explorer" text specifically -->
+        <h1 style="margin-bottom: 20px; color: #34495e;">Reading Sections</h1>
+        
+        <div class="user-input-container">
+            <label for="username-input"><strong>Test Taker Name:</strong></label>
+            <input type="text" id="username-input" placeholder="Enter your name">
+        </div>
+
+        <div class="grid-container" id="unit-grid">
+            <!-- Units will be injected here by JS -->
+        </div>
+    </div>
+
+    <!-- PASSAGE VIEW: Reader -->
+    <div id="passage-view" class="view">
+        <!-- Text Panel -->
+        <div class="passage-panel" id="text-container">
+            <div class="passage-title" id="display-title">Title Here</div>
+            <div id="display-content">
+                <!-- Content injected here -->
+            </div>
+        </div>
+
+        <!-- Question Panel -->
+        <div class="question-panel">
+            <!-- Summary Overlay -->
+            <div id="summary-screen" class="summary-overlay">
+                <h2>Section Complete!</h2>
+                <div class="summary-score" id="final-score">0 / 0</div>
+                <p>Great job practicing!</p>
+                <button class="btn-next-q" onclick="goHome()">Return to Home</button>
+            </div>
+
+            <!-- Active Question -->
+            <div id="quiz-container">
+                <div style="font-size: 14px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 10px;">
+                    Question <span id="q-progress">1</span> of <span id="q-total">10</span>
+                </div>
+                <!-- Removed question type title to allow full question text -->
+                <p id="q-text" style="font-size: 16px; font-weight: 500; margin-top: 0;">Question Text...</p>
+                
+                <div id="q-options" style="display: flex; flex-direction: column; margin-top: 20px;">
+                    <!-- Options injected by JS -->
+                </div>
+
+                <div id="feedback-area" class="feedback-text"></div>
+
+                <div class="bottom-nav">
+                    <button class="btn-check" id="btn-check-answer">Check Answer</button>
+                    <button class="btn-next-q" id="btn-next-question">Next Question</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Data: All Reading Explorer Texts & Questions ---
+        const units = [
+            {
+                id: "1A",
+                title: "Unit 1A: The Visual Village",
+                preview: "Before the age of the smartphone, aspiring photographers had to learn how to use high-tech cameras...",
+                questions: [
+                    { text: "What is the main purpose of this passage?", options: ["to give examples of camera apps, such as Instagram, that can alter photographs", "to describe how smartphones are changing the way we look at photographs", "to argue that photojournalists should not alter photographs of natural disasters", "to explain how people can upload photographs and share them around the world instantly"], correctAnswer: 1 },
+                    { text: "Which of the following is NOT mentioned as the subject of a photograph?", options: ["a natural disaster", "a political event", "a wedding", "a cat's breakfast"], correctAnswer: 2 },
+                    { text: "According to the passage, why do photojournalists sometimes use cell phones instead of professional cameras?", options: ["cell phones are cheaper", "cell phones are more convenient to carry around", "cell phones take better photos", "cell phones are less likely to be noticed"], correctAnswer: 3 },
+                    { text: "What does 'the course of history' in the second sentence of paragraph D mean?", options: ["the system of publishing photographs in magazines", "world events that happened after this", "public opinions of photographs in magazines", "history has become less memorable"], correctAnswer: 1 },
+                    { text: "What does 'embrace' in the first sentence of paragraph F mean?", options: ["to hold in your arms", "to take up something readily", "to use more of", "to become more popular"], correctAnswer: 1 },
+                    { text: "In paragraph G, what is the concern critics have about photojournalists covering war and conflicts?", options: ["They don't want the photojournalists to get injured while taking photos.", "They worry that altered photos give the public an inaccurate impression of war.", "They think that photos of war scenes are too graphic for children to see.", "They find stories of war distracting and irrelevant to their everyday lives."], correctAnswer: 1 },
+                    { text: "What does 'series' in the second sentence of paragraph H mean?", options: ["a number of events coming one after another", "a television program on how photographers make decisions", "a collection of photographs", "a set of photographs taken at different angles and with different lens"], correctAnswer: 0 },
+                    { text: "What does 'them' in the last sentence of paragraph H refer to?", options: ["altered photographs", "amateur photographers", "camera app filters", "members of the media"], correctAnswer: 0 },
+                    { text: "What does 'produce' in the last sentence of paragraph K mean?", options: ["to compose or create", "fresh fruit and vegetables", "to document something", "food sold in supermarkets"], correctAnswer: 0 },
+                    { text: "In paragraph L, what does the author mean by 'the change is irreversible'?", options: ["the effect that seeing these images has on the public is permanent", "once an image is altered, it can't be changed back to its original state", "photographers who alter photos will always be different from those who don't", "the public will not trust photographs because they might have been altered"], correctAnswer: 0 }
+                ],
+                paragraphs: [
+                    "[A] Before the age of the smartphone, aspiring photographers had to learn how to use high-tech cameras and photographic techniques. Not everyone had cameras, and it took skill and a good eye to capture and create a great photograph. Today, with the huge range of camera apps on our smartphones, we are all amateur photographers. And pretty good ones, too: The quality of smartphone images now nearly equals that of digital cameras.",
+                    "[B] The new ease of photography has given us a tremendous appetite for capturing the magical and the ordinary. We are obsessed with documenting everyday moments, whether it's a shot of our breakfast, our cat - or the cat's breakfast. And rather than collect pictures in scrapbooks, we share, like, and comment on them with friends and strangers around the globe.",
+                    "[C] Even photojournalists are experimenting with cell phones because their near invisibility makes it easier to capture unguarded moments. The Internet also allows photojournalists to avoid traditional media. They can now act as their own publishers - reaching huge audiences via social media sites such as Instagram.",
+                    "[D] In the past, magazines published unforgettable photos of important people and global events that captured our imaginations. These photos had the power to change public opinion - even the course of history. But if there are fewer memorable images today, it's not because there are fewer good images: It's because there are so many.",
+                    "[E] Cameras are everywhere - a situation that is transforming the way we experience dramatic events. When there are major political events or natural disasters, it is ordinary citizens with cell phones - not photojournalists - who often provide the first news images.",
+                    "[F] As people everywhere embrace photography and the media make use of citizen journalists, professional standards appear to be shifting. In the past, most people trusted photojournalists to accurately represent reality. Today, however, digital images can be altered in ways the naked eye might never notice.",
+                    "[G] The question of the accuracy of images gets even trickier when photojournalists start experimenting with camera apps - like Flickr or Instagram - which encourage the use of filters. Images can be colored, brightened, faded, and scratched to make photographs more artistic, or to give them an antique look. Critics worry that antique-looking photographs romanticize war, while distancing us from those who fight in them.",
+                    "[H] Yet, photography has always been more subjective than we assume. Each picture is a result of a series of decisions - where to stand, what lens to use, and what to leave in or out of the frame. Does altering photographs with camera app filters make them less true?",
+                    "[I] There's something powerful and exciting about the experiment that the digital age has forced upon us. These new tools make it easier to tell our own stories, and they give others the power to do the same.",
+                    "[J] The increase in the number of photographs and photographers might even be good for democracy itself. Hundreds of millions of potential citizen journalists make the world smaller and help keep leaders honest.",
+                    "[K] Who knows? Our obsession with documentation and constantly being connected could lead to a radical change in our way of being. Perhaps we are witnessing the development of a universal visual language. Of course, as with any language, there will be those who produce poetry and those who make shopping lists.",
+                    "[L] It's not clear whether this flowering of image-making will lead to a public that better appreciates and understands images. Or will it simply numb us to the profound effects a well-made image can have? Regardless, the change is irreversible. Let's hope the millions of new photographs made today help us see what we all have in common."
+                ]
+            },
+            {
+                id: "1B",
+                title: "Unit 1B: My Journey in Photographs",
+                preview: "I got my first real job at age 12, as a waitress. I am convinced that I learned more as a waitress...",
+                questions: [
+                    { text: "In the third sentence of paragraph A, what does 'it' refer to?", options: ["going to college", "a camera", "her job as a waitress", "a classroom"], correctAnswer: 2 },
+                    { text: "Which of the following places is NOT mentioned in the passage?", options: ["Africa", "Mexico", "South America", "Bermuda"], correctAnswer: 2 },
+                    { text: "Where is the main idea of paragraph I stated?", options: ["in the first sentence", "in the second sentence", "in the third sentence", "in the fourth sentence"], correctAnswer: 1 },
+                    { text: "Which of the following statements is Annie Griffiths most likely to agree with?", options: ["Photographers can learn a lot from other jobs that require people skills.", "Photographers should expect a lot of help from their magazine publishers.", "Photographers should go to photojournalism school after they finish college.", "Photographers should focus on learning about the culture rather than individuals."], correctAnswer: 0 },
+                    { text: "Which of the following happened first?", options: ["Griffiths started taking photographs.", "Griffiths worked at the Globe.", "Griffiths worked as a waitress.", "Griffiths graduated from college."], correctAnswer: 2 },
+                    { text: "Which of the following was true about Bob Gilka?", options: ["He lived in southern Minnesota.", "He was younger than Griffiths.", "He gave Griffiths her first job.", "He worked at National Geographic."], correctAnswer: 3 },
+                    { text: "What kind of information do you need to look for to answer this question: Who was Griffiths’ first boss after she graduated from college?", options: ["a place", "a name", "an object"], correctAnswer: 1 },
+                    { text: "What kind of information do you need to look for to answer this question: When did Griffiths start working for National Geographic?", options: ["a date", "a reason", "a name"], correctAnswer: 0 },
+                    { text: "What kind of information do you need to look for to answer this question: Where was Griffiths when she was lifted on the back of a whale?", options: ["a place", "a number", "a reason"], correctAnswer: 0 },
+                    { text: "What kind of information do you need to look for to answer this question: Why does Griffiths shoot portraits of people in developing countries every year?", options: ["an object", "a number", "a reason"], correctAnswer: 2 }
+                ],
+                paragraphs: [
+                    "[A] I got my first real job at age 12, as a waitress. I am convinced that I learned more as a waitress than I ever did in a classroom. When I went on to college, it also paid for tuition and housing and - eventually - a camera. But best of all, being a waitress taught me to quickly assess and understand all kinds of people.",
+                    "[B] From the moment I picked up a camera, I was hooked. I lost interest in other studies, and all I wanted to do was take pictures for the university newspaper. In six months, I was able to get a lot of great experience.",
+                    "[C] Jim Vance was the top-notch publisher of the Globe. He had very high expectations of all the staff. With little or no instruction from him, writers and photographers were expected to fill the paper with stories that were important to our readers.",
+                    "[D] Among the most important things I learned at the Globe was that if you can make friends with a shy Norwegian farmer and be invited to his kitchen table, you can probably do well in any culture on Earth.",
+                    "[E] It was while I was working at the Globe that I happened to answer the phone one morning. A man's voice asked, 'You a photographer?' It was Bob Gilka from National Geographic.",
+                    "[F] My little picture of hail damage in southern Minnesota was well received, and a year later, I was working for Bob - National Geographic's legendary director of photography.",
+                    "[G] I was the youngest photographer working for National Geographic when I arrived in 1978, and I spent at least a decade just trying not to make mistakes.",
+                    "[H] On many assignments, the most challenging part turned out to be the transportation. Over the years, I traveled by horse, car, train, truck, and all sorts of old vehicles. I traveled by mule in Mexico... by moped in Bermuda... In Africa I traveled by balloon...",
+                    "[I] Wherever I traveled in the world, taking beautiful pictures was always my goal. However, later in my career, I also wanted my pictures to make a real difference in people's lives.",
+                    "[J] I am deeply grateful for my life in photography and the amazing lessons it has taught me. I have learned that all people are not alike, but they do mostly have the same hopes and fears."
+                ]
+            },
+            {
+                id: "2A",
+                title: "Unit 2A: Living Light",
+                preview: "The ability of some species to create light - known as bioluminescence - is both magical and commonplace...",
+                questions: [
+                    { text: "Where is the main idea of paragraph A stated?", options: ["in the first sentence", "in the fourth sentence", "in the fifth sentence", "in the last sentence"], correctAnswer: 0 },
+                    { text: "Bioluminescence in life forms ____.", options: ["happens only at night", "can be seen only in animals", "is more common in the sea", "occurs only in the Southern hemisphere"], correctAnswer: 2 },
+                    { text: "According to the passage, at what depth is the ocean completely black?", options: ["just below the surface", "200 meters below the surface", "600 meters below the surface", "blue light is visible at any depth"], correctAnswer: 2 },
+                    { text: "In the third sentence of paragraph E, what does 'them' refer to?", options: ["the upper layers of the ocean", "predators", "jellyfish and swimming snails", "certain shrimp and squid"], correctAnswer: 3 },
+                    { text: "Which method of avoiding predators is NOT mentioned in the reading?", options: ["illuminating parts of their bodies to blend in", "staying out of the light zone in the day", "reflecting light from predators", "emitting a sudden burst of light when disturbed"], correctAnswer: 2 },
+                    { text: "In paragraph G, what does the author mean by 'the enemy of my enemy is my friend'?", options: ["two parties with a common enemy can help each other", "everyone who is not with me is my enemy", "the worst enemy is the one who was once your friend", "enemies should make up and become friends"], correctAnswer: 0 }
+                ],
+                paragraphs: [
+                    "[A] The ability of some species to create light - known as bioluminescence - is both magical and commonplace. Magical, because of its glimmering beauty. Commonplace, because many life forms can do it. On land the most familiar examples are fireflies.",
+                    "[B] But the real biological light show takes place in the sea. Here, an astonishing number of beings can make light. Some, such as ostracods, are like ocean fireflies, using flashes of light to attract a mate.",
+                    "[C] As a place to live, the ocean has a couple of peculiarities. Firstly, there is almost nowhere to hide, so being invisible is very important. Secondly, as you descend, sunlight disappears. At 200 meters below the surface, the ocean becomes a kind of perpetual twilight, and at 600 meters the blue fades out too.",
+                    "[D] In the ocean's upper layers, where light penetrates, creatures need to blend in to survive. Any life form that stands out is in danger of being spotted by predators.",
+                    "[E] Other sea species use light to survive in the upper layers - but how? Some, such as certain shrimp and squid, illuminate their bellies to match the light coming from above. This allows them to become invisible to predators below.",
+                    "[F] But if the aim is to remain invisible, why do some creatures light up when they are touched? First, a sudden burst of light may startle a predator, giving the prey a chance to escape.",
+                    "[G] Second, there is the principle of 'the enemy of my enemy is my friend.' Giving off light can help summon the predator of your predator. Known as the 'burglar alarm' effect, this is especially useful for tiny life forms."
+                ]
+            },
+            {
+                id: "2B",
+                title: "Unit 2B: Feathers of Love",
+                preview: "Covered in soft, black feathers, the noble performer bows deeply to his audience...",
+                questions: [
+                    { text: "What is the purpose of this passage?", options: ["to argue that birds of paradise are not violent", "to talk about the author's experience with birds of paradise", "to explain why female birds of paradise have longer life spans", "to describe how male birds of paradise attempt to attract females"], correctAnswer: 3 },
+                    { text: "In the second sentence of paragraph B, what does 'He' refer to?", options: ["the researcher", "the male bird", "the author", "the audience"], correctAnswer: 1 },
+                    { text: "What is the purpose of paragraph E?", options: ["to show that all birds of paradise dance the same way", "to describe different types of unusual bird behavior", "to argue that the female is the one who chooses the mate", "to persuade the reader to take a trip to New Guinea"], correctAnswer: 1 },
+                    { text: "What does the phrase 'other pressures' refers to in paragraph H?", options: ["predators and lack of food", "logging and deforestation", "hunters who sell feathers", "the importance of finding a mate"], correctAnswer: 0 },
+                    { text: "What phrase is closest in meaning to the phrase 'passed down' in paragraph K?", options: ["forgotten about something", "given to the younger generation", "sold for a lower price than usual", "changed from what it used to be"], correctAnswer: 1 },
+                    { text: "Which of the following is NOT mentioned as a type of environment found in New Guinea?", options: ["swamps", "mountains", "deserts", "coastal plains"], correctAnswer: 2 },
+                    { text: "Which of the following is true about birds of paradise?", options: ["Birds of paradise today look like they looked millions of years ago.", "New Guinea is the only place where birds of paradise live.", "Some birds of paradise dance in a group to attract females.", "Birds of paradise are no longer hunted for their feathers."], correctAnswer: 2 },
+                    { text: "In paragraph D, which of the following phrases is used in a simile?", options: ["beautiful feathers", "display behavior", "a dance floor", "the trees"], correctAnswer: 2 },
+                    { text: "In paragraph E, why is the male Carola's parotia referred to as a dance king?", options: ["He is the largest type of parotia bird.", "His dance is very impressive.", "He is the only parotia bird that does a butterfly dance.", "He is the only parotia bird that does a ballerina dance."], correctAnswer: 1 },
+                    { text: "What example of figurative language is this sentence from paragraph F? 'These birds of paradise invite us to solve a mystery of nature.'", options: ["simile", "metaphor", "personification"], correctAnswer: 2 }
+                ],
+                paragraphs: [
+                    "[A] Covered in soft, black feathers, the noble performer bows deeply to his audience. From the top of his head grow several long feathers that tap the ground as he begins his dance. This dancing bird is Carola's parotia, just one of the many birds of paradise that live on the island of New Guinea.",
+                    "[B] Keeping the females' attention isn't easy. He pauses for dramatic effect, then commences his dance again. His neck sinks and his head goes up and down, head feathers bouncing.",
+                    "[C] In the dense jungle of New Guinea is nature's most absurd theater, the special mating game of the birds of paradise. To attract females, males' feathers resemble costumes worthy of the stage.",
+                    "[D] In addition to having extremely beautiful feathers, each species has its own type of display behavior. Some dance on the ground, in areas that they have cleared and prepared like their own version of a dance floor.",
+                    "[E] The male red bird of paradise shows off his red and yellow feathers in a display called a 'butterfly dance.' The male Carola's parotia, however, is the dance king of the birds of paradise.",
+                    "[F] These brilliantly colored birds of paradise have developed over millions of years from ancient birds whose feathers were dark and boring in comparison. It seems to be a contradiction that such extreme feathers and colors could have been favored by the process of evolution.",
+                    "[G] 'Life here is pretty comfortable for birds of paradise. The island's unique environment has allowed them to go to extremes unheard of elsewhere,' says biologist Ed Scholes.",
+                    "[H] Sexual selection has thus been the driving force in the evolution of birds of paradise. Freed of other pressures, birds of paradise began to specialize in attracting mates.",
+                    "[I] The diversity of New Guinea's birds also springs from its varied environments: from coastal plains to cloud forests, from swamps to mountains rising as high as 5,000 meters.",
+                    "[J] The people of New Guinea have been watching the displays of the birds of paradise for centuries. Locals will tell you they went into the forest and copied their rituals from the birds.",
+                    "[K] In the past, demand for the birds' feathers resulted in a huge amount of hunting. Nowadays, few birds die for fashion or for traditional costumes: Ceremonial feathers are passed down from generation to generation.",
+                    "[L] There are more serious threats to the birds, however. An illegal market in feathers still exists. Large farms use up thousands of hectares of forest where birds of paradise once lived.",
+                    "[M] David Mitchell, a conservationist, is relying on the help of local villagers to record where the birds display and what they eat. He hopes to not only gather data, but also encourage protection of the birds' habitat."
+                ]
+            },
+            {
+                id: "3B",
+                title: "Unit 3B: The Battle for Biotech Foods",
+                preview: "Genetic engineering (GE) of crops and animals through the manipulation of DNA is producing a revolution...",
+                questions: [
+                    { text: "What is the main idea of paragraph A?", options: ["Genetic engineering is producing a revolution in food production.", "Genetic engineering is the manipulation of the DNA of crops and animals.", "Critics fear that biotech foods are being rushed to market.", "The potential nutritional value of biotech foods is unlimited."], correctAnswer: 0 },
+                    { text: "According to paragraph C, how are modern genetic engineering techniques different from conventional methods?", options: ["Modern techniques are faster and less expensive.", "New GE foods have a higher risk to human health and safety.", "Humans now focus on crops instead of breeding animals.", "Scientists can now transfer specific genes between unrelated species."], correctAnswer: 3 },
+                    { text: "Which of the following is NOT mentioned as an example of a gene inserted into a plant?", options: ["moth", "nut", "chicken", "rat"], correctAnswer: 2 },
+                    { text: "In the last sentence of paragraph E, the word 'They' refers to____.", options: ["critics", "genes", "species", "rats"], correctAnswer: 0 },
+                    { text: "According to paragraph I, what is golden rice thought to be a solution to?", options: ["vitamin A deficiency in children", "reducing the number of deaths of children a year", "the urgent problem of food shortage", "improving soil that is not suitable for farming"], correctAnswer: 0 },
+                    { text: "In paragraph J, the phrase, 'exaggerated the benefits' is similar in meaning to____.", options: ["done a lot of good", "made it sound better than it is", "worked hard on this product", "lied because it doesn't work at all"], correctAnswer: 1 },
+                    { text: "In the last sentence of paragraph J, 'it' refers to ____.", options: ["golden rice", "beta-carotene", "biotechnology", "vitamin A"], correctAnswer: 0 },
+                    { text: "Based on the passage, who is the most supportive of biotech foods?", options: ["Allison Snow", "Marion Nestle", "Channapatna Prakash", "the World Health Organization"], correctAnswer: 2 },
+                    { text: "Which of the following is an argument for biotech foods being safe for humans?", options: ["GE foods taste sweeter, grow bigger, and last longer.", "GE foods have not been found to have a higher risk than usual to humans.", "GE foods have had a few problems in the past.", "GE foods could give rise to unexpected health effects."], correctAnswer: 1 },
+                    { text: "Which of the following is an argument against genetic engineering?", options: ["Biotech food could eliminate world hunger and improve lives.", "Crops can be engineered to grow in unfavorable conditions.", "Crops can be modified to produce their own pesticides harm less insects.", "GE crops may be released before they are adequately tested."], correctAnswer: 3 }
+                ],
+                paragraphs: [
+                    "[A] Genetic engineering (GE) of crops and animals through the manipulation of DNA is producing a revolution in food production. The potential to improve the quality and nutritional value of the food we eat seems unlimited. Such potential benefits notwithstanding, critics fear that genetically engineered products are being rushed to market.",
+                    "[B] Biotech foods are produced from animals and plants that have been genetically altered. Genetic alteration is nothing new. Humans have been altering the genetic traits of plants for thousands of years by keeping seeds from the best crops.",
+                    "[C] On the other hand, the techniques of genetic engineering are new and different. Conventional breeders always used plants or animals that were related. In contrast, today's genetic engineers can transfer just a few genes at a time between species that are distantly related, or not related at all.",
+                    "[D] As far as we know, biotech foods are safe. So far, problems have been few. In fact, according to a 2016 report from the National Academy of Sciences, no differences have been found that indicate a higher risk to human health.",
+                    "[E] However, biotech foods have had problems in the past. One such problem occurred in the mid-1990s, when soybeans were modified using genes from a nut. Moving genes across dramatically different species also makes critics nervous.",
+                    "[F] Most scientists agree that the main safety issues of GE crops involve not people but the environment. Allison Snow, a plant ecologist, worries that GE crops are being developed too quickly.",
+                    "[G] On the other hand, advocates of GE crops argue that some genetically modified plants may actually be good for the land, by offering an environmentally friendly alternative to pesticides.",
+                    "[H] 'Eight hundred million people on this planet are malnourished,' says Channapatna Prakash. Scientists argue that genetic modification can help address the urgent problems of food shortage and hunger by increasing crop quantities.",
+                    "[I] According to the World Health Organization, an estimated 250 million children in the world suffer from vitamin A deficiency. 'Golden rice' - a biotech variety named for its yellow color - is thought by some to be a potential solution.",
+                    "[J] Other experts, however, claim that the biotechnology industry has exaggerated the benefits of golden rice. Professor Marion Nestle says golden rice alone won't greatly diminish vitamin A deficiency.",
+                    "[K] Whether biotech foods will deliver on their promise of eliminating world hunger and improving the lives of all remains to be seen. Their potential is enormous, yet they carry risks."
+                ]
+            },
+            {
+                id: "4A",
+                title: "Unit 4A: Design by Nature",
+                preview: "One cloudless midsummer day, biologist Andrew Parker knelt in the baking red sand of an Australian desert...",
+                questions: [
+                    { text: "In paragraph A, why is Parker in the Australian desert?", options: ["He is visiting a museum as a guest lecturer.", "He is there on summer vacation.", "He is there to study the thorny devil and how it collects water.", "He is returning the thorny devil to its natural habitat."], correctAnswer: 2 },
+                    { text: "What is the purpose of paragraph E?", options: ["to give examples of designs inspired by different species of fish", "to show that there are different biomimetics projects around the world", "to explain how researchers in Japan have developed a painless needle", "to highlight the biomimetics work of Parker, Rubner, and Cohen"], correctAnswer: 1 },
+                    { text: "Which animal is NOT mentioned in the passage?", options: ["butterflies", "termites", "dogs", "cats"], correctAnswer: 3 },
+                    { text: "What can we infer from this passage?", options: ["that people around the world buy a lot of biomimetics products", "that it is impossible to have another product as successful as Velcro", "that successful biomimetics projects take a lot of time to create", "that robot flies will soon look and act exactly like flies in nature"], correctAnswer: 2 },
+                    { text: "In the second sentence of paragraph G, what does 'it' refer to?", options: ["the gecko", "the gecko's foot", "the robot gecko", "the structure"], correctAnswer: 0 },
+                    { text: "Which biomimetic invention mentioned in the passage has had the most commercial success?", options: ["Stickybot", "Velcro", "painless needles", "a water collection device"], correctAnswer: 1 },
+                    { text: "Which paragraph describes what Stickybot can do?", options: ["Paragraph C", "Paragraph E", "Paragraph F", "Paragraph G"], correctAnswer: 3 },
+                    { text: "Which paragraph gives examples of Parker's work in biomimetics?", options: ["Paragraph B", "Paragraph C", "Paragraph D", "Paragraph E"], correctAnswer: 0 },
+                    { text: "Which paragraph contrasts Parker's views with Rubner and Cohen's?", options: ["Paragraph C", "Paragraph D", "Paragraph E", "Paragraph H"], correctAnswer: 0 },
+                    { text: "Which paragraph explains why there are not more well-known biomimetic products?", options: ["Paragraph A", "Paragraph D", "Paragraph H", "Paragraph I"], correctAnswer: 2 }
+                ],
+                paragraphs: [
+                    "[A] One cloudless midsummer day, biologist Andrew Parker knelt in the baking red sand of an Australian desert and gently placed the right back leg of a thorny devil into a dish of water. The thorny devil - a small lizard that has learned to survive in the extreme heat of the Australian desert - has a secret that fascinated Parker. 'Look, look!' he exclaimed. 'Its back is completely drenched!' Sure enough, in less than a minute, water from the dish had traveled up the lizard's leg, across its skin, and into its mouth. It was, in essence, drinking through its foot. The thorny devil can also do this when standing on wet sand - a vital competitive advantage in the desert. Parker had come here to solve the riddle of how it does this, not from purely biological interest, but with a specific purpose in mind: to make a device to help people collect water in the desert.",
+                    "[B] Parker is a leading scientist in the field of biomimetics - applying designs from nature to solve problems in engineering, materials science, medicine, and other fields. His studies of the body coverings of butterflies and beetles have led to brighter screens for cell phones. He has even drawn inspiration from nature's past: While visiting a museum in Poland, he noticed a 45-million-year-old fly trapped in amber and observed how the shape of its eye's surface reduced light reflection. This shape is now being used in solar panels to make them more efficient.",
+                    "[C] As part of the next phase in his plan to create a water-collection device inspired by the lizard, Parker sent his observations to Michael Rubner and Robert Cohen, two colleagues at the Massachusetts Institute of Technology. Parker is full of enthusiasm about the many possibilities of biomimetics. Rubner and Cohen, on the other hand, are much more practical; they focus on the ideas that have a chance of being applied successfully. This combination of biological insight and engineering pragmatism is vital to success in biomimetics. And it has led to several promising technologies.",
+                    "[D] Though Rubner and Cohen are certainly impressed by biological structures, they consider nature just a starting point for innovation. Cohen says, 'The natural structure provides a clue to what is useful ... But maybe you can do it better.' They consider a biomimetics project a success only if it has the potential to make a useful tool for people. 'Looking at pretty structures in nature is not sufficient,' says Cohen. 'What I want to know is can we actually transform these structures into [something] with true utility in the real world?'",
+                    "[E] The work of Parker, Rubner, and Cohen is only one part of a growing global biomimetics movement. Scientists around the world are studying and trying to copy a wide variety of nature's design secrets.",
+                    "[F] Potentially, one of the most useful applications of biomimetics is the robot. Professor Ronald Fearing of the University of California is creating a tiny robot fly that can be used in surveillance or rescue operations.",
+                    "[G] At Stanford University in California, Mark Cutkosky is working on a robot gecko. Cutkosky studied the extremely small structures on the tiny lizard's feet that allow it to run up and down vertical walls. He applied what he learned to create Stickybot, a robot that can walk up and down smooth vertical surfaces.",
+                    "[H] Despite the promise of the field and the brilliant people who work in it, biomimetics has led to surprisingly few business successes. Perhaps only one product has become truly famous - Velcro. But the main reason biomimetics hasn't yet been a business success is that nature is incredibly complex.",
+                    "[I] Nonetheless, the gap with nature is gradually closing. Researchers are using more powerful microscopes, high-speed computers, and other new technologies to learn more from nature."
+                ]
+            },
+            {
+                id: "4B",
+                title: "Unit 4B: Weaving the Future",
+                preview: "Alex Soza is a young Danish fashion designer. He says his ideas come to him in dreams...",
+                questions: [
+                    { text: "What is the purpose of paragraph D?", options: ["to give examples of innovative products", "to show that companies do not want to reveal information about their products", "to suggest potential products that could be useful in the future", "to name textile manufacturers in France"], correctAnswer: 0 },
+                    { text: "Jeff Turner hopes that one day, ____ will be able to lift satellites into space.", options: ["Nylon", "Kevlar", "BioSteel", "Air Beams"], correctAnswer: 2 },
+                    { text: "Which of the following is closest in meaning to 'the elements' in paragraph F?", options: ["other people", "toxic chemicals", "sports products", "harsh weather"], correctAnswer: 3 },
+                    { text: "Which of the following is NOT mentioned in the article?", options: ["textiles that can absorb large amounts of oil", "fibers that can resist high temperatures", "textiles that are made using 3-D printers", "fibers that can make clothing almost invisible"], correctAnswer: 2 },
+                    { text: "In paragraph H, what does 'happen overnight' mean?", options: ["made during the night", "happen at the end of the day", "work while you sleep", "occur quickly"], correctAnswer: 3 },
+                    { text: "Alex Soza probably thinks it is most important for high-tech fashion designers to be ____.", options: ["practical", "persistent", "realistic", "creative"], correctAnswer: 3 }
+                ],
+                paragraphs: [
+                    "[A] Alex Soza is a young Danish fashion designer. He says his ideas come to him in dreams: 'I daydream. That's how I get ideas.' One of his inventions, a jacket that stays suspended in the air like a balloon after it is taken off, arose from such a daydream.",
+                    "[B] Not long ago, all fibers that were used to make textiles came from natural sources: wool from the hair of sheep, cotton from the cotton plant, silk from silk worms. The first truly synthetic fiber didn't appear until 1935, when scientists at the DuPont Company invented nylon.",
+                    "[C] Synthetic textiles have come a long way since nylon. Kevlar, a textile that is stronger than steel, is used in bulletproof vests and in ropes used by astronauts. Coiled fibers are used in clothing that contracts in cold weather.",
+                    "[D] Not all companies are forthcoming about their products for fear of having their ideas stolen. However, Hugues Vinchon, a manager at Dubar Warneton - a manufacturer of high-tech textiles in France - is happy to display some of his company's amazing synthetic fibers. There is an oil-eating textile that absorbs five times its weight in oil.",
+                    "[E] Some high-tech textiles draw their inspiration from nature. Spider silk is a natural fiber that is five times as strong as steel. Unfortunately, spiders cannot be farmed as they will eat each other.",
+                    "[F] Textiles have always been used in clothing. Modern, high-tech textiles may redefine what clothes are all about. 'In the past, clothing protected us from the elements,' says Ian Scott. 'The future is about clothing that can do something for you.'",
+                    "[G] Other wearable electronics are being pioneered at a design laboratory in London run by the European manufacturer Philips Electronics. They are in the planning stages for various high-tech products, including an 'intelligent' electronic apron.",
+                    "[H] While there are many interesting clothing innovations in the pipeline, few have hit the market. One that did was marketed a few years ago as the first wearable electronics jacket. The jacket, called the ICD+, sold for about a thousand dollars.",
+                    "[I] One of the most important areas of clothing innovation is for the military. High-tech textiles are everywhere at the U.S. Army Soldier Systems Center in Natick, Massachusetts. As part of their Future Warrior program, researchers are developing uniforms that will make a soldier difficult or impossible to see.",
+                    "[J] In addition to clothing innovations, the researchers at Natick are also working on portable buildings made of what are essentially large, high-strength textile balloons.",
+                    "[K] Today's textile innovations are astonishing. From Alex Soza's artistic jacket to smart aprons to invisible military uniforms, high-tech textiles will soon be appearing in more and more places."
+                ]
+            },
+            {
+                id: "5A",
+                title: "Unit 5A: The DNA Trail",
+                preview: "Everybody loves a good story, and when it's finished, this may be the greatest one ever told...",
+                questions: [
+                    { text: "What is the main idea of paragraph C?", options: ["Eye color is determined by DNA.", "Blood contains genetic information.", "Each person contains the same DNA.", "Scientists can trace ancestral connections by studying genetic mutations."], correctAnswer: 3 },
+                    { text: "In the last line of paragraph G, what does the author show by including the analogy of people walking on the beach?", options: ["that Spencer Wells is an important scientist", "that people moved along the coast to Australia", "that our ancestors were similar to people today", "that the movement of people was gradual"], correctAnswer: 3 },
+                    { text: "What is 'vanished' in paragraph H a synonym for?", options: ["appeared", "died", "polished", "disappeared"], correctAnswer: 3 },
+                    { text: "What does 'They' in the third sentence of paragraph H refer to?", options: ["people in Australia", "groups of travelers", "genetic traces", "archeological evidence"], correctAnswer: 2 },
+                    { text: "According to the passage, where was the last place people migrated to?", options: ["Europe", "Australia", "Japan", "South America"], correctAnswer: 3 },
+                    { text: "Which of the following continents is NOT mentioned in the passage?", options: ["Europe", "Antarctica", "Africa", "Australia"], correctAnswer: 1 },
+                    { text: "According to the passage, when did modern humans first reach Europe?", options: ["about 40,000 years ago", "roughly 150,000 years ago", "between 50,000 and 70,000 years ago", "as little as a thousand years ago"], correctAnswer: 0 },
+                    { text: "Which of the following is a theory, and not a fact?", options: ["The distance from Africa to Australia is 13,000 kilometers.", "The bulk of all human genetic code is the same.", "People of African descent have twice as many genetic differences from each other.", "All humans descended from a woman who lived 150,000 years ago."], correctAnswer: 3 }
+                ],
+                paragraphs: [
+                    "[A] Everybody loves a good story, and when it's finished, this may be the greatest one ever told. It begins in Africa with a group of people, perhaps just a few hundred, surviving by hunting animals and gathering fruits. It ends about 200,000 years later with their seven billion descendants spread across the Earth.",
+                    "[B] In between is an exciting tale of survival, movement, isolation, and conquest, most of it occurring before recorded history. Who were those first modern people in Africa? For decades, the only proof was found in a small number of scattered bones and artifacts.",
+                    "[C] 'Every drop of human blood contains a history book written in the language of our genes,' says population geneticist Spencer Wells. The human genetic code, or genome, is 99.9 percent identical throughout the world. The bulk of our DNA is the same.",
+                    "[D] These ancient mutations are easiest to track in two places. One is in DNA that is passed from mother to child (mitochondrial DNA). The other is in DNA that travels from father to son (Y chromosome).",
+                    "[E] In the mid-1980s, a study compared mtDNA from people around the world. It found that people of African descent had twice as many genetic differences from each other than did others. Scientists concluded that modern humans must have lived in Africa at least twice as long as anywhere else.",
+                    "[F] What seems certain is that at a remarkably recent date - probably between 50,000 and 70,000 years ago - one small group of people, the ancestors of modern humans outside of Africa, left Africa for western Asia.",
+                    "[G] Once in Asia, genetic evidence suggests, the population split. One group stayed temporarily in the Middle East, while the other began a journey that would last tens of thousands of years.",
+                    "[H] Archeological evidence of this 13,000-kilometer migration from Africa to Australia has almost completely vanished. However, genetic traces of the group that made the trip do exist.",
+                    "[I] People in the rest of Asia and Europe share different but equally ancient mtDNA and Y-chromosome mutations. These mutations show that most are descendants of the group that stayed in the Middle East.",
+                    "[J] About the same time as modern humans pushed into Europe, some of the same group that had paused in the Middle East spread east into Central Asia. They eventually reached as far as Siberia, the Korean peninsula, and Japan.",
+                    "[K] Genetic researchers can only tell us the basic outlines of a story of human migration that is more complex than any ever written. Many details of the movements of our ancestors and their countless individual lives can only be imagined."
+                ]
+            },
+            {
+                id: "5B",
+                title: "Unit 5B: Fantastic Voyage",
+                preview: "It is mid-afternoon on the island of Bora Bora in French Polynesia. Thousands of cheering spectators...",
+                questions: [
+                    { text: "What is the purpose of paragraphs A and B?", options: ["to show how the tradition of traveling the sea by canoe has carried on from the past", "to show that Manutea Owen is a former canoe champion", "to show that Bora Bora's canoe race feels like a carnival", "to explain that the Lapita and the Polynesians did not have navigation equipment"], correctAnswer: 0 },
+                    { text: "In paragraph B, why does the author mention humans going to the moon?", options: ["to show that colonization is part of their heritage", "to explain what a huge achievement colonization was", "to say that the early Polynesians were in a race", "to describe how advanced Polynesian technology was"], correctAnswer: 1 },
+                    { text: "According to Irwin, how could early explorers have relied on trade winds?", options: ["to avoid crashing into other islands", "to return home safely at any time", "to venture farther away from their island", "to rest and not have to waste energy rowing"], correctAnswer: 1 },
+                    { text: "Which of the following is NOT mentioned as a clue that sailors might have used to get to land?", options: ["coconuts", "twigs", "nests", "clouds"], correctAnswer: 2 },
+                    { text: "What does the word 'motives' in paragraph I mean?", options: ["voyages", "reasons", "techniques", "places"], correctAnswer: 1 },
+                    { text: "When does El Niño occur in the Pacific Ocean?", options: ["when the water at the surface is hotter than normal", "when there is an increase in rainfall on the coast", "when the temperature of the water is unusually low", "when the Polynesians pray to the rain gods"], correctAnswer: 0 }
+                ],
+                paragraphs: [
+                    "[A] It is mid-afternoon on the island of Bora Bora in French Polynesia. Thousands of cheering spectators crowd the shore to see the end of the Hawaiki Nui Va'a, a challenging 130-kilometer Polynesian canoe race that virtually stops the nation. 'This is our heritage,' says Manutea Owen, a former canoe champion and a hero on his home island of Huahine. 'Our people came from over the sea by canoe. Sometimes when I'm out there competing, I try to imagine what they must have endured and the adventures they had crossing those huge distances.'",
+                    "[B] Manutea Owen's ancestors colonized nearly every island in the South Pacific. This was a remarkable feat of human navigation - comparable with humans going to the moon. Only recently have scientists begun to understand where these amazing voyagers came from, and how - with simple canoes and no navigation equipment - they reached hundreds of islands scattered across an ocean that covers nearly a third of the globe.",
+                    "[C] From about 1300 to 800 B.C., the Lapita people colonized islands that stretch over millions of square kilometers, including the Solomon Islands, Vanuatu, Fiji, New Caledonia, and Samoa. Then, for unknown reasons, they stopped. There was an interval of around 1,000 years before the Polynesian civilization - descendants of the Lapita - launched a new period of exploration.",
+                    "[D] There is one stubborn question for which archeology has yet to provide any answers. How did the Lapita and early Polynesian pioneers accomplish a feat that is analogous to a moon landing? Little evidence remains to help us understand their remarkable sailing skills.",
+                    "[E] Sailors have always relied upon the so-called trade winds, winds that blow steadily and in predictable directions over the ocean's surface. Irwin notes that the Lapita's expansion into the Pacific was eastward, against steady trade winds. Sailing against the wind, he argues, may have been the key to their success.",
+                    "[F] Irwin hypothesizes that once out in the open ocean, the explorers would detect a variety of clues to follow to land. This included seabirds and turtles that need islands on which to build their nests, coconuts and twigs carried out to sea, and the clouds that tend to form over some islands in the afternoon.",
+                    "[G] These theories rely on one unproven point - that the Lapita and early Polynesians had mastered the skill of sailing against the wind using a technique called 'tacking.' Rather than give all the credit to their bravery and technique, Atholl Anderson thinks that they might also have been lucky - helped by El Niño.",
+                    "[H] El Niño occurs in the Pacific Ocean when the surface water temperature is unusually high. One of its effects is to cause trade winds in the South Pacific to weaken or to reverse direction and blow to the east. Scientists believe that El Niño phenomena were unusually frequent around the time of the Lapita expansion.",
+                    "[I] The success of the Lapita and their descendants may have been due to their own sailing skills, to reverse trade winds, or to a mixture of both. But it is certain that by the time Europeans came to the Pacific, nearly every piece of land - hundreds of islands in all - had already been discovered by the Lapita and the Polynesians."
+                ]
+            },
+            {
+                id: "6A",
+                title: "Unit 6A: How Money Made Us Modern",
+                preview: "About 9,500 years ago, ancient accountants in Sumer invented a way to keep track of farmers' crops...",
+                questions: [
+                    { text: "In paragraph B, what does 'such early accounting tools' mean?", options: ["crops and livestock", "Sumerian tokens", "board games", "ancient accountants"], correctAnswer: 1 },
+                    { text: "Which of the following is NOT mentioned in the passage as something that was used to represent value?", options: ["teeth", "clay", "salt", "stones"], correctAnswer: 2 },
+                    { text: "Based on the passage, what can we infer about cowrie shells?", options: ["They are distinctive.", "They are very fragile.", "They are unattractive.", "They did not exist in ancient China."], correctAnswer: 0 },
+                    { text: "What is the purpose of paragraph I?", options: ["to provide steps for how to transport coins", "to show that gold or silver could be collected on demand", "to describe the 18th century global economy", "to explain the need for paper currency"], correctAnswer: 3 },
+                    { text: "Which of the following happened last?", options: ["Sumerians used tokens to keep track of crops and livestock.", "Several societies used paper bills that gave bearer ownership.", "Lydians used gold to make metal coins.", "London investors underwrote trade and colonists."], correctAnswer: 1 },
+                    { text: "According to paragraph L, who issued the first credit cards?", options: ["restaurants", "banks", "governments", "oil companies"], correctAnswer: 3 }
+                ],
+                paragraphs: [
+                    "[A] About 9,500 years ago, ancient accountants in Sumer invented a way to keep track of farmers' crops and livestock. They began using small pieces of baked clay, almost like the tokens used in board games today. One piece might signify a measure of grain, while another with a different shape might represent a farm animal or a jar of olive oil.",
+                    "[B] Those little ceramic shapes might not seem to have much in common with today's $100 bill - or with the credit cards and online transactions that are rapidly taking the place of cash - but the roots of our modern methods of payment lie in those Sumerian tokens. Such early accounting tools evolved into a system of finance and into money itself.",
+                    "[C] Since ancient times, humans have used items to represent value - from stones to animal skins, to whale teeth. In the ancient world, people often relied upon symbols that had tangible value in their own right. The ancient Chinese made payments with cowrie shells, which were prized for their beauty as materials for jewelry.",
+                    "[D] But eventually there arose a new, universal currency: gold. The gleaming metal could be combined with other metals at high temperatures to create alloys, and was easy to melt and hammer into shapes. It became the raw material for the first coins, created in Lydia around 2,700 years ago.",
+                    "[E] The result, explains financial author Kabir Sehgal, was an economic system in which 'you knew the value of what you had, and what you could buy with it.' Unlike modern money, ancient coins were what economists call fullbodied or commodity money: Their value was fixed by the metal in them.",
+                    "[F] Money's convenience made it easier for ancient merchants to develop large-scale trade networks, in which spices and grain could be bought and sold across distances of thousands of kilometers. This led to the first foreign exchanges.",
+                    "[G] In the centuries that followed, trade routes forged more cultural connections between nations and regions. Besides exchanging money and goods, traders also spread religious beliefs, knowledge, and new inventions, creating connections among far-flung cultures.",
+                    "[H] The dangers of moving money and goods over distances led humans to develop increasingly complex economic organizations. In the 1600s, investors gathering in London coffeehouses began to underwrite traders and colonists heading to the New World.",
+                    "[I] By the 1700s, the global economy had grown so much that it was inconvenient to transport and store large quantities of coins. Several societies therefore shifted toward paper currency. The earliest paper bills were literally receipts that gave the bearer ownership of gold or silver coins.",
+                    "[J] But as Lloyd Thomas explains, bankers eventually realized that many people simply used their notes rather than redeeming them for gold. That revelation eventually led to the concept of fiat money, which governments issue today. Today's money has value essentially because a government says that it does.",
+                    "[K] It's a system with an important advantage, in that human judgment determines the amount of money in circulation. On the other hand, this can become a disadvantage. If a government decides to issue too much money, it can trigger an inflationary spiral that raises the price of goods and services.",
+                    "[L] By the 20th century, new methods of payment had begun to emerge as alternatives to cash. In the 1920s, oil companies and hotel chains began to issue credit cards. In 1950, Diners Club International issued the first universal credit card.",
+                    "[M] In 2009, yet another high-tech successor to money emerged: Bitcoin. Bitcoins are a sort of unofficial virtual Internet currency. They aren't issued or even controlled by governments, and they exist only in the cloud or on a person's computer.",
+                    "[N] From the clay tokens of Sumer to today's virtual currencies, the evolution of money has helped drive the development of civilization. Money makes it easier not only to buy and sell goods, but also to connect with the world."
+                ]
+            },
+            {
+                id: "6B",
+                title: "Unit 6B: The Rise of Virtual Money",
+                preview: "It doesn't exist in any physical form, yet is increasingly used by people worldwide...",
+                questions: [
+                    { text: "What is the purpose of this passage?", options: ["to give information on virtual currencies, in particular, Bitcoin", "to explain why purchasing Bitcoin is a good investment", "to describe how Bitcoin can be used in different situations", "to talk about the benefits and drawbacks of Bitcoin"], correctAnswer: 0 },
+                    { text: "Which of the following is true about Bitcoin?", options: ["It operates on a blockchain network.", "It was developed by a bank.", "It was shut down by the FBI.", "It was the world's first cryptocurrency."], correctAnswer: 0 },
+                    { text: "Where is Satoshi Nakamoto from?", options: ["Europe", "Japan", "Africa", "nobody knows his true identity"], correctAnswer: 3 },
+                    { text: "Based on the information given in the passage, what is Silk Road?", options: ["a historical trade route connecting East and West", "a company that sell silk products online for Bitcoin", "an online marketplace used for illegal transactions", "the code name for a law enforcement task force"], correctAnswer: 2 },
+                    { text: "As of 2019, how many Bitcoins have been mined?", options: ["300,000", "1 million", "17 million", "65 billion"], correctAnswer: 2 },
+                    { text: "Which of the following events happened first?", options: ["Bitcoin was released as open-source software.", "The price of Bitcoin reached U.S. $400.", "The online black market, Silk Road, was set up.", "Satoshi Nakamoto released a paper on Bitcoin."], correctAnswer: 3 },
+                    { text: "In the fourth sentence of paragraph I, what does 'it' refer to?", options: ["a blockchain", "Bitcoin", "an engine", "a vehicle"], correctAnswer: 0 },
+                    { text: "What does Jonathan Mohan mean when he says: 'The vast majority of [people on] the planet don't even own a bank account … Just as in Africa, [people] went directly to cell phones.'", options: ["Most people in Africa use cell phones to transfer money; they do not have bank accounts.", "Most people in Africa didn't get landline telephones; they only bought cell phones instead.", "Most people in Africa own cell phones if they have a bank account.", "Most people can now open a bank account by using their cell phone."], correctAnswer: 0 },
+                    { text: "Which of the following is NOT given as a benefit of Bitcoin?", options: ["independence makes it stable", "lower transaction fees", "greater security", "convenient way of sending funds"], correctAnswer: 0 },
+                    { text: "Which of the following statements is the author most likely to agree with?", options: ["Bitcoin is most useful for criminals who want to conceal their identity.", "Virtual currencies are only useful to immigrants from developing countries.", "The price of Bitcoin is highly volatile, hence it is a risky investment.", "Virtual currency is the money of the future, and will soon overtake fiat currency."], correctAnswer: 2 }
+                ],
+                paragraphs: [
+                    "[A] According to the European Banking Authority, a virtual currency is 'a digital representation of value that is neither issued by a central bank or a public authority, nor necessarily attached to a fiat currency, but is accepted as a means of payment and can be transferred, stored, or traded electronically.' There are many types of virtual currency, but the best known is probably Bitcoin.",
+                    "[B] In online articles, or in newspapers or magazines, you may have seen pictures of gold or silver coins marked with the Bitcoin symbol. However - since Bitcoins exist only as digital constructs - these are merely representations. Bitcoin is a type of digital money known as a 'cryptocurrency'.",
+                    "[C] Unlike traditional currencies, Bitcoin is not controlled by a central bank or by a government agency. And unlike credit cards, the Bitcoin network is not run by a company. It is operated by a global network of computers called a blockchain network, which records every Bitcoin transaction in the world.",
+                    "[D] The first reference to Bitcoin appeared in 2008, in a paper by a writer supposedly named Satoshi Nakamoto. However, the name turned out to be a pseudonym for a person or group who preferred to remain anonymous. A year later, Bitcoin was released as open-source software.",
+                    "[E] Bitcoin was not the first attempt at a cryptocurrency; others had existed in one form or another for nearly 50 years, but without much success. In a short space of time, though, Bitcoin became the first cryptocurrency to be widely traded internationally.",
+                    "[F] In its early days, Bitcoin was known for its link with illegal drugs, such as those bought and sold on Silk Road, an online black market set up in 2011. Silk Road was shut down by the FBI in 2013. According to some experts, the shutdown gave Bitcoin a chance to gain some much-needed legitimacy.",
+                    "[G] Each Bitcoin can be divided out to eight decimal places. That means you can send someone a minimum of 0.00000001 Bitcoins. This smallest fraction of a Bitcoin - the penny of the Bitcoin world - is called a 'Satoshi.'",
+                    "[H] Like gold or other precious metals used as money, Bitcoins are scarce. But their scarcity is not natural or accidental. New Bitcoins are added only by being 'mined.' Computer users on the blockchain network race to solve increasingly complicated mathematical problems.",
+                    "[I] A useful analogy: Think of the blockchain network as an engine. Engines can be used to power all types of vehicles: cars, boats, aircraft. Bitcoin is a vehicle that uses that engine. Because it was the first major virtual currency to use blockchain, you could think of Bitcoin as an early model vehicle, like a Model T Ford.",
+                    "[J] In most cases, financial transactions involve exchange fees, taxes, and payment delays to guard against fraud. Virtual transactions, however, are speedy and cheap - and are settled immediately.",
+                    "[K] Virtual currencies also make it possible to make a digital payment without needing PayPal or a credit card. This is particularly useful in many parts of Africa, Latin America, and South Asia. Immigrants to developed countries may find it a convenient way to send funds back home to their families.",
+                    "[L] Bitcoin supporter Jonathan Mohan says, 'The vast majority of people on the planet don't even own a bank account … In these developing nations, you're not going to see them start getting bank accounts. You're going to see them just going straight to Bitcoins.'",
+                    "[M] The most obvious drawback is a lack of stability in the value of the currency. Bitcoin's independence makes it more stable in principle than traditional currencies. In reality, though, its value has fluctuated wildly over the time it has been in existence.",
+                    "[N] So it is worth thinking twice before putting all or a substantial amount of your assets into a virtual currency like Bitcoin. The rule of investing in virtual currency is the same as investing in stocks: Never invest more than you can afford to lose."
+                ]
+            }
+        ];
+
+        // --- App State ---
+        let currentIndex = 0; // Current unit index
+        let currentQuestionIndex = 0;
+        let selectedOptionIndex = null;
+        let isAnswerChecked = false;
+        let userScore = 0;
+        
+        // Reading State
+        let currentParagraph = 0;
+        let isPlaying = false;
+        let speechSynth = window.speechSynthesis;
+        let utterance = null;
+        let selectedVoice = null;
+        
+        // DOM Elements
+        const homeView = document.getElementById('home-view');
+        const passageView = document.getElementById('passage-view');
+        const unitGrid = document.getElementById('unit-grid');
+        const btnHome = document.getElementById('btn-home');
+        const btnBack = document.getElementById('btn-back');
+        const btnFwd = document.getElementById('btn-fwd');
+        
+        const displayTitle = document.getElementById('display-title');
+        const displayContent = document.getElementById('display-content');
+        
+        const btnPlay = document.getElementById('btn-play-pause');
+        const btnStop = document.getElementById('btn-stop');
+        
+        // Question Elements
+        const qText = document.getElementById('q-text');
+        const qOptions = document.getElementById('q-options');
+        const qProgress = document.getElementById('q-progress');
+        const qTotal = document.getElementById('q-total');
+        const btnCheck = document.getElementById('btn-check-answer');
+        const btnNextQ = document.getElementById('btn-next-question');
+        const feedbackArea = document.getElementById('feedback-area');
+        
+        // User & Score Elements
+        const usernameInput = document.getElementById('username-input');
+        const headerUsername = document.getElementById('header-username');
+        const headerScore = document.getElementById('header-score');
+        const summaryScreen = document.getElementById('summary-screen');
+        const finalScore = document.getElementById('final-score');
+        const quizContainer = document.getElementById('quiz-container');
+
+        // --- Initialization ---
+        function init() {
+            renderGrid();
+            setupVoice();
+            updateNavButtons();
+            
+            // Listeners
+            btnHome.onclick = goHome;
+            btnBack.onclick = goBack;
+            btnFwd.onclick = goForward;
+            btnPlay.onclick = togglePlay;
+            btnStop.onclick = stopReading;
+            btnCheck.onclick = checkAnswer;
+            btnNextQ.onclick = nextQuestion;
+            
+            usernameInput.addEventListener('input', (e) => {
+                headerUsername.textContent = e.target.value;
+            });
+            
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = setupVoice;
+            }
+        }
+
+        // --- Question Logic ---
+        function loadQuestion(index) {
+            const unit = units[currentIndex];
+            const q = unit.questions[index];
+            
+            // Reset UI for new question
+            selectedOptionIndex = null;
+            isAnswerChecked = false;
+            feedbackArea.textContent = "";
+            btnCheck.disabled = true;
+            btnNextQ.disabled = false;
+            
+            // Display Question
+            qText.textContent = q.text;
+            qProgress.textContent = index + 1;
+            qTotal.textContent = unit.questions.length;
+            
+            qOptions.innerHTML = '';
+            q.options.forEach((opt, i) => {
+                const div = document.createElement('div');
+                div.className = 'option-item';
+                div.id = `option-${i}`;
+                div.innerHTML = `<strong>${String.fromCharCode(65+i)}.</strong> ${opt}`;
+                div.onclick = () => selectOption(i);
+                qOptions.appendChild(div);
+            });
+        }
+
+        function selectOption(index) {
+            if (isAnswerChecked) return;
+            
+            // UI Toggle
+            const prev = document.querySelector('.option-item.selected');
+            if(prev) prev.classList.remove('selected');
+            
+            selectedOptionIndex = index;
+            const current = document.getElementById(`option-${index}`);
+            current.classList.add('selected');
+            
+            btnCheck.disabled = false;
+        }
+
+        function checkAnswer() {
+            if (selectedOptionIndex === null || isAnswerChecked) return;
+            
+            isAnswerChecked = true;
+            btnCheck.disabled = true;
+            
+            const unit = units[currentIndex];
+            const q = unit.questions[currentQuestionIndex];
+            const correctIndex = q.correctAnswer;
+            
+            // Highlight Correct
+            const correctEl = document.getElementById(`option-${correctIndex}`);
+            if (correctEl) correctEl.classList.add('correct');
+            
+            // Logic
+            if (selectedOptionIndex === correctIndex) {
+                // Correct!
+                userScore++;
+                updateScoreDisplay();
+                feedbackArea.textContent = "Correct! +1 Point";
+                feedbackArea.style.color = "#27ae60";
+            } else {
+                // Incorrect
+                const selectedEl = document.getElementById(`option-${selectedOptionIndex}`);
+                if (selectedEl) selectedEl.classList.add('incorrect');
+                feedbackArea.textContent = "Incorrect. The correct answer is shown in green.";
+                feedbackArea.style.color = "#c0392b";
+            }
+        }
+
+        function nextQuestion() {
+            const unit = units[currentIndex];
+            
+            // If checking is skipped, auto-check if selected
+            if (!isAnswerChecked && selectedOptionIndex !== null) {
+               checkAnswer(); 
+            }
+            
+            // Move to next or Finish
+            if (currentQuestionIndex < unit.questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion(currentQuestionIndex);
+            } else {
+                showSummary();
+            }
+        }
+        
+        function updateScoreDisplay() {
+            headerScore.textContent = `Score: ${userScore}`;
+        }
+        
+        function showSummary() {
+            const unit = units[currentIndex];
+            summaryScreen.classList.add('active');
+            finalScore.textContent = `${userScore} / ${unit.questions.length}`;
+        }
+
+        // --- Navigation Logic ---
+        function renderGrid() {
+            unitGrid.innerHTML = '';
+            units.forEach((unit, index) => {
+                const card = document.createElement('div');
+                card.className = 'unit-card';
+                // Only title as requested
+                card.innerHTML = `
+                    <div class="unit-title">${unit.title}</div>
+                `;
+                card.onclick = () => loadUnit(index);
+                unitGrid.appendChild(card);
+            });
+        }
+
+        function loadUnit(index) {
+            currentIndex = index;
+            const unit = units[index];
+            
+            // Content
+            displayTitle.textContent = unit.title;
+            displayContent.innerHTML = unit.paragraphs.map((p, i) => 
+                `<p id="para-${i}"><span class="paragraph-marker">[${String.fromCharCode(65+i)}]</span>${p.substring(4)}</p>`
+            ).join('');
+            
+            // Reset View
+            homeView.classList.remove('active');
+            passageView.classList.add('active');
+            summaryScreen.classList.remove('active');
+            
+            // Reset Audio
+            stopReading();
+            currentParagraph = 0;
+            
+            // Reset Quiz
+            currentQuestionIndex = 0;
+            userScore = 0;
+            updateScoreDisplay();
+            loadQuestion(0);
+        }
+
+        function goHome() {
+            stopReading();
+            passageView.classList.remove('active');
+            homeView.classList.add('active');
+        }
+
+        function goBack() {
+            if (passageView.classList.contains('active')) {
+                goHome(); // Simplified back logic
+            }
+        }
+
+        function goForward() {
+            if (!passageView.classList.contains('active')) {
+                loadUnit(0);
+            }
+        }
+        
+        function updateNavButtons() {
+            // Basic enable/disable logic
+        }
+
+        // --- TTS Logic (Simulating "Andrew") ---
+        function setupVoice() {
+            const voices = speechSynth.getVoices();
+            // Prioritize "Microsoft Andrew Online (Natural) - English (United States)"
+            // If not found, look for "Microsoft Andrew", then generic English Male
+            selectedVoice = voices.find(v => v.name === "Microsoft Andrew Online (Natural) - English (United States)")
+                         || voices.find(v => v.name.includes("Microsoft Andrew")) 
+                         || voices.find(v => v.name.includes("Andrew"))
+                         || voices.find(v => v.name.includes("Microsoft") && v.name.includes("Male") && v.lang.includes("en"))
+                         || voices.find(v => v.lang.includes("en") && v.name.includes("Male"))
+                         || voices[0];
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                speechSynth.pause();
+                isPlaying = false;
+                btnPlay.textContent = "▶";
+            } else {
+                if (speechSynth.paused) {
+                    speechSynth.resume();
+                } else {
+                    readParagraph(currentParagraph);
+                }
+                isPlaying = true;
+                btnPlay.textContent = "⏸";
+            }
+        }
+
+        function stopReading() {
+            speechSynth.cancel();
+            isPlaying = false;
+            btnPlay.textContent = "▶";
+            highlightParagraph(-1);
+        }
+
+        function readParagraph(index) {
+            const unit = units[currentIndex];
+            if (index >= unit.paragraphs.length) {
+                stopReading();
+                currentParagraph = 0;
+                return;
+            }
+
+            const rawText = unit.paragraphs[index];
+            const textToRead = rawText.replace(/^\[[A-Z]\]/, "");
+
+            utterance = new SpeechSynthesisUtterance(textToRead);
+            utterance.voice = selectedVoice;
+            utterance.rate = 0.85; // Slowed down as requested
+            
+            utterance.onend = () => {
+                if(isPlaying) {
+                    currentParagraph++;
+                    readParagraph(currentParagraph);
+                }
+            };
+
+            highlightParagraph(index);
+            speechSynth.speak(utterance);
+        }
+
+        function highlightParagraph(index) {
+            document.querySelectorAll('.reading-active').forEach(el => el.classList.remove('reading-active'));
+            if(index >= 0) {
+                const p = document.getElementById(`para-${index}`);
+                if (p) {
+                    p.classList.add('reading-active');
+                    p.scrollIntoView({behavior: "smooth", block: "center"});
+                }
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
