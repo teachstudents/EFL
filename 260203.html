@@ -1,0 +1,993 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grade 7 Speaking Master</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Nunito is rounded and friendly for younger students -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    /* Base Styles */
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      overflow: hidden;
+      color: #2d3748;
+    }
+
+    /* Container */
+    .app-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      position: relative;
+    }
+
+    /* Cards/Screens */
+    .screen-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 1100px;
+      height: 95vh;
+      display: none; /* Hidden by default */
+      flex-direction: column;
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy animation */
+      position: relative;
+      border: 4px solid #fff;
+    }
+
+    .screen-card.active {
+      display: flex;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Setup Screen */
+    .input-group {
+        background: #f7fafc;
+        border: 2px solid #e2e8f0;
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .student-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.8rem;
+      overflow-y: auto;
+      padding: 0.5rem;
+      background: #f0f4f8;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+      max-height: 40vh;
+    }
+
+    .student-card {
+      background: #fff;
+      border: 2px solid #cbd5e0;
+      border-radius: 12px;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .student-card:hover { border-color: #4fd1c5; transform: translateY(-2px); }
+    .student-card.selected { background: #e6fffa; border-color: #38b2ac; }
+    
+    .student-avatar {
+      width: 30px;
+      height: 30px;
+      background: #edf2f7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #4a5568;
+      font-size: 0.8rem;
+    }
+
+    /* Speaking Screen Layout */
+    .question-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      gap: 1rem;
+    }
+
+    /* Big Question Box */
+    .question-box {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 20px;
+      font-family: 'Fredoka', sans-serif;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(118, 75, 162, 0.3);
+      position: relative;
+      min-height: 25%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 4px solid rgba(255,255,255,0.2);
+    }
+
+    .question-text-display {
+      font-size: 1.8rem; 
+      line-height: 1.3;
+      font-weight: 500;
+      padding: 0 1rem;
+    }
+
+    /* Help Section (Word Bank) */
+    .help-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr; 
+      gap: 1rem;
+      flex-grow: 1;
+      min-height: 0;
+    }
+
+    .help-panel {
+      background: #fff;
+      border: 3px solid #edf2f7;
+      border-radius: 16px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .help-header {
+      font-family: 'Fredoka', sans-serif;
+      color: #4a5568;
+      font-size: 1.2rem;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: bold;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 0.5rem;
+    }
+
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      overflow-y: auto;
+      align-content: flex-start;
+    }
+
+    .tag {
+      background: #f7fafc;
+      padding: 0.5rem 0.8rem;
+      border-radius: 10px;
+      border: 2px solid #e2e8f0;
+      font-size: 1rem;
+      color: #4a5568;
+      font-weight: 700;
+    }
+    
+    .tag.special {
+        background: #ebf8ff;
+        border-color: #bee3f8;
+        color: #2b6cb0;
+    }
+    
+    /* Timer */
+    .timer-float {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: white;
+      color: #764ba2;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 1.2rem; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .speaker-indicator {
+        position: absolute;
+        bottom: 1rem;
+        left: 1rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: white;
+        background: rgba(255,255,255,0.2);
+        padding: 0.3rem 1rem;
+        border-radius: 20px;
+        backdrop-filter: blur(4px);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 16px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: auto;
+      flex-shrink: 0;
+      border: 2px solid #cbd5e0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #48bb78, #38a169);
+      width: 100%;
+      transition: width 1s linear;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, #4fd1c5 0%, #38b2ac 100%);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 15px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.1s;
+      width: 100%;
+      font-family: 'Fredoka', sans-serif;
+      box-shadow: 0 4px 0 #2c7a7b; /* Cartoon 3D effect */
+    }
+    .btn-primary:active { transform: translateY(4px); box-shadow: none; }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; background: #cbd5e0; box-shadow: none; transform: none; }
+
+    /* Selection Screen */
+    .roulette-wrapper {
+      background: #2d3748;
+      color: white;
+      border-radius: 30px;
+      padding: 3rem 1rem;
+      text-align: center;
+      margin: 2rem 0;
+      border: 8px solid #4a5568;
+    }
+    .roulette-name { font-size: 4rem; font-family: 'Fredoka', sans-serif; }
+
+    /* Countdown */
+    .giant-countdown {
+      font-size: 10rem;
+      font-weight: 900;
+      color: #764ba2;
+      text-align: center;
+      font-family: 'Fredoka', sans-serif;
+      animation: bounce 1s infinite;
+    }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+    /* Preview Screen */
+    .preview-card {
+      background: #ebf8ff;
+      border: 3px solid #bee3f8;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .preview-title { font-family: 'Fredoka', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Transition Overlay */
+    #transition-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255,255,255,0.98);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        z-index: 50;
+        border-radius: 24px;
+    }
+    
+    .hidden { display: none !important; }
+  </style>
+ </head>
+ <body>
+
+ <div class="app-container">
+
+  <!-- 1. SETUP SCREEN -->
+  <div id="screen-setup" class="screen-card active">
+    <h1 class="text-4xl font-extrabold text-center text-gray-700 mb-4 font-fredoka">Junior Speaking Master 🎓</h1>
+    
+    <div class="grid grid-cols-2 gap-4 mb-4">
+        <!-- Date & Topic -->
+        <div class="input-group flex flex-col justify-center">
+            <label class="font-bold text-gray-500 mb-1 text-sm uppercase">Topic (10 Choices)</label>
+            <select id="theme-select" class="w-full p-2 bg-white border border-gray-300 rounded-lg font-bold text-lg text-gray-700 outline-none focus:border-blue-400">
+                <!-- JS Populates -->
+            </select>
+        </div>
+        
+        <!-- Quick Add Students -->
+        <div class="input-group">
+            <label class="font-bold text-gray-500 mb-1 text-sm uppercase">Paste Class List (20+ supported)</label>
+            <textarea id="paste-area" class="w-full p-2 h-20 bg-white border border-gray-300 rounded-lg text-sm" placeholder="Paste names here...&#10;Alice&#10;Bob&#10;Charlie"></textarea>
+            <button onclick="parsePastedNames()" class="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded w-full text-sm">Load Names</button>
+        </div>
+    </div>
+
+    <div class="flex-grow flex flex-col min-h-0">
+      <div class="flex justify-between items-end mb-2">
+        <h2 class="text-xl font-bold text-gray-700">Student List <span id="student-count" class="text-gray-400 text-sm">(0)</span></h2>
+        <div class="space-x-2">
+            <button onclick="addPlaceholderStudents()" class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded hover:bg-gray-200">Add 20 Placeholders</button>
+            <button onclick="selectAllStudents()" class="text-blue-500 font-bold hover:bg-blue-50 px-2 py-1 rounded text-sm">Select All</button>
+        </div>
+      </div>
+      
+      <div id="student-grid" class="student-grid">
+        <!-- Populated by JS -->
+        <div class="col-span-full text-center text-gray-400 py-8 italic">
+            Paste names above or click "Add 20 Placeholders" to start.
+        </div>
+      </div>
+    </div>
+
+    <button id="btn-start" class="btn-primary mt-4" disabled>🚀 Start Class!</button>
+  </div>
+
+  <!-- 2. PREVIEW SCREEN -->
+  <div id="screen-preview" class="screen-card">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-3xl font-extrabold text-gray-700 font-fredoka">Today's Mission</h2>
+      <div class="bg-red-500 text-white font-black px-4 py-2 rounded-full text-2xl shadow-lg border-2 border-red-600" id="preview-timer">60</div>
+    </div>
+    
+    <div id="preview-content" class="flex flex-col gap-4 h-full overflow-y-auto">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- 3. SELECTION SCREEN -->
+  <div id="screen-selection" class="screen-card" style="max-width: 800px; justify-content: center; align-items: center;">
+    <h2 class="text-3xl font-extrabold text-gray-600 text-center mb-6">Who is next?</h2>
+    <div class="roulette-wrapper w-full">
+      <div id="roulette-display" class="roulette-name">...</div>
+    </div>
+  </div>
+
+  <!-- 4. COUNTDOWN SCREEN -->
+  <div id="screen-countdown" class="screen-card" style="justify-content: center; align-items: center;">
+    <h2 class="text-4xl font-bold text-gray-500 text-center mb-8">Ready...</h2>
+    <div id="countdown-display" class="giant-countdown">3</div>
+    <div id="next-speaker-name" class="text-3xl mt-8 font-bold text-blue-500 bg-blue-50 px-6 py-2 rounded-full"></div>
+  </div>
+
+  <!-- 5. SPEAKING SCREEN (MAIN) -->
+  <div id="screen-speaking" class="screen-card">
+    <!-- Overlay for Fast Transition -->
+    <div id="transition-overlay">
+        <div class="text-6xl mb-4">🌟</div>
+        <h1 class="text-5xl font-black text-blue-500 mb-2 font-fredoka">Awesome!</h1>
+        <p class="text-xl text-gray-400 font-bold">Getting next student...</p>
+    </div>
+
+    <div class="question-layout">
+      
+      <!-- Top: Big Question -->
+      <div class="question-box">
+        <div id="part-indicator" class="absolute top-2 left-3 text-xs font-bold uppercase tracking-wider opacity-70">Part 1</div>
+        <div id="speaker-indicator" class="speaker-indicator">Student</div>
+        <div id="question-timer" class="timer-float">30</div>
+        
+        <div id="question-text" class="question-text-display">
+          Question text goes here...
+        </div>
+      </div>
+
+      <!-- Bottom: Help & Progress -->
+      <div class="help-grid">
+        <!-- 1. Linking Words -->
+        <div class="help-panel bg-purple-50 border-purple-200">
+          <div class="help-header text-purple-600">
+            <span>🔗</span> Connecting Words
+          </div>
+          <div id="toolkit-container" class="tag-container">
+             <!-- Populated JS -->
+          </div>
+        </div>
+
+        <!-- 2. Sentence Starters -->
+        <div class="help-panel bg-blue-50 border-blue-200">
+          <div class="help-header text-blue-600">
+            <span>🗣️</span> Start your sentence...
+          </div>
+          <div id="stems-container" class="tag-container"></div>
+        </div>
+
+        <!-- 3. Useful Words -->
+        <div class="help-panel bg-green-50 border-green-200">
+          <div class="help-header text-green-600">
+            <span>📚</span> Good Vocabulary
+          </div>
+          <div id="words-container" class="tag-container"></div>
+        </div>
+      </div>
+
+      <div class="progress-track">
+        <div id="progress-bar" class="progress-fill"></div>
+      </div>
+      
+    </div>
+  </div>
+
+ </div>
+
+ <script>
+/* * GRADE 7 CONFIGURATION 
+ * Level: A2-B1 (Lower Intermediate)
+ * Focus: High frequency vocabulary, simpler sentence structures
+ */
+
+const LINKING_WORDS = [
+  "And...", "But...", "So...", "Because...",
+  "Also...", "For example...", "I think...", 
+  "In my opinion...", "Actually...", "Usually...",
+  "On the other hand...", "To be honest..."
+];
+
+// Default list is empty. Users add them.
+let STUDENTS = [];
+
+// TIMING (Seconds) - Shorter for younger students
+const TIMING = {
+    part1: 30, // Easy Question
+    part2: 60, // Long Turn (1 minute is enough for Gr7)
+    part3: 30  // Discussion
+};
+
+/* THEMES - EXPANDED TO 10 TOPICS */
+const THEMES = [
+  {
+    name: "🎮 Video Games",
+    idiom: "Game changer (A big change)",
+    part1: "What is your favorite video game right now?",
+    part1_stems: ["My favorite game is...", "I love playing...", "It's fun because...", "I play it on my phone/PC..."],
+    part1_words: ["online", "teammates", "level up", "win", "lose", "graphics", "exciting"],
+    
+    part2: "Talk about a game you played recently. What was it? Did you win? Who did you play with?",
+    part2_stems: ["I played...", "It was difficult because...", "I played with my...", "The best part was...", "I felt happy when..."],
+    part2_words: ["strategy", "character", "score", "victory", "challenge", "multiplayer"],
+    
+    part3: "Are video games good for your brain?",
+    part3_stems: ["Yes, because...", "They help us to...", "However, too much gaming is...", "We can learn..."],
+    part3_words: ["reaction time", "problem solving", "addiction", "relax", "eyesight"]
+  },
+  {
+    name: "🎨 Hobbies",
+    idiom: "Practice makes perfect",
+    part1: "What do you do in your free time?",
+    part1_stems: ["I usually...", "I like to...", "My hobby is...", "When I am free, I...", "I enjoy..."],
+    part1_words: ["drawing", "reading", "dancing", "collecting", "music", "relaxing"],
+    
+    part2: "Describe a new hobby you want to learn. What is it? Why do you want to learn it? Is it hard?",
+    part2_stems: ["I want to learn...", "It looks very...", "My friend can do it and...", "I need to buy...", "I will start by..."],
+    part2_words: ["instrument", "skill", "creative", "interesting", "talent", "effort"],
+    
+    part3: "Why is it important to have hobbies?",
+    part3_stems: ["Hobbies help us to...", "We can forget about...", "It makes life...", "We can make new friends who..."],
+    part3_words: ["stress", "happiness", "balance", "social", "community", "fun"]
+  },
+  {
+    name: "🍔 Food",
+    idiom: "Eat like a horse (Eat a lot)",
+    part1: "What is your favorite meal of the day?",
+    part1_stems: ["I love breakfast because...", "Dinner is the best because...", "I usually eat...", "My mom cooks..."],
+    part1_words: ["breakfast", "lunch", "dinner", "delicious", "hungry", "full"],
+    
+    part2: "Describe a delicious meal you ate recently. What was it? Where did you eat it? Who were you with?",
+    part2_stems: ["I ate...", "We went to a restaurant called...", "The food tasted...", "It was special because...", "I was with..."],
+    part2_words: ["spicy", "sweet", "flavor", "restaurant", "chef", "homemade"],
+    
+    part3: "Is it important to eat healthy food?",
+    part3_stems: ["Yes, definitely...", "We need vitamins for...", "If we eat bad food...", "Healthy food gives us..."],
+    part3_words: ["vegetables", "energy", "grow", "strong", "vitamins", "body"]
+  },
+  {
+    name: "🍫 Snacks",
+    idiom: "Sweet tooth (Liking sweet food)",
+    part1: "What is your favorite snack?",
+    part1_stems: ["I really like...", "I often buy...", "Chocolate is my...", "When I am hungry I eat...", "I prefer salty/sweet..."],
+    part1_words: ["chips", "chocolate", "candy", "cookies", "fruit", "yogurt"],
+    
+    part2: "Describe a snack shop near your school or home. What does it sell? Do you go there often?",
+    part2_stems: ["There is a shop called...", "It sells...", "I go there every...", "It is very popular because...", "The snacks are cheap/expensive..."],
+    part2_words: ["convenience store", "buy", "price", "choice", "popular", "after school"],
+    
+    part3: "Should students be allowed to eat snacks in class?",
+    part3_stems: ["I think...", "It might be messy...", "Maybe only during...", "It helps us concentrate...", "Teachers don't like it because..."],
+    part3_words: ["messy", "distraction", "break time", "hungry", "focus", "rules"]
+  },
+  {
+    name: "🏫 School Life",
+    idiom: "Teacher's pet (Favorite student)",
+    part1: "What is your favorite subject?",
+    part1_stems: ["I like Math because...", "English is fun because...", "PE is the best...", "I am good at...", "The teacher is..."],
+    part1_words: ["subject", "learn", "interesting", "boring", "difficult", "easy"],
+    
+    part2: "Talk about a school trip you went on. Where did you go? Did you have fun? What did you learn?",
+    part2_stems: ["We went to...", "We took a bus to...", "I sat with...", "We saw...", "It was a great day because..."],
+    part2_words: ["museum", "park", "bus", "classmates", "photos", "memory"],
+    
+    part3: "Do you think homework is useful?",
+    part3_stems: ["Sometimes it helps us...", "Too much homework is...", "We need time to...", "It helps us remember...", "I prefer to do..."],
+    part3_words: ["practice", "review", "stress", "free time", "grades", "study"]
+  },
+  {
+    name: "🎉 Holidays",
+    idiom: "Have a blast (Have great fun)",
+    part1: "What is your favorite festival in China?",
+    part1_stems: ["My favorite is Spring Festival...", "I like Mid-Autumn Festival...", "Because we can...", "I get to see..."],
+    part1_words: ["celebrate", "family", "tradition", "happy", "gift", "holiday"],
+    
+    part2: "Describe how you celebrated the last Spring Festival. What did you eat? Who did you see?",
+    part2_stems: ["We had a big dinner...", "I got red envelopes...", "We visited my...", "We watched fireworks...", "It was very noisy and..."],
+    part2_words: ["dumplings", "red envelope", "fireworks", "grandparents", "reunion", "lucky"],
+    
+    part3: "Why are festivals important for families?",
+    part3_stems: ["Families can come together...", "We work hard so...", "It is a time to...", "We remember our..."],
+    part3_words: ["together", "love", "share", "connect", "culture", "rest"]
+  },
+  {
+    name: "✈️ Travel",
+    idiom: "Hit the road (Start a journey)",
+    part1: "Do you prefer traveling by car, train, or plane?",
+    part1_stems: ["I prefer trains because...", "Planes are faster...", "I like cars because...", "Trains are comfortable...", "I am afraid of..."],
+    part1_words: ["fast", "slow", "comfortable", "view", "ticket", "station"],
+    
+    part2: "Describe a city you want to visit in the future. Where is it? Why do you want to go there?",
+    part2_stems: ["I really want to go to...", "It is in...", "I want to see the...", "The food there is...", "I saw it on TV and..."],
+    part2_words: ["famous", "sightseeing", "beautiful", "scenery", "tourist", "explore"],
+    
+    part3: "What can we learn when we travel?",
+    part3_stems: ["We can learn about...", "We see different...", "It opens our eyes to...", "We can try new..."],
+    part3_words: ["culture", "history", "people", "world", "language", "customs"]
+  },
+  {
+    name: "🦁 Animals",
+    idiom: "Busy as a bee (Very busy)",
+    part1: "What is your favorite wild animal?",
+    part1_stems: ["I like pandas because...", "Lions are cool because...", "Monkeys are funny...", "My favorite is the...", "It looks very..."],
+    part1_words: ["cute", "strong", "fast", "fur", "dangerous", "forest"],
+    
+    part2: "Describe a time you went to the zoo. Who did you go with? What animals did you see?",
+    part2_stems: ["I went to the zoo with...", "We saw a big...", "The weather was...", "I took a photo of...", "My favorite part was..."],
+    part2_words: ["zoo", "cage", "ticket", "watch", "feed", "animals"],
+    
+    part3: "Is it good to keep animals in zoos?",
+    part3_stems: ["It protects them from...", "But they need freedom...", "Zoos help us learn...", "Some zoos are too small..."],
+    part3_words: ["protect", "wild", "nature", "cage", "freedom", "sad"]
+  },
+  {
+    name: "🐶 Pets",
+    idiom: "Raining cats and dogs (Heavy rain)",
+    part1: "Do you have a pet? If not, do you want one?",
+    part1_stems: ["I have a dog called...", "I don't have one but...", "I want a cat because...", "My mom says no because..."],
+    part1_words: ["dog", "cat", "fish", "hamster", "cute", "noisy"],
+    
+    part2: "Describe the perfect pet. What is it? What would you name it? How would you take care of it?",
+    part2_stems: ["I want a...", "I would name it...", "I would feed it...", "We would play...", "It would be my best friend..."],
+    part2_words: ["walk", "feed", "clean", "responsibility", "loyal", "friend"],
+    
+    part3: "Is it hard to take care of a pet?",
+    part3_stems: ["Yes, because you must...", "You need to clean...", "Food costs money...", "You cannot leave them alone...", "It takes a lot of time..."],
+    part3_words: ["responsibility", "time", "money", "care", "sick", "love"]
+  },
+  {
+    name: "🏀 Sports",
+    idiom: "Give it your best shot (Try your hardest)",
+    part1: "What sport do you like to play or watch?",
+    part1_stems: ["I like playing basketball...", "I watch football on TV...", "I am good at...", "I don't like sports but..."],
+    part1_words: ["basketball", "football", "badminton", "running", "swimming", "team"],
+    
+    part2: "Describe a sport you do at school. When do you do it? Who do you play with? Do you like it?",
+    part2_stems: ["In PE class we play...", "I play with my classmates...", "It makes me tired but...", "I scored a goal...", "It is good exercise..."],
+    part2_words: ["PE class", "playground", "run", "jump", "teamwork", "score"],
+    
+    part3: "Why is exercise important for students?",
+    part3_stems: ["We sit all day so...", "It makes our bodies...", "It helps us relax...", "If we don't exercise...", "Health is very important..."],
+    part3_words: ["healthy", "strong", "fit", "energy", "sick", "move"]
+  }
+];
+
+let state = {
+  selectedThemeIndex: 0,
+  selectedStudents: new Set(),
+  remainingStudents: [],
+  currentStudent: null,
+  currentPart: 1,
+  timerInterval: null,
+  audioContext: null
+};
+
+/* --- AUDIO EFFECTS --- */
+function initAudio() {
+    if (!state.audioContext) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        state.audioContext = new AudioContext();
+    }
+    if (state.audioContext.state === 'suspended') {
+        state.audioContext.resume();
+    }
+}
+
+function playTone(freq, type, duration) {
+  if(!state.audioContext) return;
+  const osc = state.audioContext.createOscillator();
+  const gain = state.audioContext.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, state.audioContext.currentTime);
+  gain.gain.setValueAtTime(0.1, state.audioContext.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, state.audioContext.currentTime + duration);
+  osc.connect(gain);
+  gain.connect(state.audioContext.destination);
+  osc.start();
+  osc.stop(state.audioContext.currentTime + duration);
+}
+
+function playClick() { playTone(600, 'square', 0.1); }
+function playTick() { playTone(800, 'sine', 0.1); }
+function playWin() { 
+  if(!state.audioContext) return;
+  [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => playTone(f, 'triangle', 0.4), i * 100));
+}
+
+/* --- TTS (Slowed Down) --- */
+function speakText(text) {
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  // Find a clear English voice
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = voices.find(v => v.lang === 'en-US' && v.name.includes('Google'));
+  if (preferred) utterance.voice = preferred;
+  
+  utterance.rate = 0.85; // 85% Speed for A2/B1 students
+  utterance.pitch = 1.1; // Slightly friendlier pitch
+  window.speechSynthesis.speak(utterance);
+}
+
+// Load voices fix
+window.speechSynthesis.onvoiceschanged = () => {};
+
+/* --- APP LOGIC --- */
+const screens = {
+  setup: document.getElementById('screen-setup'),
+  preview: document.getElementById('screen-preview'),
+  selection: document.getElementById('screen-selection'),
+  countdown: document.getElementById('screen-countdown'),
+  speaking: document.getElementById('screen-speaking')
+};
+
+function init() {
+  const themeSelect = document.getElementById('theme-select');
+  THEMES.forEach((theme, index) => {
+    const opt = document.createElement('option');
+    opt.value = index;
+    opt.textContent = theme.name;
+    themeSelect.appendChild(opt);
+  });
+  
+  document.getElementById('theme-select').addEventListener('change', (e) => state.selectedThemeIndex = parseInt(e.target.value));
+  document.getElementById('btn-start').addEventListener('click', startPreview);
+}
+
+// 1. STUDENT MANAGEMENT
+function parsePastedNames() {
+    const input = document.getElementById('paste-area').value;
+    const lines = input.split(/\n/).map(s => s.trim()).filter(s => s.length > 0);
+    if(lines.length > 0) {
+        STUDENTS = lines.map(name => ({ name: name }));
+        renderStudentGrid();
+        document.getElementById('paste-area').value = ""; // Clear input
+    }
+}
+
+function addPlaceholderStudents() {
+    // Adds 20 students as requested
+    for(let i=1; i<=20; i++) {
+        STUDENTS.push({ name: `Student ${i}` });
+    }
+    renderStudentGrid();
+}
+
+function renderStudentGrid() {
+  const grid = document.getElementById('student-grid');
+  grid.innerHTML = '';
+  document.getElementById('student-count').textContent = `(${STUDENTS.length})`;
+  
+  if(STUDENTS.length === 0) {
+    grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-8 italic">Paste names above or click "Add 20 Placeholders" to start.</div>`;
+    document.getElementById('btn-start').disabled = true;
+    return;
+  }
+
+  STUDENTS.forEach((student, index) => {
+    const el = document.createElement('div');
+    el.className = `student-card ${state.selectedStudents.has(index) ? 'selected' : ''}`;
+    el.onclick = () => toggleStudent(index);
+    el.innerHTML = `
+      <div class="student-avatar">${student.name.substring(0,1)}</div>
+      <div class="font-bold text-gray-700 text-sm truncate">${student.name}</div>
+    `;
+    grid.appendChild(el);
+  });
+  
+  document.getElementById('btn-start').disabled = state.selectedStudents.size === 0;
+}
+
+function toggleStudent(index) {
+  if (state.selectedStudents.has(index)) state.selectedStudents.delete(index);
+  else state.selectedStudents.add(index);
+  renderStudentGrid();
+}
+
+function selectAllStudents() {
+  if(STUDENTS.length === 0) return;
+  // Toggle all logic
+  if(state.selectedStudents.size === STUDENTS.length) {
+      state.selectedStudents.clear();
+  } else {
+      STUDENTS.forEach((_, i) => state.selectedStudents.add(i));
+  }
+  renderStudentGrid();
+}
+
+function switchScreen(screenName) {
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[screenName].classList.add('active');
+}
+
+// 2. PREVIEW PHASE
+function startPreview() {
+  initAudio();
+  const theme = THEMES[state.selectedThemeIndex];
+  const container = document.getElementById('preview-content');
+  
+  container.innerHTML = `
+    <div class="preview-card bg-blue-50 border-blue-200">
+      <h3 class="preview-title text-blue-600 mb-2 font-bold">Part 1: Quick Questions</h3>
+      <p class="text-2xl font-bold text-gray-800">${theme.part1}</p>
+    </div>
+    <div class="preview-card bg-green-50 border-green-200">
+      <h3 class="preview-title text-green-600 mb-2 font-bold">Part 2: Long Turn (1 Min)</h3>
+      <p class="text-2xl font-bold text-gray-800">${theme.part2}</p>
+    </div>
+    <div class="preview-card bg-purple-50 border-purple-200">
+      <h3 class="preview-title text-purple-600 mb-2 font-bold">Part 3: Discussion</h3>
+      <p class="text-2xl font-bold text-gray-800">${theme.part3}</p>
+    </div>
+  `;
+
+  // Shuffle selected students
+  let selectedIndices = Array.from(state.selectedStudents);
+  // Simple shuffle
+  for (let i = selectedIndices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [selectedIndices[i], selectedIndices[j]] = [selectedIndices[j], selectedIndices[i]];
+  }
+  state.remainingStudents = selectedIndices.map(i => STUDENTS[i]);
+
+  switchScreen('preview');
+  
+  let timeLeft = 30; // Shorter preview for classroom flow
+  const timerDisplay = document.getElementById('preview-timer');
+  timerDisplay.textContent = timeLeft;
+  
+  const interval = setInterval(() => {
+    timeLeft--;
+    timerDisplay.textContent = timeLeft;
+    if(timeLeft <= 5) playTick();
+    if(timeLeft <= 0) {
+      clearInterval(interval);
+      startSelection();
+    }
+  }, 1000);
+}
+
+// 3. SELECTION PHASE
+function startSelection() {
+  if(state.remainingStudents.length === 0) {
+    // Round finished
+    alert("Class Finished! Great job everyone! 🎉");
+    location.reload();
+    return;
+  }
+  
+  document.getElementById('transition-overlay').style.display = 'none';
+  switchScreen('selection');
+  
+  const display = document.getElementById('roulette-display');
+  const targetStudent = state.remainingStudents[0];
+  let counter = 0;
+  let speed = 50;
+  
+  // Create a pool of names to cycle through for effect
+  const namePool = STUDENTS.map(s => s.name);
+  
+  const spin = () => {
+    display.textContent = namePool[Math.floor(Math.random() * namePool.length)];
+    playClick();
+    
+    counter++;
+    if(counter < 25) {
+      setTimeout(spin, speed);
+      speed += 5;
+    } else {
+      // Land on target
+      state.currentStudent = targetStudent;
+      display.textContent = state.currentStudent.name;
+      display.style.color = '#4fd1c5';
+      playWin();
+      
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#4fd1c5', '#63b3ed', '#f687b3']
+      });
+
+      setTimeout(startCountdown, 2500);
+    }
+  };
+  spin();
+}
+
+// 4. COUNTDOWN
+function startCountdown() {
+  switchScreen('countdown');
+  document.getElementById('next-speaker-name').textContent = state.currentStudent.name;
+  let timeLeft = 3;
+  const display = document.getElementById('countdown-display');
+  display.textContent = timeLeft;
+  
+  const interval = setInterval(() => {
+    timeLeft--;
+    display.textContent = timeLeft;
+    playTick();
+    if(timeLeft <= 0) {
+      clearInterval(interval);
+      startSpeakingSession();
+    }
+  }, 1000);
+}
+
+// 5. SPEAKING SESSION
+function startSpeakingSession() {
+  switchScreen('speaking');
+  document.getElementById('speaker-indicator').textContent = state.currentStudent.name;
+  runPart(1);
+}
+
+function runPart(partNumber) {
+  state.currentPart = partNumber;
+  const theme = THEMES[state.selectedThemeIndex];
+  const qText = document.getElementById('question-text');
+  const pBar = document.getElementById('progress-bar');
+  const partIndicator = document.getElementById('part-indicator');
+  
+  let question, duration, stems, words;
+  if(partNumber === 1) {
+    question = theme.part1; duration = TIMING.part1; stems = theme.part1_stems; words = theme.part1_words;
+  } else if(partNumber === 2) {
+    question = theme.part2; duration = TIMING.part2; stems = theme.part2_stems; words = theme.part2_words;
+  } else {
+    question = theme.part3; duration = TIMING.part3; stems = theme.part3_stems; words = theme.part3_words;
+  }
+
+  partIndicator.textContent = `Part ${partNumber}`;
+  qText.textContent = question;
+  
+  // Reset Bar
+  pBar.style.width = '100%';
+  pBar.style.transition = 'none';
+  
+  // Render Helpers
+  renderTags('stems-container', stems);
+  renderTags('words-container', words);
+  renderTags('toolkit-container', LINKING_WORDS, true);
+  
+  // Add Idiom to Vocabulary
+  const wordsContainer = document.getElementById('words-container');
+  const idiomTag = document.createElement('span');
+  idiomTag.className = 'tag special w-full text-center border-dashed border-2 bg-yellow-50 border-yellow-200 text-yellow-700';
+  idiomTag.textContent = `🌟 ${theme.idiom}`;
+  wordsContainer.prepend(idiomTag);
+
+  // Read Question
+  speakText(question);
+
+  const timerDisplay = document.getElementById('question-timer');
+  let remaining = duration;
+  timerDisplay.textContent = remaining;
+  timerDisplay.style.background = 'white';
+  timerDisplay.style.color = '#764ba2';
+
+  // Start Bar Animation
+  setTimeout(() => {
+    pBar.style.transition = `width ${duration}s linear`;
+    pBar.style.width = '0%';
+  }, 100);
+
+  if(state.timerInterval) clearInterval(state.timerInterval);
+
+  state.timerInterval = setInterval(() => {
+    remaining--;
+    timerDisplay.textContent = remaining;
+    
+    if(remaining <= 5) {
+       timerDisplay.style.background = '#fc8181'; // Red
+       timerDisplay.style.color = 'white';
+       playTick();
+    }
+
+    if(remaining <= 0) {
+      clearInterval(state.timerInterval);
+      if(partNumber < 3) {
+        runPart(partNumber + 1);
+      } else {
+        finishStudent();
+      }
+    }
+  }, 1000);
+}
+
+function renderTags(containerId, items, isSpecial = false) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  items.forEach(item => {
+    const tag = document.createElement('span');
+    tag.className = `tag ${isSpecial ? 'special' : ''}`;
+    tag.textContent = item;
+    container.appendChild(tag);
+  });
+}
+
+function finishStudent() {
+  state.remainingStudents.shift();
+  
+  // Show Overlay
+  const overlay = document.getElementById('transition-overlay');
+  overlay.style.display = 'flex';
+  playWin();
+  confetti({ particleCount: 150, origin: { y: 0.5 } });
+
+  setTimeout(() => {
+      startSelection();
+  }, 3000);
+}
+
+init();
+
+ </script>
+ </body>
+</html>
