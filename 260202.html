@@ -96,53 +96,51 @@
         <div id="practice-screen" class="hidden flex flex-col h-full relative">
             
             <!-- HEADER (Compact) -->
-            <header class="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-sm z-20 h-24">
+            <!-- Reduced height from h-24 to h-20, reduced padding -->
+            <header class="flex-shrink-0 bg-white border-b border-gray-200 px-5 py-2 flex items-center justify-between shadow-sm z-20 h-20">
                 <div class="flex items-center gap-4 w-[280px]">
-                    <!-- Font Increased: Home Button -->
-                    <button id="back-to-topics-btn" class="text-xl bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-2.5 px-5 rounded-xl border border-gray-200 flex items-center transition-colors">
+                    <!-- Slightly reduced font size for header buttons to fit better -->
+                    <button id="back-to-topics-btn" class="text-lg bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded-xl border border-gray-200 flex items-center transition-colors">
                         <i class="fas fa-home mr-2 text-green-600"></i>Home
                     </button>
-                    <!-- Font Increased: Phase Indicator -->
-                    <div id="phase-indicator" class="text-lg font-bold text-green-700 uppercase tracking-widest bg-green-50 px-3 py-1.5 rounded-lg border border-green-100 whitespace-nowrap">PART 1</div>
+                    <div id="phase-indicator" class="text-base font-bold text-green-700 uppercase tracking-widest bg-green-50 px-3 py-1 rounded-lg border border-green-100 whitespace-nowrap">PART 1</div>
                 </div>
 
                 <div class="flex items-center justify-center gap-6 flex-grow">
-                    <button id="prev-btn" class="w-14 h-14 bg-white hover:bg-gray-50 text-gray-500 rounded-full border border-gray-200 shadow-sm flex items-center justify-center disabled:opacity-30 transition-transform active:scale-95 text-2xl">
+                    <button id="prev-btn" class="w-12 h-12 bg-white hover:bg-gray-50 text-gray-500 rounded-full border border-gray-200 shadow-sm flex items-center justify-center disabled:opacity-30 transition-transform active:scale-95 text-xl">
                         <i class="fas fa-chevron-left"></i>
                     </button>
 
-                    <div class="flex items-center bg-gray-50 rounded-full px-6 py-2 border border-gray-200 shadow-inner gap-5">
+                    <div class="flex items-center bg-gray-50 rounded-full px-6 py-1.5 border border-gray-200 shadow-inner gap-5">
                         <div class="flex flex-col items-center justify-center min-w-[90px]">
-                            <!-- Font Increased: Timer -->
-                            <div class="text-3xl font-bold text-gray-700 leading-none" id="timer-display">0:00</div>
-                            <div class="flex gap-2 mt-1">
-                                <button id="pause-resume-btn" class="text-base text-gray-500 hover:text-blue-600"><i class="fas fa-pause"></i></button>
-                                <button id="reset-timer-btn" class="text-base text-gray-500 hover:text-red-600"><i class="fas fa-redo"></i></button>
+                            <div class="text-2xl font-bold text-gray-700 leading-none" id="timer-display">0:00</div>
+                            <div class="flex gap-2 mt-0.5">
+                                <button id="pause-resume-btn" class="text-sm text-gray-500 hover:text-blue-600"><i class="fas fa-pause"></i></button>
+                                <button id="reset-timer-btn" class="text-sm text-gray-500 hover:text-red-600"><i class="fas fa-redo"></i></button>
                             </div>
                         </div>
-                        <button id="prep-timer-btn" class="hidden text-sm font-bold bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-lg hover:bg-yellow-200 border border-yellow-200">1m PREP</button>
+                        <button id="prep-timer-btn" class="hidden text-sm font-bold bg-yellow-100 text-yellow-700 px-3 py-1 rounded-lg hover:bg-yellow-200 border border-yellow-200">1m PREP</button>
                         
-                        <div class="h-10 w-[2px] bg-gray-300 mx-1"></div>
+                        <div class="h-8 w-[2px] bg-gray-300 mx-1"></div>
 
-                        <div class="relative w-12 h-12 flex items-center justify-center">
-                            <button id="record-btn" class="bg-red-500 hover:bg-red-600 text-white w-12 h-12 rounded-full shadow flex items-center justify-center hover:scale-105 transition-transform"><i class="fas fa-microphone text-xl"></i></button>
-                            <button id="stop-record-btn" class="hidden bg-gray-800 text-white w-12 h-12 rounded-full shadow flex items-center justify-center animate-pulse"><i class="fas fa-stop text-xl"></i></button>
+                        <div class="relative w-10 h-10 flex items-center justify-center">
+                            <button id="record-btn" class="bg-red-500 hover:bg-red-600 text-white w-10 h-10 rounded-full shadow flex items-center justify-center hover:scale-105 transition-transform"><i class="fas fa-microphone text-lg"></i></button>
+                            <button id="stop-record-btn" class="hidden bg-gray-800 text-white w-10 h-10 rounded-full shadow flex items-center justify-center animate-pulse"><i class="fas fa-stop text-lg"></i></button>
                         </div>
                         
                         <div id="post-recording-actions" class="hidden flex items-center gap-3 animate-fadeIn">
-                            <audio id="audio-player" controls class="h-10 w-40"></audio>
-                            <button id="download-btn" class="bg-blue-600 text-white w-10 h-10 rounded-full text-base flex items-center justify-center shadow hover:bg-blue-700 transition-colors">
+                            <audio id="audio-player" controls class="h-8 w-36"></audio>
+                            <button id="download-btn" class="bg-blue-600 text-white w-9 h-9 rounded-full text-sm flex items-center justify-center shadow hover:bg-blue-700 transition-colors">
                                 <i class="fas fa-download"></i>
                             </button>
                         </div>
                     </div>
 
-                    <button id="next-btn" class="w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-sm flex items-center justify-center disabled:opacity-50 transition-transform active:scale-95 text-2xl"><i class="fas fa-chevron-right"></i></button>
+                    <button id="next-btn" class="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-sm flex items-center justify-center disabled:opacity-50 transition-transform active:scale-95 text-xl"><i class="fas fa-chevron-right"></i></button>
                 </div>
 
                 <div class="w-[280px] flex justify-end">
-                    <!-- Font Increased: Models Button -->
-                    <button id="samples-btn" class="text-xl bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2.5 px-5 rounded-xl shadow transition-colors ring-2 ring-yellow-100 hover:ring-yellow-200 flex items-center"><i class="fas fa-lightbulb mr-2"></i>Models</button>
+                    <button id="samples-btn" class="text-lg bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded-xl shadow transition-colors ring-2 ring-yellow-100 hover:ring-yellow-200 flex items-center"><i class="fas fa-lightbulb mr-2"></i>Models</button>
                 </div>
             </header>
             
@@ -291,7 +289,7 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- DATA: Original Topics (Updated with Chinese) + 8 New Topics for China Gr 6-10 ---
-        // Each topic now has EXACTLY 3 Questions
+        // Each topic now has EXACTLY 3 Questions and UPDATED SAMPLES with VOACBULARY
         const practiceData = {
             "Hometown": [
                 { 
@@ -304,7 +302,11 @@
                     wordBank: ["capital (首都)", "province (省份)", "historical (历史的)", "modern (现代的)", "district (区)", "residents (居民)", "suburbs (郊区)", "urban (城市的)"], 
                     collocations: ["densely populated (人口稠密)", "located in (位于)", "famous for (以...著名)", "bustling streets (熙熙攘攘的街道)", "local community (当地社区)", "hometown glory (家乡的骄傲)", "residential area (居住区)", "rich history (丰富的历史)"], 
                     idioms: ["Home is where the heart is", "East or west, home is best"], 
-                    samples: ["<strong>To be honest</strong>, I come from Beijing. It is a <strong>modern</strong> city <strong>located in</strong> the north. I have lived there for 10 years, and for me, <strong>home is where the heart is</strong>.", "<strong>To start with</strong>, my hometown is a <strong>historical</strong> <strong>province</strong>. It is <strong>famous for</strong> its <strong>rich history</strong> and <strong>local community</strong>."] 
+                    samples: [
+                        "<strong>To be honest</strong>, I come from Beijing. It is a <strong>modern</strong> city <strong>located in</strong> the north. I have lived there for 10 years, and for me, <strong>home is where the heart is</strong>.",
+                        "<strong>To start with</strong>, my hometown is a <strong>historical</strong> <strong>province</strong>. It is <strong>famous for</strong> its <strong>rich history</strong> and <strong>local community</strong>.",
+                        "<strong>Actually</strong>, I live in a quiet <strong>district</strong> in the <strong>suburbs</strong>. The <strong>residents</strong> are very friendly, which makes it a great <strong>residential area</strong>."
+                    ] 
                 },
                  { 
                     type: "Part 2 (Set A)", question: "Describe a place in your hometown interesting to tourists.", timer: 90, 
@@ -316,7 +318,11 @@
                     wordBank: ["Great Wall (长城)", "Palace (宫殿)", "Temple (寺庙)", "site (景点)", "museum (博物馆)", "park (公园)", "lake (湖)", "view (景色)"], 
                     collocations: ["tourist attraction (旅游景点)", "ancient architecture (古建筑)", "breathtaking view (惊人的景色)", "cultural heritage (文化遗产)", "must-visit spot (必去之地)", "flock to (涌向)", "historical significance (历史意义)", "well-preserved (保存完好)"], 
                     idioms: ["A stone's throw away", "Off the beaten track"], 
-                    samples: ["<strong>Actually, I need a moment...</strong> I want to describe the Forbidden City, which is a <strong>must-visit spot</strong>.", "<strong>Specifically</strong>, the Summer Palace is a <strong>tourist attraction</strong> <strong>famous for</strong> its <strong>breathtaking view</strong>."] 
+                    samples: [
+                        "<strong>Actually, I need a moment...</strong> I want to describe the Forbidden City, which is a <strong>must-visit spot</strong> with <strong>historical significance</strong>.",
+                        "<strong>Specifically</strong>, the Summer Palace is a <strong>tourist attraction</strong> <strong>famous for</strong> its <strong>breathtaking view</strong> and <strong>ancient architecture</strong>.",
+                        "There is a small <strong>temple</strong> which is <strong>off the beaten track</strong>. It is a <strong>well-preserved</strong> site where you can see <strong>cultural heritage</strong>."
+                    ] 
                 },
                 { 
                     type: "Part 3 (Set A)", question: "How has your hometown changed recently?", timer: 60, 
@@ -328,7 +334,11 @@
                     wordBank: ["skyscrapers (摩天大楼)", "subway (地铁)", "traffic (交通)", "convenient (方便)", "economy (经济)", "shops (商店)", "roads (道路)", "tech (科技)"], 
                     collocations: ["urban development (城市发展)", "traffic congestion (交通拥堵)", "rapid change (快速变化)", "standard of living (生活水平)", "public transport (公共交通)", "shopping mall (购物中心)", "high-rise building (高层建筑)", "technological advancement (技术进步)"], 
                     idioms: ["Concrete jungle", "Rome wasn't built in a day"], 
-                    samples: ["<strong>That's a good question.</strong> It used to be a quiet town, but now it is a <strong>concrete jungle</strong>.", "<strong>In contrast</strong> to the past, we now have <strong>high-rise buildings</strong>. The <strong>rapid change</strong> has improved our <strong>standard of living</strong>."] 
+                    samples: [
+                        "<strong>That's a good question.</strong> It used to be a quiet town, but now it is a <strong>concrete jungle</strong> with many <strong>skyscrapers</strong>.",
+                        "<strong>In contrast</strong> to the past, we now have <strong>high-rise buildings</strong>. The <strong>rapid change</strong> has improved our <strong>standard of living</strong>.",
+                        "<strong>Consequently</strong>, the <strong>urban development</strong> has brought better <strong>public transport</strong>, like the new <strong>subway</strong> system."
+                    ] 
                 }
             ],
             "Mobile Phones": [
@@ -342,7 +352,11 @@
                     wordBank: ["smartphone (智能手机)", "app (应用程序)", "chat (聊天)", "game (游戏)", "useful (有用的)", "expensive (昂贵的)", "screen (屏幕)", "battery (电池)"],
                     collocations: ["social media (社交媒体)", "play games (玩游戏)", "send messages (发信息)", "take photos (拍照)", "stay in touch (保持联系)", "online shopping (网购)", "listen to music (听音乐)", "waste time (浪费时间)"],
                     idioms: ["Glued to the screen", "Touch base"],
-                    samples: ["<strong>To be honest</strong>, yes. I have a <strong>smartphone</strong>. I mainly use it to <strong>stay in touch</strong> with friends using <strong>social media</strong>.", "<strong>Actually</strong>, I love it. I often <strong>play games</strong> on it when I finish my homework."]
+                    samples: [
+                        "<strong>To be honest</strong>, yes. I have a <strong>smartphone</strong>. I mainly use it to <strong>stay in touch</strong> with friends using <strong>social media</strong>.",
+                        "<strong>Actually</strong>, I love it. I often <strong>play games</strong> on it when I finish my homework, though I shouldn't be <strong>glued to the screen</strong>.",
+                        "Yes, I do. It is very <strong>useful</strong> for <strong>online shopping</strong> and to <strong>send messages</strong> to my parents."
+                    ]
                 },
                 {
                     type: "Part 2", question: "Describe an app you use often.", timer: 90,
@@ -354,7 +368,11 @@
                     wordBank: ["WeChat (微信)", "TikTok (抖音)", "video (视频)", "share (分享)", "convenient (方便)", "fun (有趣)", "learn (学习)", "friends (朋友)"],
                     collocations: ["user-friendly (用户友好的)", "instant messaging (即时通讯)", "share moments (分享朋友圈)", "short videos (短视频)", "daily life (日常生活)", "keep updated (保持更新)", "kill time (消磨时间)", "connect with (连接)"],
                     idioms: ["Keep in the loop", "At my fingertips"],
-                    samples: ["<strong>It's definitely</strong> WeChat. It is super <strong>convenient</strong> for <strong>instant messaging</strong>. I use it to <strong>share moments</strong> of my <strong>daily life</strong>.", "The app is TikTok. I watch <strong>short videos</strong> to <strong>kill time</strong> and have fun."]
+                    samples: [
+                        "<strong>It's definitely</strong> WeChat. It is super <strong>convenient</strong> for <strong>instant messaging</strong>. I use it to <strong>share moments</strong> of my <strong>daily life</strong>.",
+                        "The app is TikTok. I watch <strong>short videos</strong> to <strong>kill time</strong> and have fun. The information is always <strong>at my fingertips</strong>.",
+                        "<strong>Another reason is</strong> that it helps me <strong>keep updated</strong> with news. It is very <strong>user-friendly</strong> and helps me <strong>connect with</strong> friends."
+                    ]
                 },
                 {
                     type: "Part 3", question: "Should children be allowed to use mobile phones at school?", timer: 60,
@@ -366,7 +384,11 @@
                     wordBank: ["distract (分心)", "ban (禁止)", "rule (规则)", "emergency (紧急情况)", "cheat (作弊)", "focus (专注)", "class (课堂)", "tool (工具)"],
                     collocations: ["pay attention (集中注意力)", "distract students (让学生分心)", "emergency call (紧急电话)", "school rules (校规)", "educational tool (教育工具)", "cheat on exams (考试作弊)", "silent mode (静音模式)", "cyber bullying (网络霸凌)"],
                     idioms: ["Double-edged sword", "Cross the line"],
-                    samples: ["<strong>I strongly believe</strong> they should be banned in class because they <strong>distract students</strong>.", "<strong>However</strong>, for safety, they are useful. It is a <strong>double-edged sword</strong>."]
+                    samples: [
+                        "<strong>I strongly believe</strong> they should be banned in class because they <strong>distract students</strong> from being able to <strong>pay attention</strong>.",
+                        "<strong>However</strong>, for safety, they are useful for an <strong>emergency call</strong>. It is a <strong>double-edged sword</strong>.",
+                        "<strong>Ultimately</strong>, phones can be an <strong>educational tool</strong>, but strict <strong>school rules</strong> must prevent students from using them to <strong>cheat on exams</strong>."
+                    ]
                 }
             ],
             "Homework": [
@@ -380,7 +402,11 @@
                     wordBank: ["heavy (重的)", "burden (负担)", "finish (完成)", "deadline (截止日期)", "stress (压力)", "practice (练习)", "exam (考试)", "tired (累)"],
                     collocations: ["pile up (堆积)", "stay up late (熬夜)", "finish assignments (完成作业)", "academic pressure (学业压力)", "manage time (管理时间)", "math problems (数学题)", "copy answers (抄答案)", "extra practice (额外练习)"],
                     idioms: ["Burn the midnight oil", "Hit the books"],
-                    samples: ["<strong>Unfortunately</strong>, yes. I often have to <strong>stay up late</strong> to <strong>finish assignments</strong>. The <strong>academic pressure</strong> is high.", "<strong>Generally speaking</strong>, I have a lot. I have to <strong>burn the midnight oil</strong> to finish it."]
+                    samples: [
+                        "<strong>Unfortunately</strong>, yes. I often have to <strong>stay up late</strong> to <strong>finish assignments</strong>. The <strong>academic pressure</strong> is high.",
+                        "<strong>Generally speaking</strong>, I have a lot. I have to <strong>burn the midnight oil</strong> to finish the <strong>heavy burden</strong>.",
+                        "<strong>To tell the truth</strong>, assignments <strong>pile up</strong> before the <strong>deadline</strong>, so I need to <strong>manage time</strong> better."
+                    ]
                 },
                 {
                     type: "Part 2", question: "Describe a homework assignment you enjoyed.", timer: 90,
@@ -392,7 +418,11 @@
                     wordBank: ["project (项目)", "creative (有创意的)", "draw (画)", "research (研究)", "group (小组)", "poster (海报)", "fun (有趣)", "easy (容易)"],
                     collocations: ["creative project (创意项目)", "do research (做研究)", "group work (小组作业)", "presentation (展示)", "hands-on (动手的)", "proud of (为...自豪)", "history class (历史课)", "science experiment (科学实验)"],
                     idioms: ["Piece of cake", "Think outside the box"],
-                    samples: ["<strong>It was for</strong> English class. I had to make a video. I could <strong>think outside the box</strong>.", "<strong>The best part was</strong> working with friends. It was a <strong>piece of cake</strong>."]
+                    samples: [
+                        "<strong>It was for</strong> English class. I had to make a video. It was a <strong>creative project</strong> that let me <strong>think outside the box</strong>.",
+                        "<strong>The best part was</strong> the <strong>group work</strong>. We did a <strong>presentation</strong> that was a <strong>piece of cake</strong>.",
+                        "I had to <strong>do research</strong> for a <strong>history class</strong> <strong>poster</strong>. I was very <strong>proud of</strong> the result."
+                    ]
                 },
                 {
                     type: "Part 3", question: "Should students have less homework?", timer: 60,
@@ -404,7 +434,11 @@
                     wordBank: ["relax (放松)", "sleep (睡眠)", "hobby (爱好)", "health (健康)", "creative (有创造力的)", "balance (平衡)", "grow (成长)", "free (自由)"],
                     collocations: ["get enough sleep (睡眠充足)", "develop hobbies (发展爱好)", "mental health (心理健康)", "reduce stress (减轻压力)", "free time (空闲时间)", "quality of life (生活质量)", "focus on (专注于)", "extra-curricular activities (课外活动)"],
                     idioms: ["All work and no play", "Recharge one's batteries"],
-                    samples: ["<strong>I strongly believe</strong> yes. <strong>All work and no play</strong> makes Jack a dull boy. We need to <strong>recharge our batteries</strong>.", "<strong>Therefore</strong>, less homework would let us <strong>get enough sleep</strong> and <strong>develop hobbies</strong>."]
+                    samples: [
+                        "<strong>I strongly believe</strong> yes. <strong>All work and no play</strong> makes Jack a dull boy. We need to <strong>recharge our batteries</strong>.",
+                        "<strong>Therefore</strong>, less homework would let us <strong>get enough sleep</strong> and <strong>develop hobbies</strong> like sports or art.",
+                        "<strong>For example</strong>, too much work hurts our <strong>mental health</strong>. We need <strong>free time</strong> to <strong>reduce stress</strong>."
+                    ]
                 }
             ],
             "Weekends": [
@@ -418,7 +452,11 @@
                     wordBank: ["cinema (电影院)", "mall (商场)", "tutor (家教)", "class (课)", "sleep (睡觉)", "park (公园)", "lazy (懒惰)", "busy (忙)"],
                     collocations: ["remedial class (补习班)", "catch up on sleep (补觉)", "go shopping (去购物)", "hang out with friends (和朋友逛)", "watch a movie (看电影)", "family dinner (家庭聚餐)", "outdoor activity (户外活动)", "do housework (做家务)"],
                     idioms: ["Let my hair down", "Take it easy"],
-                    samples: ["<strong>Normally</strong>, I have a <strong>remedial class</strong> in the morning. Then I <strong>catch up on sleep</strong>.", "<strong>If I'm not busy</strong>, I <strong>hang out with friends</strong> at the mall to <strong>let my hair down</strong>."]
+                    samples: [
+                        "<strong>Normally</strong>, I have a <strong>remedial class</strong> in the morning. Then I <strong>catch up on sleep</strong>.",
+                        "<strong>If I'm not busy</strong>, I <strong>hang out with friends</strong> at the mall to <strong>let my hair down</strong> and <strong>watch a movie</strong>.",
+                        "<strong>Sometimes</strong> I <strong>do housework</strong>, but I prefer to <strong>go shopping</strong> or enjoy a <strong>family dinner</strong>."
+                    ]
                 },
                 {
                     type: "Part 2", question: "Describe a perfect weekend you had.", timer: 90,
@@ -430,7 +468,11 @@
                     wordBank: ["beach (海滩)", "picnic (野餐)", "sunny (晴朗)", "laugh (笑)", "relax (放松)", "food (食物)", "game (游戏)", "happy (快乐)"],
                     collocations: ["have a picnic (野餐)", "go for a drive (兜风)", "spending quality time (度过美好时光)", "fresh air (新鲜空气)", "escape the city (逃离城市)", "scenic spot (景点)", "enjoy the moment (享受当下)", "unforgettable day (难忘的一天)"],
                     idioms: ["On cloud nine", "Have a whale of a time"],
-                    samples: ["<strong>It happened last</strong> month. We went to a park for a <strong>picnic</strong>. I was <strong>on cloud nine</strong>.", "<strong>We decided to</strong> <strong>escape the city</strong>. We had a <strong>whale of a time</strong> playing games."]
+                    samples: [
+                        "<strong>It happened last</strong> month. We went to a park for a <strong>picnic</strong>. I was <strong>on cloud nine</strong> enjoying the <strong>fresh air</strong>.",
+                        "<strong>We decided to</strong> <strong>escape the city</strong>. We had a <strong>whale of a time</strong> playing games at a <strong>scenic spot</strong>.",
+                        "<strong>It was perfect because</strong> I was <strong>spending quality time</strong> with my family, and we could <strong>enjoy the moment</strong>."
+                    ]
                 },
                 {
                     type: "Part 3", question: "Are weekends long enough?", timer: 60,
@@ -442,7 +484,11 @@
                     wordBank: ["short (短)", "tired (累)", "recover (恢复)", "study (学习)", "Monday (周一)", "rush (匆忙)", "rest (休息)", "more (更多)"],
                     collocations: ["pass quickly (过得快)", "recover from work (恢复精力)", "prepare for school (准备上学)", "three-day weekend (三天周末)", "not enough time (时间不够)", "feel refreshed (感到精神焕发)", "busy schedule (忙碌的日程)", "look forward to (期待)"],
                     idioms: ["Time flies when you're having fun", "Back to the grind"],
-                    samples: ["<strong>Definitely not</strong>. <strong>Time flies when you're having fun</strong>. Before I know it, it's <strong>back to the grind</strong>.", "<strong>As a student</strong>, I spend one day studying, so I <strong>do not have enough time</strong> to rest."]
+                    samples: [
+                        "<strong>Definitely not</strong>. <strong>Time flies when you're having fun</strong>. Before I know it, it's <strong>back to the grind</strong> on Monday.",
+                        "<strong>As a student</strong>, I spend one day studying, so I <strong>do not have enough time</strong> to <strong>recover from work</strong>.",
+                        "<strong>Ideally</strong>, a <strong>three-day weekend</strong> would help us <strong>feel refreshed</strong> after a <strong>busy schedule</strong>."
+                    ]
                 }
             ],
             "Public Transport": [
@@ -456,7 +502,11 @@
                     wordBank: ["bus (公交车)", "subway (地铁)", "bicycle (自行车)", "walk (走路)", "car (汽车)", "traffic (交通)", "fast (快)", "crowded (拥挤)"],
                     collocations: ["take the bus (坐公交)", "ride a bike (骑车)", "traffic jam (堵车)", "rush hour (高峰期)", "convenient (方便的)", "environmentally friendly (环保的)", "public transport (公共交通)", "on foot (步行)"],
                     idioms: ["Packed like sardines", "Beat the traffic"],
-                    samples: ["<strong>Usually</strong>, I <strong>take the bus</strong>. But during <strong>rush hour</strong>, it is <strong>packed like sardines</strong>.", "I <strong>ride a bike</strong> because it is <strong>environmentally friendly</strong> and helps me <strong>beat the traffic</strong>."]
+                    samples: [
+                        "<strong>Usually</strong>, I <strong>take the bus</strong>. But during <strong>rush hour</strong>, it is <strong>packed like sardines</strong>.",
+                        "I <strong>ride a bike</strong> because it is <strong>environmentally friendly</strong> and helps me <strong>beat the traffic</strong>.",
+                        "<strong>To be honest</strong>, I go <strong>on foot</strong>. It is <strong>convenient</strong> and avoids any <strong>traffic jam</strong>."
+                    ]
                 },
                 {
                     type: "Part 2", question: "Describe a long journey you took by public transport.", timer: 90,
@@ -468,7 +518,11 @@
                     wordBank: ["train (火车)", "plane (飞机)", "seat (座位)", "window (窗户)", "view (风景)", "sleep (睡觉)", "boring (无聊)", "arrive (到达)"],
                     collocations: ["high-speed train (高铁)", "window seat (靠窗座位)", "beautiful scenery (美丽的风景)", "long distance (长途)", "pass the time (消磨时间)", "comfortable seat (舒适的座位)", "arrive on time (准时到达)", "listen to music (听音乐)"],
                     idioms: ["Smooth sailing", "Travel light"],
-                    samples: ["<strong>I went to</strong> Shanghai by <strong>high-speed train</strong>. I had a <strong>window seat</strong> to enjoy the <strong>beautiful scenery</strong>.", "<strong>The journey lasted</strong> 5 hours. It was <strong>smooth sailing</strong> and I slept most of the way."]
+                    samples: [
+                        "<strong>I went to</strong> Shanghai by <strong>high-speed train</strong>. I had a <strong>window seat</strong> to enjoy the <strong>beautiful scenery</strong>.",
+                        "<strong>The journey lasted</strong> 5 hours. It was <strong>smooth sailing</strong> and I slept most of the way because I had a <strong>comfortable seat</strong>.",
+                        "<strong>During the trip</strong>, I used my phone to <strong>pass the time</strong> and <strong>listen to music</strong> until we did <strong>arrive on time</strong>."
+                    ]
                 },
                 {
                     type: "Part 3", question: "How can we improve traffic in cities?", timer: 60,
@@ -480,7 +534,11 @@
                     wordBank: ["subway (地铁)", "build (建设)", "road (路)", "limit (限制)", "car (车)", "green (绿色)", "encourage (鼓励)", "bike (自行车)"],
                     collocations: ["improve infrastructure (改善基础设施)", "limit private cars (限制私家车)", "promote green travel (推广绿色出行)", "build more roads (修路)", "traffic lights (红绿灯)", "public awareness (公众意识)", "reduce pollution (减少污染)", "carpooling (拼车)"],
                     idioms: ["Bumper to bumper", "Road rage"],
-                    samples: ["<strong>First of all</strong>, we should <strong>limit private cars</strong> because traffic is often <strong>bumper to bumper</strong>.", "<strong>In addition</strong>, the government could <strong>build more subway lines</strong> to <strong>encourage</strong> people to use them."]
+                    samples: [
+                        "<strong>First of all</strong>, we should <strong>limit private cars</strong> because traffic is often <strong>bumper to bumper</strong>.",
+                        "<strong>In addition</strong>, the government could <strong>build more subway lines</strong> to <strong>encourage</strong> people to use them.",
+                        "Another solution is to <strong>promote green travel</strong> like <strong>cycling</strong>. If we <strong>build more roads</strong> for bikes, it will <strong>reduce pollution</strong> and traffic."
+                    ]
                 }
             ],
             "Fast Food": [
@@ -494,7 +552,11 @@
                     wordBank: ["burger (汉堡)", "fries (薯条)", "pizza (披萨)", "fried chicken (炸鸡)", "unhealthy (不健康的)", "fat (脂肪)", "tasty (好吃的)", "quick (快的)"],
                     collocations: ["junk food (垃圾食品)", "high calories (高热量)", "gain weight (长胖)", "fried food (油炸食品)", "convenient meal (方便的一餐)", "western style (西式)", "delicious taste (美味)", "guilty pleasure (罪恶的快感)"],
                     idioms: ["Once in a blue moon", "Eating like a horse"],
-                    samples: ["<strong>I admit</strong>, I love <strong>fried chicken</strong>. It is my <strong>guilty pleasure</strong>.", "<strong>However</strong>, I only eat it <strong>once in a blue moon</strong> because it has <strong>high calories</strong>."]
+                    samples: [
+                        "<strong>I admit</strong>, I love <strong>fried chicken</strong>. It is my <strong>guilty pleasure</strong> because of the <strong>delicious taste</strong>.",
+                        "<strong>However</strong>, I only eat it <strong>once in a blue moon</strong> because it has <strong>high calories</strong> and I don't want to <strong>gain weight</strong>.",
+                        "It is a <strong>convenient meal</strong> when I am busy, even though I know <strong>junk food</strong> is <strong>unhealthy</strong>."
+                    ]
                 },
                 {
                     type: "Part 2", question: "Describe a fast food restaurant you like.", timer: 90,
@@ -506,7 +568,11 @@
                     wordBank: ["KFC (肯德基)", "McDonalds (麦当劳)", "cheap (便宜)", "clean (干净)", "service (服务)", "drink (饮料)", "meal (套餐)", "snack (小吃)"],
                     collocations: ["fast service (快速服务)", "reasonable price (合理的价格)", "set meal (套餐)", "clean environment (干净的环境)", "hang out (闲逛)", "order food (点餐)", "convenient location (便利的位置)", "crowded place (拥挤的地方)"],
                     idioms: ["Grab a bite", "Cheap and cheerful"],
-                    samples: ["<strong>It is called</strong> KFC. I go there to <strong>grab a bite</strong> after school. It is <strong>cheap and cheerful</strong>.", "<strong>My favorite dish is</strong> the spicy burger. The <strong>fast service</strong> is great for students."]
+                    samples: [
+                        "<strong>It is called</strong> KFC. I go there to <strong>grab a bite</strong> after school. It is <strong>cheap and cheerful</strong>.",
+                        "<strong>My favorite dish is</strong> the spicy burger. The <strong>fast service</strong> and <strong>clean environment</strong> are great for students.",
+                        "I usually order a <strong>set meal</strong> for a <strong>reasonable price</strong>. It's a nice place to <strong>hang out</strong> with friends."
+                    ]
                 },
                 {
                     type: "Part 3", question: "Why is fast food so popular?", timer: 60,
@@ -518,7 +584,11 @@
                     wordBank: ["busy (忙)", "time (时间)", "cook (做饭)", "cheap (便宜)", "taste (味道)", "addictive (上瘾)", "ad (广告)", "easy (容易)"],
                     collocations: ["modern lifestyle (现代生活方式)", "save time (省时间)", "no time to cook (没时间做饭)", "aggressive marketing (激进的营销)", "heavy flavor (重口味)", "affordable price (负担得起的价格)", "global chain (全球连锁)", "satisfy hunger (充饥)"],
                     idioms: ["Sell like hotcakes", "In a rush"],
-                    samples: ["<strong>Mainly because</strong> people are <strong>in a rush</strong>. Fast food helps them <strong>save time</strong>.", "<strong>Also</strong>, it is very tasty and products <strong>sell like hotcakes</strong> due to <strong>affordable prices</strong>."]
+                    samples: [
+                        "<strong>Mainly because</strong> people are <strong>in a rush</strong>. Fast food helps them <strong>save time</strong> in their <strong>modern lifestyle</strong>.",
+                        "<strong>Also</strong>, it is very tasty and products <strong>sell like hotcakes</strong> due to <strong>affordable prices</strong>.",
+                        "<strong>Another factor is</strong> that many people have <strong>no time to cook</strong>. It is a cheap way to <strong>satisfy hunger</strong>."
+                    ]
                 }
             ],
             "Learning English": [
@@ -532,7 +602,11 @@
                     wordBank: ["useful (有用的)", "global (全球的)", "job (工作)", "travel (旅行)", "movie (电影)", "song (歌曲)", "speak (说)", "hard (难)"],
                     collocations: ["international language (国际语言)", "communicate with foreigners (和外国人交流)", "study abroad (出国留学)", "good career (好职业)", "watch movies (看电影)", "listen to songs (听歌)", "difficult grammar (难的语法)", "open doors (开启机会)"],
                     idioms: ["It's all Greek to me", "Practice makes perfect"],
-                    samples: ["<strong>To be honest</strong>, yes. It is an <strong>international language</strong> that will help me <strong>study abroad</strong>.", "Sometimes grammar is hard and <strong>it's all Greek to me</strong>, but I know <strong>practice makes perfect</strong>."]
+                    samples: [
+                        "<strong>To be honest</strong>, yes. It is an <strong>international language</strong> that will help me <strong>study abroad</strong>.",
+                        "Sometimes grammar is hard and <strong>it's all Greek to me</strong>, but I know <strong>practice makes perfect</strong>.",
+                        "I enjoy it because I can <strong>watch movies</strong> and <strong>listen to songs</strong>. It will lead to a <strong>good career</strong>."
+                    ]
                 },
                 {
                     type: "Part 2", question: "Describe a way you learn English outside of class.", timer: 90,
@@ -544,7 +618,11 @@
                     wordBank: ["app (App)", "movie (电影)", "music (音乐)", "subtitle (字幕)", "word (单词)", "repeat (重复)", "fun (有趣)", "improve (提高)"],
                     collocations: ["watch with subtitles (看带字幕的)", "memorize vocabulary (背单词)", "mimic pronunciation (模仿发音)", "learning app (学习软件)", "English songs (英文歌)", "improve listening (提高听力)", "daily practice (日常练习)", "read news (读新闻)"],
                     idioms: ["Kill two birds with one stone", "Get the hang of it"],
-                    samples: ["<strong>I prefer to</strong> watch movies. I can learn words and relax, so I <strong>kill two birds with one stone</strong>.", "<strong>This helps me</strong> with pronunciation. I'm starting to <strong>get the hang of it</strong>."]
+                    samples: [
+                        "<strong>I prefer to</strong> watch movies. I can learn words and relax, so I <strong>kill two birds with one stone</strong>.",
+                        "<strong>This helps me</strong> with pronunciation. I'm starting to <strong>get the hang of it</strong> by <strong>mimicking pronunciation</strong>.",
+                        "I use a <strong>learning app</strong> for <strong>daily practice</strong>. It is a fun way to <strong>memorize vocabulary</strong>."
+                    ]
                 },
                 {
                     type: "Part 3", question: "Is English difficult to learn?", timer: 60,
@@ -556,7 +634,11 @@
                     wordBank: ["grammar (语法)", "vocabulary (词汇)", "speak (说)", "listen (听)", "memorize (背诵)", "practice (练习)", "shy (害羞)", "mistake (错误)"],
                     collocations: ["mother tongue (母语)", "foreign language (外语)", "make mistakes (犯错)", "improve skills (提高技能)", "practice speaking (练习口语)", "wide vocabulary (词汇量大)", "grammar rules (语法规则)", "native speaker (母语者)"],
                     idioms: ["Practice makes perfect", "Learn by heart"],
-                    samples: ["<strong>Undeniably</strong>, yes. The <strong>grammar rules</strong> are very different from my <strong>mother tongue</strong>.", "<strong>For Chinese students</strong>, we need to <strong>practice speaking</strong> more. But <strong>practice makes perfect</strong>."]
+                    samples: [
+                        "<strong>Undeniably</strong>, yes. The <strong>grammar rules</strong> are very different from my <strong>mother tongue</strong>.",
+                        "<strong>For Chinese students</strong>, we need to <strong>practice speaking</strong> more. But <strong>practice makes perfect</strong>.",
+                        "It requires a <strong>wide vocabulary</strong> which I must <strong>learn by heart</strong>. It's easy to <strong>make mistakes</strong>."
+                    ]
                 }
             ],
             "Weather": [
@@ -570,7 +652,11 @@
                     wordBank: ["spring (春天)", "summer (夏天)", "autumn (秋天)", "winter (冬天)", "hot (热)", "cold (冷)", "rain (雨)", "snow (雪)"],
                     collocations: ["warm weather (温暖的天气)", "go swimming (去游泳)", "heavy rain (大雨)", "sunny day (晴天)", "freezing cold (冰冷)", "outdoor activities (户外活动)", "leaves fall (落叶)", "snowball fight (打雪仗)"],
                     idioms: ["Raining cats and dogs", "Under the weather"],
-                    samples: ["<strong>Definitely</strong> autumn. I like the <strong>warm weather</strong> and seeing the <strong>leaves fall</strong>.", "I like summer because I can <strong>go swimming</strong> on a <strong>sunny day</strong>."]
+                    samples: [
+                        "<strong>Definitely</strong> autumn. I like the <strong>warm weather</strong> and seeing the <strong>leaves fall</strong>.",
+                        "I like summer because I can <strong>go swimming</strong> on a <strong>sunny day</strong> with my friends.",
+                        "Winter is my favorite. Even though it is <strong>freezing cold</strong>, I love having a <strong>snowball fight</strong>."
+                    ]
                 },
                 {
                     type: "Part 2", question: "Describe a time the weather changed your plans.", timer: 90,
@@ -582,7 +668,11 @@
                     wordBank: ["rain (雨)", "cancel (取消)", "picnic (野餐)", "storm (暴风雨)", "wet (湿)", "indoor (室内)", "sad (难过)", "change (改变)"],
                     collocations: ["sudden downpour (突然的倾盆大雨)", "cancel the trip (取消行程)", "bad weather (坏天气)", "stay indoors (待在室内)", "ruin the day (毁了一天)", "change of plans (计划改变)", "weather forecast (天气预报)", "get soaked (湿透)"],
                     idioms: ["Rain on my parade", "Save for a rainy day"],
-                    samples: ["<strong>We had planned</strong> a picnic, but a <strong>sudden downpour</strong> really <strong>rained on my parade</strong>.", "<strong>As a result</strong>, we had to <strong>cancel the trip</strong> and <strong>stay indoors</strong>."]
+                    samples: [
+                        "<strong>We had planned</strong> a picnic, but a <strong>sudden downpour</strong> really <strong>rained on my parade</strong>.",
+                        "<strong>As a result</strong>, we had to <strong>cancel the trip</strong> and <strong>stay indoors</strong> playing games.",
+                        "It was annoying because the <strong>weather forecast</strong> was wrong. We had a <strong>change of plans</strong> to avoid the <strong>bad weather</strong>."
+                    ]
                 },
                 {
                     type: "Part 3", question: "Does weather affect people's mood?", timer: 60,
@@ -594,7 +684,11 @@
                     wordBank: ["mood (心情)", "happy (快乐)", "sad (悲伤)", "sun (太阳)", "energy (能量)", "dark (黑)", "active (活跃)", "depressed (抑郁)"],
                     collocations: ["affect mood (影响心情)", "sunny disposition (阳光的性格)", "gloomy weather (阴沉的天气)", "feel energetic (感到精力充沛)", "feeling blue (感到忧郁)", "seasonal depression (季节性抑郁)", "bright sunshine (明媚的阳光)", "stay active (保持活跃)"],
                     idioms: ["Feeling blue", "Walking on sunshine"],
-                    samples: ["<strong>Absolutely</strong>. <strong>Bright sunshine</strong> makes me feel like I'm <strong>walking on sunshine</strong>.", "<strong>Conversely</strong>, <strong>gloomy weather</strong> leaves many people <strong>feeling blue</strong>."]
+                    samples: [
+                        "<strong>Absolutely</strong>. <strong>Bright sunshine</strong> makes me feel like I'm <strong>walking on sunshine</strong>.",
+                        "<strong>Conversely</strong>, <strong>gloomy weather</strong> leaves many people <strong>feeling blue</strong> and tired.",
+                        "People definitely <strong>feel energetic</strong> when it's sunny, but <strong>seasonal depression</strong> can happen in winter."
+                    ]
                 }
             ],
             "Movies": [
@@ -608,7 +702,11 @@
                     wordBank: ["screen (屏幕)", "sound (声音)", "popcorn (爆米花)", "relax (放松)", "pause (暂停)", "ticket (票)", "atmosphere (氛围)", "expensive (贵)"],
                     collocations: ["big screen (大屏幕)", "sound effect (音效)", "immersive experience (沉浸式体验)", "pause the movie (暂停电影)", "comfortable sofa (舒适的沙发)", "ticket price (票价)", "latest release (最新上映)", "watching experience (观影体验)"],
                     idioms: ["Couch potato", "Blow my mind"],
-                    samples: ["<strong>I prefer</strong> the cinema for the <strong>big screen</strong> and <strong>immersive experience</strong>. It can <strong>blow my mind</strong>.", "<strong>However</strong>, home is better if I want to be a <strong>couch potato</strong> and <strong>pause the movie</strong>."]
+                    samples: [
+                        "<strong>I prefer</strong> the cinema for the <strong>big screen</strong> and <strong>immersive experience</strong>. It can <strong>blow my mind</strong>.",
+                        "<strong>However</strong>, home is better if I want to be a <strong>couch potato</strong> and <strong>pause the movie</strong> when I want.",
+                        "I think the <strong>ticket price</strong> is too high, so I watch on my <strong>comfortable sofa</strong> for a relaxing <strong>watching experience</strong>."
+                    ]
                 },
                 {
                     type: "Part 2", question: "Describe a movie you like.", timer: 90,
@@ -620,7 +718,11 @@
                     wordBank: ["comedy (喜剧)", "action (动作片)", "scary (恐怖的)", "hero (英雄)", "funny (好笑)", "sad (悲伤)", "star (明星)", "plot (情节)"],
                     collocations: ["box office hit (票房大卖)", "special effects (特效)", "main character (主角)", "science fiction (科幻)", "happy ending (大团圆结局)", "recommend a movie (推荐电影)", "watch a film (看电影)", "touching story (感人的故事)"],
                     idioms: ["On the edge of my seat", "Star-studded"],
-                    samples: ["<strong>It's called</strong> 'The Wandering Earth'. It is a <strong>science fiction</strong> movie and a <strong>box office hit</strong>.", "<strong>What I liked most</strong> were the <strong>special effects</strong>. I was <strong>on the edge of my seat</strong>."]
+                    samples: [
+                        "<strong>It's called</strong> 'The Wandering Earth'. It is a <strong>science fiction</strong> movie and a <strong>box office hit</strong>.",
+                        "<strong>What I liked most</strong> were the <strong>special effects</strong>. I was <strong>on the edge of my seat</strong> the whole time.",
+                        "The <strong>main character</strong> was brave. It was a <strong>touching story</strong> with a <strong>happy ending</strong>."
+                    ]
                 },
                 {
                     type: "Part 3", question: "What can we learn from movies?", timer: 60,
@@ -632,7 +734,11 @@
                     wordBank: ["culture (文化)", "history (历史)", "life (生活)", "language (语言)", "learn (学习)", "world (世界)", "value (价值观)", "story (故事)"],
                     collocations: ["different cultures (不同的文化)", "historical event (历史事件)", "learn a lesson (吸取教训)", "broaden horizons (开阔眼界)", "educational value (教育价值)", "foreign language (外语)", "inspire people (激励人们)", "reflect reality (反映现实)"],
                     idioms: ["Open one's eyes", "Picture is worth a thousand words"],
-                    samples: ["<strong>We can learn</strong> about <strong>different cultures</strong> without traveling. They <strong>broaden our horizons</strong>.", "<strong>Furthermore</strong>, they can <strong>open our eyes</strong> to history. A <strong>picture is worth a thousand words</strong>."]
+                    samples: [
+                        "<strong>We can learn</strong> about <strong>different cultures</strong> without traveling. They <strong>broaden our horizons</strong>.",
+                        "<strong>Furthermore</strong>, they can <strong>open our eyes</strong> to history. A <strong>picture is worth a thousand words</strong>.",
+                        "Movies often <strong>reflect reality</strong> and help us <strong>learn a lesson</strong> about life values."
+                    ]
                 }
             ]
         };
