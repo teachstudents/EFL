@@ -6,7 +6,7 @@
     <title>Reading Explorer 4: Curriculum (Split View)</title>
     <style>
         :root {
-            --sidebar-width: 150px; 
+            --sidebar-width: 142px; 
             --primary: #2c3e50;
             --secondary: #3498db;
             --accent: #e67e22;
@@ -103,8 +103,8 @@
         .unit-hero {
             background: white;
             border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 15px; /* Reduced padding */
+            margin-bottom: 10px; /* Reduced margin to bring buttons closer */
             border-left: 5px solid var(--accent);
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             display: flex;
@@ -112,44 +112,42 @@
             align-items: flex-start; 
         }
         .hero-title { flex: 1; }
-        .hero-title h2 { margin: 0 0 5px 0; color: var(--primary); font-size: 1.4rem; }
-        .hero-title h2 span { font-weight: 400; font-size: 1rem; color: #7f8c8d; margin-left: 10px; }
-        .date-badge { font-size: 0.7rem; background: #eef2f7; color: var(--primary); padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-right: 10px; display:inline-block; vertical-align: middle;}
-        .big-question { font-style: italic; color: #555; background: #fff8e1; padding: 4px 10px; border-radius: 4px; display: inline-block; font-size: 0.85rem; margin-bottom: 8px;}
+        .hero-title h2 { margin: 0 0 5px 0; color: var(--primary); font-size: 1.55rem; /* Reduced 10% */ }
+        .hero-title h2 span { font-weight: 400; font-size: 1.1rem; /* Reduced 10% */ color: #7f8c8d; margin-left: 10px; }
+        .date-badge { font-size: 0.8rem; /* Reduced 10% */ background: #eef2f7; color: var(--primary); padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-right: 10px; display:inline-block; vertical-align: middle;}
+        .big-question { font-style: italic; color: #555; background: #fff8e1; padding: 4px 10px; border-radius: 4px; display: inline-block; font-size: 1rem; /* Reduced 10% */ margin-bottom: 6px;}
         
         .friction-question { 
             color: var(--purple); 
             font-weight: 700; 
-            font-size: 0.85rem; 
+            font-size: 1rem; /* Reduced 10% */ 
             margin-top: 5px; 
             display: block; 
         }
 
-        .cefr-tag { background: var(--primary); color: white; padding: 4px 10px; border-radius: 15px; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.5px; white-space: nowrap; margin-left: 15px; }
+        .cefr-tag { background: var(--primary); color: white; padding: 4px 10px; border-radius: 15px; font-weight: 700; font-size: 0.85rem; /* Reduced 10% */ letter-spacing: 0.5px; white-space: nowrap; margin-left: 15px; }
 
         /* --- SINGLE PANEL VIEW --- */
         .readings-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             margin-bottom: 20px;
         }
 
         .reading-panel {
             background: white;
             border-radius: 10px;
-            padding: 25px;
+            padding: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.02);
             border-top: 4px solid var(--secondary);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
         .reading-panel.b-side { border-top-color: var(--purple); }
         
-        .panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 5px;}
-        .panel-title { font-size: 1.1rem; font-weight: 800; color: var(--primary); margin: 0;}
-        .panel-type { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: #95a5a6; }
+        /* Removed panel-header styles as requested */
 
         /* --- GENAI CARD --- */
         .genai-card {
@@ -166,15 +164,15 @@
         .genai-card:active { transform: scale(0.99); }
         .genai-card.speaking { border-color: var(--accent); background-color: #fff8e1; }
 
-        .genai-habit { font-size: 0.7rem; color: var(--accent); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; display: inline-block; background: #fff3e0; padding: 2px 6px; border-radius: 4px;}
-        .code-block { background: #2c3e50; color: #ecf0f1; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 0.8rem; margin: 8px 0; border-left: 3px solid var(--success); line-height: 1.4; }
-        .vocab-list { font-size: 0.75rem; color: #e74c3c; margin-top: 8px; font-weight: 600; background: #fdedec; padding: 6px; border-radius: 4px; }
+        .genai-habit { font-size: 0.9rem; color: var(--accent); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; display: inline-block; background: #fff3e0; padding: 2px 6px; border-radius: 4px;}
+        .code-block { background: #2c3e50; color: #ecf0f1; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 1rem; margin: 8px 0; border-left: 3px solid var(--success); line-height: 1.4; }
+        .vocab-list { font-size: 0.95rem; color: #e74c3c; margin-top: 8px; font-weight: 600; background: #fdedec; padding: 6px; border-radius: 4px; }
 
         /* --- ACCORDION BUTTON STYLES --- */
         .section-toggle-btn {
             width: 100%;
             padding: 12px;
-            font-size: 0.8rem;
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             border-radius: 6px;
@@ -227,37 +225,40 @@
         .content-vocab { background: #fff; border: 1px solid #d5dbdb; border-top: none; }
 
         /* Inner Content Styling */
-        .discussion-context { font-size: 0.75rem; color: #555; background: #f8f9fa; padding: 8px; border-radius: 4px; margin-bottom: 12px; border-left: 3px solid #bdc3c7; font-style: italic; }
-        .discussion-item { margin-bottom: 12px; line-height: 1.5; font-size: 0.85rem; color: #2c3e50; }
-        .discussion-item strong { color: var(--discussion); display: block; margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;}
+        .discussion-context { font-size: 0.95rem; color: #555; background: #f8f9fa; padding: 8px; border-radius: 4px; margin-bottom: 12px; border-left: 3px solid #bdc3c7; font-style: italic; }
+        .discussion-item { margin-bottom: 12px; line-height: 1.5; font-size: 1.1rem; color: #2c3e50; }
+        .discussion-item strong { color: var(--discussion); display: block; margin-bottom: 4px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;}
 
-        .mission-meta { font-size: 0.7rem; color: #7f8c8d; font-style: italic; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 6px;}
-        .mission-item { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed #e1e8ed; font-size: 0.85rem; }
-        .mission-role { font-weight: 700; color: var(--teal); font-size: 0.8rem; margin-right: 5px; display: block; margin-bottom: 2px;}
+        .mission-meta { font-size: 0.9rem; color: #7f8c8d; font-style: italic; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 6px;}
+        .mission-item { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed #e1e8ed; font-size: 1.1rem; }
+        .mission-role { font-weight: 700; color: var(--teal); font-size: 1rem; margin-right: 5px; display: block; margin-bottom: 2px;}
 
-        .grasps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem;}
+        .grasps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 1.1rem;}
         .grasps-box { margin-bottom: 5px; }
-        .grasps-label { font-weight: 800; color: var(--success); font-size: 0.7rem; text-transform: uppercase; display:block; margin-bottom:2px;}
+        .grasps-label { font-weight: 800; color: var(--success); font-size: 0.9rem; text-transform: uppercase; display:block; margin-bottom:2px;}
         .grasps-text { color: #555; }
 
-        .writing-text { font-size: 0.85rem; line-height: 1.6; color: #34495e; margin-bottom: 12px; }
+        .writing-text { font-size: 1.1rem; line-height: 1.6; color: #34495e; margin-bottom: 12px; }
         .writing-part { margin-bottom: 12px; display: block; }
-        .writing-part strong { color: var(--accent); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px;}
+        .writing-part strong { color: var(--accent); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px;}
 
-        .vocab-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 5px; }
+        .vocab-table { width: 100%; border-collapse: collapse; font-size: 1.1rem; margin-top: 5px; }
         .vocab-table th, .vocab-table td { border: 1px solid #eee; padding: 8px; text-align: left; vertical-align: top;}
         .vocab-table th { background: #f8f9fa; color: var(--primary); font-weight: 700; width: 40%; }
 
         /* --- SELF CHECK TOGGLE --- */
-        .sc-toggle-btn { background: #f9e79f; border: none; color: #b7950b; font-size: 0.7rem; font-weight: 700; padding: 6px 12px; border-radius: 4px; cursor: pointer; width: 100%; text-align: left; margin-top: 5px; }
+        .sc-toggle-btn { background: #f9e79f; border: none; color: #b7950b; font-size: 0.9rem; font-weight: 700; padding: 6px 12px; border-radius: 4px; cursor: pointer; width: 100%; text-align: left; margin-top: 5px; }
         .self-check-container { display: none; background: #fcf3cf; padding: 12px; border-radius: 4px; border: 1px solid #f9e79f; margin-top: 5px; cursor: default; }
         .self-check-container.open { display: block; }
-        .sc-item { display: flex; align-items: center; font-size: 0.8rem; margin-bottom: 5px; color: #555; cursor: pointer; }
+        .sc-item { display: flex; align-items: center; font-size: 1rem; margin-bottom: 5px; color: #555; cursor: pointer; }
         .sc-item input { margin-right: 8px; accent-color: #27ae60; cursor: pointer; }
 
         /* --- QA TOOLKIT INNER --- */
-        .qa-section { margin-bottom: 12px; font-size: 0.85rem; color: #4a235a; }
-        .qa-label { font-weight: 800; display: block; margin-bottom: 3px; font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; color: #8e44ad; }
+        .qa-toggle-btn { width: 100%; background: #f3e5f5; color: #8e44ad; border: 1px solid #e1bee7; padding: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; border-radius: 6px; margin-top: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; }
+        .qa-content { display: none; background: #fbf6fd; padding: 15px; border: 1px solid #e1bee7; border-top: none; border-radius: 0 0 6px 6px; font-size: 1.1rem; color: #4a235a; cursor: pointer; }
+        .qa-content.open { display: block; }
+        .qa-section { margin-bottom: 12px; font-size: 1.1rem; color: #4a235a; }
+        .qa-label { font-weight: 800; display: block; margin-bottom: 3px; font-size: 0.9rem; text-transform: uppercase; opacity: 0.7; color: #8e44ad; }
 
     </style>
 </head>
@@ -295,7 +296,6 @@
             <div class="unit-hero"><div class="hero-title"><span class="date-badge">Mar 2 - 13</span><h2>Unit 1A: Visual Village</h2><div class="big-question">Can we trust what we see?</div></div><div class="cefr-tag">Strategy: Perceiving</div></div>
             <div class="readings-container">
                 <div class="reading-panel">
-                    <div class="panel-header"><div class="panel-title">1A: The Visual Village</div><div class="panel-type">Reading Selection</div></div>
                     
                     <!-- 1. GENAI -->
                     <div class="genai-card" onclick="speakCard(this, 1)">
@@ -384,7 +384,6 @@
             <div class="unit-hero"><div class="hero-title"><span class="date-badge">Mar 2 - 13</span><h2>Unit 1B: Journey in Photos</h2><div class="big-question">Can we trust what we see?</div></div><div class="cefr-tag">Strategy: Empathizing</div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
-                    <div class="panel-header"><div class="panel-title">1B: Journey in Photos</div><div class="panel-type">Reading Selection</div></div>
                     
                     <div class="genai-card" onclick="speakCard(this, 1)">
                         <div class="genai-habit">Empathizing</div>
@@ -465,7 +464,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 2A: Living Light</h2><div class="big-question">Why do animals glow?</div></div><div class="cefr-tag">Strategy: Patterning</div></div>
             <div class="readings-container">
                 <div class="reading-panel">
-                    <div class="panel-header"><div class="panel-title">2A: Living Light</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 2)">
                         <div class="genai-habit">Patterning</div>
                         <div class="code-block">"Design a building using bioluminescence to remain invisible at night."</div>
@@ -542,7 +541,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 2B: Feathers of Love</h2><div class="big-question">Why do animals glow?</div></div><div class="cefr-tag">Strategy: Play</div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
-                    <div class="panel-header"><div class="panel-title">2B: Feathers of Love</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 2)">
                         <div class="genai-habit">Play</div>
                         <div class="code-block">"Create a bird with prominent feathers performing an absurd dance ritual."</div>
@@ -621,7 +620,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 3A: The Super-Label</h2><div class="big-question">How safe is our food?</div></div><div class="cefr-tag">Strategy: Synthesizing</div></div>
             <div class="readings-container">
                 <div class="reading-panel">
-                    <div class="panel-header"><div class="panel-title">3A: The Super-Label</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 3)">
                         <div class="genai-habit">Synthesizing</div>
                         <div class="code-block">"Design a warning label showing risk of contamination."</div>
@@ -699,7 +698,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 3B: GMO Metaphor</h2><div class="big-question">How safe is our food?</div></div><div class="cefr-tag">Strategy: Abstracting</div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
-                    <div class="panel-header"><div class="panel-title">3B: GMO Metaphor</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 3)">
                         <div class="genai-habit">Abstracting</div>
                         <div class="code-block">"Explain gene modification using a 'Lego' metaphor."</div>
@@ -778,7 +777,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 4A: Gecko Glove</h2><div class="big-question">What can we learn from nature?</div></div><div class="cefr-tag">Strategy: Modeling</div></div>
             <div class="readings-container">
                 <div class="reading-panel">
-                    <div class="panel-header"><div class="panel-title">4A: The Gecko Glove</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 4)">
                         <div class="genai-habit">Modeling</div>
                         <div class="code-block">"Create blueprint for climbing device."</div>
@@ -856,7 +855,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 4B: Smart Fashion</h2><div class="big-question">What can we learn from nature?</div></div><div class="cefr-tag">Strategy: Play</div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
-                    <div class="panel-header"><div class="panel-title">4B: Smart Fashion</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 4)">
                         <div class="genai-habit">Play</div>
                         <div class="code-block">"Design flexible portable outfit."</div>
@@ -935,7 +934,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 5A: Ancestor's Face</h2><div class="big-question">Where do we come from?</div></div><div class="cefr-tag">Strategy: Synthesizing</div></div>
             <div class="readings-container">
                 <div class="reading-panel">
-                    <div class="panel-header"><div class="panel-title">5A: The Ancestor's Face</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 5)">
                         <div class="genai-habit">Synthesizing</div>
                         <div class="code-block">"Generate face representing migration."</div>
@@ -1012,7 +1011,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 5B: Star Compass</h2><div class="big-question">Where do we come from?</div></div><div class="cefr-tag">Strategy: Embodied</div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
-                    <div class="panel-header"><div class="panel-title">5B: Star Compass</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 5)">
                         <div class="genai-habit">Embodied Thinking</div>
                         <div class="code-block">"Visualize horizon at night with stars."</div>
@@ -1090,7 +1089,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 6A: Currency of Trust</h2><div class="big-question">How does money shape us?</div></div><div class="cefr-tag">Strategy: Abstracting</div></div>
             <div class="readings-container">
                 <div class="reading-panel">
-                    <div class="panel-header"><div class="panel-title">6A: Currency of Trust</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 6)">
                         <div class="genai-habit">Abstracting</div>
                         <div class="code-block">"Design a coin representing stable value."</div>
@@ -1166,7 +1165,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 6B: Blockchain Block</h2><div class="big-question">How does money shape us?</div></div><div class="cefr-tag">Strategy: Modeling</div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
-                    <div class="panel-header"><div class="panel-title">6B: Blockchain Block</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 6)">
                         <div class="genai-habit">Modeling</div>
                         <div class="code-block">"Create diagram of verifying digital currency."</div>
@@ -1243,7 +1242,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 7A: The Pilgrim's View</h2><div class="big-question">Why follow the crowd?</div></div><div class="cefr-tag">Strategy: Empathizing</div></div>
             <div class="readings-container">
                 <div class="reading-panel">
-                    <div class="panel-header"><div class="panel-title">7A: The Pilgrim's View</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 7)">
                         <div class="genai-habit">Empathizing</div>
                         <div class="code-block">"Write monologue from crowd participant."</div>
@@ -1319,7 +1318,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 7B: The Troll's Mirror</h2><div class="big-question">Why follow the crowd?</div></div><div class="cefr-tag">Strategy: Perceiving</div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
-                    <div class="panel-header"><div class="panel-title">7B: The Troll's Mirror</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 7)">
                         <div class="genai-habit">Perceiving</div>
                         <div class="code-block">"Write chat log of online aggression."</div>
@@ -1396,7 +1395,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 8A: Crime Board</h2><div class="big-question">How do we know the truth?</div></div><div class="cefr-tag">Strategy: Synthesizing</div></div>
             <div class="readings-container">
                 <div class="reading-panel">
-                    <div class="panel-header"><div class="panel-title">8A: The Crime Board</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 8)">
                         <div class="genai-habit">Synthesizing</div>
                         <div class="code-block">"Create forensic image of arsenic poisoning."</div>
@@ -1472,7 +1471,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 8B: Unique Fingerprint</h2><div class="big-question">How do we know the truth?</div></div><div class="cefr-tag">Strategy: Patterning</div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
-                    <div class="panel-header"><div class="panel-title">8B: Unique Fingerprint</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 8)">
                         <div class="genai-habit">Patterning</div>
                         <div class="code-block">"Visualize digital footprint."</div>
@@ -1549,7 +1548,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 9A: Digital Restoration</h2><div class="big-question">Rebuild or ruin?</div></div><div class="cefr-tag">Strategy: Modeling</div></div>
             <div class="readings-container">
                 <div class="reading-panel">
-                    <div class="panel-header"><div class="panel-title">9A: Digital Restoration</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 9)">
                         <div class="genai-habit">Modeling</div>
                         <div class="code-block">"Show memorial assembled digitally."</div>
@@ -1624,7 +1623,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 9B: Lidar Vision</h2><div class="big-question">Rebuild or ruin?</div></div><div class="cefr-tag">Strategy: Perceiving</div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
-                    <div class="panel-header"><div class="panel-title">9B: Lidar Vision</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 9)">
                         <div class="genai-habit">Perceiving</div>
                         <div class="code-block">"Use satellite view to find territory."</div>
@@ -1700,7 +1699,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 10A: Aging Algorithm</h2><div class="big-question">Live to 150?</div></div><div class="cefr-tag">Strategy: Abstracting</div></div>
             <div class="readings-container">
                 <div class="reading-panel">
-                    <div class="panel-header"><div class="panel-title">10A: Aging Algorithm</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 10)">
                         <div class="genai-habit">Abstracting</div>
                         <div class="code-block">"Illustrate mechanism limiting lifespan."</div>
@@ -1775,7 +1774,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 10B: Blue Zone Menu</h2><div class="big-question">Live to 150?</div></div><div class="cefr-tag">Strategy: Synthesizing</div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
-                    <div class="panel-header"><div class="panel-title">10B: Blue Zone Menu</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 10)">
                         <div class="genai-habit">Synthesizing</div>
                         <div class="code-block">"Create menu for longevity."</div>
@@ -1852,7 +1851,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 11A: Water Footprint</h2><div class="big-question">Tech: Cause or Cure?</div></div><div class="cefr-tag">Strategy: Patterning</div></div>
             <div class="readings-container">
                 <div class="reading-panel">
-                    <div class="panel-header"><div class="panel-title">11A: Water Footprint</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 11)">
                         <div class="genai-habit">Patterning</div>
                         <div class="code-block">"Show water shortage crisis."</div>
@@ -1928,7 +1927,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 11B: E-Waste Art</h2><div class="big-question">Tech: Cause or Cure?</div></div><div class="cefr-tag">Strategy: Play</div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
-                    <div class="panel-header"><div class="panel-title">11B: E-Waste Art</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 11)">
                         <div class="genai-habit">Play</div>
                         <div class="code-block">"Create art from discarded components."</div>
@@ -2005,7 +2004,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 12A: Goldilocks Zone</h2><div class="big-question">Lifeboat or Distraction?</div></div><div class="cefr-tag">Strategy: Modeling</div></div>
             <div class="readings-container">
                 <div class="reading-panel">
-                    <div class="panel-header"><div class="panel-title">12A: Goldilocks Zone</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 12)">
                         <div class="genai-habit">Modeling</div>
                         <div class="code-block">"Visualize planet where plants thrive."</div>
@@ -2081,7 +2080,7 @@
             <div class="unit-hero"><div class="hero-title"><h2>Unit 12B: Asteroid Deflection</h2><div class="big-question">Lifeboat or Distraction?</div></div><div class="cefr-tag">Strategy: Abstracting</div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
-                    <div class="panel-header"><div class="panel-title">12B: Asteroid Deflection</div><div class="panel-type">Reading Selection</div></div>
+                    
                     <div class="genai-card" onclick="speakCard(this, 12)">
                         <div class="genai-habit">Abstracting</div>
                         <div class="code-block">"Illustrate scenario to deflect meteor."</div>
