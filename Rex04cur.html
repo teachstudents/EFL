@@ -47,10 +47,9 @@
             background: rgba(0,0,0,0.2);
             border-bottom: 1px solid rgba(255,255,255,0.1);
             text-align: center;
+            min-height: 40px; /* Keep some height for aesthetics */
         }
-        .brand-area h1 { margin: 0; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.5px; }
-        .brand-meta { font-size: 0.6rem; color: var(--text-muted); margin-top: 4px; }
-
+        
         .nav-section { padding: 10px 5px; flex-grow: 1; }
         .nav-label {
             padding-left: 5px;
@@ -103,8 +102,8 @@
         .unit-hero {
             background: white;
             border-radius: 10px;
-            padding: 15px; /* Reduced padding */
-            margin-bottom: 10px; /* Reduced margin to bring buttons closer */
+            padding: 15px; 
+            margin-bottom: 10px; 
             border-left: 5px solid var(--accent);
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             display: flex;
@@ -112,20 +111,18 @@
             align-items: flex-start; 
         }
         .hero-title { flex: 1; }
-        .hero-title h2 { margin: 0 0 5px 0; color: var(--primary); font-size: 1.55rem; /* Reduced 10% */ }
-        .hero-title h2 span { font-weight: 400; font-size: 1.1rem; /* Reduced 10% */ color: #7f8c8d; margin-left: 10px; }
-        .date-badge { font-size: 0.8rem; /* Reduced 10% */ background: #eef2f7; color: var(--primary); padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-right: 10px; display:inline-block; vertical-align: middle;}
-        .big-question { font-style: italic; color: #555; background: #fff8e1; padding: 4px 10px; border-radius: 4px; display: inline-block; font-size: 1rem; /* Reduced 10% */ margin-bottom: 6px;}
+        .hero-title h2 { margin: 0 0 5px 0; color: var(--primary); font-size: 1.55rem; }
+        .hero-title h2 span { font-weight: 400; font-size: 1.1rem; color: #7f8c8d; margin-left: 10px; }
+        
+        .big-question { font-style: italic; color: #555; background: #fff8e1; padding: 4px 10px; border-radius: 4px; display: inline-block; font-size: 1rem; margin-bottom: 6px;}
         
         .friction-question { 
             color: var(--purple); 
             font-weight: 700; 
-            font-size: 1rem; /* Reduced 10% */ 
+            font-size: 1rem; 
             margin-top: 5px; 
             display: block; 
         }
-
-        .cefr-tag { background: var(--primary); color: white; padding: 4px 10px; border-radius: 15px; font-weight: 700; font-size: 0.85rem; /* Reduced 10% */ letter-spacing: 0.5px; white-space: nowrap; margin-left: 15px; }
 
         /* --- SINGLE PANEL VIEW --- */
         .readings-container {
@@ -147,8 +144,6 @@
         }
         .reading-panel.b-side { border-top-color: var(--purple); }
         
-        /* Removed panel-header styles as requested */
-
         /* --- GENAI CARD --- */
         .genai-card {
             background: #fdfefe;
@@ -254,9 +249,6 @@
         .sc-item input { margin-right: 8px; accent-color: #27ae60; cursor: pointer; }
 
         /* --- QA TOOLKIT INNER --- */
-        .qa-toggle-btn { width: 100%; background: #f3e5f5; color: #8e44ad; border: 1px solid #e1bee7; padding: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; border-radius: 6px; margin-top: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; }
-        .qa-content { display: none; background: #fbf6fd; padding: 15px; border: 1px solid #e1bee7; border-top: none; border-radius: 0 0 6px 6px; font-size: 1.1rem; color: #4a235a; cursor: pointer; }
-        .qa-content.open { display: block; }
         .qa-section { margin-bottom: 12px; font-size: 1.1rem; color: #4a235a; }
         .qa-label { font-weight: 800; display: block; margin-bottom: 3px; font-size: 0.9rem; text-transform: uppercase; opacity: 0.7; color: #8e44ad; }
 
@@ -267,8 +259,7 @@
     <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="brand-area">
-            <h1>Level 4</h1>
-            <div class="brand-meta"><span>Split View Curriculum</span></div>
+            <!-- Removed Text -->
         </div>
         <div class="nav-section">
             <div class="nav-label">Semester 1</div>
@@ -293,7 +284,7 @@
 
         <!-- ================= UNIT 1 ================= -->
         <div id="u1a" class="unit-display active">
-            <div class="unit-hero"><div class="hero-title"><span class="date-badge">Mar 2 - 13</span><h2>Unit 1A: Visual Village</h2><div class="big-question">Can we trust what we see?</div></div><div class="cefr-tag">Strategy: Perceiving</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 1A: Visual Village</h2><div class="big-question">Can we trust what we see?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel">
                     
@@ -354,8 +345,6 @@
                         <div class="self-check-container" onclick="event.stopPropagation()">
                             <label class="sc-item"><input type="checkbox"> <strong>Vocabulary Check:</strong> Did I use at least 4 bold words?</label>
                             <label class="sc-item"><input type="checkbox"> <strong>Recycling Check:</strong> Did I include 1 word from previous unit?</label>
-                            <label class="sc-item"><input type="checkbox"> <strong>Collocation Check:</strong> Did I use the words correctly?</label>
-                            <label class="sc-item"><input type="checkbox"> <strong>"Anti-AI" Check:</strong> Did I tell a specific story about my life?</label>
                             <label class="sc-item"><input type="checkbox"> <strong>Structure:</strong> Did I use transition words?</label>
                         </div>
                     </div>
@@ -381,7 +370,7 @@
         </div>
 
         <div id="u1b" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><span class="date-badge">Mar 2 - 13</span><h2>Unit 1B: Journey in Photos</h2><div class="big-question">Can we trust what we see?</div></div><div class="cefr-tag">Strategy: Empathizing</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 1B: Journey in Photos</h2><div class="big-question">Can we trust what we see?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
                     
@@ -461,7 +450,7 @@
 
         <!-- ================= UNIT 2 ================= -->
         <div id="u2a" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 2A: Living Light</h2><div class="big-question">Why do animals glow?</div></div><div class="cefr-tag">Strategy: Patterning</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 2A: Living Light</h2><div class="big-question">Why do animals glow?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel">
                     
@@ -538,7 +527,7 @@
         </div>
 
         <div id="u2b" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 2B: Feathers of Love</h2><div class="big-question">Why do animals glow?</div></div><div class="cefr-tag">Strategy: Play</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 2B: Feathers of Love</h2><div class="big-question">Why do animals glow?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
                     
@@ -617,7 +606,7 @@
 
         <!-- ================= UNIT 3 ================= -->
         <div id="u3a" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 3A: The Super-Label</h2><div class="big-question">How safe is our food?</div></div><div class="cefr-tag">Strategy: Synthesizing</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 3A: The Super-Label</h2><div class="big-question">How safe is our food?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel">
                     
@@ -695,7 +684,7 @@
         </div>
 
         <div id="u3b" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 3B: GMO Metaphor</h2><div class="big-question">How safe is our food?</div></div><div class="cefr-tag">Strategy: Abstracting</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 3B: GMO Metaphor</h2><div class="big-question">How safe is our food?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
                     
@@ -774,7 +763,7 @@
 
         <!-- ================= UNIT 4 ================= -->
         <div id="u4a" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 4A: Gecko Glove</h2><div class="big-question">What can we learn from nature?</div></div><div class="cefr-tag">Strategy: Modeling</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 4A: Gecko Glove</h2><div class="big-question">What can we learn from nature?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel">
                     
@@ -852,7 +841,7 @@
         </div>
 
         <div id="u4b" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 4B: Smart Fashion</h2><div class="big-question">What can we learn from nature?</div></div><div class="cefr-tag">Strategy: Play</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 4B: Smart Fashion</h2><div class="big-question">What can we learn from nature?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
                     
@@ -931,7 +920,7 @@
 
         <!-- ================= UNIT 5 ================= -->
         <div id="u5a" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 5A: Ancestor's Face</h2><div class="big-question">Where do we come from?</div></div><div class="cefr-tag">Strategy: Synthesizing</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 5A: Ancestor's Face</h2><div class="big-question">Where do we come from?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel">
                     
@@ -1008,7 +997,7 @@
         </div>
 
         <div id="u5b" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 5B: Star Compass</h2><div class="big-question">Where do we come from?</div></div><div class="cefr-tag">Strategy: Embodied</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 5B: Star Compass</h2><div class="big-question">Where do we come from?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
                     
@@ -1086,7 +1075,7 @@
 
         <!-- ================= UNIT 6 ================= -->
         <div id="u6a" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 6A: Currency of Trust</h2><div class="big-question">How does money shape us?</div></div><div class="cefr-tag">Strategy: Abstracting</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 6A: Currency of Trust</h2><div class="big-question">How does money shape us?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel">
                     
@@ -1162,7 +1151,7 @@
         </div>
 
         <div id="u6b" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 6B: Blockchain Block</h2><div class="big-question">How does money shape us?</div></div><div class="cefr-tag">Strategy: Modeling</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 6B: Blockchain Block</h2><div class="big-question">How does money shape us?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
                     
@@ -1173,7 +1162,7 @@
                     </div>
 
                     <button class="section-toggle-btn btn-discussion" onclick="toggleSection(this)">Discussion Starters ▼</button>
-                    <div class="discussion-content" onclick="speakCard(this, 6)">
+                    <div class="section-content content-discussion" onclick="speakCard(this, 6)">
                         <div class="discussion-context"><strong>Source Context:</strong> This text explores cryptocurrencies like Bitcoin, their benefits (anonymity), and their risks (instability).</div>
                         <div class="discussion-item"><strong>Synthesizing Trends:</strong> The text mentions Bitcoin is "decentralized" (not controlled by a government). Considering China's strong central governance and the push for a Digital Yuan (controlled by the central bank), do you believe decentralized currency has a future in China, or will it always remain a "black market" asset?</div>
                         <div class="discussion-item"><strong>Evaluating Value:</strong> Bitcoin's value fluctuates wildly based on belief. As a student observing the intense competition for "valuable" degrees from top universities, is the value of an Ivy League degree similar to Bitcoin—based mostly on collective belief rather than intrinsic utility?</div>
@@ -1239,7 +1228,7 @@
 
         <!-- ================= UNIT 7 ================= -->
         <div id="u7a" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 7A: The Pilgrim's View</h2><div class="big-question">Why follow the crowd?</div></div><div class="cefr-tag">Strategy: Empathizing</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 7A: The Pilgrim's View</h2><div class="big-question">Why follow the crowd?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel">
                     
@@ -1315,7 +1304,7 @@
         </div>
 
         <div id="u7b" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 7B: The Troll's Mirror</h2><div class="big-question">Why follow the crowd?</div></div><div class="cefr-tag">Strategy: Perceiving</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 7B: The Troll's Mirror</h2><div class="big-question">Why follow the crowd?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
                     
@@ -1392,7 +1381,7 @@
 
         <!-- ================= UNIT 8 ================= -->
         <div id="u8a" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 8A: Crime Board</h2><div class="big-question">How do we know the truth?</div></div><div class="cefr-tag">Strategy: Synthesizing</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 8A: Crime Board</h2><div class="big-question">How do we know the truth?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel">
                     
@@ -1468,7 +1457,7 @@
         </div>
 
         <div id="u8b" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 8B: Unique Fingerprint</h2><div class="big-question">How do we know the truth?</div></div><div class="cefr-tag">Strategy: Patterning</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 8B: Unique Fingerprint</h2><div class="big-question">How do we know the truth?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
                     
@@ -1545,7 +1534,7 @@
 
         <!-- ================= UNIT 9 ================= -->
         <div id="u9a" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 9A: Digital Restoration</h2><div class="big-question">Rebuild or ruin?</div></div><div class="cefr-tag">Strategy: Modeling</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 9A: Digital Restoration</h2><div class="big-question">Rebuild or ruin?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel">
                     
@@ -1556,7 +1545,7 @@
                     </div>
 
                     <button class="section-toggle-btn btn-discussion" onclick="toggleSection(this)">Discussion Starters ▼</button>
-                    <div class="discussion-content" onclick="speakCard(this, 9)">
+                    <div class="section-content content-discussion" onclick="speakCard(this, 9)">
                         <div class="discussion-context"><strong>Source Context:</strong> The text discusses using 3-D scanning technology to preserve ancient sites like Rani ki Vav digitally.</div>
                         <div class="discussion-item"><strong>Applying Technology:</strong> China is modernizing rapidly, often destroying old neighborhoods (like Hutongs or Lilongs) to build skyscrapers. Do you believe "digital preservation" (scanning the old buildings before destroying them) is an acceptable compromise, or is the physical loss of heritage too high a price for economic growth?</div>
                         <div class="discussion-item"><strong>Evaluating Experience:</strong> The text describes "virtual" tours. If you can visit the Mogao Caves or the Forbidden City in perfect Virtual Reality from your bedroom, is there any value in physically traveling there, contributing to carbon emissions and crowding?</div>
@@ -1620,7 +1609,7 @@
         </div>
 
         <div id="u9b" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 9B: Lidar Vision</h2><div class="big-question">Rebuild or ruin?</div></div><div class="cefr-tag">Strategy: Perceiving</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 9B: Lidar Vision</h2><div class="big-question">Rebuild or ruin?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
                     
@@ -1696,7 +1685,7 @@
 
         <!-- ================= UNIT 10 ================= -->
         <div id="u10a" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 10A: Aging Algorithm</h2><div class="big-question">Live to 150?</div></div><div class="cefr-tag">Strategy: Abstracting</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 10A: Aging Algorithm</h2><div class="big-question">Live to 150?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel">
                     
@@ -1771,7 +1760,7 @@
         </div>
 
         <div id="u10b" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 10B: Blue Zone Menu</h2><div class="big-question">Live to 150?</div></div><div class="cefr-tag">Strategy: Synthesizing</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 10B: Blue Zone Menu</h2><div class="big-question">Live to 150?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
                     
@@ -1848,7 +1837,7 @@
 
         <!-- ================= UNIT 11 ================= -->
         <div id="u11a" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 11A: Water Footprint</h2><div class="big-question">Tech: Cause or Cure?</div></div><div class="cefr-tag">Strategy: Patterning</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 11A: Water Footprint</h2><div class="big-question">Tech: Cause or Cure?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel">
                     
@@ -1924,7 +1913,7 @@
         </div>
 
         <div id="u11b" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 11B: E-Waste Art</h2><div class="big-question">Tech: Cause or Cure?</div></div><div class="cefr-tag">Strategy: Play</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 11B: E-Waste Art</h2><div class="big-question">Tech: Cause or Cure?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
                     
@@ -2001,7 +1990,7 @@
 
         <!-- ================= UNIT 12 ================= -->
         <div id="u12a" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 12A: Goldilocks Zone</h2><div class="big-question">Lifeboat or Distraction?</div></div><div class="cefr-tag">Strategy: Modeling</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 12A: Goldilocks Zone</h2><div class="big-question">Lifeboat or Distraction?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel">
                     
@@ -2077,7 +2066,7 @@
         </div>
 
         <div id="u12b" class="unit-display">
-            <div class="unit-hero"><div class="hero-title"><h2>Unit 12B: Asteroid Deflection</h2><div class="big-question">Lifeboat or Distraction?</div></div><div class="cefr-tag">Strategy: Abstracting</div></div>
+            <div class="unit-hero"><div class="hero-title"><h2>Unit 12B: Asteroid Deflection</h2><div class="big-question">Lifeboat or Distraction?</div></div></div>
             <div class="readings-container">
                 <div class="reading-panel b-side">
                     
